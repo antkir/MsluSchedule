@@ -1,6 +1,6 @@
 package by.ntnk.msluschedule.mvp
 
-class Presenter<V : View> {
+open class Presenter<V : View> {
     protected var view: V? = null
 
     fun bindView(view: V) {
