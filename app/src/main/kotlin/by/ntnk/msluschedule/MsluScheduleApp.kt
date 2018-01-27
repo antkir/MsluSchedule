@@ -7,6 +7,7 @@ import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasActivityInjector
 import javax.inject.Inject
 import by.ntnk.msluschedule.di.DaggerAppComponent
+import timber.log.Timber
 
 class MsluScheduleApp : Application(), HasActivityInjector {
     @Inject
@@ -14,6 +15,7 @@ class MsluScheduleApp : Application(), HasActivityInjector {
 
     override fun onCreate() {
         super.onCreate()
+        Timber.plant(Timber.DebugTree())
         buildAppComponent().inject(this)
     }
 

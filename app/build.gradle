@@ -45,6 +45,7 @@ ext {
     daggerVersion = '2.14.1'
     espressoVersion = '3.0.1'
     junitVersion = '4.12'
+    timberVersion = '4.6.0'
 }
 
 dependencies {
@@ -59,6 +60,8 @@ dependencies {
     implementation "com.google.dagger:dagger-android-support:$daggerVersion"
     kapt "com.google.dagger:dagger-compiler:$daggerVersion"
     kapt "com.google.dagger:dagger-android-processor:$daggerVersion"
+    // Timber
+    implementation "com.jakewharton.timber:timber:$timberVersion"
     // Testing
     testImplementation "junit:junit:$junitVersion"
     androidTestImplementation "com.android.support.test:runner:$androidsupportTestVersion"
