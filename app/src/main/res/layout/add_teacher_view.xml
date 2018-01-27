@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="24dp">
+
+            <AutoCompleteTextView
+                android:id="@+id/autoCompleteTextViewTeacher"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:completionThreshold="3"
+                android:hint="@string/teacher"
+                android:imeOptions="actionDone|flagNoExtractUi"
+                android:inputType="textAutoComplete" />
+        </android.support.design.widget.TextInputLayout>
+
+    </android.support.v4.widget.NestedScrollView>
+
+</LinearLayout>
