@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 
 android {
     def versionMajor = 1
@@ -41,15 +42,24 @@ ext {
     androidsupportVersion = '27.0.2'
     androidsupportTestVersion = '1.0.1'
     constraintlayoutVersion = '1.0.2'
+    daggerVersion = '2.14.1'
     espressoVersion = '3.0.1'
     junitVersion = '4.12'
 }
 
 dependencies {
+    // Kotlin
     implementation"org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+    // Support libraries
     implementation "com.android.support:appcompat-v7:$androidsupportVersion"
     implementation "com.android.support:design:$androidsupportVersion"
     implementation "com.android.support.constraint:constraint-layout:$constraintlayoutVersion"
+    // Dagger
+    implementation "com.google.dagger:dagger:$daggerVersion"
+    implementation "com.google.dagger:dagger-android-support:$daggerVersion"
+    kapt "com.google.dagger:dagger-compiler:$daggerVersion"
+    kapt "com.google.dagger:dagger-android-processor:$daggerVersion"
+    // Testing
     testImplementation "junit:junit:$junitVersion"
     androidTestImplementation "com.android.support.test:runner:$androidsupportTestVersion"
     androidTestImplementation "com.android.support.test.espresso:espresso-core:$espressoVersion"
