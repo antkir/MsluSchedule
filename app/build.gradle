@@ -45,6 +45,8 @@ ext {
     daggerVersion = '2.14.1'
     espressoVersion = '3.0.1'
     junitVersion = '4.12'
+    okhttpVersion = '3.8.0'
+    retrofitVersion = '2.3.0'
     timberVersion = '4.6.0'
 }
 
@@ -60,6 +62,12 @@ dependencies {
     implementation "com.google.dagger:dagger-android-support:$daggerVersion"
     kapt "com.google.dagger:dagger-compiler:$daggerVersion"
     kapt "com.google.dagger:dagger-android-processor:$daggerVersion"
+    // Okhttp
+    implementation "com.squareup.okhttp3:logging-interceptor:$okhttpVersion"
+    // Retrofit
+    implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
+    implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofitVersion"
+    implementation "com.squareup.retrofit2:converter-moshi:$retrofitVersion"
     // Timber
     implementation "com.jakewharton.timber:timber:$timberVersion"
     // Testing
