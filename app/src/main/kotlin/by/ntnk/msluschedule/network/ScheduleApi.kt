@@ -1,5 +1,6 @@
 package by.ntnk.msluschedule.network
 
+import by.ntnk.msluschedule.network.data.JsonBody
 import io.reactivex.Single
 import okhttp3.ResponseBody
 import retrofit2.Response
