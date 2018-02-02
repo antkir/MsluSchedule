@@ -21,10 +21,13 @@ abstract class MvpDialogFragment<out P : Presenter<V>, V : View> : DialogFragmen
     }
 
     @Suppress("UNCHECKED_CAST")
-    protected val presenter: P?
-        get() = if (presenterId != null) {
-            presenterManager.getPresenter(presenterId!!) as P?
-        } else null
+    protected val presenter: P by lazy {
+        if (presenterId != null) {
+            presenterManager.getPresenter(presenterId!!) as P
+        } else {
+            onCreatePresenter()
+        }
+    }
 
     protected abstract val view: V
 
@@ -41,9 +44,7 @@ abstract class MvpDialogFragment<out P : Presenter<V>, V : View> : DialogFragmen
     }
 
     private fun attachViewToPresenter() {
-        var presenter = this.presenter
-        if (presenter == null) {
-            presenter = onCreatePresenter()
+        if (presenterId == null) {
             presenterId = presenterManager.addPresenter(presenter)
         }
         presenter.bindView(view)
@@ -52,14 +53,14 @@ abstract class MvpDialogFragment<out P : Presenter<V>, V : View> : DialogFragmen
     override fun onDestroy() {
         super.onDestroy()
         detachViewFromPresenter()
-        if (presenter != null && !activity!!.isChangingConfigurations) {
+        if (presenterId != null && !activity!!.isChangingConfigurations) {
             presenterManager.removePresenter(presenterId!!)
             presenterId = null
         }
     }
 
     private fun detachViewFromPresenter() {
-        presenter!!.unbindView()
+        presenter.unbindView()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
