@@ -7,6 +7,7 @@ import android.support.v7.app.AlertDialog
 import android.view.View
 import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.mvp.views.MvpDialogFragment
+import by.ntnk.msluschedule.network.data.ScheduleFilter
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
@@ -48,11 +49,11 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
         TODO("not implemented")
     }
 
-    override fun populateFacultiesView(data: HashMap<Int, String>) {
+    override fun populateFacultiesView(data: ScheduleFilter) {
         TODO("not implemented")
     }
 
-    override fun populateGroupsView(data: HashMap<Int, String>) {
+    override fun populateGroupsView(data: ScheduleFilter) {
         TODO("not implemented")
     }
 }
