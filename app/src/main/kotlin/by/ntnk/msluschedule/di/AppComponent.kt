@@ -4,6 +4,7 @@ import by.ntnk.msluschedule.MsluScheduleApp
 import by.ntnk.msluschedule.di.modules.BuildersModule
 import by.ntnk.msluschedule.di.modules.NetworkModule
 import by.ntnk.msluschedule.di.modules.PresenterManagerModule
+import by.ntnk.msluschedule.di.modules.UtilsModule
 import dagger.Component
 import dagger.android.AndroidInjector
 import dagger.android.support.AndroidSupportInjectionModule
@@ -13,7 +14,8 @@ import dagger.android.support.AndroidSupportInjectionModule
     AndroidSupportInjectionModule::class,
     BuildersModule::class,
     NetworkModule::class,
-    PresenterManagerModule::class
+    PresenterManagerModule::class,
+    UtilsModule::class
 ])
 interface AppComponent : AndroidInjector<MsluScheduleApp> {
     @Component.Builder
