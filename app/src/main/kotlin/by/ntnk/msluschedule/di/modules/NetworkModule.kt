@@ -1,6 +1,7 @@
 package by.ntnk.msluschedule.di.modules
 
 import by.ntnk.msluschedule.di.PerApp
+import by.ntnk.msluschedule.network.ScheduleApi
 import dagger.Module
 import dagger.Provides
 import okhttp3.OkHttpClient
@@ -11,10 +12,9 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 
 @Module
 class NetworkModule {
-
     @Provides
     @PerApp
-    internal fun provideHttpLoggingInterceptor(): HttpLoggingInterceptor {
+    fun provideHttpLoggingInterceptor(): HttpLoggingInterceptor {
         return HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
     }
 
@@ -37,4 +37,9 @@ class NetworkModule {
                 .build()
     }
 
+    @Provides
+    @PerApp
+    fun provideScheduleApi(retrofit: Retrofit): ScheduleApi {
+        return retrofit.create(ScheduleApi::class.java)
+    }
 }
