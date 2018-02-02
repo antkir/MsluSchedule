@@ -6,7 +6,10 @@ import by.ntnk.msluschedule.network.data.RequestData
 import by.ntnk.msluschedule.network.data.RequestInfo
 import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.utils.CurrentDate
+import by.ntnk.msluschedule.utils.EMPTY_STRING
 import io.reactivex.Single
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import java.util.*
 import javax.inject.Inject
 
@@ -48,18 +51,45 @@ class NetworkHelper @Inject constructor(private val currentDate: CurrentDate) {
                     createYearRequestDataInstance(0)
             )
 
-    fun parseDataFromJsonResponse(
-            requestInfo: RequestInfo,
-            jsonResponse: JsonBody
-    ): Single<ScheduleFilter> {
-        TODO("not implemented")
-    }
-
     fun parseDataFromHtmlBody(
             requestInfo: RequestInfo,
-            responseString: String
+            response: String
     ): Single<ScheduleFilter> {
-        TODO("not implemented")
+        return try {
+            val document = Jsoup.parse(response)
+            Single.just(parseResponse(document, requestInfo))
+        } catch (e: Exception) {
+            Single.error(e)
+        }
+    }
+
+    fun parseDataFromJsonResponse(
+            requestInfo: RequestInfo,
+            jsonBody: JsonBody
+    ): Single<ScheduleFilter> {
+        val htmlFragment: String = when (requestInfo.requestName) {
+            groupRequestInfo.requestName -> jsonBody.studyGroupZone
+            weekRequestInfo.requestName -> jsonBody.studyWeekZone
+            else -> EMPTY_STRING
+        }
+        return try {
+            val document = Jsoup.parse(htmlFragment)
+            Single.just(parseResponse(document, requestInfo))
+        } catch (e: Exception) {
+            Single.error(e)
+        }
+    }
+
+    private fun parseResponse(document: Document, requestInfo: RequestInfo): ScheduleFilter {
+        val elements = document
+                .select("select[id^=" + requestInfo.requestName + "]")
+                .first()
+                .children()
+        val data = LinkedHashMap<Int, String>()
+        elements
+                .filter { it.`val`().isNotBlank() }
+                .forEach { data[it.`val`().toInt()] = it.text() }
+        return ScheduleFilter(data)
     }
 
     fun getFormIdPair(scheduleType: String, requestData: RequestData): Pair<String, String> {

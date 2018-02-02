@@ -44,6 +44,7 @@ ext {
     constraintlayoutVersion = '1.0.2'
     daggerVersion = '2.14.1'
     espressoVersion = '3.0.1'
+    jsoupVersion = '1.11.2'
     junitVersion = '4.12'
     okhttpVersion = '3.8.0'
     retrofitVersion = '2.3.0'
@@ -63,6 +64,8 @@ dependencies {
     implementation "com.google.dagger:dagger-android-support:$daggerVersion"
     kapt "com.google.dagger:dagger-compiler:$daggerVersion"
     kapt "com.google.dagger:dagger-android-processor:$daggerVersion"
+    // Jsoup
+    implementation "org.jsoup:jsoup:$jsoupVersion"
     // Okhttp
     implementation "com.squareup.okhttp3:logging-interceptor:$okhttpVersion"
     // Retrofit
