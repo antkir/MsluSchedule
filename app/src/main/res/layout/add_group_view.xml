@@ -19,7 +19,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <AutoCompleteTextView
+                    <by.ntnk.msluschedule.ui.customviews.ExtAutoCompleteTextView
                         android:id="@+id/autoCompleteTextViewFaculty"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -38,7 +38,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp">
 
-                    <AutoCompleteTextView
+                    <by.ntnk.msluschedule.ui.customviews.ExtAutoCompleteTextView
                         android:id="@+id/autoCompleteTextViewGroup"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"

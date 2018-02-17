@@ -13,7 +13,7 @@
             android:layout_height="wrap_content"
             android:padding="24dp">
 
-            <AutoCompleteTextView
+            <by.ntnk.msluschedule.ui.customviews.ExtAutoCompleteTextView
                 android:id="@+id/autoCompleteTextViewTeacher"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
