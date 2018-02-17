@@ -3,6 +3,8 @@ package by.ntnk.msluschedule.network.data
 import java.util.AbstractMap.SimpleEntry
 
 data class ScheduleFilter(val data: LinkedHashMap<Int, String>) {
+    constructor() : this(LinkedHashMap<Int, String>())
+
     val size
         get() = data.size
 
