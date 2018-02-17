@@ -5,6 +5,6 @@ import by.ntnk.msluschedule.network.data.ScheduleFilter
 
 interface AddGroupView : View {
     fun showError(t: Throwable)
-    fun populateFacultiesView(data: ScheduleFilter)
-    fun populateGroupsView(data: ScheduleFilter)
+    fun populateFacultiesAdapter(data: ScheduleFilter)
+    fun populateGroupsAdapter(data: ScheduleFilter)
 }
