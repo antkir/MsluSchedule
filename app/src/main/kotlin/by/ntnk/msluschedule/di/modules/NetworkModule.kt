@@ -1,6 +1,7 @@
 package by.ntnk.msluschedule.di.modules
 
 import by.ntnk.msluschedule.di.PerApp
+import by.ntnk.msluschedule.network.LocalCookieJar
 import by.ntnk.msluschedule.network.ScheduleApi
 import dagger.Module
 import dagger.Provides
@@ -20,9 +21,19 @@ class NetworkModule {
 
     @Provides
     @PerApp
-    fun provideOkHttpClient(httpLoggingInterceptor: HttpLoggingInterceptor): OkHttpClient {
+    fun provideLocalCookieJar(): LocalCookieJar {
+        return LocalCookieJar()
+    }
+
+    @Provides
+    @PerApp
+    fun provideOkHttpClient(
+            httpLoggingInterceptor: HttpLoggingInterceptor,
+            localCookieJar: LocalCookieJar
+    ): OkHttpClient {
         return OkHttpClient().newBuilder()
                 .addNetworkInterceptor(httpLoggingInterceptor)
+                .cookieJar(localCookieJar)
                 .build()
     }
 
