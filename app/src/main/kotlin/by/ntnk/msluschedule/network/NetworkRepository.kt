@@ -6,83 +6,105 @@ import by.ntnk.msluschedule.network.data.RequestData
 import by.ntnk.msluschedule.network.data.RequestInfo
 import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.utils.EMPTY_STRING
+import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Scheduler
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
+import org.jsoup.HttpStatusException
+import retrofit2.Response
 import javax.inject.Inject
 
 @PerApp
 class NetworkRepository @Inject
 constructor(
         private val scheduleApi: ScheduleApi,
-        private val networkHelper: NetworkHelper
+        private val networkHelper: NetworkHelper,
+        private val localCookieJar: LocalCookieJar
 ) {
     private val mainBackgroundScheduler = Schedulers.single()
 
     fun getFaculties(): Single<ScheduleFilter> {
-        return getDataFromHtmlRequest(
+        fun getFaculties() = getDataFromHtmlRequest(
                 NetworkHelper.groupSchedule,
-                networkHelper.facultyRequestInfo,
-                mainBackgroundScheduler
+                networkHelper.facultyRequestInfo
         )
+        return wrapRequest(mainBackgroundScheduler, ::getFaculties)
     }
 
     fun getGroups(faculty: Int, course: Int): Single<ScheduleFilter> {
         val requestDataList = networkHelper.getStudyGroupsFilterDataList(faculty, course)
-        return getDataFromJsonRequest(
+        fun getGroups() = getDataFromJsonRequest(
                 networkHelper.groupRequestInfo,
                 NetworkHelper.groupSchedule,
-                requestDataList,
-                mainBackgroundScheduler
+                requestDataList
         )
+        return wrapRequest(mainBackgroundScheduler, ::getGroups)
     }
 
     fun getTeachers(): Single<ScheduleFilter> {
-        return getDataFromHtmlRequest(
+        fun getTeachers() = getDataFromHtmlRequest(
                 NetworkHelper.teacherSchedule,
-                networkHelper.teacherRequestInfo,
-                mainBackgroundScheduler
+                networkHelper.teacherRequestInfo
         )
+        return wrapRequest(mainBackgroundScheduler, ::getTeachers)
     }
 
     fun getWeeks(): Single<ScheduleFilter> {
         val requestDataList = networkHelper.getYearsFilterDataList()
-        return getDataFromJsonRequest(
+        fun getWeeks() = getDataFromJsonRequest(
                 networkHelper.weekRequestInfo,
                 // Weeks are equal for groups and teachers, so we can use either request
                 NetworkHelper.teacherSchedule,
-                requestDataList,
-                mainBackgroundScheduler
+                requestDataList
         )
+        return wrapRequest(mainBackgroundScheduler, ::getWeeks)
     }
+
+    /*
+     * The process of giving/storing session ID is not consistent,
+     * so we make sure everything will work by creating and closing
+     * a session on every batch of related requests.
+     */
+    private fun <T> wrapRequest(scheduler: Scheduler, request: () -> Single<T>): Single<T> {
+        return initSession()
+                .subscribeOn(scheduler)
+                .andThen(request())
+                .doOnEvent { _, _ -> closeSession() }
+    }
+
+    private fun closeSession() = localCookieJar.removeCookie()
 
     private fun getDataFromJsonRequest(
             requestInfo: RequestInfo,
             scheduleType: String,
-            requestDataList: List<RequestData>,
-            scheduler: Scheduler
+            requestDataList: List<RequestData>
     ): Single<ScheduleFilter> {
         return Observable
                 .fromIterable(requestDataList)
-                .flatMapSingle { changeScheduleFilter(scheduleType, it, scheduler) }
+                .flatMapSingle { changeScheduleFilter(scheduleType, it) }
                 .lastOrError()
                 .flatMap { networkHelper.parseDataFromJsonResponse(requestInfo, it) }
     }
 
     private fun getDataFromHtmlRequest(
             scheduleType: String,
-            scheduleFilter: RequestInfo,
-            scheduler: Scheduler
+            scheduleFilter: RequestInfo
     ): Single<ScheduleFilter> {
-        return getHtmlBody(scheduleType, scheduler)
+        return getHtmlBody(scheduleType)
                 .flatMap { networkHelper.parseDataFromHtmlBody(scheduleFilter, it) }
+    }
+
+    private fun initSession(): Completable {
+        return scheduleApi
+                .initSession()
+                .doOnSuccess { checkErrors(it) }
+                .toCompletable()
     }
 
     private fun changeScheduleFilter(
             scheduleType: String,
-            requestData: RequestData,
-            scheduler: Scheduler
+            requestData: RequestData
     ): Single<JsonBody> {
         val formIds = networkHelper.getFormIdPair(scheduleType, requestData)
         return scheduleApi
@@ -93,18 +115,26 @@ constructor(
                         formIds.first,
                         formIds.second,
                         requestData.selectedValue)
-                .subscribeOn(scheduler)
+                .doOnSuccess { checkErrors(it) }
                 .map { it.body() }
     }
 
 
-    private fun getHtmlBody(
-            scheduleType: String,
-            scheduler: Scheduler
-    ): Single<String> {
+    private fun getHtmlBody(scheduleType: String): Single<String> {
         return scheduleApi
                 .getHtmlBody(scheduleType)
-                .subscribeOn(scheduler)
+                .doOnSuccess { checkErrors(it) }
                 .map { it.body()?.string() ?: EMPTY_STRING }
+    }
+
+    @Throws(HttpStatusException::class)
+    private fun <T> checkErrors(response: Response<T>) {
+        if (!response.isSuccessful) {
+            throw HttpStatusException(
+                    response.message(),
+                    response.code(),
+                    response.raw().request().url().toString()
+            )
+        }
     }
 }
