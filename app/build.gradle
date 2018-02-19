@@ -46,6 +46,7 @@ ext {
     espressoVersion = '3.0.1'
     jsoupVersion = '1.11.2'
     junitVersion = '4.12'
+    mockitoVersion = '2.15.0'
     okhttpVersion = '3.8.0'
     retrofitVersion = '2.3.0'
     rxandroidVersion = '2.0.2'
@@ -83,6 +84,7 @@ dependencies {
     // Time
     implementation "org.threeten:threetenbp:$threetenbpVersion:no-tzdb"
     // Testing
+    testImplementation "org.mockito:mockito-core:$mockitoVersion"
     testImplementation "junit:junit:$junitVersion"
     androidTestImplementation "com.android.support.test:runner:$androidsupportTestVersion"
     androidTestImplementation "com.android.support.test.espresso:espresso-core:$espressoVersion"
