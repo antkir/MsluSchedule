@@ -7,6 +7,7 @@ import by.ntnk.msluschedule.network.data.RequestInfo
 import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.utils.CurrentDate
 import by.ntnk.msluschedule.utils.EMPTY_STRING
+import by.ntnk.msluschedule.utils.InvalidYearException
 import io.reactivex.Single
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -57,6 +58,7 @@ class NetworkHelper @Inject constructor(private val currentDate: CurrentDate) {
     ): Single<ScheduleFilter> {
         return try {
             val document = Jsoup.parse(response)
+            checkYearValid(document)
             Single.just(parseResponse(document, requestInfo))
         } catch (e: Exception) {
             Single.error(e)
@@ -87,9 +89,26 @@ class NetworkHelper @Inject constructor(private val currentDate: CurrentDate) {
                 .children()
         val data = LinkedHashMap<Int, String>()
         elements
-                .filter { it.`val`().isNotBlank() }
+                .filter { it.`val`().isNotBlank() && it.text().length > 1 }
                 .forEach { data[it.`val`().toInt()] = it.text() }
         return ScheduleFilter(data)
+    }
+
+    @Throws(NullPointerException::class, InvalidYearException::class)
+    private fun checkYearValid(htmlBody: Document) {
+        val elements = htmlBody
+                .select("select[id^=" + yearRequestInfo.requestName + "]")
+                .first()
+                .children()
+
+        val hasValidYear = elements
+                .map { it.`val`() }
+                .filter { it.isNotBlank() }
+                .map { Integer.parseInt(it) }
+                .filter { it == currentDate.academicYear }
+                .any()
+
+        if (!hasValidYear) throw InvalidYearException()
     }
 
     fun getFormIdPair(scheduleType: String, requestData: RequestData): Pair<String, String> {
