@@ -10,6 +10,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
+import java.util.concurrent.TimeUnit
 
 @Module
 class NetworkModule {
@@ -34,6 +35,9 @@ class NetworkModule {
         return OkHttpClient().newBuilder()
                 .addNetworkInterceptor(httpLoggingInterceptor)
                 .cookieJar(localCookieJar)
+                .connectTimeout(2, TimeUnit.MINUTES)
+                .readTimeout(2, TimeUnit.MINUTES)
+                .writeTimeout(2, TimeUnit.MINUTES)
                 .build()
     }
 
