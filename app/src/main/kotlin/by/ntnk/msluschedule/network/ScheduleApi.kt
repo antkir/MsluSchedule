@@ -7,7 +7,8 @@ import retrofit2.Response
 import retrofit2.http.*
 
 interface ScheduleApi {
-    @HEAD("schedule/login")
+    // scheduletype doesn't matter here, session ID is shared across the website
+    @HEAD("schedule/reports/publicreports/schedulelistforgroupreport")
     fun initSession(): Single<Response<Void>>
 
     @GET("schedule/reports/publicreports/{scheduletype}")
