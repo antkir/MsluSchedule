@@ -10,6 +10,7 @@ import android.view.Menu
 import android.view.MenuItem
 import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.ui.addgroup.AddGroupFragment
+import by.ntnk.msluschedule.ui.addteacher.AddTeacherFragment
 import dagger.android.AndroidInjection
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector

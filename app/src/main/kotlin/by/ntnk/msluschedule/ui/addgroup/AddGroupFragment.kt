@@ -4,6 +4,8 @@ import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.mvp.views.MvpDialogFragment
@@ -37,7 +39,12 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
         val layout = View.inflate(activity, R.layout.add_group_view, null)
         initViews(layout)
         getData(savedInstanceState)
-        return initMaterialDialog(layout)
+        val dialog = initMaterialDialog(layout)
+        dialog.setOnShowListener {
+            (it as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE).isEnabled =
+                    presenter.isValidGroup(groupView.text.toString())
+        }
+        return dialog
     }
 
     private fun getData(savedInstanceState: Bundle?) {
@@ -85,7 +92,19 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
             groupView.text.clear()
         }
 
-        groupView.setOnItemClickListener { _, _, _, id -> presenter.setGroupValue(id) }
+        groupView.setOnItemClickListener { _, _, _, id -> presenter.setGroupValue(id.toInt()) }
+        groupView.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                val isEnabled = presenter.isValidGroup(s.toString())
+                (dialog as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = isEnabled
+            }
+
+            override fun afterTextChanged(s: Editable) {
+            }
+        })
     }
 
     override fun showError(t: Throwable) {

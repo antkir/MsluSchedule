@@ -4,6 +4,8 @@ import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.mvp.views.MvpDialogFragment
@@ -36,13 +38,29 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
         val layout = View.inflate(activity, R.layout.add_teacher_view, null)
         initViews(layout)
         getData(savedInstanceState)
-        return initMaterialDialog(layout)
+        val dialog = initMaterialDialog(layout)
+        dialog.setOnShowListener {
+            (it as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE).isEnabled =
+                    presenter.isValidTeacher(teacherView.text.toString())
+        }
+        return dialog
     }
 
     private fun initViews(layout: View) {
         teacherView = layout.findViewById(R.id.actv_dialog_teacher)
         teacherView.progressBar = layout.findViewById(R.id.progressbar_dialog_teacher)
         teacherView.setEnabledFocusable(false)
+        teacherView.setOnItemClickListener { _, _, _, id -> presenter.setTeacherValue(id.toInt()) }
+        teacherView.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                val isEnabled = presenter.isValidTeacher(s.toString())
+                (dialog as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = isEnabled
+            }
+
+            override fun afterTextChanged(s: Editable) {}
+        })
     }
 
     private fun getData(savedInstanceState: Bundle?) {

@@ -33,10 +33,6 @@ class AddGroupPresenter
         faculty = faculties!!.keyAt(position)
     }
 
-    fun setGroupValue(id: Long) {
-        group = id.toInt()
-    }
-
     fun getFacultyScheduleFilter(uiScheduler: Scheduler) {
         val disposable = networkRepository.getFaculties()
                 .observeOn(uiScheduler)
@@ -61,6 +57,14 @@ class AddGroupPresenter
                         { it.printStackTrace() }
                 )
         disposables.add(disposable)
+    }
+
+    fun setGroupValue(value: Int) {
+        group = value
+    }
+
+    fun isValidGroup(string: String): Boolean {
+        return groups?.data?.values?.any { string == it } ?: false
     }
 
     fun populateFacultiesAdapter() = view!!.populateFacultiesAdapter(faculties!!)
