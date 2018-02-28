@@ -5,18 +5,18 @@ import android.content.Context
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
 import android.view.View
-import android.widget.AutoCompleteTextView
 import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.mvp.views.MvpDialogFragment
 import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.ui.adapters.ScheduleFilterAdapter
+import by.ntnk.msluschedule.ui.customviews.LoadingAutoCompleteTextView
 import by.ntnk.msluschedule.utils.uiScheduler
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
 class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), AddGroupView {
-    private lateinit var facultyView: AutoCompleteTextView
-    private lateinit var groupView: AutoCompleteTextView
+    private lateinit var facultyView: LoadingAutoCompleteTextView
+    private lateinit var groupView: LoadingAutoCompleteTextView
 
     override val view: AddGroupView
         get() = this
@@ -41,13 +41,16 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
     }
 
     private fun getData(savedInstanceState: Bundle?) {
-        if (savedInstanceState == null) {
-            presenter.getFacultyScheduleFilter(uiScheduler)
-        } else if (presenter.isFacultiesNotEmpty) {
-            presenter.populateFacultiesAdapter()
-            if (presenter.isGroupsNotEmpty) presenter.populateGroupsAdapter()
-        } else {
-            dismiss()
+        when {
+            savedInstanceState == null -> {
+                facultyView.progressBarVisibility = View.VISIBLE
+                presenter.getFacultyScheduleFilter(uiScheduler)
+            }
+            presenter.isFacultiesNotEmpty -> {
+                presenter.populateFacultiesAdapter()
+                if (presenter.isGroupsNotEmpty) presenter.populateGroupsAdapter()
+            }
+            else -> dismiss()
         }
     }
 
@@ -65,14 +68,18 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
     }
 
     private fun initViews(layout: View) {
-        facultyView = layout.findViewById(R.id.autoCompleteTextViewFaculty)
-        groupView = layout.findViewById(R.id.autoCompleteTextViewGroup)
+        facultyView = layout.findViewById(R.id.actv_dialog_faculty)
+        facultyView.progressBar = layout.findViewById(R.id.progressbar_dialog_faculty)
+        groupView = layout.findViewById(R.id.actv_dialog_group)
+        groupView.progressBar = layout.findViewById(R.id.progressbar_dialog_group)
 
-        groupView.isEnabled = false
+        facultyView.setEnabledFocusable(false)
+        groupView.setEnabledFocusable(false)
 
         facultyView.keyListener = null
         facultyView.setOnClickListener { _ -> facultyView.showDropDown() }
         facultyView.setOnItemClickListener { _, _, position, _ ->
+            groupView.progressBarVisibility = View.VISIBLE
             presenter.setFacultyValueFromPosition(position)
             presenter.getScheduleGroups(uiScheduler)
             groupView.text.clear()
@@ -86,16 +93,21 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
     }
 
     override fun populateFacultiesAdapter(data: ScheduleFilter) {
+        facultyView.progressBarVisibility = View.GONE
+        facultyView.setEnabledFocusable(true)
         val adapter = initAdapter(data)
         adapter.isFilteringEnabled = false
         facultyView.setAdapter(adapter)
+        facultyView.requestFocus()
     }
 
     override fun populateGroupsAdapter(data: ScheduleFilter) {
-        groupView.isEnabled = true
+        groupView.progressBarVisibility = View.GONE
+        groupView.setEnabledFocusable(true)
         val adapter = initAdapter(data)
         adapter.isStartsWithFilter = true
         groupView.setAdapter(adapter)
+        groupView.requestFocus()
     }
 
     private fun initAdapter(response: ScheduleFilter): ScheduleFilterAdapter {

@@ -1,56 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <android.support.v4.widget.NestedScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <LinearLayout
+        <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="24dp">
+            android:layout_margin="@dimen/dialog_margin">
 
-                <android.support.design.widget.TextInputLayout
-                    android:id="@+id/textInputLayoutFaculty"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/textinputlayout_faculty"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
-                    <by.ntnk.msluschedule.ui.customviews.ExtAutoCompleteTextView
-                        android:id="@+id/autoCompleteTextViewFaculty"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:completionThreshold="1"
-                        android:hint="@string/faculty"
-                        android:imeOptions="actionDone|flagNoFullscreen|flagNoExtractUi"
-                        android:inputType="textAutoComplete"
-                        android:longClickable="false" />
-
-                </android.support.design.widget.TextInputLayout>
-
-                <android.support.design.widget.TextInputLayout
-                    android:id="@+id/textInputLayout"
+                <by.ntnk.msluschedule.ui.customviews.LoadingAutoCompleteTextView
+                    android:id="@+id/actv_dialog_faculty"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp">
+                    android:layout_weight="1"
+                    android:completionThreshold="1"
+                    android:hint="@string/faculty"
+                    android:imeOptions="actionDone|flagNoFullscreen|flagNoExtractUi"
+                    android:inputType="textAutoComplete"
+                    android:longClickable="false" />
 
-                    <by.ntnk.msluschedule.ui.customviews.ExtAutoCompleteTextView
-                        android:id="@+id/autoCompleteTextViewGroup"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:completionThreshold="3"
-                        android:hint="@string/group"
-                        android:imeOptions="actionDone|flagNoExtractUi"
-                        android:inputType="textAutoComplete" />
+            </android.support.design.widget.TextInputLayout>
 
-                </android.support.design.widget.TextInputLayout>
+            <ProgressBar
+                android:id="@+id/progressbar_dialog_faculty"
+                android:layout_width="@dimen/actv_progressbar_size"
+                android:layout_height="@dimen/actv_progressbar_size"
+                android:layout_marginRight="@dimen/actv_progressbar_margin"
+                android:layout_marginEnd="@dimen/actv_progressbar_margin"
+                android:layout_marginBottom="@dimen/actv_progressbar_margin"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@id/textinputlayout_faculty"
+                app:layout_constraintEnd_toEndOf="@id/textinputlayout_faculty" />
 
-        </LinearLayout>
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/textinputlayout_group"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textinputlayout_faculty">
 
-    </android.support.v4.widget.NestedScrollView>
+                <by.ntnk.msluschedule.ui.customviews.LoadingAutoCompleteTextView
+                    android:id="@+id/actv_dialog_group"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:completionThreshold="1"
+                    android:hint="@string/group"
+                    android:imeOptions="actionDone|flagNoExtractUi"
+                    android:inputType="textAutoComplete" />
 
-</LinearLayout>
+            </android.support.design.widget.TextInputLayout>
+
+            <ProgressBar
+                android:id="@+id/progressbar_dialog_group"
+                android:layout_width="@dimen/actv_progressbar_size"
+                android:layout_height="@dimen/actv_progressbar_size"
+                android:layout_marginRight="@dimen/actv_progressbar_margin"
+                android:layout_marginEnd="@dimen/actv_progressbar_margin"
+                android:layout_marginBottom="@dimen/actv_progressbar_margin"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@id/textinputlayout_group"
+                app:layout_constraintEnd_toEndOf="@id/textinputlayout_group" />
+
+        </android.support.constraint.ConstraintLayout>
+
+</ScrollView>

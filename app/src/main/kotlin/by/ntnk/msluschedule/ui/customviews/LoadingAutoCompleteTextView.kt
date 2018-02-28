@@ -5,14 +5,26 @@ import android.util.AttributeSet
 import android.view.KeyEvent
 import android.view.inputmethod.InputMethodManager
 import android.widget.AutoCompleteTextView
+import android.widget.ProgressBar
 
-class ExtAutoCompleteTextView : AutoCompleteTextView {
+class LoadingAutoCompleteTextView : AutoCompleteTextView {
+    var progressBar: ProgressBar? = null
+    var progressBarVisibility: Int
+        get() = progressBar?.visibility!!
+        set(value) { progressBar?.visibility = value }
+
     constructor(context: Context) : super(context)
 
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
 
     constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int)
             : super(context, attrs, defStyleAttr)
+
+    fun setEnabledFocusable(focusable: Boolean) {
+        isEnabled = focusable
+        isFocusable = focusable
+        isFocusableInTouchMode = focusable
+    }
 
     override fun onKeyPreIme(keyCode: Int, event: KeyEvent): Boolean {
         if (keyCode == KeyEvent.KEYCODE_BACK && isPopupShowing) {
