@@ -8,6 +8,7 @@ import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.data.StudyGroup
 import by.ntnk.msluschedule.data.Teacher
@@ -19,29 +20,32 @@ import dagger.android.DispatchingAndroidInjector
 import dagger.android.support.HasSupportFragmentInjector
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
+import kotlinx.android.synthetic.main.fam_main.*
 import timber.log.Timber
 import javax.inject.Inject
 
 private const val ADD_GROUP_FRAGMENT = "AddGroupFragment"
+private const val ADD_TEACHER_FRAGMENT = "AddTeacherFragment"
 
 class MainActivity :
         AppCompatActivity(),
         NavigationView.OnNavigationItemSelectedListener,
         HasSupportFragmentInjector,
         AddContainerDialogListener {
+    private var isFamOpen = false
+
     @Inject
     lateinit var fragmentDispatchingAndroidInjector: DispatchingAndroidInjector<Fragment>
+
+    override fun supportFragmentInjector(): AndroidInjector<Fragment> {
+        return fragmentDispatchingAndroidInjector
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
-
-        fab.setOnClickListener { view ->
-            val addGroupFragment = AddGroupFragment()
-            addGroupFragment.show(supportFragmentManager, ADD_GROUP_FRAGMENT)
-        }
 
         val toggle = ActionBarDrawerToggle(
                 this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
@@ -102,8 +106,41 @@ class MainActivity :
         return true
     }
 
-    override fun supportFragmentInjector(): AndroidInjector<Fragment> {
-        return fragmentDispatchingAndroidInjector
+    @Suppress("UNUSED_PARAMETER")
+    fun onBaseFabClick(view: View) {
+        toggleFloatingActionMenu(!isFamOpen)
+    }
+
+    private fun toggleFloatingActionMenu(enabled: Boolean) {
+        if (enabled) expandFam() else collapseFam()
+    }
+
+    private fun expandFam() {
+        isFamOpen = true
+        groupfab_main.visibility = View.VISIBLE
+        teacherfab_main.visibility = View.VISIBLE
+    }
+
+    private fun collapseFam() {
+        isFamOpen = false
+        groupfab_main.visibility = View.INVISIBLE
+        teacherfab_main.visibility = View.INVISIBLE
+    }
+
+    @Suppress("UNUSED_PARAMETER")
+    fun onGroupFabClick(view: View) {
+        val addGroupFragment = AddGroupFragment()
+        addGroupFragment.isCancelable = false
+        addGroupFragment.show(supportFragmentManager, ADD_GROUP_FRAGMENT)
+        if (isFamOpen) collapseFam()
+    }
+
+    @Suppress("UNUSED_PARAMETER")
+    fun onTeacherFabClick(view: View) {
+        val addTeacherFragment = AddTeacherFragment()
+        addTeacherFragment.isCancelable = false
+        addTeacherFragment.show(supportFragmentManager, ADD_TEACHER_FRAGMENT)
+        if (isFamOpen) collapseFam()
     }
 
     override fun onPositiveButtonGroup(studyGroup: StudyGroup) {
