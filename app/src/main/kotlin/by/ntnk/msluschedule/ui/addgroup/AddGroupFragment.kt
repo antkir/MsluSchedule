@@ -12,11 +12,13 @@ import by.ntnk.msluschedule.mvp.views.MvpDialogFragment
 import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.ui.adapters.ScheduleFilterAdapter
 import by.ntnk.msluschedule.ui.customviews.LoadingAutoCompleteTextView
+import by.ntnk.msluschedule.ui.main.AddContainerDialogListener
 import by.ntnk.msluschedule.utils.uiScheduler
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
 class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), AddGroupView {
+    private var listener: AddContainerDialogListener? = null
     private lateinit var facultyView: LoadingAutoCompleteTextView
     private lateinit var groupView: LoadingAutoCompleteTextView
 
@@ -33,6 +35,17 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
     override fun onAttach(context: Context?) {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
+        try {
+            listener = context as AddContainerDialogListener
+        } catch (e: ClassCastException) {
+            throw ClassCastException(context.toString() +
+                    " must implement AddContainerDialogListener")
+        }
+    }
+
+    override fun onDetach() {
+        listener = null
+        super.onDetach()
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -66,7 +79,7 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
                 .setTitle((R.string.add_group_title))
                 .setView(layout)
                 .setPositiveButton(R.string.button_add) { _, _ ->
-                    dismiss()
+                    listener!!.onPositiveButtonGroup(presenter.getStudyGroup())
                 }
                 .setNegativeButton(R.string.button_cancel) { _, _ ->
                     dismiss()

@@ -9,6 +9,8 @@ import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import by.ntnk.msluschedule.R
+import by.ntnk.msluschedule.data.StudyGroup
+import by.ntnk.msluschedule.data.Teacher
 import by.ntnk.msluschedule.ui.addgroup.AddGroupFragment
 import by.ntnk.msluschedule.ui.addteacher.AddTeacherFragment
 import dagger.android.AndroidInjection
@@ -17,13 +19,16 @@ import dagger.android.DispatchingAndroidInjector
 import dagger.android.support.HasSupportFragmentInjector
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
+import timber.log.Timber
 import javax.inject.Inject
 
 private const val ADD_GROUP_FRAGMENT = "AddGroupFragment"
 
-class MainActivity : AppCompatActivity(),
-        NavigationView.OnNavigationItemSelectedListener, HasSupportFragmentInjector {
-
+class MainActivity :
+        AppCompatActivity(),
+        NavigationView.OnNavigationItemSelectedListener,
+        HasSupportFragmentInjector,
+        AddContainerDialogListener {
     @Inject
     lateinit var fragmentDispatchingAndroidInjector: DispatchingAndroidInjector<Fragment>
 
@@ -99,5 +104,13 @@ class MainActivity : AppCompatActivity(),
 
     override fun supportFragmentInjector(): AndroidInjector<Fragment> {
         return fragmentDispatchingAndroidInjector
+    }
+
+    override fun onPositiveButtonGroup(studyGroup: StudyGroup) {
+        Timber.d(studyGroup.toString())
+    }
+
+    override fun onPositiveButtonTeacher(teacher: Teacher) {
+        Timber.d(teacher.toString())
     }
 }

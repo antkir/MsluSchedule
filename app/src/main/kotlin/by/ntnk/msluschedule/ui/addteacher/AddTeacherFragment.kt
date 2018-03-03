@@ -12,11 +12,13 @@ import by.ntnk.msluschedule.mvp.views.MvpDialogFragment
 import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.ui.adapters.ScheduleFilterAdapter
 import by.ntnk.msluschedule.ui.customviews.LoadingAutoCompleteTextView
+import by.ntnk.msluschedule.ui.main.AddContainerDialogListener
 import by.ntnk.msluschedule.utils.uiScheduler
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
 class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView>(), AddTeacherView {
+    private var listener: AddContainerDialogListener? = null
     private lateinit var teacherView: LoadingAutoCompleteTextView
 
     override val view: AddTeacherView
@@ -32,6 +34,17 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
     override fun onAttach(context: Context?) {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
+        try {
+            listener = context as AddContainerDialogListener
+        } catch (e: ClassCastException) {
+            throw ClassCastException(context.toString() +
+                    " must implement AddContainerDialogListener")
+        }
+    }
+
+    override fun onDetach() {
+        listener = null
+        super.onDetach()
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -79,7 +92,7 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
                 .setTitle((R.string.add_teacher_title))
                 .setView(layout)
                 .setPositiveButton(R.string.button_add) { _, _ ->
-                    dismiss()
+                    listener!!.onPositiveButtonTeacher(presenter.getTeacher())
                 }
                 .setNegativeButton(R.string.button_cancel) { _, _ ->
                     dismiss()

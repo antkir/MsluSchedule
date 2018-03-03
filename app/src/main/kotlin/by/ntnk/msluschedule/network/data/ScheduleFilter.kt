@@ -13,6 +13,8 @@ data class ScheduleFilter(val data: LinkedHashMap<Int, String>) {
         return SimpleEntry(key, value)
     }
 
+    fun getValue(key: Int) = data.getValue(key)
+
     fun valueAt(position: Int): String = data.values.toList()[position]
 
     fun keyAt(position: Int): Int = data.keys.toList()[position]

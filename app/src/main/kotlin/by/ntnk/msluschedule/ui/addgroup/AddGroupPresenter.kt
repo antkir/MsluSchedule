@@ -1,15 +1,19 @@
 package by.ntnk.msluschedule.ui.addgroup
 
+import by.ntnk.msluschedule.data.StudyGroup
 import by.ntnk.msluschedule.mvp.Presenter
 import by.ntnk.msluschedule.network.NetworkRepository
 import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.utils.COURSE_VALUE
+import by.ntnk.msluschedule.utils.CurrentDate
 import io.reactivex.Scheduler
 import io.reactivex.disposables.CompositeDisposable
 import javax.inject.Inject
 
-class AddGroupPresenter
-@Inject constructor(private val networkRepository: NetworkRepository) : Presenter<AddGroupView>() {
+class AddGroupPresenter @Inject constructor(
+        private val networkRepository: NetworkRepository,
+        private val currentDate: CurrentDate
+) : Presenter<AddGroupView>() {
     private val disposables: CompositeDisposable = CompositeDisposable()
     private var faculties: ScheduleFilter? = null
     private var groups: ScheduleFilter? = null
@@ -66,6 +70,9 @@ class AddGroupPresenter
     fun isValidGroup(string: String): Boolean {
         return groups?.data?.values?.any { string == it } ?: false
     }
+
+    fun getStudyGroup(): StudyGroup =
+            StudyGroup(group, groups!!.getValue(group), faculty, course, currentDate.academicYear)
 
     fun populateFacultiesAdapter() = view!!.populateFacultiesAdapter(faculties!!)
 
