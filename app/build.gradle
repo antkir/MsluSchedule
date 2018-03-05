@@ -39,7 +39,7 @@ android {
 }
 
 ext {
-    androidsupportVersion = '27.0.2'
+    androidsupportVersion = '27.1.0'
     androidsupportTestVersion = '1.0.1'
     constraintlayoutVersion = '1.0.2'
     daggerVersion = '2.14.1'
@@ -49,6 +49,7 @@ ext {
     mockitoVersion = '2.15.0'
     okhttpVersion = '3.8.0'
     retrofitVersion = '2.3.0'
+    roomVersion = '1.0.0'
     rxandroidVersion = '2.0.2'
     rxjavaVersion = '2.1.9'
     threetenbpVersion = '1.3.6'
@@ -75,6 +76,10 @@ dependencies {
     implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
     implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofitVersion"
     implementation "com.squareup.retrofit2:converter-moshi:$retrofitVersion"
+    //Room
+    implementation "android.arch.persistence.room:runtime:$roomVersion"
+    implementation "android.arch.persistence.room:rxjava2:$roomVersion"
+    kapt "android.arch.persistence.room:compiler:$roomVersion"
     // RxAndroid
     implementation "io.reactivex.rxjava2:rxandroid:$rxandroidVersion"
     // RxJava
