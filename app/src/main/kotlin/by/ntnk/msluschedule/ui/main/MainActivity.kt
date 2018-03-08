@@ -5,13 +5,13 @@ import android.support.design.widget.NavigationView
 import android.support.v4.app.Fragment
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
-import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.data.StudyGroup
 import by.ntnk.msluschedule.data.Teacher
+import by.ntnk.msluschedule.mvp.views.MvpActivity
 import by.ntnk.msluschedule.ui.addgroup.AddGroupFragment
 import by.ntnk.msluschedule.ui.addteacher.AddTeacherFragment
 import dagger.android.AndroidInjection
@@ -28,17 +28,27 @@ private const val ADD_GROUP_FRAGMENT = "AddGroupFragment"
 private const val ADD_TEACHER_FRAGMENT = "AddTeacherFragment"
 
 class MainActivity :
-        AppCompatActivity(),
+        MvpActivity<MainPresenter, MainView>(), MainView,
         NavigationView.OnNavigationItemSelectedListener,
         HasSupportFragmentInjector,
         AddContainerDialogListener {
+    override val view: MainView
+        get() = this
+
     private var isFamOpen = false
 
     @Inject
     lateinit var fragmentDispatchingAndroidInjector: DispatchingAndroidInjector<Fragment>
 
+    @Inject
+    lateinit var injectedPresenter: MainPresenter
+
     override fun supportFragmentInjector(): AndroidInjector<Fragment> {
         return fragmentDispatchingAndroidInjector
+    }
+
+    override fun onCreatePresenter(): MainPresenter {
+        return injectedPresenter
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -144,10 +154,14 @@ class MainActivity :
     }
 
     override fun onPositiveButtonGroup(studyGroup: StudyGroup) {
-        Timber.d(studyGroup.toString())
+        presenter.addGroup(studyGroup)
     }
 
     override fun onPositiveButtonTeacher(teacher: Teacher) {
-        Timber.d(teacher.toString())
+        presenter.addTeacher(teacher)
+    }
+
+    override fun initMainContent() {
+        TODO("not implemented")
     }
 }

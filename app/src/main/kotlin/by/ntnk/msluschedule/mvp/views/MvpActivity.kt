@@ -1,7 +1,7 @@
 package by.ntnk.msluschedule.mvp.views
 
 import android.os.Bundle
-import android.support.v4.app.DialogFragment
+import android.support.v7.app.AppCompatActivity
 import by.ntnk.msluschedule.mvp.Presenter
 import by.ntnk.msluschedule.mvp.PresenterManager
 import by.ntnk.msluschedule.mvp.View
@@ -9,7 +9,7 @@ import by.ntnk.msluschedule.utils.PRESENTER_ID_KEY
 import timber.log.Timber
 import javax.inject.Inject
 
-abstract class MvpDialogFragment<out P : Presenter<V>, V : View> : DialogFragment() {
+abstract class MvpActivity<out P : Presenter<V>, V : View> : AppCompatActivity() {
     private var presenterId: Int? = null
     private lateinit var presenterManager: PresenterManager
 
@@ -52,7 +52,7 @@ abstract class MvpDialogFragment<out P : Presenter<V>, V : View> : DialogFragmen
     override fun onDestroy() {
         super.onDestroy()
         detachViewFromPresenter()
-        if (presenterId != null && !activity!!.isChangingConfigurations) {
+        if (presenterId != null && !isChangingConfigurations) {
             presenterManager.removePresenter(presenterId!!)
             presenterId = null
         }
