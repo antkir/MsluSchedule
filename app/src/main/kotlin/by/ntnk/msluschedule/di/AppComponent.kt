@@ -1,10 +1,7 @@
 package by.ntnk.msluschedule.di
 
 import by.ntnk.msluschedule.MsluScheduleApp
-import by.ntnk.msluschedule.di.modules.BuildersModule
-import by.ntnk.msluschedule.di.modules.NetworkModule
-import by.ntnk.msluschedule.di.modules.PresenterManagerModule
-import by.ntnk.msluschedule.di.modules.UtilsModule
+import by.ntnk.msluschedule.di.modules.*
 import dagger.Component
 import dagger.android.AndroidInjector
 import dagger.android.support.AndroidSupportInjectionModule
@@ -13,6 +10,7 @@ import dagger.android.support.AndroidSupportInjectionModule
 @Component(modules = [
     AndroidSupportInjectionModule::class,
     BuildersModule::class,
+    DatabaseModule::class,
     NetworkModule::class,
     PresenterManagerModule::class,
     UtilsModule::class
