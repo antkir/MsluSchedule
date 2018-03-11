@@ -30,6 +30,8 @@ abstract class MvpActivity<out P : Presenter<V>, V : View> : AppCompatActivity()
 
     protected abstract val view: V
 
+    protected var retainPresenter: Boolean = false
+
     protected abstract fun onCreatePresenter(): P
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,7 +45,7 @@ abstract class MvpActivity<out P : Presenter<V>, V : View> : AppCompatActivity()
     }
 
     private fun attachViewToPresenter() {
-        if (presenterId == null) {
+        if (retainPresenter && presenterId == null) {
             presenterId = presenterManager.addPresenter(presenter)
         }
         presenter.bindView(view)
@@ -52,7 +54,7 @@ abstract class MvpActivity<out P : Presenter<V>, V : View> : AppCompatActivity()
     override fun onDestroy() {
         super.onDestroy()
         detachViewFromPresenter()
-        if (presenterId != null && !isChangingConfigurations) {
+        if (retainPresenter && presenterId != null && !isChangingConfigurations) {
             presenterManager.removePresenter(presenterId!!)
             presenterId = null
         }
