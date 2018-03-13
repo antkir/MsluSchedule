@@ -8,7 +8,7 @@ data class ScheduleContainer constructor(
         @PrimaryKey val id: Int,
         val name: String,
         val type: String,
-        val facultyValue: Int,
-        val courseValue: Int,
-        val yearValue: Int
+        val faculty: Int,
+        val course: Int,
+        val year: Int
 )
