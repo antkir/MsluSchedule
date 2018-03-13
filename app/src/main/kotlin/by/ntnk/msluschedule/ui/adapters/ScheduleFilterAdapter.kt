@@ -88,16 +88,16 @@ class ScheduleFilterAdapter(
             } else {
                 val constraintString = constraint.toString()
                 val filteredData = ScheduleFilter()
-                for (entry in unfilteredData.data.entries) {
-                    val key = entry.key
-                    val value = entry.value
+                for (i in 0 until unfilteredData.size) {
+                    val key = unfilteredData.keyAt(i)
+                    val value = unfilteredData.valueAt(i)
                     if (isStartsWithFilter) {
                         if (value.startsWith(constraintString, ignoreCase = isIgnoreCaseFilter)) {
-                            filteredData.data[key] = value
+                            filteredData.put(key, value)
                         }
                     } else {
                         if (value.contains(constraintString, ignoreCase = isIgnoreCaseFilter)) {
-                            filteredData.data[key] = value
+                            filteredData.put(key, value)
                         }
                     }
                 }

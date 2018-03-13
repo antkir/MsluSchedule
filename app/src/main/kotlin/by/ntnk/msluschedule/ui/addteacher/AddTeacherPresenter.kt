@@ -40,7 +40,7 @@ class AddTeacherPresenter @Inject constructor(
     }
 
     fun isValidTeacher(string: String): Boolean {
-        return teachers?.data?.values?.any { string == it } ?: false
+        return teachers?.containsValue(string) ?: false
     }
 
     fun getTeacher(): Teacher =

@@ -68,7 +68,7 @@ class AddGroupPresenter @Inject constructor(
     }
 
     fun isValidGroup(string: String): Boolean {
-        return groups?.data?.values?.any { string == it } ?: false
+        return groups?.containsValue(string) ?: false
     }
 
     fun getStudyGroup(): StudyGroup =

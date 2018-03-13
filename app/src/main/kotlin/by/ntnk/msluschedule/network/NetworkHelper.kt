@@ -1,5 +1,6 @@
 package by.ntnk.msluschedule.network
 
+import android.util.SparseArray
 import by.ntnk.msluschedule.di.PerApp
 import by.ntnk.msluschedule.network.data.JsonBody
 import by.ntnk.msluschedule.network.data.RequestData
@@ -87,10 +88,10 @@ class NetworkHelper @Inject constructor(private val currentDate: CurrentDate) {
                 .select("select[id^=" + requestInfo.requestName + "]")
                 .first()
                 .children()
-        val data = LinkedHashMap<Int, String>()
+        val data = SparseArray<String>()
         elements
                 .filter { it.`val`().isNotBlank() && it.text().length > 1 }
-                .forEach { data[it.`val`().toInt()] = it.text() }
+                .forEach { data.put(it.`val`().toInt(), it.text()) }
         return ScheduleFilter(data)
     }
 
