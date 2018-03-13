@@ -8,9 +8,7 @@ import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.utils.EMPTY_STRING
 import io.reactivex.Completable
 import io.reactivex.Observable
-import io.reactivex.Scheduler
 import io.reactivex.Single
-import io.reactivex.schedulers.Schedulers
 import org.jsoup.HttpStatusException
 import retrofit2.Response
 import javax.inject.Inject
@@ -22,14 +20,12 @@ constructor(
         private val networkHelper: NetworkHelper,
         private val localCookieJar: LocalCookieJar
 ) {
-    private val mainBackgroundScheduler = Schedulers.single()
-
     fun getFaculties(): Single<ScheduleFilter> {
         fun getFaculties() = getDataFromHtmlRequest(
                 NetworkHelper.groupSchedule,
                 networkHelper.facultyRequestInfo
         )
-        return wrapRequest(mainBackgroundScheduler, ::getFaculties)
+        return wrapRequest(::getFaculties)
     }
 
     fun getGroups(faculty: Int, course: Int): Single<ScheduleFilter> {
@@ -39,7 +35,7 @@ constructor(
                 NetworkHelper.groupSchedule,
                 requestDataList
         )
-        return wrapRequest(mainBackgroundScheduler, ::getGroups)
+        return wrapRequest(::getGroups)
     }
 
     fun getTeachers(): Single<ScheduleFilter> {
@@ -47,7 +43,7 @@ constructor(
                 NetworkHelper.teacherSchedule,
                 networkHelper.teacherRequestInfo
         )
-        return wrapRequest(mainBackgroundScheduler, ::getTeachers)
+        return wrapRequest(::getTeachers)
     }
 
     fun getWeeks(): Single<ScheduleFilter> {
@@ -58,7 +54,7 @@ constructor(
                 NetworkHelper.teacherSchedule,
                 requestDataList
         )
-        return wrapRequest(mainBackgroundScheduler, ::getWeeks)
+        return wrapRequest(::getWeeks)
     }
 
     /*
@@ -66,9 +62,8 @@ constructor(
      * so we make sure everything will work by creating and closing
      * a session on every batch of related requests.
      */
-    private fun <T> wrapRequest(scheduler: Scheduler, request: () -> Single<T>): Single<T> {
+    private fun <T> wrapRequest(request: () -> Single<T>): Single<T> {
         return initSession()
-                .subscribeOn(scheduler)
                 .andThen(request())
                 .doOnEvent { _, _ -> closeSession() }
     }

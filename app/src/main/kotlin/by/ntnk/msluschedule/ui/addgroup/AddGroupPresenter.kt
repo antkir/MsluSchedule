@@ -6,6 +6,7 @@ import by.ntnk.msluschedule.network.NetworkRepository
 import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.utils.COURSE_VALUE
 import by.ntnk.msluschedule.utils.CurrentDate
+import by.ntnk.msluschedule.utils.singleScheduler
 import io.reactivex.Scheduler
 import io.reactivex.disposables.CompositeDisposable
 import javax.inject.Inject
@@ -39,6 +40,7 @@ class AddGroupPresenter @Inject constructor(
 
     fun getFacultyScheduleFilter(uiScheduler: Scheduler) {
         val disposable = networkRepository.getFaculties()
+                .subscribeOn(singleScheduler)
                 .observeOn(uiScheduler)
                 .subscribe(
                         {
@@ -52,6 +54,7 @@ class AddGroupPresenter @Inject constructor(
 
     fun getScheduleGroups(uiScheduler: Scheduler) {
         val disposable = networkRepository.getGroups(faculty, course)
+                .subscribeOn(singleScheduler)
                 .observeOn(uiScheduler)
                 .subscribe(
                         {

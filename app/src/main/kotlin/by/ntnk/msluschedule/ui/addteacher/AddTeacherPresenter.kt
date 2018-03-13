@@ -5,6 +5,7 @@ import by.ntnk.msluschedule.mvp.Presenter
 import by.ntnk.msluschedule.network.NetworkRepository
 import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.utils.CurrentDate
+import by.ntnk.msluschedule.utils.singleScheduler
 import io.reactivex.Scheduler
 import io.reactivex.disposables.CompositeDisposable
 import timber.log.Timber
@@ -23,6 +24,7 @@ class AddTeacherPresenter @Inject constructor(
 
     fun getTeachersScheduleFilter(uiScheduler: Scheduler) {
         val disposable = networkRequestRepository.getTeachers()
+                .subscribeOn(singleScheduler)
                 .observeOn(uiScheduler)
                 .subscribe(
                         {
