@@ -16,6 +16,7 @@ class DatabaseModule {
     @Provides
     fun provideAppDatabase(app: MsluScheduleApp): AppDatabase {
         return Room.databaseBuilder(app, AppDatabase::class.java, DATABASE_NAME)
+                .fallbackToDestructiveMigration() // Temporary
                 .build()
     }
 }
