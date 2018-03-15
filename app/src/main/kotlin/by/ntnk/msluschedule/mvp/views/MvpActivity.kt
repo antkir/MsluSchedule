@@ -22,7 +22,7 @@ abstract class MvpActivity<out P : Presenter<V>, V : View> : AppCompatActivity()
     @Suppress("UNCHECKED_CAST")
     protected val presenter: P by lazy {
         if (presenterId != null) {
-            presenterManager.getPresenter(presenterId!!) as P
+            presenterManager.getPresenter(presenterId!!) as P? ?: onCreatePresenter()
         } else {
             onCreatePresenter()
         }
@@ -30,7 +30,7 @@ abstract class MvpActivity<out P : Presenter<V>, V : View> : AppCompatActivity()
 
     protected abstract val view: V
 
-    protected var retainPresenter: Boolean = false
+    protected var retainPresenter: Boolean = true
 
     protected abstract fun onCreatePresenter(): P
 
@@ -56,7 +56,6 @@ abstract class MvpActivity<out P : Presenter<V>, V : View> : AppCompatActivity()
         detachViewFromPresenter()
         if (retainPresenter && presenterId != null && !isChangingConfigurations) {
             presenterManager.removePresenter(presenterId!!)
-            presenterId = null
         }
     }
 

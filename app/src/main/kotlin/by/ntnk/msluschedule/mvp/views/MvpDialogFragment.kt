@@ -22,7 +22,7 @@ abstract class MvpDialogFragment<out P : Presenter<V>, V : View> : DialogFragmen
     @Suppress("UNCHECKED_CAST")
     protected val presenter: P by lazy {
         if (presenterId != null) {
-            presenterManager.getPresenter(presenterId!!) as P
+            presenterManager.getPresenter(presenterId!!) as P? ?: onCreatePresenter()
         } else {
             onCreatePresenter()
         }
@@ -54,7 +54,6 @@ abstract class MvpDialogFragment<out P : Presenter<V>, V : View> : DialogFragmen
         detachViewFromPresenter()
         if (presenterId != null && !activity!!.isChangingConfigurations) {
             presenterManager.removePresenter(presenterId!!)
-            presenterId = null
         }
     }
 
