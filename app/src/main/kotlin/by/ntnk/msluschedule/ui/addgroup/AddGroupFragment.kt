@@ -68,6 +68,7 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
             }
             presenter.isFacultiesNotEmpty -> {
                 presenter.populateFacultiesAdapter()
+                if (presenter.isFacultySelected) groupView.progressBarVisibility = View.VISIBLE
                 if (presenter.isGroupsNotEmpty) presenter.populateGroupsAdapter()
             }
             else -> dismiss()
@@ -150,8 +151,8 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
         )
     }
 
-    override fun onStop() {
+    override fun dismiss() {
         presenter.clearDisposables()
-        super.onStop()
+        super.dismiss()
     }
 }

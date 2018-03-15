@@ -121,8 +121,8 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
         TODO("not implemented")
     }
 
-    override fun onStop() {
+    override fun dismiss() {
         presenter.clearDisposables()
-        super.onStop()
+        super.dismiss()
     }
 }

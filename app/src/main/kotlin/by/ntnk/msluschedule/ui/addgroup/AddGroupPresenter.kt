@@ -34,6 +34,9 @@ class AddGroupPresenter @Inject constructor(
     val isGroupsNotEmpty: Boolean
         get() = groups != null
 
+    val isFacultySelected: Boolean
+            get() = faculty != 0
+
     fun setFacultyValueFromPosition(position: Int) {
         faculty = faculties!!.keyAt(position)
     }
