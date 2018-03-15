@@ -15,3 +15,11 @@ const val PRESENTER_ID_KEY = "PresenterID"
 val uiScheduler: Scheduler = AndroidSchedulers.mainThread()
 
 val singleScheduler = Schedulers.single()
+
+const val MONDAY = "ПН"
+const val TUESDAY = "ВТ"
+const val WEDNESDAY = "СР"
+const val THURSDAY = "ЧТ"
+const val FRIDAY = "ПТ"
+const val SATURDAY = "СБ"
+const val SUNDAY = "ВС"
