@@ -42,4 +42,7 @@ class DatabaseRepository @Inject constructor(
                 .flatMapObservable { Observable.fromIterable(it) }
                 .map { it.toInt() }
     }
+
+    fun deleteScheduleContainer(id: Int): Completable =
+            Completable.fromCallable { appDatabase.scheduleContainerDao.delete(id) }
 }

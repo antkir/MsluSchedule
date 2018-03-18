@@ -9,4 +9,7 @@ import io.reactivex.Single
 interface ScheduleContainerDao : BaseDao<ScheduleContainer> {
     @Query("SELECT * FROM ScheduleContainer")
     fun getAllScheduleContainers(): Single<List<ScheduleContainer>>
+
+    @Query("DELETE FROM ScheduleContainer WHERE id=:id")
+    fun delete(id: Int): Int
 }

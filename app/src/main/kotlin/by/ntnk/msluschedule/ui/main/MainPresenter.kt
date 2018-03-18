@@ -40,6 +40,7 @@ class MainPresenter @Inject constructor(
         return networkRepository.getWeeks()
                 .flatMapObservable { databaseRepository.insertWeeksGetIds(it, containerId) }
                 .flatMapCompletable { databaseRepository.insertWeekdays(it) }
+                .doOnError { databaseRepository.deleteScheduleContainer(containerId) }
                 .andThen(Single.just(containerId))
     }
 }
