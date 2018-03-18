@@ -5,6 +5,8 @@ import by.ntnk.msluschedule.data.Teacher
 import by.ntnk.msluschedule.db.DatabaseRepository
 import by.ntnk.msluschedule.mvp.Presenter
 import by.ntnk.msluschedule.network.NetworkRepository
+import by.ntnk.msluschedule.utils.ScheduleType
+import by.ntnk.msluschedule.utils.SharedPreferencesRepository
 import by.ntnk.msluschedule.utils.singleScheduler
 import by.ntnk.msluschedule.utils.uiScheduler
 import io.reactivex.Single
@@ -12,7 +14,8 @@ import javax.inject.Inject
 
 class MainPresenter @Inject constructor(
         private val databaseRepository: DatabaseRepository,
-        private val networkRepository: NetworkRepository
+        private val networkRepository: NetworkRepository,
+        private val sharedPreferencesRepository: SharedPreferencesRepository
 ) : Presenter<MainView>() {
     fun addGroup(studyGroup: StudyGroup) {
         databaseRepository.insertStudyGroup(studyGroup)
@@ -20,7 +23,14 @@ class MainPresenter @Inject constructor(
                 .subscribeOn(singleScheduler)
                 .observeOn(uiScheduler)
                 .subscribe(
-                        { view?.initMainContent() },
+                        {
+                            sharedPreferencesRepository.putSelectedScheduleContainer(
+                                    it,
+                                    studyGroup.name,
+                                    ScheduleType.STUDYGROUP
+                            )
+                            view?.initMainContent()
+                        },
                         { it.printStackTrace() }
                 )
     }
@@ -31,7 +41,14 @@ class MainPresenter @Inject constructor(
                 .subscribeOn(singleScheduler)
                 .observeOn(uiScheduler)
                 .subscribe(
-                        { view!!.initMainContent() },
+                        {
+                            sharedPreferencesRepository.putSelectedScheduleContainer(
+                                    it,
+                                    teacher.name,
+                                    ScheduleType.TEACHER
+                            )
+                            view!!.initMainContent()
+                        },
                         { it.printStackTrace() }
                 )
     }
