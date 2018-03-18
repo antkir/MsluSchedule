@@ -1,7 +1,7 @@
 package by.ntnk.msluschedule.data
 
 data class StudyGroup constructor(
-        val id: Int,
+        val key: Int,
         val name: String,
         val faculty: Int,
         val course: Int,

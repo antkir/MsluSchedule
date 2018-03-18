@@ -14,20 +14,18 @@ class DatabaseRepository @Inject constructor(
         private val appDatabase: AppDatabase,
         private val databaseDataMapper: DatabaseDataMapper
 ) {
-    fun insertStudyGroup(entry: StudyGroup): Completable {
+    fun insertStudyGroup(entry: StudyGroup): Single<Int> {
         return Single.just(entry)
                 .map { databaseDataMapper.map(it) }
-                .flatMapCompletable {
-                    Completable.fromCallable { appDatabase.scheduleContainerDao.insert(it) }
-                }
+                .flatMap { Single.fromCallable { appDatabase.scheduleContainerDao.insert(it) } }
+                .map { it.toInt() }
     }
 
-    fun insertTeacher(entry: Teacher): Completable {
+    fun insertTeacher(entry: Teacher): Single<Int> {
         return Single.just(entry)
                 .map { databaseDataMapper.map(it) }
-                .flatMapCompletable {
-                    Completable.fromCallable { appDatabase.scheduleContainerDao.insert(it) }
-                }
+                .flatMap { Single.fromCallable { appDatabase.scheduleContainerDao.insert(it) } }
+                .map { it.toInt() }
     }
 
     fun insertWeekdays(weekId: Int): Completable {

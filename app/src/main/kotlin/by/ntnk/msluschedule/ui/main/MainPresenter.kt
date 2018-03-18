@@ -7,7 +7,7 @@ import by.ntnk.msluschedule.mvp.Presenter
 import by.ntnk.msluschedule.network.NetworkRepository
 import by.ntnk.msluschedule.utils.singleScheduler
 import by.ntnk.msluschedule.utils.uiScheduler
-import io.reactivex.CompletableTransformer
+import io.reactivex.Single
 import javax.inject.Inject
 
 class MainPresenter @Inject constructor(
@@ -16,7 +16,7 @@ class MainPresenter @Inject constructor(
 ) : Presenter<MainView>() {
     fun addGroup(studyGroup: StudyGroup) {
         databaseRepository.insertStudyGroup(studyGroup)
-                .compose(insertWeeksWithWeekdays(studyGroup.id))
+                .flatMap { insertWeeksWithWeekdays(it) }
                 .subscribeOn(singleScheduler)
                 .observeOn(uiScheduler)
                 .subscribe(
@@ -27,7 +27,7 @@ class MainPresenter @Inject constructor(
 
     fun addTeacher(teacher: Teacher) {
         databaseRepository.insertTeacher(teacher)
-                .compose(insertWeeksWithWeekdays(teacher.id))
+                .flatMap { insertWeeksWithWeekdays(it) }
                 .subscribeOn(singleScheduler)
                 .observeOn(uiScheduler)
                 .subscribe(
@@ -36,12 +36,10 @@ class MainPresenter @Inject constructor(
                 )
     }
 
-    private fun insertWeeksWithWeekdays(containerId: Int): CompletableTransformer {
-        return CompletableTransformer {
-            return@CompletableTransformer it
-                    .andThen(networkRepository.getWeeks())
-                    .flatMapObservable { databaseRepository.insertWeeksGetIds(it, containerId) }
-                    .flatMapCompletable { databaseRepository.insertWeekdays(it) }
-        }
+    private fun insertWeeksWithWeekdays(containerId: Int): Single<Int> {
+        return networkRepository.getWeeks()
+                .flatMapObservable { databaseRepository.insertWeeksGetIds(it, containerId) }
+                .flatMapCompletable { databaseRepository.insertWeekdays(it) }
+                .andThen(Single.just(containerId))
     }
 }

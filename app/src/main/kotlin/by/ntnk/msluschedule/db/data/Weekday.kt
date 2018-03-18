@@ -15,6 +15,8 @@ import android.arch.persistence.room.PrimaryKey
         ],
         indices = [Index(value = ["weekId"])]
 )
-data class Weekday constructor(val weekId: Int, val value: String) {
-    @PrimaryKey(autoGenerate = true) var id: Int = 0
-}
+data class Weekday constructor(
+        val value: String,
+        val weekId: Int,
+        @PrimaryKey(autoGenerate = true) val id: Int = 0
+)

@@ -11,7 +11,7 @@ import by.ntnk.msluschedule.db.data.Weekday
 
 @Database(
         entities = [ScheduleContainer::class, Week::class, Weekday::class],
-        version = 2,
+        version = 3,
         exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

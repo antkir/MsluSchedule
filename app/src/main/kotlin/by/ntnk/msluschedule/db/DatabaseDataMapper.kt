@@ -14,17 +14,17 @@ import javax.inject.Inject
 @PerApp
 class DatabaseDataMapper @Inject constructor() {
     fun map(data: StudyGroup): ScheduleContainer =
-            ScheduleContainer(data.id, data.name, ScheduleType.STUDYGROUP, data.faculty, data.course, data.year)
+            ScheduleContainer(data.key, data.name, ScheduleType.STUDYGROUP, data.year, data.faculty, data.course)
 
     fun map(data: Teacher): ScheduleContainer =
-            ScheduleContainer(data.id, data.name, ScheduleType.TEACHER, 0, 0, data.year)
+            ScheduleContainer(data.key, data.name, ScheduleType.TEACHER, data.year)
 
     fun map(data: ScheduleFilter, containerId: Int): List<Week> {
         val weeks = ArrayList<Week>()
         for (i in 0 until data.size) {
             val key = data.keyAt(i)
             val value = data.valueAt(i)
-            val week = Week(containerId, key, value)
+            val week = Week(key, value, containerId)
             weeks.add(week)
         }
         return weeks
@@ -32,6 +32,6 @@ class DatabaseDataMapper @Inject constructor() {
 
     fun createWeekDaysList(weekId: Int): List<Weekday> =
             Arrays.asList(MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY)
-                    .map { weekdayValue -> Weekday(weekId, weekdayValue) }
+                    .map { weekdayValue -> Weekday(weekdayValue, weekId) }
                     .toList()
 }
