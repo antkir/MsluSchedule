@@ -1,6 +1,7 @@
 package by.ntnk.msluschedule.utils
 
 import android.content.SharedPreferences
+import by.ntnk.msluschedule.data.ScheduleContainerInfo
 import by.ntnk.msluschedule.di.PerApp
 
 import javax.inject.Inject
@@ -13,11 +14,28 @@ const val SCHEDULECONTAINER_TYPE = "scheduleContainerType"
 class SharedPreferencesRepository @Inject constructor(
         private val sharedPreferences: SharedPreferences
 ) {
-    fun putSelectedScheduleContainer(key: Int, value: String, type: ScheduleType) {
+    fun getSelectedScheduleContainerInfo(): ScheduleContainerInfo {
+        val id = sharedPreferences.getInt(SCHEDULECONTAINER_ID, 0)
+        val value = sharedPreferences.getString(SCHEDULECONTAINER_VALUE, EMPTY_STRING)
+        val typeString = sharedPreferences.getString(SCHEDULECONTAINER_TYPE, null)
+        val type = ScheduleTypeConverter.stringToScheduleType(typeString)
+        return ScheduleContainerInfo(id, value, type)
+    }
+
+    fun putSelectedScheduleContainer(id: Int, value: String, type: ScheduleType) {
         val typeString = ScheduleTypeConverter.scheduleTypeToString(type)
         sharedPreferences.edit()
-                .putInt(SCHEDULECONTAINER_ID, key)
+                .putInt(SCHEDULECONTAINER_ID, id)
                 .putString(SCHEDULECONTAINER_VALUE, value)
+                .putString(SCHEDULECONTAINER_TYPE, typeString)
+                .apply()
+    }
+
+    fun putSelectedScheduleContainer(scheduleContainerInfo: ScheduleContainerInfo) {
+        val typeString = ScheduleTypeConverter.scheduleTypeToString(scheduleContainerInfo.type)
+        sharedPreferences.edit()
+                .putInt(SCHEDULECONTAINER_ID, scheduleContainerInfo.id)
+                .putString(SCHEDULECONTAINER_VALUE, scheduleContainerInfo.value)
                 .putString(SCHEDULECONTAINER_TYPE, typeString)
                 .apply()
     }

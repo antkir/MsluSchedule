@@ -1,5 +1,6 @@
 package by.ntnk.msluschedule.ui.main
 
+import by.ntnk.msluschedule.data.ScheduleContainerInfo
 import by.ntnk.msluschedule.data.StudyGroup
 import by.ntnk.msluschedule.data.Teacher
 import by.ntnk.msluschedule.db.DatabaseRepository
@@ -24,12 +25,11 @@ class MainPresenter @Inject constructor(
                 .observeOn(uiScheduler)
                 .subscribe(
                         {
-                            sharedPreferencesRepository.putSelectedScheduleContainer(
-                                    it,
-                                    studyGroup.name,
-                                    ScheduleType.STUDYGROUP
-                            )
+                            val info = ScheduleContainerInfo(it, studyGroup.name, ScheduleType.STUDYGROUP)
+                            sharedPreferencesRepository.putSelectedScheduleContainer(info)
                             view?.initMainContent()
+                            view?.addScheduleContainerMenuItem(info)
+                            view?.checkScheduleContainerMenuItem(info)
                         },
                         { it.printStackTrace() }
                 )
@@ -42,12 +42,11 @@ class MainPresenter @Inject constructor(
                 .observeOn(uiScheduler)
                 .subscribe(
                         {
-                            sharedPreferencesRepository.putSelectedScheduleContainer(
-                                    it,
-                                    teacher.name,
-                                    ScheduleType.TEACHER
-                            )
-                            view!!.initMainContent()
+                            val info = ScheduleContainerInfo(it, teacher.name, ScheduleType.TEACHER)
+                            sharedPreferencesRepository.putSelectedScheduleContainer(info)
+                            view?.initMainContent()
+                            view?.addScheduleContainerMenuItem(info)
+                            view?.checkScheduleContainerMenuItem(info)
                         },
                         { it.printStackTrace() }
                 )
@@ -60,4 +59,24 @@ class MainPresenter @Inject constructor(
                 .doOnError { databaseRepository.deleteScheduleContainer(containerId) }
                 .andThen(Single.just(containerId))
     }
+
+    fun initContainerListView() {
+        databaseRepository.getScheduleContainers()
+                .subscribeOn(singleScheduler)
+                .observeOn(uiScheduler)
+                .subscribe(
+                        {
+                            val info = ScheduleContainerInfo(it.id, it.name, it.type)
+                            view?.addScheduleContainerMenuItem(info)
+                        },
+                        { it.printStackTrace() },
+                        {
+                            val info = sharedPreferencesRepository.getSelectedScheduleContainerInfo()
+                            view?.checkScheduleContainerMenuItem(info)
+                        }
+                )
+    }
+
+    fun setSelectedSheduleContainer(id: Int, value: String, type: ScheduleType) =
+            sharedPreferencesRepository.putSelectedScheduleContainer(id, value, type)
 }

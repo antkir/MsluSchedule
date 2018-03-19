@@ -7,8 +7,8 @@ import io.reactivex.Single
 
 @Dao
 interface ScheduleContainerDao : BaseDao<ScheduleContainer> {
-    @Query("SELECT * FROM ScheduleContainer")
-    fun getAllScheduleContainers(): Single<List<ScheduleContainer>>
+    @Query("SELECT * FROM ScheduleContainer ORDER BY name")
+    fun getScheduleContainers(): Single<List<ScheduleContainer>>
 
     @Query("DELETE FROM ScheduleContainer WHERE id=:id")
     fun delete(id: Int): Int

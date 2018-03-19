@@ -9,11 +9,13 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import by.ntnk.msluschedule.R
+import by.ntnk.msluschedule.data.ScheduleContainerInfo
 import by.ntnk.msluschedule.data.StudyGroup
 import by.ntnk.msluschedule.data.Teacher
 import by.ntnk.msluschedule.mvp.views.MvpActivity
 import by.ntnk.msluschedule.ui.addgroup.AddGroupFragment
 import by.ntnk.msluschedule.ui.addteacher.AddTeacherFragment
+import by.ntnk.msluschedule.utils.ScheduleType
 import dagger.android.AndroidInjection
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
@@ -63,6 +65,8 @@ class MainActivity :
         toggle.syncState()
 
         nav_view.setNavigationItemSelectedListener(this)
+
+        presenter.initContainerListView()
     }
 
     override fun onBackPressed() {
@@ -90,25 +94,23 @@ class MainActivity :
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        if (item.isChecked) return true
+
         // Handle navigation view item clicks here.
         when (item.itemId) {
-            R.id.nav_camera -> {
-                // Handle the camera action
-            }
-            R.id.nav_gallery -> {
-
-            }
-            R.id.nav_slideshow -> {
-
-            }
-            R.id.nav_manage -> {
-
-            }
             R.id.nav_share -> {
-
             }
             R.id.nav_send -> {
-
+            }
+            else -> {
+                val isStudyGroupItem = nav_view.menu
+                        .findItem(getContainerMenuViewId(ScheduleType.STUDYGROUP))
+                        .subMenu
+                        .findItem(item.itemId) != null
+                val type = if (isStudyGroupItem) ScheduleType.STUDYGROUP else ScheduleType.TEACHER
+                supportActionBar?.title = item.title
+                presenter.setSelectedSheduleContainer(item.itemId, item.title.toString(), type)
+                initMainContent()
             }
         }
 
@@ -162,6 +164,37 @@ class MainActivity :
     }
 
     override fun initMainContent() {
-        TODO("not implemented")
+        Timber.e("Not implemented")
+    }
+
+    override fun addScheduleContainerMenuItem(scheduleContainerInfo: ScheduleContainerInfo) {
+        nav_view.menu
+                .findItem(getContainerMenuViewId(scheduleContainerInfo.type!!))
+                .subMenu
+                .add(Menu.NONE, scheduleContainerInfo.id, Menu.NONE, scheduleContainerInfo.value)
+                .isCheckable = true
+    }
+
+    private fun getContainerMenuViewId(scheduleType: ScheduleType): Int {
+        return when (scheduleType) {
+            ScheduleType.STUDYGROUP -> R.id.group_submenu
+            else -> R.id.teacher_submenu
+        }
+    }
+
+    override fun checkScheduleContainerMenuItem(scheduleContainerInfo: ScheduleContainerInfo) {
+        supportActionBar?.title = scheduleContainerInfo.value
+        if (scheduleContainerInfo.type != null) {
+            val subMenu = nav_view.menu
+                    .findItem(getContainerMenuViewId(scheduleContainerInfo.type))
+                    .subMenu
+            for (i in 0 until subMenu.size()) {
+                val item = subMenu.getItem(i)
+                if (scheduleContainerInfo.id == item.itemId) {
+                    nav_view!!.setCheckedItem(item.itemId)
+                    break
+                }
+            }
+        }
     }
 }
