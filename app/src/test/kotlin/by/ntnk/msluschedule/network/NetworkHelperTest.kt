@@ -1,5 +1,6 @@
 package by.ntnk.msluschedule.network
 
+import by.ntnk.msluschedule.TestTree
 import by.ntnk.msluschedule.utils.CurrentDate
 import by.ntnk.msluschedule.utils.EMPTY_STRING
 import by.ntnk.msluschedule.utils.InvalidYearException
@@ -11,6 +12,7 @@ import org.mockito.Mock
 import org.mockito.Mockito.`when` as whenever
 import org.mockito.MockitoAnnotations
 import org.threeten.bp.LocalDate
+import timber.log.Timber
 
 class NetworkHelperTest {
     @Mock
@@ -21,6 +23,7 @@ class NetworkHelperTest {
     fun setUp() {
         MockitoAnnotations.initMocks(this)
         networkHelper = NetworkHelper(currentDate)
+        Timber.plant(TestTree())
     }
 
     @Test

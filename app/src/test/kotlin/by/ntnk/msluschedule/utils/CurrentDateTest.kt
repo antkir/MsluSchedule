@@ -1,13 +1,21 @@
 package by.ntnk.msluschedule.utils
 
+import by.ntnk.msluschedule.TestTree
 import org.junit.Test
 
 import org.junit.Assert.*
+import org.junit.Before
 import org.threeten.bp.LocalDate
+import timber.log.Timber
 
 class CurrentDateTest {
     private val currentDate = object : CurrentDate() {
-        override var date = LocalDate.now(CurrentDate.localTimeZone)
+        override var date = LocalDate.of(1970, 9, 1)
+    }
+
+    @Before
+    fun setUp() {
+        Timber.plant(TestTree())
     }
 
     @Test
@@ -20,7 +28,7 @@ class CurrentDateTest {
         // when
         val academicYear = currentDate.academicYear
         // then
-        assertEquals(academicYear, year)
+        assertEquals(year, academicYear)
     }
 
     @Test
@@ -33,7 +41,48 @@ class CurrentDateTest {
         // when
         val academicYear = currentDate.academicYear
         // then
-        assertEquals(academicYear, year - 1)
+        assertEquals(year - 1, academicYear)
     }
 
+    @Test
+    fun `"academicWeek" for September the 1st must return 0`() {
+        // given
+        val year = 1970
+        val month = 9
+        val day = 1
+        for (i in 0 .. 100) {
+            val currentYear = year + i
+            currentDate.date = LocalDate.of(currentYear, month, day)
+            // when
+            val academicWeek = currentDate.academicWeek
+            // then
+            assertEquals(0, academicWeek)
+        }
+    }
+
+    @Test
+    fun `When September the 1st is Sunday, "academicWeek" for September the 2nd must return 0`() {
+        // given
+        val year = 2019
+        val month = 9
+        val day = 2
+        currentDate.date = LocalDate.of(year, month, day)
+        // when
+        val academicWeek = currentDate.academicWeek
+        // then
+        assertEquals(0, academicWeek)
+    }
+
+    @Test
+    fun `If the current month is August, "academicWeek" must return 0`() {
+        // given
+        val year = 1970
+        val month = 8
+        val day = 15
+        currentDate.date = LocalDate.of(year, month, day)
+        // when
+        val academicWeek = currentDate.academicWeek
+        // then
+        assertEquals(0, academicWeek)
+    }
 }
