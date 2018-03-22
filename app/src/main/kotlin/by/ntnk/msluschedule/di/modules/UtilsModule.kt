@@ -12,12 +12,6 @@ import dagger.Provides
 class UtilsModule {
     @Provides
     @PerApp
-    fun provideCurrentDate(): CurrentDate {
-        return CurrentDate()
-    }
-
-    @Provides
-    @PerApp
     fun provideSharedPreferences(application: MsluScheduleApp): SharedPreferences {
         return PreferenceManager.getDefaultSharedPreferences(application.applicationContext)
     }
