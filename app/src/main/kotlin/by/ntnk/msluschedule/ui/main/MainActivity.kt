@@ -15,6 +15,7 @@ import by.ntnk.msluschedule.data.Teacher
 import by.ntnk.msluschedule.mvp.views.MvpActivity
 import by.ntnk.msluschedule.ui.addgroup.AddGroupFragment
 import by.ntnk.msluschedule.ui.addteacher.AddTeacherFragment
+import by.ntnk.msluschedule.ui.weekscontainer.WeeksContainerFragment
 import by.ntnk.msluschedule.utils.ScheduleType
 import dagger.android.AndroidInjection
 import dagger.android.AndroidInjector
@@ -67,6 +68,7 @@ class MainActivity :
         nav_view.setNavigationItemSelectedListener(this)
 
         presenter.initContainerListView()
+        if (savedInstanceState == null) initMainContent()
     }
 
     override fun onBackPressed() {
@@ -164,7 +166,9 @@ class MainActivity :
     }
 
     override fun initMainContent() {
-        Timber.e("Not implemented")
+        val transaction = supportFragmentManager.beginTransaction()
+        transaction.replace(R.id.framelayout_main, WeeksContainerFragment())
+        transaction.commit()
     }
 
     override fun addScheduleContainerMenuItem(scheduleContainerInfo: ScheduleContainerInfo) {

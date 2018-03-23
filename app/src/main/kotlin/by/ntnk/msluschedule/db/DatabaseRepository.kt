@@ -3,6 +3,7 @@ package by.ntnk.msluschedule.db
 import by.ntnk.msluschedule.data.StudyGroup
 import by.ntnk.msluschedule.data.Teacher
 import by.ntnk.msluschedule.db.data.ScheduleContainer
+import by.ntnk.msluschedule.db.data.Week
 import by.ntnk.msluschedule.di.PerApp
 import by.ntnk.msluschedule.network.data.ScheduleFilter
 import io.reactivex.Completable
@@ -49,6 +50,11 @@ class DatabaseRepository @Inject constructor(
 
     fun getScheduleContainers(): Observable<ScheduleContainer> {
         return appDatabase.scheduleContainerDao.getScheduleContainers()
+                .flatMapObservable { Observable.fromIterable(it) }
+    }
+
+    fun getWeeksForContainer(id: Int): Observable<Week> {
+        return appDatabase.weekDao.getWeeksForContainer(id)
                 .flatMapObservable { Observable.fromIterable(it) }
     }
 }
