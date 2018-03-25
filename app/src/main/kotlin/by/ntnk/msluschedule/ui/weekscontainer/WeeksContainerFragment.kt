@@ -4,10 +4,9 @@ import android.content.Context
 import android.os.Bundle
 import android.support.design.widget.TabLayout
 import android.support.v4.view.ViewPager
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import by.ntnk.msluschedule.R
+import by.ntnk.msluschedule.data.ScheduleContainerInfo
 import by.ntnk.msluschedule.mvp.views.MvpFragment
 import by.ntnk.msluschedule.ui.adapters.ViewPagerFragmentAdapter
 import by.ntnk.msluschedule.utils.ImmutableEntry
@@ -23,6 +22,7 @@ class WeeksContainerFragment :
     private lateinit var tabLayout: TabLayout
     private lateinit var fragmentAdapter: ViewPagerFragmentAdapter
     private var savedCurrentPosition = -1
+    private var listener: OnScheduleContainerRemovedListener? = null
 
     override val view: WeeksContainerView
         get() = this
@@ -35,6 +35,17 @@ class WeeksContainerFragment :
     override fun onAttach(context: Context?) {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
+        try {
+            listener = context as OnScheduleContainerRemovedListener
+        } catch (e: ClassCastException) {
+            throw ClassCastException(context.toString() +
+                    " must implement OnScheduleContainerRemovedListener")
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
     }
 
     override fun onCreateView(
@@ -67,5 +78,28 @@ class WeeksContainerFragment :
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putInt(SELECTED_TAB_POSITION, tabLayout.selectedTabPosition)
         super.onSaveInstanceState(outState)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+        inflater?.inflate(R.menu.fragment_weekscontainer_menu, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        super.onOptionsItemSelected(item)
+        return when (item?.itemId) {
+            R.id.item_weekscontainer_remove -> {
+                presenter.removeSelectedScheduleContainer()
+                return true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    override fun removeScheduleContainerFromView(info: ScheduleContainerInfo) {
+        listener!!.onScheduleContainerRemoved(info)
+    }
+
+    interface OnScheduleContainerRemovedListener {
+        fun onScheduleContainerRemoved(info: ScheduleContainerInfo)
     }
 }

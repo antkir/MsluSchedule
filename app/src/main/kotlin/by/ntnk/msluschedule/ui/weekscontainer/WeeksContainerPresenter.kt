@@ -36,4 +36,18 @@ class WeeksContainerPresenter @Inject constructor(
                         { view!!.initWeeksAdapter(it.first, it.second) },
                         { it.printStackTrace() })
     }
+
+    fun removeSelectedScheduleContainer() {
+        val info = sharedPreferencesRepository.getSelectedScheduleContainerInfo()
+        databaseRepository.deleteScheduleContainer(info.id)
+                .subscribeOn(ioScheduler)
+                .observeOn(uiScheduler)
+                .subscribe(
+                        {
+                            sharedPreferencesRepository.selectEmptyScheduleContainer()
+                            view!!.removeScheduleContainerFromView(info)
+                        },
+                        { it.printStackTrace() }
+                )
+    }
 }

@@ -16,6 +16,7 @@ import by.ntnk.msluschedule.mvp.views.MvpActivity
 import by.ntnk.msluschedule.ui.addgroup.AddGroupFragment
 import by.ntnk.msluschedule.ui.addteacher.AddTeacherFragment
 import by.ntnk.msluschedule.ui.weekscontainer.WeeksContainerFragment
+import by.ntnk.msluschedule.utils.EMPTY_STRING
 import by.ntnk.msluschedule.utils.ScheduleType
 import dagger.android.AndroidInjection
 import dagger.android.AndroidInjector
@@ -24,7 +25,6 @@ import dagger.android.support.HasSupportFragmentInjector
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.fam_main.*
-import timber.log.Timber
 import javax.inject.Inject
 
 private const val ADD_GROUP_FRAGMENT = "AddGroupFragment"
@@ -34,7 +34,8 @@ class MainActivity :
         MvpActivity<MainPresenter, MainView>(), MainView,
         NavigationView.OnNavigationItemSelectedListener,
         HasSupportFragmentInjector,
-        AddContainerDialogListener {
+        AddContainerDialogListener,
+        WeeksContainerFragment.OnScheduleContainerRemovedListener {
     override val view: MainView
         get() = this
 
@@ -68,7 +69,7 @@ class MainActivity :
         nav_view.setNavigationItemSelectedListener(this)
 
         presenter.initContainerListView()
-        if (savedInstanceState == null) initMainContent()
+        if (savedInstanceState == null && !presenter.isSelectedContainerNull()) initMainContent()
     }
 
     override fun onBackPressed() {
@@ -200,5 +201,21 @@ class MainActivity :
                 }
             }
         }
+    }
+
+    override fun onScheduleContainerRemoved(info: ScheduleContainerInfo) {
+        supportActionBar?.title = EMPTY_STRING
+        val fragmentManager = supportFragmentManager
+        val fragment = fragmentManager.findFragmentById(R.id.framelayout_main)
+        if (fragment != null) {
+            fragmentManager
+                    .beginTransaction()
+                    .remove(fragment)
+                    .commit()
+        }
+        nav_view.menu
+                .findItem(getContainerMenuViewId(info.type!!))
+                .subMenu
+                .removeItem(info.id)
     }
 }

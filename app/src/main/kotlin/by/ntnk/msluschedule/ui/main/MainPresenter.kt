@@ -79,4 +79,7 @@ class MainPresenter @Inject constructor(
 
     fun setSelectedSheduleContainer(id: Int, value: String, type: ScheduleType) =
             sharedPreferencesRepository.putSelectedScheduleContainer(id, value, type)
+
+    fun isSelectedContainerNull() =
+            sharedPreferencesRepository.getSelectedScheduleContainerInfo().type == null
 }

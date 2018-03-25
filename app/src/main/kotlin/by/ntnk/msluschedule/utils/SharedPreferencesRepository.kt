@@ -39,4 +39,12 @@ class SharedPreferencesRepository @Inject constructor(
                 .putString(SCHEDULECONTAINER_TYPE, typeString)
                 .apply()
     }
+
+    fun selectEmptyScheduleContainer() {
+        sharedPreferences.edit()
+                .putInt(SCHEDULECONTAINER_ID, 0)
+                .putString(SCHEDULECONTAINER_VALUE, EMPTY_STRING)
+                .putString(SCHEDULECONTAINER_TYPE, null)
+                .apply()
+    }
 }
