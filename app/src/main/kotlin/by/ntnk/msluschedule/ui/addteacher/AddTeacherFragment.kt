@@ -14,6 +14,7 @@ import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.ui.adapters.ScheduleFilterAdapter
 import by.ntnk.msluschedule.ui.customviews.LoadingAutoCompleteTextView
 import by.ntnk.msluschedule.utils.uiScheduler
+import dagger.Lazy
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
@@ -25,11 +26,9 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
         get() = this
 
     @Inject
-    lateinit var injectedPresenter: AddTeacherPresenter
+    lateinit var injectedPresenter: Lazy<AddTeacherPresenter>
 
-    override fun onCreatePresenter(): AddTeacherPresenter {
-        return injectedPresenter
-    }
+    override fun onCreatePresenter(): AddTeacherPresenter = injectedPresenter.get()
 
     override fun onAttach(context: Context?) {
         AndroidSupportInjection.inject(this)

@@ -18,6 +18,7 @@ import by.ntnk.msluschedule.ui.addteacher.AddTeacherFragment
 import by.ntnk.msluschedule.ui.weekscontainer.WeeksContainerFragment
 import by.ntnk.msluschedule.utils.EMPTY_STRING
 import by.ntnk.msluschedule.utils.ScheduleType
+import dagger.Lazy
 import dagger.android.AndroidInjection
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
@@ -46,15 +47,13 @@ class MainActivity :
     lateinit var fragmentDispatchingAndroidInjector: DispatchingAndroidInjector<Fragment>
 
     @Inject
-    lateinit var injectedPresenter: MainPresenter
+    lateinit var injectedPresenter: Lazy<MainPresenter>
 
     override fun supportFragmentInjector(): AndroidInjector<Fragment> {
         return fragmentDispatchingAndroidInjector
     }
 
-    override fun onCreatePresenter(): MainPresenter {
-        return injectedPresenter
-    }
+    override fun onCreatePresenter(): MainPresenter = injectedPresenter.get()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)

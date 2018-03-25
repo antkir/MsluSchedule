@@ -10,6 +10,7 @@ import by.ntnk.msluschedule.data.ScheduleContainerInfo
 import by.ntnk.msluschedule.mvp.views.MvpFragment
 import by.ntnk.msluschedule.ui.adapters.ViewPagerFragmentAdapter
 import by.ntnk.msluschedule.utils.ImmutableEntry
+import dagger.Lazy
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
@@ -22,15 +23,15 @@ class WeeksContainerFragment :
     private lateinit var tabLayout: TabLayout
     private lateinit var fragmentAdapter: ViewPagerFragmentAdapter
     private var savedCurrentPosition = -1
-    private var listener: OnScheduleContainerRemovedListener? = null
+    private lateinit var listener: OnScheduleContainerRemovedListener
 
     override val view: WeeksContainerView
         get() = this
 
     @Inject
-    lateinit var injectedPresenter: WeeksContainerPresenter
+    lateinit var injectedPresenter: Lazy<WeeksContainerPresenter>
 
-    override fun onCreatePresenter(): WeeksContainerPresenter = injectedPresenter
+    override fun onCreatePresenter(): WeeksContainerPresenter = injectedPresenter.get()
 
     override fun onAttach(context: Context?) {
         AndroidSupportInjection.inject(this)
@@ -96,7 +97,7 @@ class WeeksContainerFragment :
     }
 
     override fun removeScheduleContainerFromView(info: ScheduleContainerInfo) {
-        listener!!.onScheduleContainerRemoved(info)
+        listener.onScheduleContainerRemoved(info)
     }
 
     interface OnScheduleContainerRemovedListener {
