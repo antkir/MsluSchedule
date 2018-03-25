@@ -34,7 +34,8 @@ class MainActivity :
         MvpActivity<MainPresenter, MainView>(), MainView,
         NavigationView.OnNavigationItemSelectedListener,
         HasSupportFragmentInjector,
-        AddContainerDialogListener,
+        AddGroupFragment.OnPositiveButtonListener,
+        AddTeacherFragment.OnPositiveButtonListener,
         WeeksContainerFragment.OnScheduleContainerRemovedListener {
     override val view: MainView
         get() = this

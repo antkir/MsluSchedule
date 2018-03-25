@@ -8,17 +8,17 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import by.ntnk.msluschedule.R
+import by.ntnk.msluschedule.data.StudyGroup
 import by.ntnk.msluschedule.mvp.views.MvpDialogFragment
 import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.ui.adapters.ScheduleFilterAdapter
 import by.ntnk.msluschedule.ui.customviews.LoadingAutoCompleteTextView
-import by.ntnk.msluschedule.ui.main.AddContainerDialogListener
 import by.ntnk.msluschedule.utils.uiScheduler
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
 class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), AddGroupView {
-    private var listener: AddContainerDialogListener? = null
+    private lateinit var listener: OnPositiveButtonListener
     private lateinit var facultyView: LoadingAutoCompleteTextView
     private lateinit var groupView: LoadingAutoCompleteTextView
 
@@ -36,16 +36,11 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
         try {
-            listener = context as AddContainerDialogListener
+            listener = context as OnPositiveButtonListener
         } catch (e: ClassCastException) {
             throw ClassCastException(context.toString() +
-                    " must implement AddContainerDialogListener")
+                    " must implement OnPositiveButtonListener")
         }
-    }
-
-    override fun onDetach() {
-        listener = null
-        super.onDetach()
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -80,7 +75,7 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
                 .setTitle((R.string.add_group_title))
                 .setView(layout)
                 .setPositiveButton(R.string.button_add) { _, _ ->
-                    listener!!.onPositiveButtonGroup(presenter.getStudyGroup())
+                    listener.onPositiveButtonGroup(presenter.getStudyGroup())
                 }
                 .setNegativeButton(R.string.button_cancel) { _, _ ->
                     dismiss()
@@ -154,5 +149,9 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
     override fun dismiss() {
         presenter.clearDisposables()
         super.dismiss()
+    }
+
+    interface OnPositiveButtonListener {
+        fun onPositiveButtonGroup(studyGroup: StudyGroup)
     }
 }
