@@ -7,7 +7,7 @@ import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.utils.CurrentDate
 import by.ntnk.msluschedule.utils.singleScheduler
 import io.reactivex.Scheduler
-import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -15,7 +15,7 @@ class AddTeacherPresenter @Inject constructor(
         private val networkRequestRepository: NetworkRepository,
         private val currentDate: CurrentDate
 ) : Presenter<AddTeacherView>() {
-    private val disposables: CompositeDisposable = CompositeDisposable()
+    private lateinit var disposable: Disposable
     private var teachers: ScheduleFilter? = null
     private var teacher: Int = 0
 
@@ -23,7 +23,7 @@ class AddTeacherPresenter @Inject constructor(
         get() = teachers != null
 
     fun getTeachersScheduleFilter(uiScheduler: Scheduler) {
-        val disposable = networkRequestRepository.getTeachers()
+        disposable = networkRequestRepository.getTeachers()
                 .subscribeOn(singleScheduler)
                 .observeOn(uiScheduler)
                 .subscribe(
@@ -33,7 +33,6 @@ class AddTeacherPresenter @Inject constructor(
                         },
                         { it.printStackTrace() }
                 )
-        disposables.add(disposable)
     }
 
     fun setTeacherValue(value: Int) {
@@ -50,5 +49,5 @@ class AddTeacherPresenter @Inject constructor(
 
     fun populateTeachersAdapter() = view!!.populateTeachersView(teachers!!)
 
-    fun clearDisposables() = disposables.clear()
+    fun clearDisposables() = disposable.dispose()
 }

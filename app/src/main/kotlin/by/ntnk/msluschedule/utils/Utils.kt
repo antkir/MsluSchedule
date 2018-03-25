@@ -1,8 +1,5 @@
 package by.ntnk.msluschedule.utils
 
-import io.reactivex.Scheduler
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import java.util.AbstractMap
 
 const val EMPTY_STRING = ""
@@ -12,10 +9,6 @@ const val EMPTY_STRING = ""
 const val COURSE_VALUE = 1
 
 const val PRESENTER_ID_KEY = "PresenterID"
-
-val uiScheduler: Scheduler = AndroidSchedulers.mainThread()
-val singleScheduler = Schedulers.single()
-val ioScheduler = Schedulers.io()
 
 const val MONDAY = "ПН"
 const val TUESDAY = "ВТ"
