@@ -70,7 +70,7 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
     }
 
     private fun initMaterialDialog(layout: View): Dialog {
-        return AlertDialog.Builder(activity!!)
+        return AlertDialog.Builder(activity!!, R.style.MsluTheme_Dialog_Alert)
                 .setTitle((R.string.add_group_title))
                 .setView(layout)
                 .setPositiveButton(R.string.button_add) { _, _ ->

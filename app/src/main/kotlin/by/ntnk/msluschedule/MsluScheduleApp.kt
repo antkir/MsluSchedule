@@ -2,6 +2,7 @@ package by.ntnk.msluschedule
 
 import android.app.Activity
 import android.app.Application
+import android.support.v7.app.AppCompatDelegate
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasActivityInjector
@@ -15,6 +16,7 @@ class MsluScheduleApp : Application(), HasActivityInjector {
 
     override fun onCreate() {
         super.onCreate()
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         Timber.plant(Timber.DebugTree())
         buildAppComponent().inject(this)
     }

@@ -10,7 +10,7 @@
         android:id="@+id/tabs_weekscontainer"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="@color/colorPrimary"
+        android:background="@color/colorPrimaryLight"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:tabGravity="center"
         app:tabMode="scrollable" />
