@@ -13,7 +13,6 @@ import by.ntnk.msluschedule.mvp.views.MvpDialogFragment
 import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.ui.adapters.ScheduleFilterAdapter
 import by.ntnk.msluschedule.ui.customviews.LoadingAutoCompleteTextView
-import by.ntnk.msluschedule.utils.uiScheduler
 import dagger.Lazy
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
@@ -58,7 +57,7 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
         when {
             savedInstanceState == null -> {
                 facultyView.progressBarVisibility = View.VISIBLE
-                presenter.getFacultyScheduleFilter(uiScheduler)
+                presenter.getFacultyScheduleFilter()
             }
             presenter.isFacultiesNotEmpty -> {
                 presenter.populateFacultiesAdapter()
@@ -96,7 +95,7 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
         facultyView.setOnItemClickListener { _, _, position, _ ->
             groupView.progressBarVisibility = View.VISIBLE
             presenter.setFacultyValueFromPosition(position)
-            presenter.getScheduleGroups(uiScheduler)
+            presenter.getScheduleGroups()
             groupView.text.clear()
         }
 

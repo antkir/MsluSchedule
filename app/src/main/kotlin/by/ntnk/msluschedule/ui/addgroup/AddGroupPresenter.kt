@@ -4,17 +4,14 @@ import by.ntnk.msluschedule.data.StudyGroup
 import by.ntnk.msluschedule.mvp.Presenter
 import by.ntnk.msluschedule.network.NetworkRepository
 import by.ntnk.msluschedule.network.data.ScheduleFilter
-import by.ntnk.msluschedule.utils.COURSE_VALUE
-import by.ntnk.msluschedule.utils.CurrentDate
-import by.ntnk.msluschedule.utils.plusAssign
-import by.ntnk.msluschedule.utils.singleScheduler
-import io.reactivex.Scheduler
+import by.ntnk.msluschedule.utils.*
 import io.reactivex.disposables.CompositeDisposable
 import javax.inject.Inject
 
 class AddGroupPresenter @Inject constructor(
         private val networkRepository: NetworkRepository,
-        private val currentDate: CurrentDate
+        private val currentDate: CurrentDate,
+        private val schedulerProvider: SchedulerProvider
 ) : Presenter<AddGroupView>() {
     private val disposables: CompositeDisposable = CompositeDisposable()
     private var faculties: ScheduleFilter? = null
@@ -42,10 +39,10 @@ class AddGroupPresenter @Inject constructor(
         faculty = faculties!!.keyAt(position)
     }
 
-    fun getFacultyScheduleFilter(uiScheduler: Scheduler) {
+    fun getFacultyScheduleFilter() {
         disposables += networkRepository.getFaculties()
-                .subscribeOn(singleScheduler)
-                .observeOn(uiScheduler)
+                .subscribeOn(schedulerProvider.single())
+                .observeOn(schedulerProvider.ui())
                 .subscribe(
                         {
                             faculties = it
@@ -55,10 +52,10 @@ class AddGroupPresenter @Inject constructor(
                 )
     }
 
-    fun getScheduleGroups(uiScheduler: Scheduler) {
+    fun getScheduleGroups() {
         disposables += networkRepository.getGroups(faculty, course)
-                .subscribeOn(singleScheduler)
-                .observeOn(uiScheduler)
+                .subscribeOn(schedulerProvider.single())
+                .observeOn(schedulerProvider.ui())
                 .subscribe(
                         {
                             groups = it

@@ -6,7 +6,7 @@ import android.support.v4.app.DialogFragment
 import android.support.v7.app.AlertDialog
 import android.widget.Button
 import by.ntnk.msluschedule.R
-import by.ntnk.msluschedule.utils.uiScheduler
+import by.ntnk.msluschedule.utils.SchedulerProvider
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import java.util.Locale
@@ -58,7 +58,7 @@ class WarningDialogFragment : DialogFragment() {
                         resources.getString(R.string.button_delete),
                         it)
                 }
-                .observeOn(uiScheduler)
+                .observeOn(SchedulerProvider.ui())
                 .subscribe(
                         { button.text = it },
                         {},

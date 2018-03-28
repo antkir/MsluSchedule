@@ -6,23 +6,21 @@ import by.ntnk.msluschedule.data.Teacher
 import by.ntnk.msluschedule.db.DatabaseRepository
 import by.ntnk.msluschedule.mvp.Presenter
 import by.ntnk.msluschedule.network.NetworkRepository
-import by.ntnk.msluschedule.utils.ScheduleType
-import by.ntnk.msluschedule.utils.SharedPreferencesRepository
-import by.ntnk.msluschedule.utils.singleScheduler
-import by.ntnk.msluschedule.utils.uiScheduler
+import by.ntnk.msluschedule.utils.*
 import io.reactivex.Single
 import javax.inject.Inject
 
 class MainPresenter @Inject constructor(
         private val databaseRepository: DatabaseRepository,
         private val networkRepository: NetworkRepository,
-        private val sharedPreferencesRepository: SharedPreferencesRepository
+        private val sharedPreferencesRepository: SharedPreferencesRepository,
+        private val schedulerProvider: SchedulerProvider
 ) : Presenter<MainView>() {
     fun addGroup(studyGroup: StudyGroup) {
         databaseRepository.insertStudyGroup(studyGroup)
                 .flatMap { insertWeeksWithWeekdays(it) }
-                .subscribeOn(singleScheduler)
-                .observeOn(uiScheduler)
+                .subscribeOn(schedulerProvider.single())
+                .observeOn(schedulerProvider.ui())
                 .subscribe(
                         {
                             val info = ScheduleContainerInfo(it, studyGroup.name, ScheduleType.STUDYGROUP)
@@ -38,8 +36,8 @@ class MainPresenter @Inject constructor(
     fun addTeacher(teacher: Teacher) {
         databaseRepository.insertTeacher(teacher)
                 .flatMap { insertWeeksWithWeekdays(it) }
-                .subscribeOn(singleScheduler)
-                .observeOn(uiScheduler)
+                .subscribeOn(schedulerProvider.single())
+                .observeOn(schedulerProvider.ui())
                 .subscribe(
                         {
                             val info = ScheduleContainerInfo(it, teacher.name, ScheduleType.TEACHER)
@@ -62,8 +60,8 @@ class MainPresenter @Inject constructor(
 
     fun initContainerListView() {
         databaseRepository.getScheduleContainers()
-                .subscribeOn(singleScheduler)
-                .observeOn(uiScheduler)
+                .subscribeOn(schedulerProvider.single())
+                .observeOn(schedulerProvider.ui())
                 .subscribe(
                         {
                             val info = ScheduleContainerInfo(it.id, it.name, it.type)

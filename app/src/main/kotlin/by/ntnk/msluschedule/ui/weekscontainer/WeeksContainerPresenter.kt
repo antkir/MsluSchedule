@@ -9,7 +9,8 @@ import javax.inject.Inject
 class WeeksContainerPresenter @Inject constructor(
         private val databaseRepository: DatabaseRepository,
         private val sharedPreferencesRepository: SharedPreferencesRepository,
-        private val currentDate: CurrentDate
+        private val currentDate: CurrentDate,
+        private val schedulerProvider: SchedulerProvider
 ) : Presenter<WeeksContainerView>() {
     fun initWeeksAdapter() {
         val info = sharedPreferencesRepository.getSelectedScheduleContainerInfo()
@@ -30,8 +31,8 @@ class WeeksContainerPresenter @Inject constructor(
                     val currentItemIndex = if (index < 2) index else 2
                     return@map Pair(weekIds, currentItemIndex)
                 }
-                .subscribeOn(ioScheduler)
-                .observeOn(uiScheduler)
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.ui())
                 .subscribe(
                         { view!!.initWeeksAdapter(it.first, it.second) },
                         { it.printStackTrace() })
@@ -40,8 +41,8 @@ class WeeksContainerPresenter @Inject constructor(
     fun deleteSelectedScheduleContainer() {
         val info = sharedPreferencesRepository.getSelectedScheduleContainerInfo()
         databaseRepository.deleteScheduleContainer(info.id)
-                .subscribeOn(ioScheduler)
-                .observeOn(uiScheduler)
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.ui())
                 .subscribe(
                         {
                             sharedPreferencesRepository.selectEmptyScheduleContainer()
