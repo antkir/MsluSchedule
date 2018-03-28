@@ -37,7 +37,7 @@ class MainActivity :
         HasSupportFragmentInjector,
         AddGroupFragment.OnPositiveButtonListener,
         AddTeacherFragment.OnPositiveButtonListener,
-        WeeksContainerFragment.OnScheduleContainerRemovedListener {
+        WeeksContainerFragment.OnScheduleContainerDeletedListener {
     override val view: MainView
         get() = this
 
@@ -203,7 +203,7 @@ class MainActivity :
         }
     }
 
-    override fun onScheduleContainerRemoved(info: ScheduleContainerInfo) {
+    override fun onScheduleContainerDeleted(info: ScheduleContainerInfo) {
         supportActionBar?.title = EMPTY_STRING
         val fragmentManager = supportFragmentManager
         val fragment = fragmentManager.findFragmentById(R.id.framelayout_main)

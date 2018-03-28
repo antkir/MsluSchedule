@@ -9,21 +9,24 @@ import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.data.ScheduleContainerInfo
 import by.ntnk.msluschedule.mvp.views.MvpFragment
 import by.ntnk.msluschedule.ui.adapters.ViewPagerFragmentAdapter
+import by.ntnk.msluschedule.ui.warningdialog.WarningDialogFragment
 import by.ntnk.msluschedule.utils.ImmutableEntry
 import dagger.Lazy
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
 private const val SELECTED_TAB_POSITION = "tab_position"
+private const val WARNING_DIALOG_FRAGMENT = "WarningDialogFragment"
 
 class WeeksContainerFragment :
         MvpFragment<WeeksContainerPresenter, WeeksContainerView>(),
-        WeeksContainerView {
+        WeeksContainerView,
+        WarningDialogFragment.OnPositiveButtonClickListener {
     private lateinit var viewPager: ViewPager
     private lateinit var tabLayout: TabLayout
     private lateinit var fragmentAdapter: ViewPagerFragmentAdapter
     private var savedCurrentPosition = -1
-    private lateinit var listener: OnScheduleContainerRemovedListener
+    private lateinit var listener: OnScheduleContainerDeletedListener
 
     override val view: WeeksContainerView
         get() = this
@@ -37,10 +40,10 @@ class WeeksContainerFragment :
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
         try {
-            listener = context as OnScheduleContainerRemovedListener
+            listener = context as OnScheduleContainerDeletedListener
         } catch (e: ClassCastException) {
             throw ClassCastException(context.toString() +
-                    " must implement OnScheduleContainerRemovedListener")
+                    " must implement OnScheduleContainerDeletedListener")
         }
     }
 
@@ -88,19 +91,22 @@ class WeeksContainerFragment :
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         super.onOptionsItemSelected(item)
         return when (item?.itemId) {
-            R.id.item_weekscontainer_remove -> {
-                presenter.removeSelectedScheduleContainer()
+            R.id.item_weekscontainer_delete -> {
+                val warningFragment = WarningDialogFragment()
+                warningFragment.show(childFragmentManager, WARNING_DIALOG_FRAGMENT)
                 return true
             }
             else -> super.onOptionsItemSelected(item)
         }
     }
 
+    override fun onPositiveButtonClick() = presenter.deleteSelectedScheduleContainer()
+
     override fun removeScheduleContainerFromView(info: ScheduleContainerInfo) {
-        listener.onScheduleContainerRemoved(info)
+        listener.onScheduleContainerDeleted(info)
     }
 
-    interface OnScheduleContainerRemovedListener {
-        fun onScheduleContainerRemoved(info: ScheduleContainerInfo)
+    interface OnScheduleContainerDeletedListener {
+        fun onScheduleContainerDeleted(info: ScheduleContainerInfo)
     }
 }

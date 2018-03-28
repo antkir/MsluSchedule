@@ -37,7 +37,7 @@ class WeeksContainerPresenter @Inject constructor(
                         { it.printStackTrace() })
     }
 
-    fun removeSelectedScheduleContainer() {
+    fun deleteSelectedScheduleContainer() {
         val info = sharedPreferencesRepository.getSelectedScheduleContainerInfo()
         databaseRepository.deleteScheduleContainer(info.id)
                 .subscribeOn(ioScheduler)
