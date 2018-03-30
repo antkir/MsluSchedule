@@ -8,7 +8,7 @@ import android.view.*
 import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.data.ScheduleContainerInfo
 import by.ntnk.msluschedule.mvp.views.MvpFragment
-import by.ntnk.msluschedule.ui.adapters.ViewPagerFragmentAdapter
+import by.ntnk.msluschedule.ui.adapters.WeekFragmentViewPagerAdapter
 import by.ntnk.msluschedule.ui.warningdialog.WarningDialogFragment
 import by.ntnk.msluschedule.utils.ImmutableEntry
 import dagger.Lazy
@@ -24,7 +24,7 @@ class WeeksContainerFragment :
         WarningDialogFragment.OnPositiveButtonClickListener {
     private lateinit var viewPager: ViewPager
     private lateinit var tabLayout: TabLayout
-    private lateinit var fragmentAdapter: ViewPagerFragmentAdapter
+    private lateinit var fragmentViewPagerAdapter: WeekFragmentViewPagerAdapter
     private var savedCurrentPosition = -1
     private lateinit var listener: OnScheduleContainerDeletedListener
 
@@ -71,8 +71,8 @@ class WeeksContainerFragment :
     }
 
     override fun initWeeksAdapter(weekIds: List<ImmutableEntry>, currentWeekItemIndex: Int) {
-        fragmentAdapter = ViewPagerFragmentAdapter(childFragmentManager, weekIds)
-        viewPager.adapter = fragmentAdapter
+        fragmentViewPagerAdapter = WeekFragmentViewPagerAdapter(childFragmentManager, weekIds)
+        viewPager.adapter = fragmentViewPagerAdapter
         viewPager.currentItem = currentWeekItemIndex
         viewPager.currentItem =
                 if (savedCurrentPosition == -1) currentWeekItemIndex else savedCurrentPosition
