@@ -1,5 +1,7 @@
 package by.ntnk.msluschedule.network
 
+import by.ntnk.msluschedule.data.StudyGroup
+import by.ntnk.msluschedule.data.Teacher
 import by.ntnk.msluschedule.di.PerApp
 import by.ntnk.msluschedule.network.data.JsonBody
 import by.ntnk.msluschedule.network.data.RequestData
@@ -11,6 +13,7 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import org.jsoup.HttpStatusException
 import retrofit2.Response
+import java.io.InputStream
 import javax.inject.Inject
 
 @PerApp
@@ -57,6 +60,18 @@ constructor(
         return wrapRequest(::getWeeks)
     }
 
+    fun getScheduleStream(studyGroup: StudyGroup, weekKey: Int): Single<InputStream> {
+        val requestDataList = networkHelper.getStudyGroupRequestDataList(studyGroup, weekKey)
+        fun getScheduleData() = getScheduleData(NetworkHelper.groupSchedule, requestDataList)
+        return wrapRequest(::getScheduleData)
+    }
+
+    fun getScheduleStream(teacher: Teacher, weekKey: Int): Single<InputStream> {
+        val requestDataList = networkHelper.getTeacherRequestDataList(teacher, weekKey)
+        fun getScheduleData() = getScheduleData(NetworkHelper.teacherSchedule, requestDataList)
+        return wrapRequest(::getScheduleData)
+    }
+
     /*
      * The process of giving/storing session ID is not consistent,
      * so we make sure everything will work by creating and closing
@@ -90,6 +105,16 @@ constructor(
                 .flatMap { networkHelper.parseDataFromHtmlBody(scheduleFilter, it) }
     }
 
+    private fun getScheduleData(
+            requestedScheduleType: String,
+            requestDataList: List<RequestData>
+    ): Single<InputStream> {
+        return Observable.fromIterable(requestDataList)
+                .flatMapSingle { changeScheduleFilter(requestedScheduleType, it) }
+                .ignoreElements()
+                .andThen(getScheduleInputStream(requestedScheduleType))
+    }
+
     private fun initSession(): Completable {
         return scheduleApi
                 .initSession()
@@ -120,6 +145,13 @@ constructor(
                 .getHtmlBody(scheduleType)
                 .doOnSuccess { checkErrors(it) }
                 .map { it.body()?.string() ?: EMPTY_STRING }
+    }
+
+    private fun getScheduleInputStream(scheduleType: String): Single<InputStream> {
+        return scheduleApi
+                .getSchedule(scheduleType)
+                .doOnSuccess { checkErrors(it) }
+                .map { it.body()?.byteStream() }
     }
 
     @Throws(HttpStatusException::class)

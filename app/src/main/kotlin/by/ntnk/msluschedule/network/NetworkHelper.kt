@@ -1,6 +1,8 @@
 package by.ntnk.msluschedule.network
 
 import android.util.SparseArray
+import by.ntnk.msluschedule.data.StudyGroup
+import by.ntnk.msluschedule.data.Teacher
 import by.ntnk.msluschedule.di.PerApp
 import by.ntnk.msluschedule.network.data.JsonBody
 import by.ntnk.msluschedule.network.data.RequestData
@@ -42,15 +44,37 @@ class NetworkHelper @Inject constructor(private val currentDate: CurrentDate) {
     private fun createFacultyRequestDataInstance(value: Int): RequestData =
             RequestData(facultyRequestInfo, value)
 
+    private fun createStudyGroupRequestDataInstance(value: Int): RequestData =
+            RequestData(groupRequestInfo, value)
+
+    private fun createTeacherRequestDataInstance(value: Int): RequestData =
+            RequestData(teacherRequestInfo, value)
+
     fun getYearsFilterDataList(): List<RequestData> =
             Collections.singletonList(createYearRequestDataInstance(currentDate.academicYear))
 
     fun getStudyGroupsFilterDataList(faculty: Int, course: Int): List<RequestData> =
-            Arrays.asList(
+            listOf(
                     createFacultyRequestDataInstance(faculty),
                     createCourseRequestDataInstance(course),
                     // When passing 0, groups for all courses are returned
                     createYearRequestDataInstance(0)
+            )
+
+    fun getStudyGroupRequestDataList(studyGroup: StudyGroup, weekKey: Int): List<RequestData> =
+            listOf(
+                    createYearRequestDataInstance(studyGroup.year),
+                    createWeekRequestDataInstance(weekKey),
+                    createFacultyRequestDataInstance(studyGroup.faculty),
+                    createCourseRequestDataInstance(studyGroup.course),
+                    createStudyGroupRequestDataInstance(studyGroup.key)
+            )
+
+    fun getTeacherRequestDataList(teacher: Teacher, weekKey: Int): List<RequestData> =
+            listOf(
+                    createYearRequestDataInstance(teacher.year),
+                    createWeekRequestDataInstance(weekKey),
+                    createTeacherRequestDataInstance(teacher.key)
             )
 
     fun parseDataFromHtmlBody(
