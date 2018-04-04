@@ -26,6 +26,7 @@ android {
         applicationId "by.ntnk.msluschedule"
         minSdkVersion 15
         targetSdkVersion 27
+        multiDexEnabled true
         versionCode versionMajor * 100 + versionMinor * 10 + versionPatch
         versionName "${versionMajor}.${versionMinor}.${versionPatch}"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -52,6 +53,7 @@ ext {
     junitVersion = '4.12'
     mockitoVersion = '2.15.0'
     okhttpVersion = '3.10.0'
+    poiVersion = '3.17'
     retrofitVersion = '2.4.0'
     roomVersion = '1.1.0-beta1'
     rxandroidVersion = '2.0.2'
@@ -80,7 +82,9 @@ dependencies {
     implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
     implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofitVersion"
     implementation "com.squareup.retrofit2:converter-moshi:$retrofitVersion"
-    //Room
+    // Poi
+    implementation "org.apache.poi:poi:$poiVersion"
+    // Room
     implementation "android.arch.persistence.room:runtime:$roomVersion"
     implementation "android.arch.persistence.room:rxjava2:$roomVersion"
     kapt "android.arch.persistence.room:compiler:$roomVersion"

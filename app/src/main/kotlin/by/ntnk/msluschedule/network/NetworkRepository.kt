@@ -2,6 +2,8 @@ package by.ntnk.msluschedule.network
 
 import by.ntnk.msluschedule.data.StudyGroup
 import by.ntnk.msluschedule.data.Teacher
+import by.ntnk.msluschedule.data.WeekdayWithStudyGroupLessons
+import by.ntnk.msluschedule.data.WeekdayWithTeacherLessons
 import by.ntnk.msluschedule.di.PerApp
 import by.ntnk.msluschedule.network.data.JsonBody
 import by.ntnk.msluschedule.network.data.RequestData
@@ -21,7 +23,8 @@ class NetworkRepository @Inject
 constructor(
         private val scheduleApi: ScheduleApi,
         private val networkHelper: NetworkHelper,
-        private val localCookieJar: LocalCookieJar
+        private val localCookieJar: LocalCookieJar,
+        private val xlsParser: XlsParser
 ) {
     fun getFaculties(): Single<ScheduleFilter> {
         fun getFaculties() = getDataFromHtmlRequest(
@@ -60,16 +63,16 @@ constructor(
         return wrapRequest(::getWeeks)
     }
 
-    fun getScheduleStream(studyGroup: StudyGroup, weekKey: Int): Single<InputStream> {
+    fun getSchedule(studyGroup: StudyGroup, weekKey: Int): Observable<WeekdayWithStudyGroupLessons> {
         val requestDataList = networkHelper.getStudyGroupRequestDataList(studyGroup, weekKey)
         fun getScheduleData() = getScheduleData(NetworkHelper.groupSchedule, requestDataList)
-        return wrapRequest(::getScheduleData)
+        return wrapRequest(::getScheduleData).flatMapObservable { xlsParser.parseStudyGroupXls(it) }
     }
 
-    fun getScheduleStream(teacher: Teacher, weekKey: Int): Single<InputStream> {
+    fun getSchedule(teacher: Teacher, weekKey: Int): Observable<WeekdayWithTeacherLessons> {
         val requestDataList = networkHelper.getTeacherRequestDataList(teacher, weekKey)
         fun getScheduleData() = getScheduleData(NetworkHelper.teacherSchedule, requestDataList)
-        return wrapRequest(::getScheduleData)
+        return wrapRequest(::getScheduleData).flatMapObservable { xlsParser.parseTeacherXls(it) }
     }
 
     /*
