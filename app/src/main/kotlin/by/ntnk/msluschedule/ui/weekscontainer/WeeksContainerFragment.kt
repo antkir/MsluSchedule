@@ -1,5 +1,6 @@
 package by.ntnk.msluschedule.ui.weekscontainer
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.support.design.widget.TabLayout
@@ -52,6 +53,7 @@ class WeeksContainerFragment :
         setHasOptionsMenu(true)
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
@@ -60,7 +62,7 @@ class WeeksContainerFragment :
         val view = inflater.inflate(R.layout.fragment_weekscontainer, container, false)
         viewPager = view.findViewById(R.id.viewpager_weekscontainer)
         tabLayout = view.findViewById(R.id.tabs_weekscontainer)
-        viewPager.offscreenPageLimit = 2
+        tabLayout.setOnTouchListener { _, _ -> true }
         return view
     }
 
@@ -73,7 +75,7 @@ class WeeksContainerFragment :
     override fun initWeeksAdapter(weekIds: List<ImmutableEntry>, currentWeekItemIndex: Int) {
         fragmentViewPagerAdapter = WeekFragmentViewPagerAdapter(childFragmentManager, weekIds)
         viewPager.adapter = fragmentViewPagerAdapter
-        viewPager.currentItem = currentWeekItemIndex
+        viewPager.offscreenPageLimit = weekIds.size - 1
         viewPager.currentItem =
                 if (savedCurrentPosition == -1) currentWeekItemIndex else savedCurrentPosition
         tabLayout.setupWithViewPager(viewPager)
