@@ -6,4 +6,4 @@ data class StudyGroupLesson(
     val classroom: String,
     val startTime: String,
     val endTime: String
-)
+) : Lesson

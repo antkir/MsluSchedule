@@ -2,8 +2,14 @@ package by.ntnk.msluschedule.data
 
 import java.util.*
 
-data class WeekdayWithTeacherLessons(val weekday: String) {
-    val lessons: MutableList<TeacherLesson> = ArrayList()
+data class WeekdayWithTeacherLessons(
+        override val weekday: String
+) : WeekdayWithLessons<TeacherLesson> {
+    override val lessons: MutableList<TeacherLesson> = ArrayList()
+
+    constructor(weekday: String, lessons: List<TeacherLesson>) : this(weekday) {
+        this.lessons.addAll(lessons)
+    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

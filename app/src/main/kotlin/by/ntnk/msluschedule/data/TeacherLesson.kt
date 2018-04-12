@@ -10,7 +10,7 @@ data class TeacherLesson(
         val classroom: String,
         val startTime: String,
         val endTime: String
-) {
+) : Lesson {
     constructor(startTime: String, endTime: String): this(
             EMPTY_STRING,
             EMPTY_STRING,
