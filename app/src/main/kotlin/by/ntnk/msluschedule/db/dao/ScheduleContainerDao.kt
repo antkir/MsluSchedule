@@ -10,6 +10,9 @@ interface ScheduleContainerDao : BaseDao<ScheduleContainer> {
     @Query("SELECT * FROM ScheduleContainer ORDER BY name")
     fun getScheduleContainers(): Single<List<ScheduleContainer>>
 
+    @Query("SELECT * FROM ScheduleContainer WHERE id=:id")
+    fun getScheduleContainer(id: Int): Single<ScheduleContainer>
+
     @Query("DELETE FROM ScheduleContainer WHERE id=:id")
     fun delete(id: Int): Int
 }

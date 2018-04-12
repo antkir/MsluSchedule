@@ -1,10 +1,7 @@
 package by.ntnk.msluschedule.db
 
-import by.ntnk.msluschedule.data.StudyGroup
-import by.ntnk.msluschedule.data.Teacher
-import by.ntnk.msluschedule.db.data.ScheduleContainer
-import by.ntnk.msluschedule.db.data.Week
-import by.ntnk.msluschedule.db.data.Weekday
+import by.ntnk.msluschedule.data.*
+import by.ntnk.msluschedule.db.data.*
 import by.ntnk.msluschedule.di.PerApp
 import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.utils.*
@@ -19,6 +16,12 @@ class DatabaseDataMapper @Inject constructor() {
     fun map(data: Teacher): ScheduleContainer =
             ScheduleContainer(data.key, data.name, ScheduleType.TEACHER, data.year)
 
+    fun mapToStudyGroup(data: ScheduleContainer): StudyGroup =
+            StudyGroup(data.key, data.name, data.faculty, data.course, data.year)
+
+    fun mapToTeacher(data: ScheduleContainer): Teacher =
+            Teacher(data.key, data.name, data.year)
+
     fun map(data: ScheduleFilter, containerId: Int): List<Week> {
         val weeks = ArrayList<Week>()
         for (i in 0 until data.size) {
@@ -30,8 +33,42 @@ class DatabaseDataMapper @Inject constructor() {
         return weeks
     }
 
-    fun createWeekDaysList(weekId: Int): List<Weekday> =
+    fun createWeekdaysList(weekId: Int): List<Weekday> =
             Arrays.asList(MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY)
                     .map { weekdayValue -> Weekday(weekdayValue, weekId) }
                     .toList()
+
+    fun map(weekdayWithLessons: DbWeekdayWithTeacherLessons): WeekdayWithTeacherLessons {
+        val lessons = ArrayList<TeacherLesson>()
+        for (lesson in weekdayWithLessons.lessons) {
+            lessons.add(
+                    TeacherLesson(
+                            lesson.subject,
+                            lesson.faculty,
+                            lesson.groups,
+                            lesson.type,
+                            lesson.classroom,
+                            lesson.startTime,
+                            lesson.endTime
+                    )
+            )
+        }
+        return WeekdayWithTeacherLessons(weekdayWithLessons.weekday.value, lessons)
+    }
+
+    fun map(weekdayWithLessons: DbWeekdayWithStudyGroupLessons): WeekdayWithStudyGroupLessons {
+        val lessons = ArrayList<StudyGroupLesson>()
+        for (lesson in weekdayWithLessons.lessons) {
+            lessons.add(
+                    StudyGroupLesson(
+                            lesson.subject,
+                            lesson.teacher,
+                            lesson.classroom,
+                            lesson.startTime,
+                            lesson.endTime
+                    )
+            )
+        }
+        return WeekdayWithStudyGroupLessons(weekdayWithLessons.weekday.value, lessons)
+    }
 }

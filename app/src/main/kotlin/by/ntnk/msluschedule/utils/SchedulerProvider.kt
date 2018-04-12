@@ -14,6 +14,8 @@ class SchedulerProvider @Inject constructor() {
 
     fun single(): Scheduler = Schedulers.single()
 
+    fun newThread(): Scheduler = Schedulers.newThread()
+
     companion object {
         fun ui(): Scheduler = AndroidSchedulers.mainThread()
     }

@@ -16,6 +16,8 @@ import javax.inject.Inject
 class WeekFragment :
         MvpFragment<WeekPresenter, WeekView>(),
         WeekView {
+    private var weekId: Int? = null
+
     override val view: WeekView
         get() = this
 
@@ -27,6 +29,11 @@ class WeekFragment :
     override fun onAttach(context: Context?) {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        weekId = arguments?.getInt(WEEK_ID)
     }
 
     override fun onCreateView(
@@ -45,6 +52,24 @@ class WeekFragment :
         recyclerView.setHasFixedSize(true)
     }
 
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        weekId ?: return
+        savedInstanceState ?: presenter.getScheduleData(weekId!!)
+    }
+
     override fun showSchedule() {
+    }
+
+    companion object {
+        private const val WEEK_ID = "weekID"
+
+        fun newInstance(weekId: Int): WeekFragment {
+            return WeekFragment().apply {
+                arguments = Bundle().apply {
+                    putInt(WEEK_ID, weekId)
+                }
+            }
+        }
     }
 }

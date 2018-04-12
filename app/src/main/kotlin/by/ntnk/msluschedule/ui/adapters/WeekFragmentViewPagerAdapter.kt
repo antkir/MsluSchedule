@@ -10,7 +10,10 @@ class WeekFragmentViewPagerAdapter(
         fragmentManager: FragmentManager,
         private val fragmentsInfo: List<ImmutableEntry>
 ) : FragmentStatePagerAdapter(fragmentManager) {
-    override fun getItem(position: Int): Fragment = WeekFragment()
+    override fun getItem(position: Int): Fragment {
+        val weekId = fragmentsInfo[position].key
+        return WeekFragment.newInstance(weekId)
+    }
 
     override fun getCount(): Int = fragmentsInfo.size
 
