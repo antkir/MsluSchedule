@@ -13,10 +13,6 @@ android {
         test.java.srcDirs += 'src/test/kotlin'
         androidTest.java.srcDirs += 'src/androidTest/kotlin'
     }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
     testOptions {
         unitTests.returnDefaultValues = true
     }
@@ -44,9 +40,9 @@ android {
 }
 
 ext {
-    androidsupportVersion = '27.1.0'
+    androidsupportVersion = '27.1.1'
     androidsupportTestVersion = '1.0.1'
-    constraintlayoutVersion = '1.0.2'
+    constraintlayoutVersion = '1.1.0'
     daggerVersion = '2.15'
     espressoVersion = '3.0.1'
     jsoupVersion = '1.11.2'
@@ -55,11 +51,11 @@ ext {
     okhttpVersion = '3.10.0'
     poiVersion = '3.17'
     retrofitVersion = '2.4.0'
-    roomVersion = '1.1.0-beta1'
+    roomVersion = '1.1.0-beta2'
     rxandroidVersion = '2.0.2'
-    rxjavaVersion = '2.1.10'
+    rxjavaVersion = '2.1.12'
     threetenbpVersion = '1.3.6'
-    timberVersion = '4.6.1'
+    timberVersion = '4.7.0'
 }
 
 dependencies {
