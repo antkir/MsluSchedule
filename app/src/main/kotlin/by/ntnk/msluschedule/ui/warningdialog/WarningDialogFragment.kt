@@ -48,7 +48,7 @@ class WarningDialogFragment : DialogFragment() {
 
     private fun initPositiveButtonCountdown(button: Button) {
         button.isEnabled = false
-        val timeout = 15L
+        val timeout = 5L
         disposable = Observable
                 .intervalRange(1, timeout, 0, 1, TimeUnit.SECONDS)
                 .map { timeout - it }
