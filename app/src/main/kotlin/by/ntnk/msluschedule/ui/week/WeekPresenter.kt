@@ -11,7 +11,6 @@ import by.ntnk.msluschedule.utils.SchedulerProvider
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
 import io.reactivex.*
 import io.reactivex.android.schedulers.AndroidSchedulers
-import timber.log.Timber
 import javax.inject.Inject
 
 class WeekPresenter @Inject constructor(
@@ -28,7 +27,7 @@ class WeekPresenter @Inject constructor(
                 .subscribeOn(schedulerProvider.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        { weekDayEntities -> Timber.d(weekDayEntities.toString()) },
+                        { weekDayEntities -> view?.showSchedule(weekDayEntities) },
                         { it.printStackTrace() })
     }
 

@@ -1,7 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#01579B</color>
-    <color name="colorPrimaryDark">#002F6C</color>
-    <color name="colorPrimaryLight">#4F83CC</color>
+    <color name="colorPrimary">#005BCC</color>
+    <color name="colorPrimaryDark">#0A3BAD</color>
+    <color name="colorPrimaryLight">#006DDE</color>
     <color name="colorAccent">#FDD835</color>
+
+    <color name="surface">#FFFFFF</color>
+    <color name="lesson_type_circle">#FDD835</color>
+
+    <color name="primary_text">#000000</color>
+    <color name="primary_text_inverted">#FFFFFF</color>
+    <color name="tertiary_text">#808080</color>
+
+    <color name="shadow_start_color">#37000000</color>
+    <color name="shadow_end_color">#03000000</color>
+
+    <color name="state_pressed">#E0E0E0</color>
 </resources>

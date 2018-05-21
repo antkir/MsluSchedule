@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="60dp"
+    android:layout_marginEnd="@dimen/card_margin_side"
+    android:layout_marginLeft="@dimen/card_margin_side"
+    android:layout_marginRight="@dimen/card_margin_side"
+    android:layout_marginStart="@dimen/card_margin_side"
+    android:background="@color/surface"
+    android:foreground="?android:attr/selectableItemBackground">
+
+    <TextView
+        android:id="@+id/text_studygrouplesson_starttime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textColor="@color/tertiary_text"
+        app:layout_constraintBottom_toTopOf="@+id/text_studygrouplesson_endtime"
+        app:layout_constraintEnd_toEndOf="@id/text_studygrouplesson_endtime"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:text="1:40" />
+
+    <TextView
+        android:id="@+id/text_studygrouplesson_endtime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textColor="@color/tertiary_text"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/text_studygrouplesson_teacher"
+        app:layout_constraintTop_toBottomOf="@id/text_studygrouplesson_starttime"
+        tools:text="13:15" />
+
+
+    <TextView
+        android:id="@+id/text_studygrouplesson_subject"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="72dp"
+        android:layout_marginLeft="72dp"
+        android:layout_marginRight="72dp"
+        android:layout_marginStart="72dp"
+        android:layout_marginTop="8dp"
+        android:singleLine="true"
+        android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+        android:textColor="@color/primary_text"
+        app:layout_constraintBottom_toTopOf="@id/text_studygrouplesson_teacher"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:text="Мод. &quot;Экономика&quot;: Экон. теория" />
+
+
+    <TextView
+        android:id="@+id/text_studygrouplesson_teacher"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:singleLine="true"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textColor="@color/tertiary_text"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/text_studygrouplesson_subject"
+        app:layout_constraintStart_toStartOf="@id/text_studygrouplesson_subject"
+        app:layout_constraintTop_toBottomOf="@id/text_studygrouplesson_subject"
+        tools:text="ст.пр. Петров Николай Владимирович." />
+
+    <TextView
+        android:id="@+id/text_studygrouplesson_classroom"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="1dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textColor="@color/primary_text"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/text_studygrouplesson_subject"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Д418/1" />
+
+</android.support.constraint.ConstraintLayout>

@@ -8,7 +8,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import by.ntnk.msluschedule.R
+import by.ntnk.msluschedule.data.Lesson
+import by.ntnk.msluschedule.data.WeekdayWithLessons
 import by.ntnk.msluschedule.mvp.views.MvpFragment
+import by.ntnk.msluschedule.ui.adapters.*
 import dagger.Lazy
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
@@ -17,6 +20,7 @@ class WeekFragment :
         MvpFragment<WeekPresenter, WeekView>(),
         WeekView {
     private var weekId: Int? = null
+    private lateinit var lessonRVAdapter: LessonRecyclerViewAdapter
 
     override val view: WeekView
         get() = this
@@ -50,15 +54,18 @@ class WeekFragment :
         val recyclerView: RecyclerView = rootView.findViewById(R.id.rv_week_days)
         recyclerView.layoutManager = LinearLayoutManager(activity)
         recyclerView.setHasFixedSize(true)
+        lessonRVAdapter = LessonRecyclerViewAdapter()
+        recyclerView.adapter = lessonRVAdapter
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         weekId ?: return
-        savedInstanceState ?: presenter.getScheduleData(weekId!!)
+        presenter.getScheduleData(weekId!!)
     }
 
-    override fun showSchedule() {
+    override fun showSchedule(data: List<WeekdayWithLessons<Lesson>>) {
+        lessonRVAdapter.initData(data)
     }
 
     companion object {
