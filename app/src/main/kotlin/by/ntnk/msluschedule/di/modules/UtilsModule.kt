@@ -4,7 +4,6 @@ import android.content.SharedPreferences
 import android.preference.PreferenceManager
 import by.ntnk.msluschedule.MsluScheduleApp
 import by.ntnk.msluschedule.di.PerApp
-import by.ntnk.msluschedule.utils.CurrentDate
 import dagger.Module
 import dagger.Provides
 

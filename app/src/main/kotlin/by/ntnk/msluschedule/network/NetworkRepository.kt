@@ -19,60 +19,63 @@ import java.io.InputStream
 import javax.inject.Inject
 
 @PerApp
-class NetworkRepository @Inject
-constructor(
+class NetworkRepository @Inject constructor(
         private val scheduleApi: ScheduleApi,
         private val networkHelper: NetworkHelper,
         private val localCookieJar: LocalCookieJar,
         private val xlsParser: XlsParser
 ) {
     fun getFaculties(): Single<ScheduleFilter> {
-        fun getFaculties() = getDataFromHtmlRequest(
-                NetworkHelper.groupSchedule,
-                networkHelper.facultyRequestInfo
-        )
-        return wrapRequest(::getFaculties)
+        return wrapRequest({
+            getDataFromHtmlRequest(
+                    NetworkHelper.groupSchedule,
+                    networkHelper.facultyRequestInfo
+            )
+        })
     }
 
     fun getGroups(faculty: Int, course: Int): Single<ScheduleFilter> {
         val requestDataList = networkHelper.getStudyGroupsFilterDataList(faculty, course)
-        fun getGroups() = getDataFromJsonRequest(
-                networkHelper.groupRequestInfo,
-                NetworkHelper.groupSchedule,
-                requestDataList
-        )
-        return wrapRequest(::getGroups)
+        return wrapRequest({
+            getDataFromJsonRequest(
+                    networkHelper.groupRequestInfo,
+                    NetworkHelper.groupSchedule,
+                    requestDataList
+            )
+        })
     }
 
     fun getTeachers(): Single<ScheduleFilter> {
-        fun getTeachers() = getDataFromHtmlRequest(
-                NetworkHelper.teacherSchedule,
-                networkHelper.teacherRequestInfo
-        )
-        return wrapRequest(::getTeachers)
+        return wrapRequest({
+            getDataFromHtmlRequest(
+                    NetworkHelper.teacherSchedule,
+                    networkHelper.teacherRequestInfo
+            )
+        })
     }
 
     fun getWeeks(): Single<ScheduleFilter> {
         val requestDataList = networkHelper.getYearsFilterDataList()
-        fun getWeeks() = getDataFromJsonRequest(
-                networkHelper.weekRequestInfo,
-                // Weeks are equal for groups and teachers, so we can use either request
-                NetworkHelper.teacherSchedule,
-                requestDataList
-        )
-        return wrapRequest(::getWeeks)
+        return wrapRequest({
+            getDataFromJsonRequest(
+                    networkHelper.weekRequestInfo,
+                    // Weeks are equal for groups and teachers, so we can use either request
+                    NetworkHelper.teacherSchedule,
+                    requestDataList
+            )
+        })
     }
 
     fun getSchedule(studyGroup: StudyGroup, weekKey: Int): Observable<WeekdayWithStudyGroupLessons> {
         val requestDataList = networkHelper.getStudyGroupRequestDataList(studyGroup, weekKey)
-        fun getScheduleData() = getScheduleData(NetworkHelper.groupSchedule, requestDataList)
-        return wrapRequest(::getScheduleData).flatMapObservable { xlsParser.parseStudyGroupXls(it) }
+        return wrapRequest({ getScheduleData(NetworkHelper.groupSchedule, requestDataList) })
+                .flatMapObservable { xlsParser.parseStudyGroupXls(it) }
     }
 
     fun getSchedule(teacher: Teacher, weekKey: Int): Observable<WeekdayWithTeacherLessons> {
         val requestDataList = networkHelper.getTeacherRequestDataList(teacher, weekKey)
-        fun getScheduleData() = getScheduleData(NetworkHelper.teacherSchedule, requestDataList)
-        return wrapRequest(::getScheduleData).flatMapObservable { xlsParser.parseTeacherXls(it) }
+        return wrapRequest({ getScheduleData(NetworkHelper.teacherSchedule, requestDataList) })
+                .flatMapObservable { xlsParser.parseTeacherXls(it) }
     }
 
     /*
@@ -80,7 +83,7 @@ constructor(
      * so we make sure everything will work by creating and closing
      * a session on every batch of related requests.
      */
-    private fun <T> wrapRequest(request: () -> Single<T>): Single<T> {
+    private inline fun <T> wrapRequest(request: () -> Single<T>): Single<T> {
         return initSession()
                 .andThen(request())
                 .doOnEvent { _, _ -> closeSession() }
@@ -122,7 +125,7 @@ constructor(
         return scheduleApi
                 .initSession()
                 .doOnSuccess { checkErrors(it) }
-                .toCompletable()
+                .ignoreElement()
     }
 
     private fun changeScheduleFilter(
