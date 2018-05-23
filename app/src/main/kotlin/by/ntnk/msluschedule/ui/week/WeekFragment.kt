@@ -11,7 +11,7 @@ import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.data.Lesson
 import by.ntnk.msluschedule.data.WeekdayWithLessons
 import by.ntnk.msluschedule.mvp.views.MvpFragment
-import by.ntnk.msluschedule.ui.adapters.*
+import by.ntnk.msluschedule.ui.adapters.LessonRecyclerViewAdapter
 import dagger.Lazy
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
@@ -52,10 +52,14 @@ class WeekFragment :
 
     private fun initRecyclerView(rootView: View) {
         val recyclerView: RecyclerView = rootView.findViewById(R.id.rv_week_days)
-        recyclerView.layoutManager = LinearLayoutManager(activity)
+        val layoutManager = LinearLayoutManager(activity)
+        recyclerView.layoutManager = layoutManager
         recyclerView.setHasFixedSize(true)
         lessonRVAdapter = LessonRecyclerViewAdapter()
         recyclerView.adapter = lessonRVAdapter
+        val itemDivider =
+                LessonRecyclerViewAdapter.Divider(recyclerView.context, layoutManager.orientation)
+        recyclerView.addItemDecoration(itemDivider)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {

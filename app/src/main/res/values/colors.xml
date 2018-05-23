@@ -12,8 +12,5 @@
     <color name="primary_text_inverted">#FFFFFF</color>
     <color name="tertiary_text">#808080</color>
 
-    <color name="shadow_start_color">#37000000</color>
-    <color name="shadow_end_color">#03000000</color>
-
     <color name="state_pressed">#E0E0E0</color>
 </resources>

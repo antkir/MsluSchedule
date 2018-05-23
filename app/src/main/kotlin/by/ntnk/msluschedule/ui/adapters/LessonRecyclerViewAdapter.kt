@@ -1,8 +1,9 @@
 package by.ntnk.msluschedule.ui.adapters
 
 import android.content.Context
-import android.os.Build
+import android.graphics.Rect
 import android.support.v4.content.ContextCompat
+import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -13,7 +14,6 @@ import by.ntnk.msluschedule.data.Lesson
 import by.ntnk.msluschedule.data.StudyGroupLesson
 import by.ntnk.msluschedule.data.TeacherLesson
 import by.ntnk.msluschedule.data.WeekdayWithLessons
-import by.ntnk.msluschedule.ui.customviews.RoundRectDrawable
 import by.ntnk.msluschedule.utils.*
 import java.util.*
 
@@ -53,52 +53,24 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
         return when (viewType) {
             VIEWTYPE_STUDYGROUP -> {
                 val view = inflater.inflate(R.layout.item_studygrouplesson, parent, false)
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-                    setDrawable(parent, view, false, false)
-                }
                 StudyGroupLessonViewHolder(view)
             }
             VIEWTYPE_TEACHER -> {
                 val view = inflater.inflate(R.layout.item_teacherlesson, parent, false)
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-                    setDrawable(parent, view, false, false)
-                }
                 TeacherLessonViewHolder(view)
             }
             VIEWTYPE_WEEKDAY -> {
                 val view = inflater.inflate(R.layout.item_day, parent, false)
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-                    setDrawable(parent, view, true, false)
-                }
                 DayViewHolder(view)
             }
             VIEWTYPE_DAYEND -> {
                 val view = inflater.inflate(R.layout.item_dayend, parent, false)
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-                    setDrawable(parent, view, false, true)
-                }
                 DayEndViewHolder(view)
             }
             else -> {
                 val view = inflater.inflate(R.layout.item_blanklesson, parent, false)
                 BlankViewHolder(view)
             }
-        }
-    }
-
-    private fun setDrawable(parent: ViewGroup, view: View, isTopShown: Boolean, isBottomShown: Boolean) {
-        val myColorStateList =
-                ContextCompat.getColorStateList(parent.context, R.color.background_item_day)
-        val radius = parent.resources.getDimension(R.dimen.corner_radius)
-        val elevation = parent.resources.getDimension(R.dimen.card_elevation)
-        val drawable =
-                RoundRectDrawable(parent.context, myColorStateList, radius, elevation, elevation)
-        drawable.setSidesDrawn(isTopShown, isBottomShown)
-        @Suppress("DEPRECATION")
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
-            view.background = drawable
-        } else {
-            view.setBackgroundDrawable(drawable)
         }
     }
 
@@ -213,4 +185,15 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
     private class BlankViewHolder(view: View) : RecyclerView.ViewHolder(view)
 
     private class DayEndViewHolder(view: View) : RecyclerView.ViewHolder(view)
+
+    class Divider(context: Context?, orientation: Int) : DividerItemDecoration(context, orientation) {
+        override fun getItemOffsets(
+                outRect: Rect?, view: View?, parent: RecyclerView?, state: RecyclerView.State?
+        ) {
+            val viewHolder = parent!!.getChildViewHolder(view)
+            if (viewHolder is LessonRecyclerViewAdapter.DayEndViewHolder) {
+                super.getItemOffsets(outRect, view, parent, state)
+            }
+        }
+    }
 }
