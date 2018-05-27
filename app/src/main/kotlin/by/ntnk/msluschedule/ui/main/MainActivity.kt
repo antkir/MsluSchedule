@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.v4.app.Fragment
 import android.support.v4.view.GravityCompat
+import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBarDrawerToggle
 import android.view.Menu
 import android.view.MenuItem
@@ -26,6 +27,7 @@ import dagger.android.support.HasSupportFragmentInjector
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.fam_main.*
+import kotlinx.android.synthetic.main.fragment_weekscontainer.*
 import javax.inject.Inject
 
 private const val ADD_GROUP_FRAGMENT = "AddGroupFragment"
@@ -34,6 +36,7 @@ private const val ADD_TEACHER_FRAGMENT = "AddTeacherFragment"
 class MainActivity :
         MvpActivity<MainPresenter, MainView>(), MainView,
         NavigationView.OnNavigationItemSelectedListener,
+        DrawerLayout.DrawerListener,
         HasSupportFragmentInjector,
         AddGroupFragment.OnPositiveButtonListener,
         AddTeacherFragment.OnPositiveButtonListener,
@@ -42,6 +45,7 @@ class MainActivity :
         get() = this
 
     private var isFamOpen = false
+    private var isUpdatingWeeksContainer = false
 
     @Inject
     lateinit var fragmentDispatchingAndroidInjector: DispatchingAndroidInjector<Fragment>
@@ -62,9 +66,12 @@ class MainActivity :
         setSupportActionBar(toolbar)
 
         val toggle = ActionBarDrawerToggle(
-                this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
+                this, drawer_layout, toolbar, R.string.navigation_drawer_open,
+                R.string.navigation_drawer_close
+        )
         drawer_layout.addDrawerListener(toggle)
         toggle.syncState()
+        drawer_layout.addDrawerListener(this)
 
         nav_view.setNavigationItemSelectedListener(this)
 
@@ -90,20 +97,17 @@ class MainActivity :
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        when (item.itemId) {
-            R.id.action_settings -> return true
-            else -> return super.onOptionsItemSelected(item)
+        return when (item.itemId) {
+            R.id.action_settings -> true
+            else -> super.onOptionsItemSelected(item)
         }
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         if (item.isChecked) return true
-
         // Handle navigation view item clicks here.
         when (item.itemId) {
-            R.id.nav_share -> {
-            }
-            R.id.nav_send -> {
+            R.id.nav_settings -> {
             }
             else -> {
                 val isStudyGroupItem = nav_view.menu
@@ -113,12 +117,39 @@ class MainActivity :
                 val type = if (isStudyGroupItem) ScheduleType.STUDYGROUP else ScheduleType.TEACHER
                 supportActionBar?.title = item.title
                 presenter.setSelectedSheduleContainer(item.itemId, item.title.toString(), type)
-                initMainContent()
+                isUpdatingWeeksContainer = true
             }
         }
-
         drawer_layout.closeDrawer(GravityCompat.START)
         return true
+    }
+
+    override fun onDrawerStateChanged(newState: Int) {
+    }
+
+    override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
+        if (isUpdatingWeeksContainer) {
+            viewpager_weekscontainer.alpha = slideOffset
+            if (slideOffset < 0.03) {
+                isUpdatingWeeksContainer = false
+                viewpager_weekscontainer.visibility = View.INVISIBLE
+                viewpager_weekscontainer.alpha = 1f
+                swapWeeksContainerData()
+            }
+        }
+    }
+
+    private fun swapWeeksContainerData() {
+        val weeksContainerFragment = supportFragmentManager.findFragmentById(R.id.framelayout_main)
+        weeksContainerFragment ?: return
+        weeksContainerFragment as WeeksContainerFragment
+        weeksContainerFragment.swapTabs()
+    }
+
+    override fun onDrawerClosed(drawerView: View) {
+    }
+
+    override fun onDrawerOpened(drawerView: View) {
     }
 
     @Suppress("UNUSED_PARAMETER")
@@ -167,9 +198,9 @@ class MainActivity :
     }
 
     override fun initMainContent() {
-        val transaction = supportFragmentManager.beginTransaction()
-        transaction.replace(R.id.framelayout_main, WeeksContainerFragment())
-        transaction.commit()
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.framelayout_main, WeeksContainerFragment())
+            .commit()
     }
 
     override fun addScheduleContainerMenuItem(scheduleContainerInfo: ScheduleContainerInfo) {

@@ -14,6 +14,7 @@ import by.ntnk.msluschedule.ui.warningdialog.WarningDialogFragment
 import by.ntnk.msluschedule.utils.ImmutableEntry
 import dagger.Lazy
 import dagger.android.support.AndroidSupportInjection
+import kotlinx.android.synthetic.main.fragment_weekscontainer.*
 import javax.inject.Inject
 
 private const val SELECTED_TAB_POSITION = "tab_position"
@@ -73,6 +74,7 @@ class WeeksContainerFragment :
     }
 
     override fun initWeeksAdapter(weekIds: List<ImmutableEntry>, currentWeekItemIndex: Int) {
+        viewpager_weekscontainer.visibility = View.VISIBLE
         fragmentViewPagerAdapter = WeekFragmentViewPagerAdapter(childFragmentManager, weekIds)
         viewPager.adapter = fragmentViewPagerAdapter
         viewPager.offscreenPageLimit = weekIds.size - 1
@@ -80,6 +82,8 @@ class WeeksContainerFragment :
                 if (savedCurrentPosition == -1) currentWeekItemIndex else savedCurrentPosition
         tabLayout.setupWithViewPager(viewPager)
     }
+
+    fun swapTabs() = presenter.initWeeksAdapter()
 
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putInt(SELECTED_TAB_POSITION, tabLayout.selectedTabPosition)

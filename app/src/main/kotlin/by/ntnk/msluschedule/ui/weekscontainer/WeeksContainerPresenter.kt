@@ -34,7 +34,7 @@ class WeeksContainerPresenter @Inject constructor(
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
                 .subscribe(
-                        { view!!.initWeeksAdapter(it.first, it.second) },
+                        { view?.initWeeksAdapter(it.first, it.second) },
                         { it.printStackTrace() })
     }
 
@@ -46,7 +46,7 @@ class WeeksContainerPresenter @Inject constructor(
                 .subscribe(
                         {
                             sharedPreferencesRepository.selectEmptyScheduleContainer()
-                            view!!.removeScheduleContainerFromView(info)
+                            view?.removeScheduleContainerFromView(info)
                         },
                         { it.printStackTrace() }
                 )

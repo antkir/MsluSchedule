@@ -13,4 +13,6 @@
     <color name="tertiary_text">#808080</color>
 
     <color name="state_pressed">#E0E0E0</color>
+
+    <color name="menuitem_highlight">#21006DDE</color>
 </resources>
