@@ -2,6 +2,7 @@ package by.ntnk.msluschedule.ui.main
 
 import android.os.Bundle
 import android.support.design.widget.NavigationView
+import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
@@ -19,6 +20,7 @@ import by.ntnk.msluschedule.ui.addteacher.AddTeacherFragment
 import by.ntnk.msluschedule.ui.weekscontainer.WeeksContainerFragment
 import by.ntnk.msluschedule.utils.EMPTY_STRING
 import by.ntnk.msluschedule.utils.ScheduleType
+import by.ntnk.msluschedule.utils.isNetworkAccessible
 import dagger.Lazy
 import dagger.android.AndroidInjection
 import dagger.android.AndroidInjector
@@ -26,6 +28,7 @@ import dagger.android.DispatchingAndroidInjector
 import dagger.android.support.HasSupportFragmentInjector
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
+import kotlinx.android.synthetic.main.content_main.*
 import kotlinx.android.synthetic.main.fam_main.*
 import kotlinx.android.synthetic.main.fragment_weekscontainer.*
 import javax.inject.Inject
@@ -154,7 +157,13 @@ class MainActivity :
 
     @Suppress("UNUSED_PARAMETER")
     fun onBaseFabClick(view: View) {
-        toggleFloatingActionMenu(!isFamOpen)
+        if (isNetworkAccessible(applicationContext)) {
+            toggleFloatingActionMenu(!isFamOpen)
+        } else {
+            Snackbar.make(
+                    framelayout_main, R.string.snackbar_internet_unavailable, Snackbar.LENGTH_LONG
+            ).show()
+        }
     }
 
     private fun toggleFloatingActionMenu(enabled: Boolean) {

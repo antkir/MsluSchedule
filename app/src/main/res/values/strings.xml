@@ -37,4 +37,8 @@
     <string name="sunday">Sunday</string>
 
     <string name="item_blanklesson">No classes this day ;)</string>
+
+    <string name="snackbar_internet_unavailable">
+        Internet connection is unavailable, try again later.
+    </string>
 </resources>

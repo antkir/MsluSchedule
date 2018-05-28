@@ -1,5 +1,7 @@
 package by.ntnk.msluschedule.utils
 
+import android.content.Context
+import android.net.ConnectivityManager
 import java.util.AbstractMap
 
 const val EMPTY_STRING = ""
@@ -19,3 +21,12 @@ const val SATURDAY = "СБ"
 const val SUNDAY = "ВС"
 
 typealias ImmutableEntry = AbstractMap.SimpleImmutableEntry<Int, String>
+
+class InvalidYearException : Exception()
+
+fun isNetworkAccessible(context: Context): Boolean {
+    val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    return connectivityManager.activeNetworkInfo != null &&
+            connectivityManager.activeNetworkInfo.isConnected
+}
