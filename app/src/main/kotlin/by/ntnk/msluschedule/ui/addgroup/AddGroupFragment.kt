@@ -46,6 +46,7 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
         initViews(layout)
         getData(savedInstanceState)
         val dialog = initMaterialDialog(layout)
+        dialog.window.attributes.windowAnimations = R.style.DialogAnimation
         dialog.setOnShowListener {
             (it as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE).isEnabled =
                     presenter.isValidGroup(groupView.text.toString())

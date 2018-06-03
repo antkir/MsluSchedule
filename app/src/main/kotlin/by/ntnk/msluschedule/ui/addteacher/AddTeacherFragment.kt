@@ -45,6 +45,7 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
         initViews(layout)
         getData(savedInstanceState)
         val dialog = initMaterialDialog(layout)
+        dialog.window.attributes.windowAnimations = R.style.DialogAnimation
         dialog.setOnShowListener {
             (it as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE).isEnabled =
                     presenter.isValidTeacher(teacherView.text.toString())

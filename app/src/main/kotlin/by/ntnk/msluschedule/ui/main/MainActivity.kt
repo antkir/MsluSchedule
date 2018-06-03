@@ -5,11 +5,13 @@ import android.support.design.widget.NavigationView
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v4.view.GravityCompat
+import android.support.v4.view.ViewCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBarDrawerToggle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.animation.*
 import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.data.ScheduleContainerInfo
 import by.ntnk.msluschedule.data.StudyGroup
@@ -49,6 +51,9 @@ class MainActivity :
 
     private var isFamOpen = false
     private var isUpdatingWeeksContainer = false
+
+    private val originalGroupFabY = lazy { groupfab_main.y }
+    private val originalTeacherFabY = lazy { teacherfab_main.y }
 
     @Inject
     lateinit var fragmentDispatchingAndroidInjector: DispatchingAndroidInjector<Fragment>
@@ -172,14 +177,35 @@ class MainActivity :
 
     private fun expandFam() {
         isFamOpen = true
+
+        ViewCompat.animate(basefab_main)
+                .rotation(135f)
+                .setDuration(300)
+                .setInterpolator(OvershootInterpolator(2f))
+                .start()
+
+        val originalGroupFabY = originalGroupFabY.value
         groupfab_main.visibility = View.VISIBLE
+        groupfab_main.y = basefab_main.y
+        groupfab_main.animate().y(originalGroupFabY).setDuration(200).start()
+
+        val originalTeacherFabY = originalTeacherFabY.value
         teacherfab_main.visibility = View.VISIBLE
+        teacherfab_main.y = basefab_main.y
+        teacherfab_main.animate().y(originalTeacherFabY).setDuration(200).start()
     }
 
     private fun collapseFam() {
         isFamOpen = false
-        groupfab_main.visibility = View.INVISIBLE
-        teacherfab_main.visibility = View.INVISIBLE
+
+        groupfab_main.animate().y(basefab_main.y).setDuration(200).start()
+        teacherfab_main.animate().y(basefab_main.y).setDuration(200).start()
+
+        ViewCompat.animate(basefab_main)
+                .rotation(0f)
+                .setDuration(300)
+                .setInterpolator(OvershootInterpolator(2f))
+                .start()
     }
 
     @Suppress("UNUSED_PARAMETER")
