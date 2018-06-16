@@ -26,55 +26,55 @@ class NetworkRepository @Inject constructor(
         private val xlsParser: XlsParser
 ) {
     fun getFaculties(): Single<ScheduleFilter> {
-        return wrapRequest({
+        return wrapRequest {
             getDataFromHtmlRequest(
                     NetworkHelper.groupSchedule,
                     networkHelper.facultyRequestInfo
             )
-        })
+        }
     }
 
     fun getGroups(faculty: Int, course: Int): Single<ScheduleFilter> {
         val requestDataList = networkHelper.getStudyGroupsFilterDataList(faculty, course)
-        return wrapRequest({
+        return wrapRequest {
             getDataFromJsonRequest(
                     networkHelper.groupRequestInfo,
                     NetworkHelper.groupSchedule,
                     requestDataList
             )
-        })
+        }
     }
 
     fun getTeachers(): Single<ScheduleFilter> {
-        return wrapRequest({
+        return wrapRequest {
             getDataFromHtmlRequest(
                     NetworkHelper.teacherSchedule,
                     networkHelper.teacherRequestInfo
             )
-        })
+        }
     }
 
     fun getWeeks(): Single<ScheduleFilter> {
         val requestDataList = networkHelper.getYearsFilterDataList()
-        return wrapRequest({
+        return wrapRequest {
             getDataFromJsonRequest(
                     networkHelper.weekRequestInfo,
                     // Weeks are equal for groups and teachers, so we can use either request
                     NetworkHelper.teacherSchedule,
                     requestDataList
             )
-        })
+        }
     }
 
     fun getSchedule(studyGroup: StudyGroup, weekKey: Int): Observable<WeekdayWithStudyGroupLessons> {
         val requestDataList = networkHelper.getStudyGroupRequestDataList(studyGroup, weekKey)
-        return wrapRequest({ getScheduleData(NetworkHelper.groupSchedule, requestDataList) })
+        return wrapRequest { getScheduleData(NetworkHelper.groupSchedule, requestDataList) }
                 .flatMapObservable { xlsParser.parseStudyGroupXls(it) }
     }
 
     fun getSchedule(teacher: Teacher, weekKey: Int): Observable<WeekdayWithTeacherLessons> {
         val requestDataList = networkHelper.getTeacherRequestDataList(teacher, weekKey)
-        return wrapRequest({ getScheduleData(NetworkHelper.teacherSchedule, requestDataList) })
+        return wrapRequest { getScheduleData(NetworkHelper.teacherSchedule, requestDataList) }
                 .flatMapObservable { xlsParser.parseTeacherXls(it) }
     }
 
