@@ -3,13 +3,14 @@ package by.ntnk.msluschedule.ui.warningdialog
 import android.app.Dialog
 import android.os.Bundle
 import android.support.v4.app.DialogFragment
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.widget.Button
 import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.utils.SchedulerProvider
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
-import java.util.Locale
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 class WarningDialogFragment : DialogFragment() {
@@ -39,8 +40,8 @@ class WarningDialogFragment : DialogFragment() {
         return AlertDialog.Builder(activity!!, R.style.MsluTheme_Dialog_Alert)
                 .setTitle(R.string.dialog_delete_container_title)
                 .setMessage(R.string.dialog_delete_container_message)
-                .setPositiveButton(R.string.button_delete) {
-                    _, _ -> listener.onPositiveButtonClick()
+                .setPositiveButton(R.string.button_delete) { _, _ ->
+                    listener.onPositiveButtonClick()
                 }
                 .setNegativeButton(R.string.button_cancel) { _, _ -> dismiss() }
                 .create()
@@ -52,17 +53,19 @@ class WarningDialogFragment : DialogFragment() {
         disposable = Observable
                 .intervalRange(1, timeout, 0, 1, TimeUnit.SECONDS)
                 .map { timeout - it }
-                .map { String.format(
-                        Locale.getDefault(),
-                        "%s (%d)",
-                        resources.getString(R.string.button_delete),
-                        it)
+                .map {
+                    String.format(
+                            Locale.getDefault(),
+                            "%s (%d)",
+                            resources.getString(R.string.button_delete),
+                            it)
                 }
                 .observeOn(SchedulerProvider.ui())
                 .subscribe(
                         { button.text = it },
                         {},
                         {
+                            button.setTextColor(ContextCompat.getColor(context!!, R.color.warning))
                             button.isEnabled = true
                             button.text = resources.getString(R.string.button_delete)
                         }
