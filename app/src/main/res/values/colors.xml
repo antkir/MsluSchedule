@@ -13,10 +13,10 @@
     <color name="tertiary_text">#808080</color>
 
     <color name="state_pressed">#E0E0E0</color>
-
-    <color name="menuitem_highlight">#21006DDE</color>
+    <color name="menuitem_highlight">#E0EBF9</color>
 
     <color name="ic_launcher_background">#005BCC</color>
 
     <color name="warning">#B00020</color>
+    <color name="button_secondary">#E0EBF9</color>
 </resources>

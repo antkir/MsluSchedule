@@ -32,11 +32,11 @@ class FABLayoutBehavior(
     ) {
         if (child.visibility == View.VISIBLE && dyConsumed > 0) {
             child.visibility = View.INVISIBLE
-            child.startAnimation(AnimationUtils.loadAnimation(child.context, R.anim.slide_down))
+            child.startAnimation(AnimationUtils.loadAnimation(child.context, R.anim.fam_slide_down))
 
         } else if (child.visibility == View.INVISIBLE && dyConsumed < 0) {
             child.visibility = View.VISIBLE
-            child.startAnimation(AnimationUtils.loadAnimation(child.context, R.anim.slide_up))
+            child.startAnimation(AnimationUtils.loadAnimation(child.context, R.anim.fam_slide_up))
         }
     }
 }

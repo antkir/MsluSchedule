@@ -11,5 +11,8 @@
     <color name="primary_text_inverted">#000000</color>
     <color name="tertiary_text">#BEBEBE</color>
 
-    <color name="state_pressed">#636363</color>
+    <color name="state_pressed">#646464</color>
+    <color name="menuitem_highlight">#646464</color>
+
+    <color name="button_secondary">#424242</color>
 </resources>

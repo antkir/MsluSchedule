@@ -2,7 +2,6 @@ package by.ntnk.msluschedule.ui.main
 
 import android.os.Bundle
 import android.support.design.widget.NavigationView
-import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v4.view.GravityCompat
 import android.support.v4.view.ViewCompat
@@ -11,7 +10,7 @@ import android.support.v7.app.ActionBarDrawerToggle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.animation.*
+import android.view.animation.OvershootInterpolator
 import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.data.ScheduleContainerInfo
 import by.ntnk.msluschedule.data.StudyGroup
@@ -23,6 +22,7 @@ import by.ntnk.msluschedule.ui.weekscontainer.WeeksContainerFragment
 import by.ntnk.msluschedule.utils.EMPTY_STRING
 import by.ntnk.msluschedule.utils.ScheduleType
 import by.ntnk.msluschedule.utils.isNetworkAccessible
+import by.ntnk.msluschedule.utils.showSnackbarNetworkInaccessible
 import dagger.Lazy
 import dagger.android.AndroidInjection
 import dagger.android.AndroidInjector
@@ -51,9 +51,6 @@ class MainActivity :
 
     private var isFamOpen = false
     private var isUpdatingWeeksContainer = false
-
-    private val originalGroupFabY = lazy { groupfab_main.y }
-    private val originalTeacherFabY = lazy { teacherfab_main.y }
 
     @Inject
     lateinit var fragmentDispatchingAndroidInjector: DispatchingAndroidInjector<Fragment>
@@ -84,7 +81,12 @@ class MainActivity :
         nav_view.setNavigationItemSelectedListener(this)
 
         presenter.initContainerListView()
-        if (savedInstanceState == null && !presenter.isSelectedContainerNull()) initMainContent()
+        if (savedInstanceState == null && !presenter.isSelectedContainerNull()) {
+            initMainContent()
+        } else if (presenter.isSelectedContainerNull()) {
+            image_main_smileyface.visibility = View.VISIBLE
+            text_main_advice.visibility = View.VISIBLE
+        }
     }
 
     override fun onBackPressed() {
@@ -137,21 +139,14 @@ class MainActivity :
 
     override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
         if (isUpdatingWeeksContainer) {
-            viewpager_weekscontainer.alpha = slideOffset
+            viewpager_weekscontainer?.alpha = slideOffset
             if (slideOffset < 0.03) {
                 isUpdatingWeeksContainer = false
-                viewpager_weekscontainer.visibility = View.INVISIBLE
-                viewpager_weekscontainer.alpha = 1f
-                swapWeeksContainerData()
+                viewpager_weekscontainer?.visibility = View.INVISIBLE
+                viewpager_weekscontainer?.alpha = 1f
+                initMainContent()
             }
         }
-    }
-
-    private fun swapWeeksContainerData() {
-        val weeksContainerFragment = supportFragmentManager.findFragmentById(R.id.framelayout_main)
-        weeksContainerFragment ?: return
-        weeksContainerFragment as WeeksContainerFragment
-        weeksContainerFragment.swapTabs()
     }
 
     override fun onDrawerClosed(drawerView: View) {
@@ -165,9 +160,7 @@ class MainActivity :
         if (isNetworkAccessible(applicationContext)) {
             toggleFloatingActionMenu(!isFamOpen)
         } else {
-            Snackbar.make(
-                    framelayout_main, R.string.snackbar_internet_unavailable, Snackbar.LENGTH_LONG
-            ).show()
+            showSnackbarNetworkInaccessible(framelayout_main)
         }
     }
 
@@ -184,15 +177,13 @@ class MainActivity :
                 .setInterpolator(OvershootInterpolator(2f))
                 .start()
 
-        val originalGroupFabY = originalGroupFabY.value
         groupfab_main.visibility = View.VISIBLE
         groupfab_main.y = basefab_main.y
-        groupfab_main.animate().y(originalGroupFabY).setDuration(200).start()
+        groupfab_main.animate().translationY(0f).setDuration(200).start()
 
-        val originalTeacherFabY = originalTeacherFabY.value
         teacherfab_main.visibility = View.VISIBLE
         teacherfab_main.y = basefab_main.y
-        teacherfab_main.animate().y(originalTeacherFabY).setDuration(200).start()
+        teacherfab_main.animate().translationY(0f).setDuration(200).start()
     }
 
     private fun collapseFam() {
@@ -233,9 +224,17 @@ class MainActivity :
     }
 
     override fun initMainContent() {
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.framelayout_main, WeeksContainerFragment())
-            .commit()
+        val weeksContainerFragment = supportFragmentManager.findFragmentById(R.id.framelayout_main)
+        if (weeksContainerFragment == null) {
+            supportFragmentManager.beginTransaction()
+                    .replace(R.id.framelayout_main, WeeksContainerFragment())
+                    .commit()
+        } else {
+            weeksContainerFragment as WeeksContainerFragment
+            weeksContainerFragment.swapTabs()
+        }
+        image_main_smileyface.visibility = View.INVISIBLE
+        text_main_advice.visibility = View.INVISIBLE
     }
 
     override fun addScheduleContainerMenuItem(scheduleContainerInfo: ScheduleContainerInfo) {
@@ -271,6 +270,8 @@ class MainActivity :
 
     override fun onScheduleContainerDeleted(info: ScheduleContainerInfo) {
         supportActionBar?.title = EMPTY_STRING
+        image_main_smileyface.visibility = View.VISIBLE
+        text_main_advice.visibility = View.VISIBLE
         val fragmentManager = supportFragmentManager
         val fragment = fragmentManager.findFragmentById(R.id.framelayout_main)
         if (fragment != null) {
