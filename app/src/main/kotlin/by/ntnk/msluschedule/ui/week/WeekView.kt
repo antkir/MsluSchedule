@@ -6,4 +6,9 @@ import by.ntnk.msluschedule.mvp.View
 
 interface WeekView : View {
     fun showSchedule(data: List<WeekdayWithLessons<Lesson>>)
+    fun hideInitProgressBar()
+    fun showInitProgressBar()
+    fun hideUpdateProgressBar()
+    fun showUpdateProgressBar()
+    fun showError()
 }

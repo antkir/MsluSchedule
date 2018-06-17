@@ -28,6 +28,7 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
 
     @Throws(NullPointerException::class)
     fun initData(days: List<WeekdayWithLessons<Lesson>>) {
+        data.clear()
         for (day in days) {
             data.add(DayLessonView(day.weekday))
             if (day.lessons.isNotEmpty()) {

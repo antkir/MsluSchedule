@@ -4,6 +4,7 @@ import by.ntnk.msluschedule.data.*
 import by.ntnk.msluschedule.db.data.*
 import by.ntnk.msluschedule.di.PerApp
 import by.ntnk.msluschedule.network.data.ScheduleFilter
+import by.ntnk.msluschedule.utils.ScheduleType
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -103,16 +104,13 @@ class DatabaseRepository @Inject constructor(
     fun insertStudyGroupSchedule(
             weekdays: List<WeekdayWithStudyGroupLessons>, weekId: Int
     ): Single<List<WeekdayWithStudyGroupLessons>> {
-        return Observable.fromIterable(weekdays)
-                .flatMapCompletable {
-                    weekdayWithLessons -> getWeekdaysForWeek(weekId)
-                        .flatMapObservable { Observable.fromIterable(it) }
-                        .filter { weekday -> weekday.value == weekdayWithLessons.weekday }
-                        .firstOrError()
-                        .map { it.id }
-                        .flatMapCompletable {
-                            insertStudyGroupLessons(weekdayWithLessons.lessons, it)
-                        }
+        return getWeekdaysForWeek(weekId)
+                .flatMapObservable { Observable.fromIterable(it) }
+                .flatMapCompletable { weekday ->
+                    Observable.fromIterable(weekdays)
+                            .filter { it.weekday == weekday.value }
+                            .firstElement()
+                            .flatMapCompletable { insertStudyGroupLessons(it.lessons, weekday.id) }
                 }
                 .andThen(Single.just(weekdays))
     }
@@ -120,17 +118,32 @@ class DatabaseRepository @Inject constructor(
     fun insertTeacherSchedule(
             weekdays: List<WeekdayWithTeacherLessons>, weekId: Int
     ): Single<List<WeekdayWithTeacherLessons>> {
-        return Observable.fromIterable(weekdays)
-                .flatMapCompletable {
-                    weekdayWithLessons -> getWeekdaysForWeek(weekId)
-                        .flatMapObservable { Observable.fromIterable(it) }
-                        .filter { weekday -> weekday.value == weekdayWithLessons.weekday }
-                        .firstOrError()
-                        .map { it.id }
-                        .flatMapCompletable {
-                            insertTeacherLessons(weekdayWithLessons.lessons, it)
-                        }
+        return getWeekdaysForWeek(weekId)
+                .flatMapObservable { Observable.fromIterable(it) }
+                .flatMapCompletable { weekday ->
+                    Observable.fromIterable(weekdays)
+                            .filter { it.weekday == weekday.value }
+                            .firstElement()
+                            .flatMapCompletable { insertTeacherLessons(it.lessons, weekday.id) }
                 }
                 .andThen(Single.just(weekdays))
     }
+
+    fun deleteLessonsForWeek(weekId: Int, scheduleType: ScheduleType): Completable {
+        return getWeekdaysForWeek(weekId)
+                .flatMapObservable { Observable.fromIterable(it) }
+                .map { it.id }
+                .flatMapCompletable {
+                    when (scheduleType) {
+                        ScheduleType.STUDYGROUP -> deleteStudyGroupLessons(it)
+                        ScheduleType.TEACHER -> deleteTeacherLessons(it)
+                    }
+                }
+    }
+
+    private fun deleteStudyGroupLessons(weekdayId: Int): Completable =
+            Completable.fromCallable { appDatabase.studyGroupLessonDao.deleteForWeekday(weekdayId) }
+
+    private fun deleteTeacherLessons(weekdayId: Int): Completable =
+            Completable.fromCallable { appDatabase.teacherLessonDao.deleteForWeekday(weekdayId) }
 }

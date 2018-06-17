@@ -1,5 +1,6 @@
 package by.ntnk.msluschedule.mvp.views
 
+import android.graphics.Rect
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import by.ntnk.msluschedule.mvp.Presenter
@@ -12,6 +13,9 @@ import javax.inject.Inject
 abstract class MvpFragment<out P : Presenter<V>, V : View> : Fragment() {
     private var presenterId: Int? = null
     private lateinit var presenterManager: PresenterManager
+
+    val isFragmentVisible: Boolean
+        get() = getView() != null && getView()!!.getGlobalVisibleRect(Rect())
 
     @Inject
     fun setPresenter(presenterManager: PresenterManager) {
