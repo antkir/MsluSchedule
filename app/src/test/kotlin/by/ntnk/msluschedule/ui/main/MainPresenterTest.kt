@@ -79,7 +79,6 @@ class MainPresenterTest {
         verify(networkRepository).getWeeks()
         verify(databaseRepository).insertStudyGroup(any())
         verify(databaseRepository).insertWeeksGetIds(any(), eq(0))
-        verify(databaseRepository).insertWeekdays(eq(0))
         verify(view).initMainContent()
     }
 
