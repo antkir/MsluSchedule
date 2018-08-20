@@ -7,7 +7,9 @@ android {
     def versionMajor = 1
     def versionMinor = 0
     def versionPatch = 0
-
+    lintOptions {
+        abortOnError false
+    }
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
         test.java.srcDirs += 'src/test/kotlin'
