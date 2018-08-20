@@ -34,8 +34,10 @@ captures/
 
 # IntelliJ
 *.iml
+.idea/*
+!.idea/inspectionProfiles
+.idea/inspectionProfiles/*
 !.idea/inspectionProfiles/Project_Default.xml
-.idea/
 
 # Heap dump files
 *.hprof
