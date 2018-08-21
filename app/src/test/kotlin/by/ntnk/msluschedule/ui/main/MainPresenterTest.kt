@@ -6,15 +6,15 @@ import by.ntnk.msluschedule.data.StudyGroup
 import by.ntnk.msluschedule.db.DatabaseRepository
 import by.ntnk.msluschedule.network.NetworkRepository
 import by.ntnk.msluschedule.network.data.ScheduleFilter
+import by.ntnk.msluschedule.utils.CurrentDate
 import by.ntnk.msluschedule.utils.SchedulerProvider
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
-import org.junit.Test
-
 import org.junit.Before
+import org.junit.Test
 import org.mockito.ArgumentMatchers.eq
 import org.mockito.Mock
 import org.mockito.Mockito.verify
@@ -24,6 +24,9 @@ import timber.log.Timber
 import org.mockito.Mockito.`when` as whenever
 
 class MainPresenterTest {
+    @Mock
+    private lateinit var currentDate: CurrentDate
+
     @Mock
     private lateinit var databaseRepository: DatabaseRepository
 
@@ -60,6 +63,7 @@ class MainPresenterTest {
         whenever(schedulerProvider.ui())
                 .thenReturn(Schedulers.trampoline())
         presenter = MainPresenter(
+                currentDate,
                 databaseRepository,
                 networkRepository,
                 sharedPreferencesRepository,
@@ -72,7 +76,7 @@ class MainPresenterTest {
     @Test
     fun addGroup() {
         // given
-        val studyGroup = StudyGroup(0, "", 0, 0 , 0)
+        val studyGroup = StudyGroup(0, "", 0, 0, 0)
         // when
         presenter.addGroup(studyGroup)
         // then

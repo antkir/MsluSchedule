@@ -6,11 +6,15 @@ import by.ntnk.msluschedule.data.Teacher
 import by.ntnk.msluschedule.db.DatabaseRepository
 import by.ntnk.msluschedule.mvp.Presenter
 import by.ntnk.msluschedule.network.NetworkRepository
-import by.ntnk.msluschedule.utils.*
+import by.ntnk.msluschedule.utils.CurrentDate
+import by.ntnk.msluschedule.utils.ScheduleType
+import by.ntnk.msluschedule.utils.SchedulerProvider
+import by.ntnk.msluschedule.utils.SharedPreferencesRepository
 import io.reactivex.Single
 import javax.inject.Inject
 
 class MainPresenter @Inject constructor(
+        private val currentDate: CurrentDate,
         private val databaseRepository: DatabaseRepository,
         private val networkRepository: NetworkRepository,
         private val sharedPreferencesRepository: SharedPreferencesRepository,
@@ -64,7 +68,12 @@ class MainPresenter @Inject constructor(
                 .observeOn(schedulerProvider.ui())
                 .subscribe(
                         {
-                            val info = ScheduleContainerInfo(it.id, it.name, it.type)
+                            val name = if (it.year != currentDate.academicYear) {
+                                String.format("(%d) ", it.year) + it.name
+                            } else {
+                                it.name
+                            }
+                            val info = ScheduleContainerInfo(it.id, name, it.type)
                             view?.addScheduleContainerMenuItem(info)
                         },
                         { it.printStackTrace() },
