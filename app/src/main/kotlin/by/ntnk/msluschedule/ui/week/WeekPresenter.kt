@@ -107,9 +107,9 @@ class WeekPresenter @Inject constructor(
     fun updateSchedule(weekId: Int) {
         val containerInfo = sharedPreferencesRepository.getSelectedScheduleContainerInfo()
         databaseRepository.getScheduleContainer(containerInfo.id)
-                .flatMap {
+                .flatMap { scheduleContainer ->
                     databaseRepository.deleteLessonsForWeek(weekId, containerInfo.type!!)
-                            .andThen(downloadSchedule(it, weekId))
+                            .andThen(downloadSchedule(scheduleContainer, weekId))
                             .flatMap {
                                 getWeekdaysWithLessonsForWeek(containerInfo.type, weekId)
                                         .toList()
@@ -119,6 +119,7 @@ class WeekPresenter @Inject constructor(
                 .observeOn(schedulerProvider.ui())
                 .doOnSubscribe { view?.showUpdateProgressBar() }
                 .doOnEvent { _, _ -> view?.hideUpdateProgressBar() }
+                .doOnSuccess { _ -> view?.showUpdateSuccessMessage() }
                 .subscribe(
                         { weekDayEntities -> view?.showSchedule(weekDayEntities) },
                         { it.printStackTrace(); view?.showError() }

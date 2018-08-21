@@ -8,6 +8,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.*
 import android.view.animation.AnimationUtils
+import android.widget.Toast
 import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.data.Lesson
 import by.ntnk.msluschedule.data.WeekdayWithLessons
@@ -20,6 +21,7 @@ import dagger.Lazy
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_week.*
 import javax.inject.Inject
+
 
 class WeekFragment :
         MvpFragment<WeekPresenter, WeekView>(),
@@ -126,6 +128,10 @@ class WeekFragment :
                     rv_week_days.setOnTouchListener { _, _ -> true }
                 }
             }
+        } else {
+            button_week_weekdays_visibility.visibility = View.GONE
+            text_week_nolessons.visibility = View.GONE
+            rv_week_days.setOnTouchListener(null)
         }
         lessonRVAdapter.initData(data)
     }
@@ -166,6 +172,15 @@ class WeekFragment :
 
     override fun showInitProgressBar() {
         progressbar_week_init.visibility = View.VISIBLE
+    }
+
+    override fun showUpdateSuccessMessage() {
+        if (!isFragmentVisible) return
+        Toast.makeText(
+                context?.applicationContext,
+                resources.getString(R.string.messsage_schedule_update_successful),
+                Toast.LENGTH_SHORT
+        ).show()
     }
 
     override fun showError() {

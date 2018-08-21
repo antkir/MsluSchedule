@@ -44,6 +44,8 @@
         Internet connection is unavailable, try again later.
     </string>
 
+    <string name="messsage_schedule_update_successful">The schedule for this week was updated!</string>
+
     <string name="view_main_image_description">Slightly smiling face emoji</string>
     <string name="view_main_empty_message">Add a new schedule or\nchoose one from the list.</string>
 

@@ -10,5 +10,6 @@ interface WeekView : View {
     fun showInitProgressBar()
     fun hideUpdateProgressBar()
     fun showUpdateProgressBar()
+    fun showUpdateSuccessMessage()
     fun showError()
 }
