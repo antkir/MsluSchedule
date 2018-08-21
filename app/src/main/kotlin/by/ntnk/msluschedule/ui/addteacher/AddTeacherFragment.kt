@@ -3,6 +3,7 @@ package by.ntnk.msluschedule.ui.addteacher
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
+import android.support.design.widget.TextInputLayout
 import android.support.v7.app.AlertDialog
 import android.text.Editable
 import android.text.TextWatcher
@@ -13,6 +14,7 @@ import by.ntnk.msluschedule.mvp.views.MvpDialogFragment
 import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.ui.adapters.ScheduleFilterAdapter
 import by.ntnk.msluschedule.ui.customviews.LoadingAutoCompleteTextView
+import by.ntnk.msluschedule.utils.EMPTY_STRING
 import dagger.Lazy
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
@@ -56,13 +58,19 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
     private fun initViews(layout: View) {
         teacherView = layout.findViewById(R.id.actv_dialog_teacher)
         teacherView.progressBar = layout.findViewById(R.id.progressbar_dialog_teacher)
+        val teacherTextInputLayout: TextInputLayout = layout.findViewById(R.id.textinputlayout_teacher)
         teacherView.setEnabledFocusable(false)
         teacherView.setOnItemClickListener { _, _, _, id -> presenter.setTeacherValue(id.toInt()) }
         teacherView.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                val isEnabled = presenter.isValidTeacher(s.toString())
+                teacherTextInputLayout.error = EMPTY_STRING
+                var isEnabled = presenter.isValidTeacher(s.toString())
+                if (presenter.isTeacherStored(s.toString())) {
+                    teacherTextInputLayout.error = resources.getString(R.string.teacher_already_added)
+                    isEnabled = false
+                }
                 (dialog as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = isEnabled
             }
 

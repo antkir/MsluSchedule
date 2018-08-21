@@ -2,7 +2,9 @@
     <string name="app_name">MSLU Schedule</string>
 
     <string name="add_group_title">Add Group</string>
+    <string name="group_already_added">Group already added.</string>
     <string name="add_teacher_title">Add Teacher</string>
+    <string name="teacher_already_added">Teacher already added.</string>
     <string name="button_add">Add</string>
     <string name="button_cancel">Cancel</string>
 

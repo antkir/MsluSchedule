@@ -3,6 +3,7 @@ package by.ntnk.msluschedule.ui.addgroup
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
+import android.support.design.widget.TextInputLayout
 import android.support.v7.app.AlertDialog
 import android.text.Editable
 import android.text.TextWatcher
@@ -13,6 +14,7 @@ import by.ntnk.msluschedule.mvp.views.MvpDialogFragment
 import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.ui.adapters.ScheduleFilterAdapter
 import by.ntnk.msluschedule.ui.customviews.LoadingAutoCompleteTextView
+import by.ntnk.msluschedule.utils.EMPTY_STRING
 import dagger.Lazy
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
@@ -87,6 +89,7 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
         facultyView.progressBar = layout.findViewById(R.id.progressbar_dialog_faculty)
         groupView = layout.findViewById(R.id.actv_dialog_group)
         groupView.progressBar = layout.findViewById(R.id.progressbar_dialog_group)
+        val groupTextInputLayout: TextInputLayout = layout.findViewById(R.id.textinputlayout_group)
 
         facultyView.setEnabledFocusable(false)
         groupView.setEnabledFocusable(false)
@@ -106,7 +109,12 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
             }
 
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                val isEnabled = presenter.isValidGroup(s.toString())
+                groupTextInputLayout.error = EMPTY_STRING
+                var isEnabled = presenter.isValidGroup(s.toString())
+                if (presenter.isGroupStored(s.toString())) {
+                    groupTextInputLayout.error = resources.getString(R.string.group_already_added)
+                    isEnabled = false
+                }
                 (dialog as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = isEnabled
             }
 
