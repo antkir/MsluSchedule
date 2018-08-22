@@ -13,6 +13,7 @@
 
     <color name="state_pressed">#646464</color>
     <color name="menuitem_highlight">#646464</color>
+    <color name="item_separator">#4F4F4F</color>
 
     <color name="button_secondary">#424242</color>
 </resources>

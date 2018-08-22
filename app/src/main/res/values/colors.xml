@@ -14,6 +14,7 @@
 
     <color name="state_pressed">#E0E0E0</color>
     <color name="menuitem_highlight">#E0EBF9</color>
+    <color name="item_separator">#E5E5E5</color>
 
     <color name="ic_launcher_background">#005BCC</color>
 

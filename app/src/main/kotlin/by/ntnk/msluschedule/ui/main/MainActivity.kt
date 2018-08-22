@@ -79,6 +79,13 @@ class MainActivity :
         drawer_layout.addDrawerListener(this)
 
         nav_view.setNavigationItemSelectedListener(this)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            nav_layout_main.setOnApplyWindowInsetsListener { v, insets ->
+                v!!.setPaddingRelative(v.paddingStart, insets!!.stableInsetTop,
+                                       v.paddingEnd, v.paddingBottom)
+                insets
+            }
+        }
 
         presenter.initContainerListView()
         if (savedInstanceState == null && !presenter.isSelectedContainerNull()) {
@@ -100,25 +107,16 @@ class MainActivity :
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         if (item.isChecked) return true
         // Handle navigation view item clicks here.
-        when (item.itemId) {
-            R.id.nav_settings -> {
-            }
-            else -> {
-                val isStudyGroupItem = nav_view.menu
-                        .findItem(getContainerMenuViewId(ScheduleType.STUDYGROUP))
-                        .subMenu
-                        .findItem(item.itemId) != null
-                val type = if (isStudyGroupItem) ScheduleType.STUDYGROUP else ScheduleType.TEACHER
-                supportActionBar?.title = item.title
-                presenter.setSelectedSheduleContainer(item.itemId, item.title.toString(), type)
-                isUpdatingWeeksContainer = true
-            }
-        }
+        val isStudyGroupItem = nav_view.menu
+                .findItem(getContainerMenuViewId(ScheduleType.STUDYGROUP))
+                .subMenu
+                .findItem(item.itemId) != null
+        val type = if (isStudyGroupItem) ScheduleType.STUDYGROUP else ScheduleType.TEACHER
+        supportActionBar?.title = item.title
+        presenter.setSelectedSheduleContainer(item.itemId, item.title.toString(), type)
+        isUpdatingWeeksContainer = true
         drawer_layout.closeDrawer(GravityCompat.START)
         return true
-    }
-
-    override fun onDrawerStateChanged(newState: Int) {
     }
 
     override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
@@ -133,11 +131,11 @@ class MainActivity :
         }
     }
 
-    override fun onDrawerClosed(drawerView: View) {
-    }
+    override fun onDrawerOpened(drawerView: View) = Unit
 
-    override fun onDrawerOpened(drawerView: View) {
-    }
+    override fun onDrawerClosed(drawerView: View) = Unit
+
+    override fun onDrawerStateChanged(newState: Int) = Unit
 
     @Suppress("UNUSED_PARAMETER")
     fun onBaseFabClick(view: View) {

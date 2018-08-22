@@ -31,24 +31,17 @@
             app:itemTextColor="@drawable/nav_view_item_textcolor"
             app:menu="@menu/activity_main_drawer" />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_alignParentBottom="true"
-            android:layout_marginBottom="@dimen/nav_view_footer_height"
-            android:background="@color/item_separator" />
-
-
         <TextView
             android:layout_width="match_parent"
             android:layout_height="@dimen/nav_view_footer_height"
             android:layout_alignParentBottom="true"
-            android:background="@drawable/item_surface"
+            android:background="@color/surface"
             android:clickable="true"
-            android:drawableLeft="@drawable/ic_menu_settings"
             android:drawablePadding="@dimen/nav_view_footer_image_padding_end"
             android:drawableStart="@drawable/ic_menu_settings"
+            android:elevation="18dp"
             android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground"
             android:gravity="start|center_vertical"
             android:paddingEnd="@dimen/nav_view_footer_textview_padding_side"
             android:paddingLeft="@dimen/nav_view_footer_textview_padding_side"
