@@ -22,10 +22,7 @@ import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_week.*
 import javax.inject.Inject
 
-
-class WeekFragment :
-        MvpFragment<WeekPresenter, WeekView>(),
-        WeekView {
+class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     private var weekId: Int? = null
     private lateinit var lessonRVAdapter: LessonRecyclerViewAdapter
 
@@ -48,11 +45,7 @@ class WeekFragment :
         weekId = arguments?.getInt(WEEK_ID)
     }
 
-    override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.fragment_week, container, false)
         initRecyclerView(rootView)
         return rootView
@@ -65,8 +58,7 @@ class WeekFragment :
         recyclerView.setHasFixedSize(true)
         lessonRVAdapter = LessonRecyclerViewAdapter()
         recyclerView.adapter = lessonRVAdapter
-        val itemDivider =
-                LessonRecyclerViewAdapter.Divider(recyclerView.context, layoutManager.orientation)
+        val itemDivider = LessonRecyclerViewAdapter.Divider(recyclerView.context, layoutManager.orientation)
         recyclerView.addItemDecoration(itemDivider)
     }
 
@@ -112,8 +104,7 @@ class WeekFragment :
                     isEmptyScheduleDaysVisible = true
                     text_week_nolessons.visibility = View.INVISIBLE
 
-                    button_week_weekdays_visibility.text =
-                            context!!.getString(R.string.button_week_hide_weekdays)
+                    button_week_weekdays_visibility.text = context!!.getString(R.string.button_week_hide_weekdays)
                     rv_week_days.setOnTouchListener(null)
                 } else {
                     isEmptyScheduleDaysVisible = false
@@ -123,8 +114,7 @@ class WeekFragment :
                     // the hiding animation and won't show again
                     rv_week_days.smoothScrollBy(0, -1)
 
-                    button_week_weekdays_visibility.text =
-                            context!!.getString(R.string.button_week_show_weekdays)
+                    button_week_weekdays_visibility.text = context!!.getString(R.string.button_week_show_weekdays)
                     rv_week_days.setOnTouchListener { _, _ -> true }
                 }
             }

@@ -81,8 +81,7 @@ class MainActivity :
         nav_view.setNavigationItemSelectedListener(this)
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
             nav_layout_main.setOnApplyWindowInsetsListener { v, insets ->
-                v!!.setPaddingRelative(v.paddingStart, insets!!.stableInsetTop,
-                                       v.paddingEnd, v.paddingBottom)
+                v!!.setPaddingRelative(v.paddingStart, insets!!.stableInsetTop, v.paddingEnd, v.paddingBottom)
                 insets
             }
         }

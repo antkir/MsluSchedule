@@ -14,41 +14,29 @@ import by.ntnk.msluschedule.utils.InvalidYearException
 import io.reactivex.Single
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import java.util.*
+import java.util.Collections
 import javax.inject.Inject
 
 @PerApp
 class NetworkHelper @Inject constructor(private val currentDate: CurrentDate) {
-    val facultyRequestInfo: RequestInfo =
-            RequestInfo("faculty", studyGroupZone)
-    val groupRequestInfo: RequestInfo =
-            RequestInfo("studygroups", buttonZone)
-    val weekRequestInfo: RequestInfo =
-            RequestInfo("studyweeks", buttonZone)
-    val teacherRequestInfo: RequestInfo =
-            RequestInfo("teachers", buttonZone)
-    private val yearRequestInfo: RequestInfo =
-            RequestInfo("studyyears", studyWeekZone)
-    private val courseRequestInfo: RequestInfo =
-            RequestInfo("course", studyWeekZone)
+    val facultyRequestInfo = RequestInfo("faculty", studyGroupZone)
+    val groupRequestInfo = RequestInfo("studygroups", buttonZone)
+    val weekRequestInfo = RequestInfo("studyweeks", buttonZone)
+    val teacherRequestInfo = RequestInfo("teachers", buttonZone)
+    private val yearRequestInfo = RequestInfo("studyyears", studyWeekZone)
+    private val courseRequestInfo = RequestInfo("course", studyWeekZone)
 
-    private fun createYearRequestDataInstance(value: Int): RequestData =
-            RequestData(yearRequestInfo, value)
+    private fun createYearRequestDataInstance(value: Int) = RequestData(yearRequestInfo, value)
 
-    private fun createWeekRequestDataInstance(value: Int): RequestData =
-            RequestData(weekRequestInfo, value)
+    private fun createWeekRequestDataInstance(value: Int) = RequestData(weekRequestInfo, value)
 
-    private fun createCourseRequestDataInstance(value: Int): RequestData =
-            RequestData(courseRequestInfo, value)
+    private fun createCourseRequestDataInstance(value: Int) = RequestData(courseRequestInfo, value)
 
-    private fun createFacultyRequestDataInstance(value: Int): RequestData =
-            RequestData(facultyRequestInfo, value)
+    private fun createFacultyRequestDataInstance(value: Int) = RequestData(facultyRequestInfo, value)
 
-    private fun createStudyGroupRequestDataInstance(value: Int): RequestData =
-            RequestData(groupRequestInfo, value)
+    private fun createStudyGroupRequestDataInstance(value: Int) = RequestData(groupRequestInfo, value)
 
-    private fun createTeacherRequestDataInstance(value: Int): RequestData =
-            RequestData(teacherRequestInfo, value)
+    private fun createTeacherRequestDataInstance(value: Int) = RequestData(teacherRequestInfo, value)
 
     fun getYearsFilterDataList(): List<RequestData> =
             Collections.singletonList(createYearRequestDataInstance(currentDate.academicYear))
@@ -77,10 +65,7 @@ class NetworkHelper @Inject constructor(private val currentDate: CurrentDate) {
                     createTeacherRequestDataInstance(teacher.key)
             )
 
-    fun parseDataFromHtmlBody(
-            requestInfo: RequestInfo,
-            response: String
-    ): Single<ScheduleFilter> {
+    fun parseDataFromHtmlBody(requestInfo: RequestInfo, response: String): Single<ScheduleFilter> {
         return try {
             val document = Jsoup.parse(response)
             checkYearValid(document)
@@ -90,10 +75,7 @@ class NetworkHelper @Inject constructor(private val currentDate: CurrentDate) {
         }
     }
 
-    fun parseDataFromJsonResponse(
-            requestInfo: RequestInfo,
-            jsonBody: JsonBody
-    ): Single<ScheduleFilter> {
+    fun parseDataFromJsonResponse(requestInfo: RequestInfo, jsonBody: JsonBody): Single<ScheduleFilter> {
         val htmlFragment: String = when (requestInfo.requestName) {
             groupRequestInfo.requestName -> jsonBody.studyGroupZone
             weekRequestInfo.requestName -> jsonBody.studyWeekZone
@@ -160,14 +142,11 @@ class NetworkHelper @Inject constructor(private val currentDate: CurrentDate) {
         const val groupSchedule = "schedulelistforgroupreport"
         const val teacherSchedule = "schedulelistteacherreport"
         private const val groupFormID = "printForm"
-        private const val groupFormComponentID =
-                "reports/publicreports/ScheduleListForGroupReport:printform"
+        private const val groupFormComponentID = "reports/publicreports/ScheduleListForGroupReport:printform"
         private const val teacherFormID = "buttonForm"
-        private const val teacherFormComponentID =
-                "reports/publicreports/ScheduleListTeacherReport:buttonForm"
+        private const val teacherFormComponentID = "reports/publicreports/ScheduleListTeacherReport:buttonForm"
         private const val teacherYearFormID = "requiredFilters"
-        private const val teacherYearFormComponentID =
-                "reports/publicreports/ScheduleListTeacherReport:requiredfilters"
+        private const val teacherYearFormComponentID = "reports/publicreports/ScheduleListTeacherReport:requiredfilters"
         private const val studyGroupZone = "studyGroupZone"
         private const val buttonZone = "buttonZone"
         private const val studyWeekZone = "studyWeekZone"

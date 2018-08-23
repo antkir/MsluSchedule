@@ -4,11 +4,11 @@ import android.content.Context
 import android.support.design.widget.CoordinatorLayout
 import android.support.v4.view.ViewCompat
 import android.util.AttributeSet
+import android.view.Gravity
 import android.view.View
+import android.view.animation.AnimationUtils
 import android.widget.LinearLayout
 import by.ntnk.msluschedule.R
-import android.view.Gravity
-import android.view.animation.AnimationUtils
 
 @Suppress("UNUSED")
 class FABLayoutBehavior(

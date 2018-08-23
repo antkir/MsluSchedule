@@ -5,7 +5,7 @@ import by.ntnk.msluschedule.utils.ImmutableEntry
 import java.util.Arrays
 
 data class ScheduleFilter(private val data: SparseArray<String>) {
-    val size
+    val size: Int
         get() = data.size()
 
     constructor() : this(SparseArray<String>())
@@ -15,7 +15,7 @@ data class ScheduleFilter(private val data: SparseArray<String>) {
         return ImmutableEntry(key, value)
     }
 
-    fun getValue(key: Int): String = data.get(key)
+    fun getValue(key: Int): String = data[key]
 
     fun valueAt(index: Int): String = data.valueAt(index)
 

@@ -30,7 +30,7 @@ abstract class MvpActivity<out P : Presenter<V>, V : View> : AppCompatActivity()
 
     protected abstract val view: V
 
-    protected var retainPresenter: Boolean = true
+    private var retainPresenter: Boolean = true
 
     protected abstract fun onCreatePresenter(): P
 

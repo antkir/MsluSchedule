@@ -64,8 +64,7 @@ class AddTeacherPresenter @Inject constructor(
                 .any { it == string }
     }
 
-    fun getTeacher(): Teacher =
-            Teacher(teacher, teachers!!.getValue(teacher), currentDate.academicYear)
+    fun getTeacher() = Teacher(teacher, teachers!!.getValue(teacher), currentDate.academicYear)
 
     fun populateTeachersAdapter() = view!!.populateTeachersView(teachers!!)
 

@@ -12,7 +12,6 @@ import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
 import java.io.InputStream
 import javax.inject.Inject
-import kotlin.collections.ArrayList
 
 class XlsParser @Inject constructor() {
     fun parseStudyGroupXls(xlsStream: InputStream): Observable<WeekdayWithStudyGroupLessons> {
@@ -24,8 +23,8 @@ class XlsParser @Inject constructor() {
                 .filter { row -> row.rowNum > 1 }
                 .flatMap { Observable.fromIterable(it) }
                 .toList()
-                .flatMapObservable {
-                    cells -> Observable.fromIterable(parseCellsToStudyGroupWeekdays(cells))
+                .flatMapObservable { cells ->
+                    Observable.fromIterable(parseCellsToStudyGroupWeekdays(cells))
                 }
     }
 
@@ -101,8 +100,8 @@ class XlsParser @Inject constructor() {
         return Observable.fromIterable(hssfSheet)
                 .filter { row -> row.rowNum > 2 }
                 .toList()
-                .flatMapObservable {
-                    cells -> Observable.fromIterable(parseCellsToTeacherWeekdays(cells))
+                .flatMapObservable { cells ->
+                    Observable.fromIterable(parseCellsToTeacherWeekdays(cells))
                 }
     }
 

@@ -23,12 +23,14 @@ import okhttp3.HttpUrl
 import okhttp3.internal.Util
 import timber.log.Timber
 import java.net.HttpCookie
-import java.util.*
+import java.util.ArrayList
+import java.util.Collections
 
 /* Simplified/Kotlinified JavaNetCookieJar from OkHttp package with local threads support */
 class LocalCookieJar : CookieJar {
     private val localThreadCookie = object : ThreadLocal<String>() {
-        @Synchronized override fun initialValue(): String? = null
+        @Synchronized
+        override fun initialValue(): String? = null
     }
 
     fun removeCookie() {
@@ -92,10 +94,10 @@ class LocalCookieJar : CookieJar {
             }
 
             result.add(Cookie.Builder()
-                    .name(name)
-                    .value(value)
-                    .domain(url.host())
-                    .build())
+                               .name(name)
+                               .value(value)
+                               .domain(url.host())
+                               .build())
             pos = pairEnd + 1
         }
         return result

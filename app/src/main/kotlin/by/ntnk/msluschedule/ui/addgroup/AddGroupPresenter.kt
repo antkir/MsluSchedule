@@ -96,8 +96,7 @@ class AddGroupPresenter @Inject constructor(
                 .any { it == string }
     }
 
-    fun getStudyGroup(): StudyGroup =
-            StudyGroup(group, groups!!.getValue(group), faculty, course, currentDate.academicYear)
+    fun getStudyGroup() = StudyGroup(group, groups!!.getValue(group), faculty, course, currentDate.academicYear)
 
     fun populateFacultiesAdapter() = view!!.populateFacultiesAdapter(faculties!!)
 

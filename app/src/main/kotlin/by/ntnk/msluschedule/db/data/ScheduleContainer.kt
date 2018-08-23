@@ -3,8 +3,8 @@ package by.ntnk.msluschedule.db.data
 import android.arch.persistence.room.Entity
 import android.arch.persistence.room.PrimaryKey
 import android.arch.persistence.room.TypeConverters
-import by.ntnk.msluschedule.utils.ScheduleTypeConverter
 import by.ntnk.msluschedule.utils.ScheduleType
+import by.ntnk.msluschedule.utils.ScheduleTypeConverter
 
 @Entity
 @TypeConverters(ScheduleTypeConverter::class)

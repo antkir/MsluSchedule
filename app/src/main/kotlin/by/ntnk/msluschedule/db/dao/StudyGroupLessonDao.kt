@@ -2,8 +2,8 @@ package by.ntnk.msluschedule.db.dao
 
 import android.arch.persistence.room.Dao
 import android.arch.persistence.room.Query
-import by.ntnk.msluschedule.db.data.DbStudyGroupLesson
 import android.arch.persistence.room.Transaction
+import by.ntnk.msluschedule.db.data.DbStudyGroupLesson
 import by.ntnk.msluschedule.db.data.DbWeekdayWithStudyGroupLessons
 import io.reactivex.Single
 

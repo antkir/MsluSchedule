@@ -10,7 +10,7 @@ import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.utils.SchedulerProvider
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
-import java.util.*
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 class WarningDialogFragment : DialogFragment() {
@@ -22,8 +22,7 @@ class WarningDialogFragment : DialogFragment() {
         try {
             listener = parentFragment as OnPositiveButtonClickListener
         } catch (e: ClassCastException) {
-            throw ClassCastException(parentFragment.toString() +
-                    " must implement OnPositiveButtonClickListener")
+            throw ClassCastException(parentFragment.toString() + " must implement OnPositiveButtonClickListener")
         }
     }
 

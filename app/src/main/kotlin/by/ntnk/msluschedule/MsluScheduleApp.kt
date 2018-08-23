@@ -3,12 +3,12 @@ package by.ntnk.msluschedule
 import android.app.Activity
 import android.support.multidex.MultiDexApplication
 import android.support.v7.app.AppCompatDelegate
+import by.ntnk.msluschedule.di.DaggerAppComponent
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasActivityInjector
-import javax.inject.Inject
-import by.ntnk.msluschedule.di.DaggerAppComponent
 import timber.log.Timber
+import javax.inject.Inject
 
 class MsluScheduleApp : MultiDexApplication(), HasActivityInjector {
     @Inject

@@ -5,8 +5,6 @@ import android.content.Context
 import android.os.Bundle
 import android.support.design.widget.TextInputLayout
 import android.support.v7.app.AlertDialog
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.View
 import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.data.StudyGroup
@@ -15,6 +13,7 @@ import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.ui.adapters.ScheduleFilterAdapter
 import by.ntnk.msluschedule.ui.customviews.LoadingAutoCompleteTextView
 import by.ntnk.msluschedule.utils.EMPTY_STRING
+import by.ntnk.msluschedule.utils.SimpleTextWatcher
 import dagger.Lazy
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
@@ -38,8 +37,7 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
         try {
             listener = context as OnPositiveButtonListener
         } catch (e: ClassCastException) {
-            throw ClassCastException(context.toString() +
-                    " must implement OnPositiveButtonListener")
+            throw ClassCastException(context.toString() + " must implement OnPositiveButtonListener")
         }
     }
 
@@ -104,10 +102,7 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
         }
 
         groupView.setOnItemClickListener { _, _, _, id -> presenter.setGroupValue(id.toInt()) }
-        groupView.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
-            }
-
+        groupView.addTextChangedListener(object : SimpleTextWatcher {
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
                 groupTextInputLayout.error = EMPTY_STRING
                 var isEnabled = presenter.isValidGroup(s.toString())
@@ -116,9 +111,6 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
                     isEnabled = false
                 }
                 (dialog as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = isEnabled
-            }
-
-            override fun afterTextChanged(s: Editable) {
             }
         })
     }

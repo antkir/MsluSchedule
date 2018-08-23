@@ -2,7 +2,10 @@ package by.ntnk.msluschedule.ui.weekscontainer
 
 import by.ntnk.msluschedule.db.DatabaseRepository
 import by.ntnk.msluschedule.mvp.Presenter
-import by.ntnk.msluschedule.utils.*
+import by.ntnk.msluschedule.utils.CurrentDate
+import by.ntnk.msluschedule.utils.ImmutableEntry
+import by.ntnk.msluschedule.utils.SchedulerProvider
+import by.ntnk.msluschedule.utils.SharedPreferencesRepository
 import org.threeten.bp.DayOfWeek
 import javax.inject.Inject
 
@@ -23,7 +26,7 @@ class WeeksContainerPresenter @Inject constructor(
                         currentDate.academicWeek
                     }
                     val weekIds = ArrayList<ImmutableEntry>()
-                    for (j in index - 2 .. index + 2) {
+                    for (j in index - 2..index + 2) {
                         if (j in weeks.indices) {
                             weekIds.add(ImmutableEntry(weeks[j].id, weeks[j].value))
                         }

@@ -5,8 +5,6 @@ import android.content.Context
 import android.os.Bundle
 import android.support.design.widget.TextInputLayout
 import android.support.v7.app.AlertDialog
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.View
 import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.data.Teacher
@@ -15,6 +13,7 @@ import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.ui.adapters.ScheduleFilterAdapter
 import by.ntnk.msluschedule.ui.customviews.LoadingAutoCompleteTextView
 import by.ntnk.msluschedule.utils.EMPTY_STRING
+import by.ntnk.msluschedule.utils.SimpleTextWatcher
 import dagger.Lazy
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
@@ -37,8 +36,7 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
         try {
             listener = context as OnPositiveButtonListener
         } catch (e: ClassCastException) {
-            throw ClassCastException(context.toString() +
-                    " must implement OnPositiveButtonListener")
+            throw ClassCastException(context.toString() + " must implement OnPositiveButtonListener")
         }
     }
 
@@ -61,9 +59,7 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
         val teacherTextInputLayout: TextInputLayout = layout.findViewById(R.id.textinputlayout_teacher)
         teacherView.setEnabledFocusable(false)
         teacherView.setOnItemClickListener { _, _, _, id -> presenter.setTeacherValue(id.toInt()) }
-        teacherView.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-
+        teacherView.addTextChangedListener(object : SimpleTextWatcher {
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
                 teacherTextInputLayout.error = EMPTY_STRING
                 var isEnabled = presenter.isValidTeacher(s.toString())
@@ -73,8 +69,6 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
                 }
                 (dialog as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = isEnabled
             }
-
-            override fun afterTextChanged(s: Editable) {}
         })
     }
 

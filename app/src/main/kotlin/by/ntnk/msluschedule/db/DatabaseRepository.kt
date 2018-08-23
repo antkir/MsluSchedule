@@ -80,8 +80,7 @@ class DatabaseRepository @Inject constructor(
 
     fun getWeekKey(id: Int): Single<Int> = appDatabase.weekDao.getWeek(id).map { it.key }
 
-    private fun getWeekdaysForWeek(id: Int): Single<List<Weekday>> =
-            appDatabase.weekdayDao.getWeekdaysForWeek(id)
+    private fun getWeekdaysForWeek(id: Int): Single<List<Weekday>> = appDatabase.weekdayDao.getWeekdaysForWeek(id)
 
     fun isWeekInitialized(weekId: Int): Single<Boolean> {
         return appDatabase.weekDao.getWeek(weekId)

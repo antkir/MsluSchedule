@@ -1,10 +1,8 @@
 package by.ntnk.msluschedule.data
 
-import java.util.*
+import java.util.Arrays
 
-data class WeekdayWithStudyGroupLessons(
-        override val weekday: String
-) : WeekdayWithLessons<StudyGroupLesson> {
+data class WeekdayWithStudyGroupLessons(override val weekday: String) : WeekdayWithLessons<StudyGroupLesson> {
     override val lessons: MutableList<StudyGroupLesson> = ArrayList()
 
     constructor(weekday: String, lessons: List<StudyGroupLesson>) : this(weekday) {

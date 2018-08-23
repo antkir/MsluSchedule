@@ -28,13 +28,8 @@ class ScheduleFilterAdapter(
         return createViewFromResource(layoutInflater, position, convertView, parent, resource)
     }
 
-    private fun createViewFromResource(
-            inflater: LayoutInflater,
-            position: Int,
-            convertView: View?,
-            parent: ViewGroup,
-            resource: Int
-    ): View {
+    private fun createViewFromResource(inflater: LayoutInflater, position: Int,
+                                       convertView: View?, parent: ViewGroup, resource: Int): View {
         val text: TextView
         val view: View = convertView ?: inflater.inflate(resource, parent, false)
         try {
@@ -51,21 +46,13 @@ class ScheduleFilterAdapter(
         return view
     }
 
-    override fun getCount(): Int {
-        return filteredData.size
-    }
+    override fun getCount(): Int = filteredData.size
 
-    override fun getItem(position: Int): String {
-        return filteredData.valueAt(position)
-    }
+    override fun getItem(position: Int): String = filteredData.valueAt(position)
 
-    override fun getItemId(position: Int): Long {
-        return filteredData.keyAt(position).toLong()
-    }
+    override fun getItemId(position: Int): Long = filteredData.keyAt(position).toLong()
 
-    override fun getFilter(): Filter {
-        return if (isFilteringEnabled) filter else dummyFilter
-    }
+    override fun getFilter(): Filter = if (isFilteringEnabled) filter else dummyFilter
 
     private inner class DummyFilter : Filter() {
         override fun performFiltering(constraint: CharSequence?): Filter.FilterResults {
@@ -75,8 +62,7 @@ class ScheduleFilterAdapter(
             return filterResults
         }
 
-        override fun publishResults(constraint: CharSequence?, results: Filter.FilterResults) {
-        }
+        override fun publishResults(constraint: CharSequence?, results: Filter.FilterResults) = Unit
     }
 
     private inner class DataFilter : Filter() {

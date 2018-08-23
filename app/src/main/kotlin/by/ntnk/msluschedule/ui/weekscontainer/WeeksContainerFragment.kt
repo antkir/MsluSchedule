@@ -44,8 +44,7 @@ class WeeksContainerFragment :
         try {
             listener = context as OnScheduleContainerDeletedListener
         } catch (e: ClassCastException) {
-            throw ClassCastException(context.toString() +
-                    " must implement OnScheduleContainerDeletedListener")
+            throw ClassCastException(context.toString() + " must implement OnScheduleContainerDeletedListener")
         }
     }
 
@@ -55,11 +54,7 @@ class WeeksContainerFragment :
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_weekscontainer, container, false)
         viewPager = view.findViewById(R.id.viewpager_weekscontainer)
         tabLayout = view.findViewById(R.id.tabs_weekscontainer)
@@ -78,8 +73,7 @@ class WeeksContainerFragment :
         fragmentViewPagerAdapter = WeekFragmentViewPagerAdapter(childFragmentManager, weekIds)
         viewPager.adapter = fragmentViewPagerAdapter
         viewPager.offscreenPageLimit = weekIds.size - 1
-        viewPager.currentItem =
-                if (savedCurrentPosition == -1) currentWeekItemIndex else savedCurrentPosition
+        viewPager.currentItem = if (savedCurrentPosition == -1) currentWeekItemIndex else savedCurrentPosition
         tabLayout.setupWithViewPager(viewPager)
     }
 

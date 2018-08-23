@@ -48,7 +48,6 @@ open class CurrentDate @Inject constructor() {
 
     companion object {
         private val localTimeZone: ZoneId = ZoneId.of("GMT+3")
-        private val weekField: TemporalField =
-                WeekFields.of(DayOfWeek.MONDAY, 7).weekOfYear()
+        private val weekField: TemporalField = WeekFields.of(DayOfWeek.MONDAY, 7).weekOfYear()
     }
 }

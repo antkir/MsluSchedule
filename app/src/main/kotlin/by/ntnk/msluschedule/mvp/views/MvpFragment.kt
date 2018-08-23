@@ -34,7 +34,7 @@ abstract class MvpFragment<out P : Presenter<V>, V : View> : Fragment() {
 
     protected abstract val view: V
 
-    protected var retainPresenter: Boolean = true
+    private var retainPresenter: Boolean = true
 
     protected abstract fun onCreatePresenter(): P
 

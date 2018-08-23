@@ -27,30 +27,20 @@ class NetworkRepository @Inject constructor(
 ) {
     fun getFaculties(): Single<ScheduleFilter> {
         return wrapRequest {
-            getDataFromHtmlRequest(
-                    NetworkHelper.groupSchedule,
-                    networkHelper.facultyRequestInfo
-            )
+            getDataFromHtmlRequest(NetworkHelper.groupSchedule, networkHelper.facultyRequestInfo)
         }
     }
 
     fun getGroups(faculty: Int, course: Int): Single<ScheduleFilter> {
         val requestDataList = networkHelper.getStudyGroupsFilterDataList(faculty, course)
         return wrapRequest {
-            getDataFromJsonRequest(
-                    networkHelper.groupRequestInfo,
-                    NetworkHelper.groupSchedule,
-                    requestDataList
-            )
+            getDataFromJsonRequest(networkHelper.groupRequestInfo, NetworkHelper.groupSchedule, requestDataList)
         }
     }
 
     fun getTeachers(): Single<ScheduleFilter> {
         return wrapRequest {
-            getDataFromHtmlRequest(
-                    NetworkHelper.teacherSchedule,
-                    networkHelper.teacherRequestInfo
-            )
+            getDataFromHtmlRequest(NetworkHelper.teacherSchedule, networkHelper.teacherRequestInfo)
         }
     }
 
@@ -103,10 +93,7 @@ class NetworkRepository @Inject constructor(
                 .flatMap { networkHelper.parseDataFromJsonResponse(requestInfo, it) }
     }
 
-    private fun getDataFromHtmlRequest(
-            scheduleType: String,
-            scheduleFilter: RequestInfo
-    ): Single<ScheduleFilter> {
+    private fun getDataFromHtmlRequest(scheduleType: String, scheduleFilter: RequestInfo): Single<ScheduleFilter> {
         return getHtmlBody(scheduleType)
                 .flatMap { networkHelper.parseDataFromHtmlBody(scheduleFilter, it) }
     }
@@ -128,10 +115,7 @@ class NetworkRepository @Inject constructor(
                 .ignoreElement()
     }
 
-    private fun changeScheduleFilter(
-            scheduleType: String,
-            requestData: RequestData
-    ): Single<JsonBody> {
+    private fun changeScheduleFilter(scheduleType: String, requestData: RequestData): Single<JsonBody> {
         val formIds = networkHelper.getFormIdPair(scheduleType, requestData)
         return scheduleApi
                 .changeScheduleFilter(

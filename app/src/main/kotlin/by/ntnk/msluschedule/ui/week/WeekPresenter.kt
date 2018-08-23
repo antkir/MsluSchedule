@@ -36,10 +36,7 @@ class WeekPresenter @Inject constructor(
                 )
     }
 
-    private fun getScheduleData(
-            container: ScheduleContainer,
-            weekId: Int
-    ): Single<List<WeekdayWithLessons<Lesson>>> {
+    private fun getScheduleData(container: ScheduleContainer, weekId: Int): Single<List<WeekdayWithLessons<Lesson>>> {
         return databaseRepository.isWeekInitialized(weekId)
                 .flatMap { isInitialized ->
                     return@flatMap if (isInitialized) {
@@ -51,10 +48,7 @@ class WeekPresenter @Inject constructor(
                 }
     }
 
-    private fun getWeekdaysWithLessonsForWeek(
-            type: ScheduleType,
-            weekId: Int
-    ): Observable<WeekdayWithLessons<Lesson>> {
+    private fun getWeekdaysWithLessonsForWeek(type: ScheduleType, weekId: Int): Observable<WeekdayWithLessons<Lesson>> {
         return when (type) {
             ScheduleType.STUDYGROUP -> {
                 databaseRepository.getWeekdayWithStudyGroupLessonsForWeek(weekId)
@@ -65,10 +59,7 @@ class WeekPresenter @Inject constructor(
         }
     }
 
-    private fun initSchedule(
-            container: ScheduleContainer,
-            weekId: Int
-    ): Single<List<WeekdayWithLessons<Lesson>>> {
+    private fun initSchedule(container: ScheduleContainer, weekId: Int): Single<List<WeekdayWithLessons<Lesson>>> {
         return databaseRepository.insertWeekdays(weekId)
                 .observeOn(schedulerProvider.ui())
                 .doOnComplete { view?.showInitProgressBar() }
@@ -78,10 +69,7 @@ class WeekPresenter @Inject constructor(
                 .doOnEvent { _, _ -> view?.hideInitProgressBar() }
     }
 
-    private fun downloadSchedule(
-            container: ScheduleContainer,
-            weekId: Int
-    ): Single<List<WeekdayWithLessons<Lesson>>> {
+    private fun downloadSchedule(container: ScheduleContainer, weekId: Int): Single<List<WeekdayWithLessons<Lesson>>> {
         return when (container.type) {
             ScheduleType.STUDYGROUP -> {
                 databaseRepository.getWeekKey(weekId)

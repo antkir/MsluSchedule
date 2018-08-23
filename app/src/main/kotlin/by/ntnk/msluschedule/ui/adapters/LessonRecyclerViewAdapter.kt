@@ -15,7 +15,7 @@ import by.ntnk.msluschedule.data.StudyGroupLesson
 import by.ntnk.msluschedule.data.TeacherLesson
 import by.ntnk.msluschedule.data.WeekdayWithLessons
 import by.ntnk.msluschedule.utils.*
-import java.util.*
+import java.util.ArrayList
 
 private const val VIEWTYPE_BLANK = R.layout.item_blanklesson
 private const val VIEWTYPE_STUDYGROUP = R.layout.item_studygrouplesson
@@ -86,15 +86,13 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
     private class BlankLessonView : LessonView {
         override val viewType: Int = VIEWTYPE_BLANK
 
-        override fun bindViewHolder(viewHolder: RecyclerView.ViewHolder) {
-        }
+        override fun bindViewHolder(viewHolder: RecyclerView.ViewHolder) = Unit
     }
 
     private class DayEndView : LessonView {
         override val viewType: Int = VIEWTYPE_DAYEND
 
-        override fun bindViewHolder(viewHolder: RecyclerView.ViewHolder) {
-        }
+        override fun bindViewHolder(viewHolder: RecyclerView.ViewHolder) = Unit
     }
 
     private class DayLessonView(private val weekday: String) : LessonView {
@@ -188,9 +186,7 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
     private class DayEndViewHolder(view: View) : RecyclerView.ViewHolder(view)
 
     class Divider(context: Context?, orientation: Int) : DividerItemDecoration(context, orientation) {
-        override fun getItemOffsets(
-                outRect: Rect?, view: View?, parent: RecyclerView?, state: RecyclerView.State?
-        ) {
+        override fun getItemOffsets(outRect: Rect?, view: View?, parent: RecyclerView?, state: RecyclerView.State?) {
             val viewHolder = parent!!.getChildViewHolder(view)
             if (viewHolder is LessonRecyclerViewAdapter.DayEndViewHolder) {
                 super.getItemOffsets(outRect, view, parent, state)
