@@ -22,9 +22,16 @@ class MainPresenter @Inject constructor(
 ) : Presenter<MainView>() {
     fun addGroup(studyGroup: StudyGroup) {
         databaseRepository.insertStudyGroup(studyGroup)
+                .observeOn(schedulerProvider.ui())
+                .doOnSuccess {
+                    val info = ScheduleContainerInfo(it, studyGroup.name, ScheduleType.STUDYGROUP)
+                    view?.showNewScheduleContainerLoading(info)
+                }
+                .observeOn(schedulerProvider.single())
                 .flatMap { insertWeeksWithWeekdays(it) }
                 .subscribeOn(schedulerProvider.single())
                 .observeOn(schedulerProvider.ui())
+                .doOnError { view?.showError() }
                 .subscribe(
                         {
                             val info = ScheduleContainerInfo(it, studyGroup.name, ScheduleType.STUDYGROUP)
@@ -39,9 +46,16 @@ class MainPresenter @Inject constructor(
 
     fun addTeacher(teacher: Teacher) {
         databaseRepository.insertTeacher(teacher)
+                .observeOn(schedulerProvider.ui())
+                .doOnSuccess {
+                    val info = ScheduleContainerInfo(it, teacher.name, ScheduleType.STUDYGROUP)
+                    view?.showNewScheduleContainerLoading(info)
+                }
+                .observeOn(schedulerProvider.single())
                 .flatMap { insertWeeksWithWeekdays(it) }
                 .subscribeOn(schedulerProvider.single())
                 .observeOn(schedulerProvider.ui())
+                .doOnError { view?.showError() }
                 .subscribe(
                         {
                             val info = ScheduleContainerInfo(it, teacher.name, ScheduleType.TEACHER)
@@ -58,7 +72,7 @@ class MainPresenter @Inject constructor(
         return networkRepository.getWeeks()
                 .flatMapObservable { databaseRepository.insertWeeksGetIds(it, containerId) }
                 .ignoreElements()
-                .doOnError { databaseRepository.deleteScheduleContainer(containerId) }
+                .doOnError { databaseRepository.deleteScheduleContainer(containerId).subscribe() }
                 .andThen(Single.just(containerId))
     }
 

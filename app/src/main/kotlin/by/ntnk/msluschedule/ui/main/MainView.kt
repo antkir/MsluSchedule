@@ -7,4 +7,6 @@ interface MainView : View {
     fun initMainContent()
     fun addScheduleContainerMenuItem(scheduleContainerInfo: ScheduleContainerInfo)
     fun checkScheduleContainerMenuItem(scheduleContainerInfo: ScheduleContainerInfo)
+    fun showNewScheduleContainerLoading(scheduleContainerInfo: ScheduleContainerInfo)
+    fun showError()
 }

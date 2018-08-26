@@ -2,6 +2,7 @@ package by.ntnk.msluschedule.ui.main
 
 import android.os.Bundle
 import android.support.design.widget.NavigationView
+import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v4.view.GravityCompat
 import android.support.v4.view.ViewCompat
@@ -214,6 +215,8 @@ class MainActivity :
             weeksContainerFragment as WeeksContainerFragment
             weeksContainerFragment.swapTabs()
         }
+
+        progressbar_main.visibility = View.INVISIBLE
         image_main_smileyface.visibility = View.INVISIBLE
         text_main_advice.visibility = View.INVISIBLE
     }
@@ -249,21 +252,46 @@ class MainActivity :
         }
     }
 
-    override fun onScheduleContainerDeleted(info: ScheduleContainerInfo) {
+    override fun showNewScheduleContainerLoading(scheduleContainerInfo: ScheduleContainerInfo) {
+        supportActionBar?.title = scheduleContainerInfo.value
+        removeWeeksContainerFragment()
+
+        progressbar_main.visibility = View.VISIBLE
+        image_main_smileyface.visibility = View.INVISIBLE
+        text_main_advice.visibility = View.INVISIBLE
+    }
+
+    override fun showError() {
         supportActionBar?.title = EMPTY_STRING
+        removeWeeksContainerFragment()
+
+        progressbar_main.visibility = View.INVISIBLE
         image_main_smileyface.visibility = View.VISIBLE
         text_main_advice.visibility = View.VISIBLE
-        val fragmentManager = supportFragmentManager
-        val fragment = fragmentManager.findFragmentById(R.id.framelayout_main)
-        if (fragment != null) {
-            fragmentManager
-                    .beginTransaction()
-                    .remove(fragment)
-                    .commit()
-        }
+
+        Snackbar.make(framelayout_main, R.string.error_init_schedule, Snackbar.LENGTH_LONG).show()
+    }
+
+    override fun onScheduleContainerDeleted(info: ScheduleContainerInfo) {
+        supportActionBar?.title = EMPTY_STRING
+        removeWeeksContainerFragment()
+
+        image_main_smileyface.visibility = View.VISIBLE
+        text_main_advice.visibility = View.VISIBLE
+
         nav_view.menu
                 .findItem(getContainerMenuViewId(info.type!!))
                 .subMenu
                 .removeItem(info.id)
+    }
+
+    private fun removeWeeksContainerFragment() {
+        val fragment = supportFragmentManager.findFragmentById(R.id.framelayout_main)
+        if (fragment != null) {
+            supportFragmentManager
+                    .beginTransaction()
+                    .remove(fragment)
+                    .commit()
+        }
     }
 }
