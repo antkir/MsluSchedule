@@ -1,10 +1,11 @@
 package by.ntnk.msluschedule.utils
 
 import by.ntnk.msluschedule.TestTree
-import org.junit.Test
-
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Test
+import org.threeten.bp.DayOfWeek
 import org.threeten.bp.LocalDate
 import timber.log.Timber
 
@@ -45,18 +46,22 @@ class CurrentDateTest {
     }
 
     @Test
-    fun `"academicWeek" for September the 1st must return 0`() {
+    fun `"academicWeek" for September the 1st must return 0 or -1 for Sundays`() {
         // given
         val year = 1970
         val month = 9
         val day = 1
-        for (i in 0 .. 100) {
+        for (i in 0..100) {
             val currentYear = year + i
             currentDate.date = LocalDate.of(currentYear, month, day)
             // when
             val academicWeek = currentDate.academicWeek
             // then
-            assertEquals(0, academicWeek)
+            if (currentDate.date.dayOfWeek == DayOfWeek.SUNDAY) {
+                assertEquals(-1, academicWeek)
+            } else {
+                assertEquals(0, academicWeek)
+            }
         }
     }
 
@@ -74,7 +79,7 @@ class CurrentDateTest {
     }
 
     @Test
-    fun `If the current month is August, "academicWeek" must return 0`() {
+    fun `If the current month is August, "academicWeek" must return a negative number`() {
         // given
         val year = 1970
         val month = 8
@@ -83,6 +88,6 @@ class CurrentDateTest {
         // when
         val academicWeek = currentDate.academicWeek
         // then
-        assertEquals(0, academicWeek)
+        assertTrue(academicWeek < 0)
     }
 }

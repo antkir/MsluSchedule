@@ -38,12 +38,10 @@ open class CurrentDate @Inject constructor() {
             val yearEndDate = LocalDate.of(academicYear, Month.DECEMBER, 31)
             val yearEndWeek = yearEndDate.get(weekField)
 
-            val academicWeek = when (month >= Month.AUGUST.value) {
+            return when (month >= Month.AUGUST.value) {
                 true -> week - septemberWeek
                 false -> yearEndWeek - septemberWeek + week
             }
-
-            return if (academicWeek > 0) academicWeek else 0
         }
 
     companion object {

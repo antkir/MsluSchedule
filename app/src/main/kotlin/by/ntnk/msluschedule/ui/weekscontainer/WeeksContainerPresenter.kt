@@ -20,10 +20,10 @@ class WeeksContainerPresenter @Inject constructor(
         databaseRepository.getWeeksForContainer(info.id)
                 .toList()
                 .map { weeks ->
-                    val index = if (currentDate.date.dayOfWeek == DayOfWeek.SUNDAY) {
-                        currentDate.academicWeek + 1
-                    } else {
-                        currentDate.academicWeek
+                    val index = when {
+                        currentDate.date.dayOfWeek == DayOfWeek.SUNDAY -> currentDate.academicWeek + 1
+                        currentDate.academicWeek < 0 -> 0
+                        else -> currentDate.academicWeek
                     }
                     val weekIds = ArrayList<ImmutableEntry>()
                     for (j in index - 2..index + 2) {
