@@ -22,13 +22,13 @@ class WeekPresenter @Inject constructor(
         private val schedulerProvider: SchedulerProvider,
         private val networkRepository: NetworkRepository
 ) : Presenter<WeekView>() {
-    private val newThread = schedulerProvider.newThread()
+    private var scheduler = schedulerProvider.cachedThreadPool()
 
     fun getSchedule(weekId: Int) {
         val containerInfo = sharedPreferencesRepository.getSelectedScheduleContainerInfo()
         databaseRepository.getScheduleContainer(containerInfo.id)
                 .flatMap { getScheduleData(it, weekId) }
-                .subscribeOn(newThread)
+                .subscribeOn(scheduler)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         { weekDayEntities -> view?.showSchedule(weekDayEntities) },
@@ -63,7 +63,7 @@ class WeekPresenter @Inject constructor(
         return databaseRepository.insertWeekdays(weekId)
                 .observeOn(schedulerProvider.ui())
                 .doOnComplete { view?.showInitProgressBar() }
-                .observeOn(newThread)
+                .observeOn(scheduler)
                 .andThen(downloadSchedule(container, weekId))
                 .observeOn(schedulerProvider.ui())
                 .doOnEvent { _, _ -> view?.hideInitProgressBar() }
@@ -103,7 +103,7 @@ class WeekPresenter @Inject constructor(
                                         .toList()
                             }
                 }
-                .subscribeOn(schedulerProvider.newThread())
+                .subscribeOn(schedulerProvider.cachedThreadPool())
                 .observeOn(schedulerProvider.ui())
                 .doOnSubscribe { view?.showUpdateProgressBar() }
                 .doOnEvent { _, _ -> view?.hideUpdateProgressBar() }
