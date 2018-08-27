@@ -25,6 +25,7 @@ import javax.inject.Inject
 class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     private var weekId: Int? = null
     private lateinit var lessonRVAdapter: LessonRecyclerViewAdapter
+    private var isEmptyScheduleDaysVisible: Boolean = false
 
     override val view: WeekView
         get() = this
@@ -67,8 +68,6 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         weekId ?: return
         presenter.getSchedule(weekId!!)
     }
-
-    private var isEmptyScheduleDaysVisible: Boolean = false
 
     override fun showSchedule(data: List<WeekdayWithLessons<Lesson>>) {
         if (data.map { it.lessons.size }.sum() <= 0) {
@@ -173,14 +172,18 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         ).show()
     }
 
-    override fun showError() {
+    override fun showError(shouldSetupViews: Boolean) {
+        if (shouldSetupViews) {
+            weekId ?: return
+            presenter.getSchedule(weekId!!)
+        }
         if (!isFragmentVisible) return
-        Snackbar.make(getView()!!, R.string.error_init_schedule, Snackbar.LENGTH_INDEFINITE)
+        Snackbar.make(getView()!!, R.string.error_init_schedule, 5000)
                 .setAction(R.string.snackbar_week_init_retry) {
                     if (isNetworkAccessible(context!!.applicationContext)) {
                         presenter.updateSchedule(weekId!!)
                     } else {
-                        showError()
+                        showError(shouldSetupViews = false)
                     }
                 }
                 .show()

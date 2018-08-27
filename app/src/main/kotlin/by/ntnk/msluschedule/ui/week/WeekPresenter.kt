@@ -12,7 +12,6 @@ import by.ntnk.msluschedule.utils.SchedulerProvider
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
 import io.reactivex.Observable
 import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
 import javax.inject.Inject
 
 class WeekPresenter @Inject constructor(
@@ -29,10 +28,13 @@ class WeekPresenter @Inject constructor(
         databaseRepository.getScheduleContainer(containerInfo.id)
                 .flatMap { getScheduleData(it, weekId) }
                 .subscribeOn(scheduler)
-                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(schedulerProvider.ui())
                 .subscribe(
                         { weekDayEntities -> view?.showSchedule(weekDayEntities) },
-                        { it.printStackTrace(); view?.showError() }
+                        {
+                            it.printStackTrace()
+                            view?.showError(true)
+                        }
                 )
     }
 
@@ -110,7 +112,10 @@ class WeekPresenter @Inject constructor(
                 .doOnSuccess { _ -> view?.showUpdateSuccessMessage() }
                 .subscribe(
                         { weekDayEntities -> view?.showSchedule(weekDayEntities) },
-                        { it.printStackTrace(); view?.showError() }
+                        {
+                            it.printStackTrace()
+                            view?.showError(shouldSetupViews = false)
+                        }
                 )
     }
 }
