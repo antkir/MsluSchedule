@@ -50,7 +50,8 @@
     <string name="view_main_empty_message">Add a new schedule or\nchoose one from the list.</string>
 
     <string name="action_update_schedule">Update</string>
-    <string name="error_init_schedule">An error occurred 😨</string>
+    <string name="error_general">An error occurred 😨</string>
+    <string name="error_website_unavailable">Error: Could not connect to the website 😨</string>
     <string name="snackbar_week_init_retry">Retry</string>
     <string name="text_week_no_classes">No classes this week.\nGood luck!</string>
     <string name="button_week_show_weekdays">Show weekdays</string>

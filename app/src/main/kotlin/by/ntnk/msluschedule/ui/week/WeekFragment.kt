@@ -15,6 +15,7 @@ import by.ntnk.msluschedule.data.WeekdayWithLessons
 import by.ntnk.msluschedule.mvp.views.MvpFragment
 import by.ntnk.msluschedule.ui.adapters.LessonRecyclerViewAdapter
 import by.ntnk.msluschedule.utils.SimpleAnimatorListener
+import by.ntnk.msluschedule.utils.getErrorMessageResId
 import by.ntnk.msluschedule.utils.isNetworkAccessible
 import by.ntnk.msluschedule.utils.showSnackbarNetworkInaccessible
 import dagger.Lazy
@@ -172,18 +173,18 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         ).show()
     }
 
-    override fun showError(shouldSetupViews: Boolean) {
+    override fun showError(t: Throwable, shouldSetupViews: Boolean) {
         if (shouldSetupViews) {
             weekId ?: return
             presenter.getSchedule(weekId!!)
         }
         if (!isFragmentVisible) return
-        Snackbar.make(getView()!!, R.string.error_init_schedule, 5000)
+        Snackbar.make(getView()!!, getErrorMessageResId(t), 5000)
                 .setAction(R.string.snackbar_week_init_retry) {
                     if (isNetworkAccessible(context!!.applicationContext)) {
                         presenter.updateSchedule(weekId!!)
                     } else {
-                        showError(shouldSetupViews = false)
+                        showError(t, shouldSetupViews = false)
                     }
                 }
                 .show()

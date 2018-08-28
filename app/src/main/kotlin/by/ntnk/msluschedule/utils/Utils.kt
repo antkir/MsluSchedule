@@ -21,3 +21,6 @@ const val SUNDAY = "ВС"
 typealias ImmutableEntry = AbstractMap.SimpleImmutableEntry<Int, String>
 
 class InvalidYearException : Exception()
+
+class HttpStatusException(message: String, statusCode: Int, url: String)
+    : org.jsoup.HttpStatusException(message, statusCode, url)

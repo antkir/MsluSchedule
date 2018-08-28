@@ -33,7 +33,7 @@ class WeekPresenter @Inject constructor(
                         { weekDayEntities -> view?.showSchedule(weekDayEntities) },
                         {
                             it.printStackTrace()
-                            view?.showError(true)
+                            view?.showError(it, shouldSetupViews = true)
                         }
                 )
     }
@@ -114,7 +114,7 @@ class WeekPresenter @Inject constructor(
                         { weekDayEntities -> view?.showSchedule(weekDayEntities) },
                         {
                             it.printStackTrace()
-                            view?.showError(shouldSetupViews = false)
+                            view?.showError(it, shouldSetupViews = false)
                         }
                 )
     }

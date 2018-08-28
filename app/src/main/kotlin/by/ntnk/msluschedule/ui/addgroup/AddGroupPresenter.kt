@@ -64,7 +64,10 @@ class AddGroupPresenter @Inject constructor(
                             faculties = it
                             populateFacultiesAdapter()
                         },
-                        { it.printStackTrace() }
+                        {
+                            it.printStackTrace()
+                            view?.showError(it)
+                        }
                 )
     }
 
@@ -77,7 +80,10 @@ class AddGroupPresenter @Inject constructor(
                             groups = it
                             populateGroupsAdapter()
                         },
-                        { it.printStackTrace() }
+                        {
+                            it.printStackTrace()
+                            view?.showError(it)
+                        }
                 )
     }
 
@@ -98,9 +104,9 @@ class AddGroupPresenter @Inject constructor(
 
     fun getStudyGroup() = StudyGroup(group, groups!!.getValue(group), faculty, course, currentDate.academicYear)
 
-    fun populateFacultiesAdapter() = view!!.populateFacultiesAdapter(faculties!!)
+    fun populateFacultiesAdapter() = view?.populateFacultiesAdapter(faculties!!)
 
-    fun populateGroupsAdapter() = view!!.populateGroupsAdapter(groups!!)
+    fun populateGroupsAdapter() = view?.populateGroupsAdapter(groups!!)
 
     fun clearDisposables() = disposables.clear()
 }

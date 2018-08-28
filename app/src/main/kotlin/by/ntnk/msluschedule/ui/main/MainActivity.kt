@@ -20,10 +20,7 @@ import by.ntnk.msluschedule.mvp.views.MvpActivity
 import by.ntnk.msluschedule.ui.addgroup.AddGroupFragment
 import by.ntnk.msluschedule.ui.addteacher.AddTeacherFragment
 import by.ntnk.msluschedule.ui.weekscontainer.WeeksContainerFragment
-import by.ntnk.msluschedule.utils.EMPTY_STRING
-import by.ntnk.msluschedule.utils.ScheduleType
-import by.ntnk.msluschedule.utils.isNetworkAccessible
-import by.ntnk.msluschedule.utils.showSnackbarNetworkInaccessible
+import by.ntnk.msluschedule.utils.*
 import dagger.Lazy
 import dagger.android.AndroidInjection
 import dagger.android.AndroidInjector
@@ -44,8 +41,8 @@ class MainActivity :
         NavigationView.OnNavigationItemSelectedListener,
         DrawerLayout.DrawerListener,
         HasSupportFragmentInjector,
-        AddGroupFragment.OnPositiveButtonListener,
-        AddTeacherFragment.OnPositiveButtonListener,
+        AddGroupFragment.DialogListener,
+        AddTeacherFragment.DialogListener,
         WeeksContainerFragment.OnScheduleContainerDeletedListener {
     override val view: MainView
         get() = this
@@ -197,12 +194,16 @@ class MainActivity :
         if (isFamOpen) collapseFam()
     }
 
-    override fun onPositiveButtonGroup(studyGroup: StudyGroup) {
+    override fun onNewStudyGroup(studyGroup: StudyGroup) {
         presenter.addGroup(studyGroup)
     }
 
-    override fun onPositiveButtonTeacher(teacher: Teacher) {
+    override fun onNewTeacher(teacher: Teacher) {
         presenter.addTeacher(teacher)
+    }
+
+    override fun onError(t: Throwable) {
+        Snackbar.make(framelayout_main, getErrorMessageResId(t), Snackbar.LENGTH_LONG).show()
     }
 
     override fun initMainContent() {
@@ -245,7 +246,7 @@ class MainActivity :
             for (i in 0 until subMenu.size()) {
                 val item = subMenu.getItem(i)
                 if (scheduleContainerInfo.id == item.itemId) {
-                    nav_view!!.setCheckedItem(item.itemId)
+                    nav_view.setCheckedItem(item.itemId)
                     break
                 }
             }
@@ -269,7 +270,7 @@ class MainActivity :
         image_main_smileyface.visibility = View.VISIBLE
         text_main_advice.visibility = View.VISIBLE
 
-        Snackbar.make(framelayout_main, R.string.error_init_schedule, Snackbar.LENGTH_LONG).show()
+        Snackbar.make(framelayout_main, R.string.error_general, Snackbar.LENGTH_LONG).show()
     }
 
     override fun onScheduleContainerDeleted(info: ScheduleContainerInfo) {

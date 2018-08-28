@@ -8,6 +8,8 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import by.ntnk.msluschedule.R
+import java.net.ConnectException
+import java.net.SocketTimeoutException
 
 fun isNetworkAccessible(context: Context): Boolean {
     val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -16,6 +18,15 @@ fun isNetworkAccessible(context: Context): Boolean {
 
 fun showSnackbarNetworkInaccessible(view: View) =
         Snackbar.make(view, R.string.snackbar_internet_unavailable, Snackbar.LENGTH_LONG).show()
+
+fun getErrorMessageResId(t: Throwable): Int {
+    return when (t) {
+        is ConnectException -> R.string.error_website_unavailable
+        is HttpStatusException -> R.string.error_website_unavailable
+        is SocketTimeoutException -> R.string.error_website_unavailable
+        else -> R.string.error_general
+    }
+}
 
 interface SimpleAnimatorListener : Animator.AnimatorListener {
     override fun onAnimationRepeat(animation: Animator?) = Unit

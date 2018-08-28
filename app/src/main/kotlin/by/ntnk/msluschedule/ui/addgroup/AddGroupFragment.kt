@@ -19,7 +19,7 @@ import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
 class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), AddGroupView {
-    private lateinit var listener: OnPositiveButtonListener
+    private lateinit var listener: DialogListener
     private lateinit var facultyView: LoadingAutoCompleteTextView
     private lateinit var groupView: LoadingAutoCompleteTextView
 
@@ -35,9 +35,9 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
         try {
-            listener = context as OnPositiveButtonListener
+            listener = context as DialogListener
         } catch (e: ClassCastException) {
-            throw ClassCastException(context.toString() + " must implement OnPositiveButtonListener")
+            throw ClassCastException(context.toString() + " must implement DialogListener")
         }
     }
 
@@ -74,7 +74,7 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
                 .setTitle((R.string.add_group_title))
                 .setView(layout)
                 .setPositiveButton(R.string.button_add) { _, _ ->
-                    listener.onPositiveButtonGroup(presenter.getStudyGroup())
+                    listener.onNewStudyGroup(presenter.getStudyGroup())
                 }
                 .setNegativeButton(R.string.button_cancel) { _, _ ->
                     dismiss()
@@ -116,7 +116,8 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
     }
 
     override fun showError(t: Throwable) {
-        TODO("not implemented")
+        dismiss()
+        listener.onError(t)
     }
 
     override fun populateFacultiesAdapter(data: ScheduleFilter) {
@@ -150,7 +151,8 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
         super.dismiss()
     }
 
-    interface OnPositiveButtonListener {
-        fun onPositiveButtonGroup(studyGroup: StudyGroup)
+    interface DialogListener {
+        fun onNewStudyGroup(studyGroup: StudyGroup)
+        fun onError(t: Throwable)
     }
 }

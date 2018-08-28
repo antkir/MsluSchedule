@@ -166,7 +166,7 @@ class WeekPresenterTest {
         verify(databaseDataMapper).mapToStudyGroup(any())
         verify(view).showInitProgressBar()
         verify(view).hideInitProgressBar()
-        verify(view).showError(eq(true))
+        verify(view).showError(any(), eq(true))
     }
 
     @Test
@@ -209,6 +209,6 @@ class WeekPresenterTest {
         verify(sharedPreferencesRepository).getSelectedScheduleContainerInfo()
         verify(view).showUpdateProgressBar()
         verify(view).hideUpdateProgressBar()
-        verify(view).showError(eq(false))
+        verify(view).showError(any(), eq(false))
     }
 }

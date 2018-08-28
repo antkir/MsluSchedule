@@ -9,7 +9,6 @@ import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.utils.CurrentDate
 import by.ntnk.msluschedule.utils.SchedulerProvider
 import io.reactivex.disposables.Disposable
-import timber.log.Timber
 import javax.inject.Inject
 
 class AddTeacherPresenter @Inject constructor(
@@ -44,12 +43,14 @@ class AddTeacherPresenter @Inject constructor(
                             teachers = it
                             populateTeachersAdapter()
                         },
-                        { it.printStackTrace() }
+                        {
+                            it.printStackTrace()
+                            view?.showError(it)
+                        }
                 )
     }
 
     fun setTeacherValue(value: Int) {
-        Timber.d("VALUE: %d", value)
         teacher = value
     }
 
@@ -66,7 +67,7 @@ class AddTeacherPresenter @Inject constructor(
 
     fun getTeacher() = Teacher(teacher, teachers!!.getValue(teacher), currentDate.academicYear)
 
-    fun populateTeachersAdapter() = view!!.populateTeachersView(teachers!!)
+    fun populateTeachersAdapter() = view?.populateTeachersView(teachers!!)
 
     fun clearDisposables() = disposable.dispose()
 }

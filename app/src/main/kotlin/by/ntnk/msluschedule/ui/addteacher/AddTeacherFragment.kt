@@ -19,7 +19,7 @@ import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
 class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView>(), AddTeacherView {
-    private lateinit var listener: OnPositiveButtonListener
+    private lateinit var listener: DialogListener
     private lateinit var teacherView: LoadingAutoCompleteTextView
 
     override val view: AddTeacherView
@@ -34,9 +34,9 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
         try {
-            listener = context as OnPositiveButtonListener
+            listener = context as DialogListener
         } catch (e: ClassCastException) {
-            throw ClassCastException(context.toString() + " must implement OnPositiveButtonListener")
+            throw ClassCastException(context.toString() + " must implement DialogListener")
         }
     }
 
@@ -88,7 +88,7 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
                 .setTitle((R.string.add_teacher_title))
                 .setView(layout)
                 .setPositiveButton(R.string.button_add) { _, _ ->
-                    listener.onPositiveButtonTeacher(presenter.getTeacher())
+                    listener.onNewTeacher(presenter.getTeacher())
                 }
                 .setNegativeButton(R.string.button_cancel) { _, _ ->
                     dismiss()
@@ -114,7 +114,8 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
     }
 
     override fun showError(t: Throwable) {
-        TODO("not implemented")
+        dismiss()
+        listener.onError(t)
     }
 
     override fun dismiss() {
@@ -122,7 +123,8 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
         super.dismiss()
     }
 
-    interface OnPositiveButtonListener {
-        fun onPositiveButtonTeacher(teacher: Teacher)
+    interface DialogListener {
+        fun onNewTeacher(teacher: Teacher)
+        fun onError(t: Throwable)
     }
 }
