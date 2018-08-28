@@ -9,6 +9,7 @@ import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.utils.CurrentDate
 import by.ntnk.msluschedule.utils.SchedulerProvider
 import io.reactivex.disposables.Disposable
+import io.reactivex.rxkotlin.subscribeBy
 import javax.inject.Inject
 
 class AddTeacherPresenter @Inject constructor(
@@ -30,20 +31,20 @@ class AddTeacherPresenter @Inject constructor(
         databaseRepository.getScheduleContainers()
                 .toList()
                 .subscribeOn(schedulerProvider.io())
-                .subscribe(
-                        { scheduleContaners = it },
-                        { it.printStackTrace() }
+                .subscribeBy(
+                        onSuccess = { scheduleContaners = it },
+                        onError = { it.printStackTrace() }
                 )
 
         disposable = networkRequestRepository.getTeachers()
                 .subscribeOn(schedulerProvider.single())
                 .observeOn(schedulerProvider.ui())
-                .subscribe(
-                        {
+                .subscribeBy(
+                        onSuccess = {
                             teachers = it
                             populateTeachersAdapter()
                         },
-                        {
+                        onError = {
                             it.printStackTrace()
                             view?.showError(it)
                         }

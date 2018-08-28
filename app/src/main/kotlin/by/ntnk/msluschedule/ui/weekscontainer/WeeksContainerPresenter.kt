@@ -6,6 +6,7 @@ import by.ntnk.msluschedule.utils.CurrentDate
 import by.ntnk.msluschedule.utils.ImmutableEntry
 import by.ntnk.msluschedule.utils.SchedulerProvider
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
+import io.reactivex.rxkotlin.subscribeBy
 import org.threeten.bp.DayOfWeek
 import javax.inject.Inject
 
@@ -36,9 +37,10 @@ class WeeksContainerPresenter @Inject constructor(
                 }
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
-                .subscribe(
-                        { view?.initWeeksAdapter(it.first, it.second) },
-                        { it.printStackTrace() })
+                .subscribeBy(
+                        onSuccess = { view?.initWeeksAdapter(it.first, it.second) },
+                        onError = { it.printStackTrace() }
+                )
     }
 
     fun deleteSelectedScheduleContainer() {
@@ -46,12 +48,12 @@ class WeeksContainerPresenter @Inject constructor(
         databaseRepository.deleteScheduleContainer(info.id)
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
-                .subscribe(
-                        {
+                .subscribeBy(
+                        onComplete = {
                             sharedPreferencesRepository.selectEmptyScheduleContainer()
                             view?.removeScheduleContainerFromView(info)
                         },
-                        { it.printStackTrace() }
+                        onError = { it.printStackTrace() }
                 )
     }
 }

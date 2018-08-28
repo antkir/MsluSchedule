@@ -11,6 +11,7 @@ import by.ntnk.msluschedule.utils.ScheduleType
 import by.ntnk.msluschedule.utils.SchedulerProvider
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
 import io.reactivex.Single
+import io.reactivex.rxkotlin.subscribeBy
 import javax.inject.Inject
 
 class MainPresenter @Inject constructor(
@@ -23,8 +24,8 @@ class MainPresenter @Inject constructor(
     fun addGroup(studyGroup: StudyGroup) {
         databaseRepository.insertStudyGroup(studyGroup)
                 .observeOn(schedulerProvider.ui())
-                .doOnSuccess {
-                    val info = ScheduleContainerInfo(it, studyGroup.name, ScheduleType.STUDYGROUP)
+                .doOnSuccess { studyGroupId ->
+                    val info = ScheduleContainerInfo(studyGroupId, studyGroup.name, ScheduleType.STUDYGROUP)
                     view?.showNewScheduleContainerLoading(info)
                 }
                 .observeOn(schedulerProvider.single())
@@ -32,23 +33,23 @@ class MainPresenter @Inject constructor(
                 .subscribeOn(schedulerProvider.single())
                 .observeOn(schedulerProvider.ui())
                 .doOnError { view?.showError() }
-                .subscribe(
-                        {
-                            val info = ScheduleContainerInfo(it, studyGroup.name, ScheduleType.STUDYGROUP)
+                .subscribeBy(
+                        onSuccess = { studyGroupId ->
+                            val info = ScheduleContainerInfo(studyGroupId, studyGroup.name, ScheduleType.STUDYGROUP)
                             sharedPreferencesRepository.putSelectedScheduleContainer(info)
                             view?.initMainContent()
                             view?.addScheduleContainerMenuItem(info)
                             view?.checkScheduleContainerMenuItem(info)
                         },
-                        { it.printStackTrace() }
+                        onError = { it.printStackTrace() }
                 )
     }
 
     fun addTeacher(teacher: Teacher) {
         databaseRepository.insertTeacher(teacher)
                 .observeOn(schedulerProvider.ui())
-                .doOnSuccess {
-                    val info = ScheduleContainerInfo(it, teacher.name, ScheduleType.STUDYGROUP)
+                .doOnSuccess { teacherId ->
+                    val info = ScheduleContainerInfo(teacherId, teacher.name, ScheduleType.STUDYGROUP)
                     view?.showNewScheduleContainerLoading(info)
                 }
                 .observeOn(schedulerProvider.single())
@@ -56,15 +57,15 @@ class MainPresenter @Inject constructor(
                 .subscribeOn(schedulerProvider.single())
                 .observeOn(schedulerProvider.ui())
                 .doOnError { view?.showError() }
-                .subscribe(
-                        {
-                            val info = ScheduleContainerInfo(it, teacher.name, ScheduleType.TEACHER)
+                .subscribeBy(
+                        onSuccess = { teacherId ->
+                            val info = ScheduleContainerInfo(teacherId, teacher.name, ScheduleType.TEACHER)
                             sharedPreferencesRepository.putSelectedScheduleContainer(info)
                             view?.initMainContent()
                             view?.addScheduleContainerMenuItem(info)
                             view?.checkScheduleContainerMenuItem(info)
                         },
-                        { it.printStackTrace() }
+                        onError = { it.printStackTrace() }
                 )
     }
 
@@ -80,18 +81,18 @@ class MainPresenter @Inject constructor(
         databaseRepository.getScheduleContainers()
                 .subscribeOn(schedulerProvider.single())
                 .observeOn(schedulerProvider.ui())
-                .subscribe(
-                        {
-                            val name = if (it.year != currentDate.academicYear) {
-                                String.format("(%d) ", it.year) + it.name
+                .subscribeBy(
+                        onNext = { scheduleContainer ->
+                            val name = if (scheduleContainer.year != currentDate.academicYear) {
+                                String.format("(%d) ", scheduleContainer.year) + scheduleContainer.name
                             } else {
-                                it.name
+                                scheduleContainer.name
                             }
-                            val info = ScheduleContainerInfo(it.id, name, it.type)
+                            val info = ScheduleContainerInfo(scheduleContainer.id, name, scheduleContainer.type)
                             view?.addScheduleContainerMenuItem(info)
                         },
-                        { it.printStackTrace() },
-                        {
+                        onError = { it.printStackTrace() },
+                        onComplete = {
                             val info = sharedPreferencesRepository.getSelectedScheduleContainerInfo()
                             view?.checkScheduleContainerMenuItem(info)
                         }

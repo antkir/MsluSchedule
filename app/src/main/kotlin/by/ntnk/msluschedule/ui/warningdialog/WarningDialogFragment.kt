@@ -10,6 +10,7 @@ import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.utils.SchedulerProvider
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
+import io.reactivex.rxkotlin.subscribeBy
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
@@ -51,19 +52,18 @@ class WarningDialogFragment : DialogFragment() {
         val timeout = 5L
         disposable = Observable
                 .intervalRange(1, timeout, 0, 1, TimeUnit.SECONDS)
-                .map { timeout - it }
-                .map {
+                .map { timePassed -> timeout - timePassed }
+                .map { timeLeft ->
                     String.format(
                             Locale.getDefault(),
                             "%s (%d)",
                             resources.getString(R.string.button_delete),
-                            it)
+                            timeLeft)
                 }
                 .observeOn(SchedulerProvider.ui())
-                .subscribe(
-                        { button.text = it },
-                        {},
-                        {
+                .subscribeBy(
+                        onNext = { button.text = it },
+                        onComplete = {
                             button.setTextColor(ContextCompat.getColor(context!!, R.color.warning))
                             button.isEnabled = true
                             button.text = resources.getString(R.string.button_delete)

@@ -57,6 +57,7 @@ ext {
     roomVersion = '1.1.1'
     rxandroidVersion = '2.1.0'
     rxjavaVersion = '2.2.1'
+    rxkotlinVersion = '2.3.0'
     threetenbpVersion = '1.3.6'
     timberVersion = '4.7.1'
 }
@@ -92,6 +93,8 @@ dependencies {
     implementation "io.reactivex.rxjava2:rxandroid:$rxandroidVersion"
     // RxJava
     implementation "io.reactivex.rxjava2:rxjava:$rxjavaVersion"
+    // RxKotlin
+    implementation "io.reactivex.rxjava2:rxkotlin:$rxkotlinVersion"
     // Timber
     implementation "com.jakewharton.timber:timber:$timberVersion"
     // Time

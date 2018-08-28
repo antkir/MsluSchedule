@@ -9,8 +9,9 @@ import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.utils.COURSE_VALUE
 import by.ntnk.msluschedule.utils.CurrentDate
 import by.ntnk.msluschedule.utils.SchedulerProvider
-import by.ntnk.msluschedule.utils.plusAssign
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.plusAssign
+import io.reactivex.rxkotlin.subscribeBy
 import javax.inject.Inject
 
 class AddGroupPresenter @Inject constructor(
@@ -51,20 +52,20 @@ class AddGroupPresenter @Inject constructor(
         databaseRepository.getScheduleContainers()
                 .toList()
                 .subscribeOn(schedulerProvider.io())
-                .subscribe(
-                        { scheduleContaners = it },
-                        { it.printStackTrace() }
+                .subscribeBy(
+                        onSuccess = { scheduleContaners = it },
+                        onError = { it.printStackTrace() }
                 )
 
         disposables += networkRepository.getFaculties()
                 .subscribeOn(schedulerProvider.single())
                 .observeOn(schedulerProvider.ui())
-                .subscribe(
-                        {
+                .subscribeBy (
+                        onSuccess = {
                             faculties = it
                             populateFacultiesAdapter()
                         },
-                        {
+                        onError = {
                             it.printStackTrace()
                             view?.showError(it)
                         }
@@ -75,12 +76,12 @@ class AddGroupPresenter @Inject constructor(
         disposables += networkRepository.getGroups(faculty, course)
                 .subscribeOn(schedulerProvider.single())
                 .observeOn(schedulerProvider.ui())
-                .subscribe(
-                        {
+                .subscribeBy(
+                        onSuccess = {
                             groups = it
                             populateGroupsAdapter()
                         },
-                        {
+                        onError = {
                             it.printStackTrace()
                             view?.showError(it)
                         }

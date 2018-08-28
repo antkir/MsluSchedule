@@ -12,6 +12,7 @@ import by.ntnk.msluschedule.utils.SchedulerProvider
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
 import io.reactivex.Observable
 import io.reactivex.Single
+import io.reactivex.rxkotlin.subscribeBy
 import javax.inject.Inject
 
 class WeekPresenter @Inject constructor(
@@ -29,9 +30,9 @@ class WeekPresenter @Inject constructor(
                 .flatMap { getScheduleData(it, weekId) }
                 .subscribeOn(scheduler)
                 .observeOn(schedulerProvider.ui())
-                .subscribe(
-                        { weekDayEntities -> view?.showSchedule(weekDayEntities) },
-                        {
+                .subscribeBy(
+                        onSuccess = { weekDayEntities -> view?.showSchedule(weekDayEntities) },
+                        onError = {
                             it.printStackTrace()
                             view?.showError(it, shouldSetupViews = true)
                         }
@@ -80,7 +81,9 @@ class WeekPresenter @Inject constructor(
                             return@flatMapObservable networkRepository.getSchedule(studyGroup, it)
                         }
                         .toList()
-                        .flatMap { databaseRepository.insertStudyGroupSchedule(it, weekId) }
+                        .flatMap { weekdaysWithLessons ->
+                            databaseRepository.insertStudyGroupSchedule(weekdaysWithLessons, weekId)
+                        }
             }
             ScheduleType.TEACHER -> {
                 databaseRepository.getWeekKey(weekId)
@@ -89,7 +92,9 @@ class WeekPresenter @Inject constructor(
                             return@flatMapObservable networkRepository.getSchedule(teacher, it)
                         }
                         .toList()
-                        .flatMap { databaseRepository.insertTeacherSchedule(it, weekId) }
+                        .flatMap { weekdaysWithLessons ->
+                            databaseRepository.insertTeacherSchedule(weekdaysWithLessons, weekId)
+                        }
             }
         }
     }
@@ -110,9 +115,9 @@ class WeekPresenter @Inject constructor(
                 .doOnSubscribe { view?.showUpdateProgressBar() }
                 .doOnEvent { _, _ -> view?.hideUpdateProgressBar() }
                 .doOnSuccess { _ -> view?.showUpdateSuccessMessage() }
-                .subscribe(
-                        { weekDayEntities -> view?.showSchedule(weekDayEntities) },
-                        {
+                .subscribeBy(
+                        onSuccess = { weekDayEntities -> view?.showSchedule(weekDayEntities) },
+                        onError = {
                             it.printStackTrace()
                             view?.showError(it, shouldSetupViews = false)
                         }
