@@ -5,6 +5,7 @@ import android.content.Context
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.LinearSmoothScroller
 import android.support.v7.widget.RecyclerView
 import android.view.*
 import android.view.animation.AnimationUtils
@@ -24,9 +25,12 @@ import kotlinx.android.synthetic.main.fragment_week.*
 import javax.inject.Inject
 
 class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
-    private var weekId: Int? = null
+    private lateinit var recyclerView: RecyclerView
     private lateinit var lessonRVAdapter: LessonRecyclerViewAdapter
+    private lateinit var smoothScroller: RecyclerView.SmoothScroller
     private var isEmptyScheduleDaysVisible: Boolean = false
+    private var weekId: Int? = null
+    private var isCurrentWeek: Boolean = false
 
     override val view: WeekView
         get() = this
@@ -45,6 +49,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
         weekId = arguments?.getInt(WEEK_ID)
+        isCurrentWeek = arguments?.getBoolean(ARG_IS_CURRENT_WEEK) == true
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -54,7 +59,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     }
 
     private fun initRecyclerView(rootView: View) {
-        val recyclerView: RecyclerView = rootView.findViewById(R.id.rv_week_days)
+        recyclerView = rootView.findViewById(R.id.rv_week_days)
         val layoutManager = LinearLayoutManager(activity)
         recyclerView.layoutManager = layoutManager
         recyclerView.setHasFixedSize(true)
@@ -62,6 +67,19 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         recyclerView.adapter = lessonRVAdapter
         val itemDivider = LessonRecyclerViewAdapter.Divider(recyclerView.context, layoutManager.orientation)
         recyclerView.addItemDecoration(itemDivider)
+        smoothScroller = object : LinearSmoothScroller(context!!.applicationContext) {
+            override fun getVerticalSnapPreference(): Int {
+                return LinearSmoothScroller.SNAP_TO_START
+            }
+        }
+    }
+
+    fun showToday() {
+        if (text_week_nolessons.visibility != View.VISIBLE) {
+            val index = lessonRVAdapter.getWeekDayViewIndex(presenter.getCurrentDayOfWeek())
+            smoothScroller.targetPosition = index
+            recyclerView.layoutManager.startSmoothScroll(smoothScroller)
+        }
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -124,6 +142,10 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
             rv_week_days.setOnTouchListener(null)
         }
         lessonRVAdapter.initData(data)
+        if (isCurrentWeek && !isFragmentRecreated) {
+            val index = lessonRVAdapter.getWeekDayViewIndex(presenter.getCurrentDayOfWeek())
+            recyclerView.layoutManager.scrollToPosition(index)
+        }
     }
 
     override fun hideUpdateProgressBar() {
@@ -212,11 +234,13 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
 
     companion object {
         private const val WEEK_ID = "weekID"
+        private const val ARG_IS_CURRENT_WEEK = "isCurrentWeek"
 
-        fun newInstance(weekId: Int): WeekFragment {
+        fun newInstance(weekId: Int, isCurrentWeek: Boolean): WeekFragment {
             return WeekFragment().apply {
                 arguments = Bundle().apply {
                     putInt(WEEK_ID, weekId)
+                    putBoolean(ARG_IS_CURRENT_WEEK, isCurrentWeek)
                 }
             }
         }

@@ -70,7 +70,7 @@ class WeeksContainerFragment :
 
     override fun initWeeksAdapter(weekIds: List<ImmutableEntry>, currentWeekItemIndex: Int) {
         viewpager_weekscontainer.visibility = View.VISIBLE
-        fragmentViewPagerAdapter = WeekFragmentViewPagerAdapter(childFragmentManager, weekIds)
+        fragmentViewPagerAdapter = WeekFragmentViewPagerAdapter(childFragmentManager, weekIds, currentWeekItemIndex)
         viewPager.adapter = fragmentViewPagerAdapter
         viewPager.offscreenPageLimit = weekIds.size - 1
         viewPager.currentItem = if (savedCurrentPosition == -1) currentWeekItemIndex else savedCurrentPosition
@@ -91,6 +91,14 @@ class WeeksContainerFragment :
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         super.onOptionsItemSelected(item)
         return when (item?.itemId) {
+            R.id.item_weekscontainer_today -> {
+                val index = presenter.getCurrentWeekIndex()
+                        .coerceAtLeast(0)
+                        .coerceAtMost(fragmentViewPagerAdapter.count - 1)
+                viewPager.currentItem = index
+                fragmentViewPagerAdapter.getWeekFragment(index).showToday()
+                return true
+            }
             R.id.item_weekscontainer_delete -> {
                 val warningFragment = WarningDialogFragment()
                 warningFragment.show(childFragmentManager, WARNING_DIALOG_FRAGMENT)

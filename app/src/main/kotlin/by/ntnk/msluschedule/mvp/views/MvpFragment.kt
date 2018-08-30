@@ -13,6 +13,7 @@ import javax.inject.Inject
 abstract class MvpFragment<out P : Presenter<V>, V : View> : Fragment() {
     private var presenterId: Int? = null
     private lateinit var presenterManager: PresenterManager
+    protected var isFragmentRecreated: Boolean = false
 
     val isFragmentVisible: Boolean
         get() = getView() != null && getView()!!.getGlobalVisibleRect(Rect())
@@ -40,6 +41,7 @@ abstract class MvpFragment<out P : Presenter<V>, V : View> : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        isFragmentRecreated = savedInstanceState != null
         presenterId = restoreId(savedInstanceState)
         attachViewToPresenter()
     }

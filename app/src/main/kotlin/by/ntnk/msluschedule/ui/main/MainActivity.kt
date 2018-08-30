@@ -102,7 +102,6 @@ class MainActivity :
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        if (item.isChecked) return true
         // Handle navigation view item clicks here.
         val isStudyGroupItem = nav_view.menu
                 .findItem(getContainerMenuViewId(ScheduleType.STUDYGROUP))

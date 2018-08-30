@@ -7,15 +7,18 @@ import by.ntnk.msluschedule.db.DatabaseRepository
 import by.ntnk.msluschedule.db.data.ScheduleContainer
 import by.ntnk.msluschedule.mvp.Presenter
 import by.ntnk.msluschedule.network.NetworkRepository
+import by.ntnk.msluschedule.utils.CurrentDate
 import by.ntnk.msluschedule.utils.ScheduleType
 import by.ntnk.msluschedule.utils.SchedulerProvider
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.subscribeBy
+import org.threeten.bp.DayOfWeek
 import javax.inject.Inject
 
 class WeekPresenter @Inject constructor(
+        private val currentDate: CurrentDate,
         private val databaseRepository: DatabaseRepository,
         private val databaseDataMapper: DatabaseDataMapper,
         private val sharedPreferencesRepository: SharedPreferencesRepository,
@@ -122,5 +125,13 @@ class WeekPresenter @Inject constructor(
                             view?.showError(it, shouldSetupViews = false)
                         }
                 )
+    }
+
+    fun getCurrentDayOfWeek(): Int {
+        return if (currentDate.academicWeek >= 0) {
+            currentDate.date.dayOfWeek.value
+        } else {
+            DayOfWeek.MONDAY.value
+        }
     }
 }

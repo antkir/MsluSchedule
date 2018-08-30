@@ -49,6 +49,19 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
         notifyDataSetChanged()
     }
 
+    fun getWeekDayViewIndex(weekdayNumber: Int): Int {
+        var dayIndex = 0
+        for (i in 0 until data.size) {
+            if (data[i] is DayLessonView) {
+                if (dayIndex == weekdayNumber - 1) {
+                    return i
+                }
+                ++dayIndex
+            }
+        }
+        return 0
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {

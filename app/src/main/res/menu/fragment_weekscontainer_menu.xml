@@ -2,6 +2,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/item_weekscontainer_today"
+        android:icon="@drawable/ic_today"
+        android:title="@string/action_show_today"
+        app:showAsAction="ifRoom" />
+    <item
         android:id="@+id/item_weekscontainer_delete"
         android:orderInCategory="10"
         android:title="@string/action_delete_schedule"
