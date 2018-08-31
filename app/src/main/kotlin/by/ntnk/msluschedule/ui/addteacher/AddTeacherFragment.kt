@@ -78,7 +78,7 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
                 teacherView.progressBarVisibility = View.VISIBLE
                 presenter.getTeachersScheduleFilter()
             }
-            presenter.isTeachersNotEmpty -> presenter.populateTeachersAdapter()
+            presenter.isTeachersNotEmpty() -> presenter.populateTeachersAdapter()
             else -> dismiss()
         }
     }
@@ -100,7 +100,7 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
         teacherView.progressBarVisibility = View.GONE
         teacherView.setEnabledFocusable(true)
         val adapter = initAdapter(data)
-        adapter.isIgnoreCaseFilter = true
+        adapter.isIgnoreCaseFilterActive = true
         teacherView.setAdapter(adapter)
         teacherView.requestFocus()
     }

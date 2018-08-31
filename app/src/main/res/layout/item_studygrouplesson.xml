@@ -11,27 +11,23 @@
         android:id="@+id/text_studygrouplesson_starttime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textColor="@color/tertiary_text"
-        app:layout_constraintBottom_toTopOf="@+id/text_studygrouplesson_endtime"
+        app:layout_constraintBottom_toTopOf="@+id/text_studygrouplesson_teacher"
         app:layout_constraintEnd_toEndOf="@id/text_studygrouplesson_endtime"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed"
+        app:layout_constraintVertical_chainStyle="spread_inside"
         tools:text="1:40" />
 
     <TextView
         android:id="@+id/text_studygrouplesson_endtime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textColor="@color/tertiary_text"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/text_studygrouplesson_teacher"
-        app:layout_constraintTop_toBottomOf="@id/text_studygrouplesson_starttime"
+        app:layout_constraintTop_toTopOf="@+id/text_studygrouplesson_teacher"
         tools:text="13:15" />
 
 

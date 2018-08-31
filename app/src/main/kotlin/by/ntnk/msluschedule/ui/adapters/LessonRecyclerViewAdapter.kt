@@ -160,8 +160,9 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
                 lessonFaculty.text = lesson.faculty
 
                 if (lesson.subject.isBlank()) {
-                    val typeBgColor = ContextCompat.getColor(itemView.context, R.color.surface)
-                    lessonType.setBackgroundColor(typeBgColor)
+                    lessonType.setBackgroundColor(ContextCompat.getColor(itemView.context, R.color.surface))
+                } else {
+                    lessonType.background = ContextCompat.getDrawable(itemView.context, R.drawable.classtype_circle)
                 }
             }
         }

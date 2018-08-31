@@ -24,8 +24,7 @@ class AddTeacherPresenter @Inject constructor(
 
     private lateinit var scheduleContaners: List<ScheduleContainer>
 
-    val isTeachersNotEmpty: Boolean
-        get() = teachers != null
+    fun isTeachersNotEmpty(): Boolean = teachers != null
 
     fun getTeachersScheduleFilter() {
         databaseRepository.getScheduleContainers()

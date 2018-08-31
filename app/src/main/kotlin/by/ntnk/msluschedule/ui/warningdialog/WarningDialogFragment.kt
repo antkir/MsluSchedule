@@ -16,14 +16,14 @@ import java.util.concurrent.TimeUnit
 
 class WarningDialogFragment : DialogFragment() {
     private lateinit var disposable: Disposable
-    private lateinit var listener: OnPositiveButtonClickListener
+    private lateinit var listener: DialogListener
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         try {
-            listener = parentFragment as OnPositiveButtonClickListener
+            listener = parentFragment as DialogListener
         } catch (e: ClassCastException) {
-            throw ClassCastException(parentFragment.toString() + " must implement OnPositiveButtonClickListener")
+            throw ClassCastException(parentFragment.toString() + " must implement DialogListener")
         }
     }
 
@@ -41,7 +41,7 @@ class WarningDialogFragment : DialogFragment() {
                 .setTitle(R.string.dialog_delete_container_title)
                 .setMessage(R.string.dialog_delete_container_message)
                 .setPositiveButton(R.string.button_delete) { _, _ ->
-                    listener.onPositiveButtonClick()
+                    listener.onDeleteScheduleContainerClick()
                 }
                 .setNegativeButton(R.string.button_cancel) { _, _ -> dismiss() }
                 .create()
@@ -76,7 +76,7 @@ class WarningDialogFragment : DialogFragment() {
         super.dismiss()
     }
 
-    interface OnPositiveButtonClickListener {
-        fun onPositiveButtonClick()
+    interface DialogListener {
+        fun onDeleteScheduleContainerClick()
     }
 }

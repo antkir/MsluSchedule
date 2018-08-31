@@ -8,7 +8,7 @@ android {
     def versionMinor = 0
     def versionPatch = 0
     lintOptions {
-        abortOnError false
+        disable 'InvalidPackage', 'TrustAllX509TrustManager', 'OldTargetApi'
     }
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
@@ -44,7 +44,7 @@ android {
 ext {
     androidsupportVersion = '27.1.1'
     androidsupportTestVersion = '1.0.1'
-    constraintlayoutVersion = '1.1.2'
+    constraintlayoutVersion = '1.1.3'
     daggerVersion = '2.17'
     espressoVersion = '3.0.1'
     jsoupVersion = '1.11.3'

@@ -23,11 +23,11 @@ private const val WARNING_DIALOG_FRAGMENT = "WarningDialogFragment"
 class WeeksContainerFragment :
         MvpFragment<WeeksContainerPresenter, WeeksContainerView>(),
         WeeksContainerView,
-        WarningDialogFragment.OnPositiveButtonClickListener {
+        WarningDialogFragment.DialogListener {
     private lateinit var viewPager: ViewPager
     private lateinit var tabLayout: TabLayout
-    private lateinit var fragmentViewPagerAdapter: WeekFragmentViewPagerAdapter
     private var savedCurrentPosition = -1
+
     private lateinit var listener: OnScheduleContainerDeletedListener
 
     override val view: WeeksContainerView
@@ -70,10 +70,12 @@ class WeeksContainerFragment :
 
     override fun initWeeksAdapter(weekIds: List<ImmutableEntry>, currentWeekItemIndex: Int) {
         viewpager_weekscontainer.visibility = View.VISIBLE
-        fragmentViewPagerAdapter = WeekFragmentViewPagerAdapter(childFragmentManager, weekIds, currentWeekItemIndex)
-        viewPager.adapter = fragmentViewPagerAdapter
-        viewPager.offscreenPageLimit = weekIds.size - 1
-        viewPager.currentItem = if (savedCurrentPosition == -1) currentWeekItemIndex else savedCurrentPosition
+        val viewPagerAdapter = WeekFragmentViewPagerAdapter(childFragmentManager, weekIds, currentWeekItemIndex)
+        with(viewPager) {
+            adapter = viewPagerAdapter
+            offscreenPageLimit = weekIds.size - 1
+            currentItem = if (savedCurrentPosition == -1) currentWeekItemIndex else savedCurrentPosition
+        }
         tabLayout.setupWithViewPager(viewPager)
     }
 
@@ -94,9 +96,10 @@ class WeeksContainerFragment :
             R.id.item_weekscontainer_today -> {
                 val index = presenter.getCurrentWeekIndex()
                         .coerceAtLeast(0)
-                        .coerceAtMost(fragmentViewPagerAdapter.count - 1)
+                        .coerceAtMost((viewPager.adapter?.count ?: 1) - 1)
                 viewPager.currentItem = index
-                fragmentViewPagerAdapter.getWeekFragment(index).showToday()
+                val adapter = viewPager.adapter as WeekFragmentViewPagerAdapter?
+                adapter?.getWeekFragment(index)?.showToday()
                 return true
             }
             R.id.item_weekscontainer_delete -> {
@@ -108,7 +111,7 @@ class WeeksContainerFragment :
         }
     }
 
-    override fun onPositiveButtonClick() = presenter.deleteSelectedScheduleContainer()
+    override fun onDeleteScheduleContainerClick() = presenter.deleteSelectedScheduleContainer()
 
     override fun removeScheduleContainerFromView(info: ScheduleContainerInfo) {
         listener.onScheduleContainerDeleted(info)

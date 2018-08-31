@@ -63,6 +63,24 @@ class XlsParserTest {
         // given
         val weekdayWithTeacherLessons = WeekdayWithTeacherLessons(SATURDAY)
         val lesson1 = TeacherLesson(
+                subject = "ПППТР",
+                faculty = "Англ.яз., Нем.яз., ФРЯ (исп.), ФРЯ (фр.)",
+                groups = "521 а.исп, 522 а.фр, 523 а.нем, 524 а.нем, 502 н- кл, 505 и., 509 фр.",
+                type = "ЛК",
+                classroom = "",
+                startTime = "8:15",
+                endTime = "9:35"
+        )
+        val lesson2 = TeacherLesson(
+                subject = "Стр. и содерж. рекл. текста",
+                faculty = "Меж.ком.",
+                groups = "316 мк_а_н, 317 мк_а-ис, 318 мк_а_ис",
+                type = "ЛК",
+                classroom = "",
+                startTime = "9:45",
+                endTime = "11:05"
+        )
+        val lesson3 = TeacherLesson(
                 subject = "Введ. в литер-ние",
                 faculty = "ФРЯ",
                 groups = "201 и., 202 и., 203 и., 204 и., 205 и., 206 ф., 207 ф., 208 ф., 209 ф.",
@@ -71,7 +89,7 @@ class XlsParserTest {
                 startTime = "11:15",
                 endTime = "12:35"
         )
-        val lesson2 = TeacherLesson(
+        val lesson4 = TeacherLesson(
                 subject = "Практ. фон. (2)",
                 faculty = "Англ.яз.",
                 groups = "301 а.исп",
@@ -82,13 +100,15 @@ class XlsParserTest {
         )
         weekdayWithTeacherLessons.lessons.add(lesson1)
         weekdayWithTeacherLessons.lessons.add(lesson2)
-        val weekdays = 6
+        weekdayWithTeacherLessons.lessons.add(lesson3)
+        weekdayWithTeacherLessons.lessons.add(lesson4)
+        val weekdays = 7
         val xlsBody = this.javaClass.getResource("/sample_teacher_schedule.xls").openStream()
         // when
         val observable = xlsParser.parseTeacherXls(xlsBody)
         // then
         observable.test().assertNoErrors()
         observable.test().assertValueCount(weekdays)
-        observable.test().assertValueAt(weekdays - 1, weekdayWithTeacherLessons)
+        observable.test().assertValueAt(weekdays - 2, weekdayWithTeacherLessons)
     }
 }

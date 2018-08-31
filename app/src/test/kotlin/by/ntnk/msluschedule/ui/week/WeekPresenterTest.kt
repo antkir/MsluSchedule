@@ -7,6 +7,7 @@ import by.ntnk.msluschedule.db.DatabaseDataMapper
 import by.ntnk.msluschedule.db.DatabaseRepository
 import by.ntnk.msluschedule.db.data.ScheduleContainer
 import by.ntnk.msluschedule.network.NetworkRepository
+import by.ntnk.msluschedule.utils.CurrentDate
 import by.ntnk.msluschedule.utils.ScheduleType
 import by.ntnk.msluschedule.utils.SchedulerProvider
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
@@ -27,6 +28,9 @@ import java.util.Collections
 import org.mockito.Mockito.`when` as whenever
 
 class WeekPresenterTest {
+    @Mock
+    private lateinit var currentDate: CurrentDate
+
     @Mock
     private lateinit var databaseRepository: DatabaseRepository
 
@@ -108,6 +112,7 @@ class WeekPresenterTest {
                 .thenReturn(Schedulers.trampoline())
 
         presenter = WeekPresenter(
+                currentDate,
                 databaseRepository,
                 databaseDataMapper,
                 sharedPreferencesRepository,

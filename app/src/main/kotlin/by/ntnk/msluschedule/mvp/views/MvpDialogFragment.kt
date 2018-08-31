@@ -6,7 +6,6 @@ import by.ntnk.msluschedule.mvp.Presenter
 import by.ntnk.msluschedule.mvp.PresenterManager
 import by.ntnk.msluschedule.mvp.View
 import by.ntnk.msluschedule.utils.PRESENTER_ID_KEY
-import timber.log.Timber
 import javax.inject.Inject
 
 abstract class MvpDialogFragment<out P : Presenter<V>, V : View> : DialogFragment() {
@@ -16,7 +15,6 @@ abstract class MvpDialogFragment<out P : Presenter<V>, V : View> : DialogFragmen
     @Inject
     fun setPresenter(presenterManager: PresenterManager) {
         this.presenterManager = presenterManager
-        Timber.i("presenterManager injected")
     }
 
     @Suppress("UNCHECKED_CAST")

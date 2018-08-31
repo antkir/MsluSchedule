@@ -1,13 +1,13 @@
 package by.ntnk.msluschedule.ui.customviews
 
 import android.content.Context
+import android.support.v7.widget.AppCompatAutoCompleteTextView
 import android.util.AttributeSet
 import android.view.KeyEvent
 import android.view.inputmethod.InputMethodManager
-import android.widget.AutoCompleteTextView
 import android.widget.ProgressBar
 
-class LoadingAutoCompleteTextView : AutoCompleteTextView {
+class LoadingAutoCompleteTextView : AppCompatAutoCompleteTextView {
     var progressBar: ProgressBar? = null
     var progressBarVisibility: Int
         get() = progressBar?.visibility!!

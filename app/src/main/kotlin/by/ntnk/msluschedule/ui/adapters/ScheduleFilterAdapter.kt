@@ -20,8 +20,8 @@ class ScheduleFilterAdapter(
     private val filter: DataFilter by lazy { DataFilter() }
     private val dummyFilter: DummyFilter by lazy { DummyFilter() }
     private val layoutInflater: LayoutInflater = LayoutInflater.from(context)
-    var isStartsWithFilter = false
-    var isIgnoreCaseFilter = false
+    var isStartsWithFilterActive = false
+    var isIgnoreCaseFilterActive = false
     var isFilteringEnabled = true
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
@@ -77,12 +77,12 @@ class ScheduleFilterAdapter(
                 for (i in 0 until unfilteredData.size) {
                     val key = unfilteredData.keyAt(i)
                     val value = unfilteredData.valueAt(i)
-                    if (isStartsWithFilter) {
-                        if (value.startsWith(constraintString, ignoreCase = isIgnoreCaseFilter)) {
+                    if (isStartsWithFilterActive) {
+                        if (value.startsWith(constraintString, ignoreCase = isIgnoreCaseFilterActive)) {
                             filteredData.put(key, value)
                         }
                     } else {
-                        if (value.contains(constraintString, ignoreCase = isIgnoreCaseFilter)) {
+                        if (value.contains(constraintString, ignoreCase = isIgnoreCaseFilterActive)) {
                             filteredData.put(key, value)
                         }
                     }

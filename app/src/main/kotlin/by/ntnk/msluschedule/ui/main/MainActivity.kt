@@ -6,7 +6,6 @@ import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v4.view.GravityCompat
 import android.support.v4.view.ViewCompat
-import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBarDrawerToggle
 import android.view.Menu
 import android.view.MenuItem
@@ -33,13 +32,12 @@ import kotlinx.android.synthetic.main.fam_main.*
 import kotlinx.android.synthetic.main.fragment_weekscontainer.*
 import javax.inject.Inject
 
-private const val ADD_GROUP_FRAGMENT = "AddGroupFragment"
-private const val ADD_TEACHER_FRAGMENT = "AddTeacherFragment"
+private const val ADD_GROUP_FRAGMENT_TAG = "AddGroupFragment"
+private const val ADD_TEACHER_FRAGMENT_TAG = "AddTeacherFragment"
 
-class MainActivity :
-        MvpActivity<MainPresenter, MainView>(), MainView,
+class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
         NavigationView.OnNavigationItemSelectedListener,
-        DrawerLayout.DrawerListener,
+        SimpleDrawerListener,
         HasSupportFragmentInjector,
         AddGroupFragment.DialogListener,
         AddTeacherFragment.DialogListener,
@@ -56,9 +54,7 @@ class MainActivity :
     @Inject
     lateinit var injectedPresenter: Lazy<MainPresenter>
 
-    override fun supportFragmentInjector(): AndroidInjector<Fragment> {
-        return fragmentDispatchingAndroidInjector
-    }
+    override fun supportFragmentInjector(): AndroidInjector<Fragment> = fragmentDispatchingAndroidInjector
 
     override fun onCreatePresenter(): MainPresenter = injectedPresenter.get()
 
@@ -127,12 +123,6 @@ class MainActivity :
         }
     }
 
-    override fun onDrawerOpened(drawerView: View) = Unit
-
-    override fun onDrawerClosed(drawerView: View) = Unit
-
-    override fun onDrawerStateChanged(newState: Int) = Unit
-
     @Suppress("UNUSED_PARAMETER")
     fun onBaseFabClick(view: View) {
         if (isNetworkAccessible(applicationContext)) {
@@ -155,13 +145,16 @@ class MainActivity :
                 .setInterpolator(OvershootInterpolator(2f))
                 .start()
 
-        groupfab_main.visibility = View.VISIBLE
-        groupfab_main.y = basefab_main.y
-        groupfab_main.animate().translationY(0f).setDuration(200).start()
-
-        teacherfab_main.visibility = View.VISIBLE
-        teacherfab_main.y = basefab_main.y
-        teacherfab_main.animate().translationY(0f).setDuration(200).start()
+        with(groupfab_main) {
+            visibility = View.VISIBLE
+            y = basefab_main.y
+            animate().translationY(0f).setDuration(200).start()
+        }
+        with(teacherfab_main) {
+            visibility = View.VISIBLE
+            y = basefab_main.y
+            animate().translationY(0f).setDuration(200).start()
+        }
     }
 
     private fun collapseFam() {
@@ -179,17 +172,19 @@ class MainActivity :
 
     @Suppress("UNUSED_PARAMETER")
     fun onGroupFabClick(view: View) {
-        val addGroupFragment = AddGroupFragment()
-        addGroupFragment.isCancelable = false
-        addGroupFragment.show(supportFragmentManager, ADD_GROUP_FRAGMENT)
+        with(AddGroupFragment()) {
+            isCancelable = false
+            show(supportFragmentManager, ADD_GROUP_FRAGMENT_TAG)
+        }
         if (isFamOpen) collapseFam()
     }
 
     @Suppress("UNUSED_PARAMETER")
     fun onTeacherFabClick(view: View) {
-        val addTeacherFragment = AddTeacherFragment()
-        addTeacherFragment.isCancelable = false
-        addTeacherFragment.show(supportFragmentManager, ADD_TEACHER_FRAGMENT)
+        with(AddTeacherFragment()) {
+            isCancelable = false
+            show(supportFragmentManager, ADD_TEACHER_FRAGMENT_TAG)
+        }
         if (isFamOpen) collapseFam()
     }
 

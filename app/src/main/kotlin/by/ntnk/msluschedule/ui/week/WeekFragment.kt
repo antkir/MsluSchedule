@@ -26,10 +26,9 @@ import javax.inject.Inject
 
 class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     private lateinit var recyclerView: RecyclerView
-    private lateinit var lessonRVAdapter: LessonRecyclerViewAdapter
     private lateinit var smoothScroller: RecyclerView.SmoothScroller
     private var isEmptyScheduleDaysVisible: Boolean = false
-    private var weekId: Int? = null
+    private var weekId: Int = -1
     private var isCurrentWeek: Boolean = false
 
     override val view: WeekView
@@ -48,7 +47,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-        weekId = arguments?.getInt(WEEK_ID)
+        weekId = arguments?.getInt(ARG_WEEK_ID) ?: -1
         isCurrentWeek = arguments?.getBoolean(ARG_IS_CURRENT_WEEK) == true
     }
 
@@ -60,13 +59,13 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
 
     private fun initRecyclerView(rootView: View) {
         recyclerView = rootView.findViewById(R.id.rv_week_days)
-        val layoutManager = LinearLayoutManager(activity)
-        recyclerView.layoutManager = layoutManager
-        recyclerView.setHasFixedSize(true)
-        lessonRVAdapter = LessonRecyclerViewAdapter()
-        recyclerView.adapter = lessonRVAdapter
-        val itemDivider = LessonRecyclerViewAdapter.Divider(recyclerView.context, layoutManager.orientation)
-        recyclerView.addItemDecoration(itemDivider)
+        val itemDivider = LessonRecyclerViewAdapter.Divider(recyclerView.context, RecyclerView.VERTICAL)
+        with(recyclerView) {
+            layoutManager = LinearLayoutManager(activity)
+            setHasFixedSize(true)
+            adapter = LessonRecyclerViewAdapter()
+            addItemDecoration(itemDivider)
+        }
         smoothScroller = object : LinearSmoothScroller(context!!.applicationContext) {
             override fun getVerticalSnapPreference(): Int {
                 return LinearSmoothScroller.SNAP_TO_START
@@ -76,7 +75,8 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
 
     fun showToday() {
         if (text_week_nolessons.visibility != View.VISIBLE) {
-            val index = lessonRVAdapter.getWeekDayViewIndex(presenter.getCurrentDayOfWeek())
+            val adapter = recyclerView.adapter as LessonRecyclerViewAdapter
+            val index = adapter.getWeekDayViewIndex(presenter.getCurrentDayOfWeek())
             smoothScroller.targetPosition = index
             recyclerView.layoutManager.startSmoothScroll(smoothScroller)
         }
@@ -84,12 +84,12 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        weekId ?: return
-        presenter.getSchedule(weekId!!)
+        if (weekId == -1) return
+        presenter.getSchedule(weekId)
     }
 
     override fun showSchedule(data: List<WeekdayWithLessons<Lesson>>) {
-        if (data.map { it.lessons.size }.sum() <= 0) {
+        if (data.map { it.lessons.size }.sum() == 0) {
             button_week_weekdays_visibility.visibility = View.VISIBLE
             if (!isEmptyScheduleDaysVisible) {
                 text_week_nolessons.visibility = View.VISIBLE
@@ -141,9 +141,10 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
             text_week_nolessons.visibility = View.GONE
             rv_week_days.setOnTouchListener(null)
         }
-        lessonRVAdapter.initData(data)
+        val adapter = recyclerView.adapter as LessonRecyclerViewAdapter
+        adapter.initData(data)
         if (isCurrentWeek && !isFragmentRecreated) {
-            val index = lessonRVAdapter.getWeekDayViewIndex(presenter.getCurrentDayOfWeek())
+            val index = adapter.getWeekDayViewIndex(presenter.getCurrentDayOfWeek())
             recyclerView.layoutManager.scrollToPosition(index)
         }
     }
@@ -187,7 +188,6 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     }
 
     override fun showUpdateSuccessMessage() {
-        if (!isFragmentVisible) return
         Toast.makeText(
                 context?.applicationContext,
                 resources.getString(R.string.messsage_schedule_update_successful),
@@ -196,15 +196,14 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     }
 
     override fun showError(t: Throwable, shouldSetupViews: Boolean) {
+        if (weekId == -1) return
         if (shouldSetupViews) {
-            weekId ?: return
-            presenter.getSchedule(weekId!!)
+            presenter.getSchedule(weekId)
         }
-        if (!isFragmentVisible) return
         Snackbar.make(getView()!!, getErrorMessageResId(t), 5000)
                 .setAction(R.string.snackbar_week_init_retry) {
                     if (isNetworkAccessible(context!!.applicationContext)) {
-                        presenter.updateSchedule(weekId!!)
+                        presenter.updateSchedule(weekId)
                     } else {
                         showError(t, shouldSetupViews = false)
                     }
@@ -217,12 +216,11 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        super.onOptionsItemSelected(item)
         return when (item?.itemId) {
             R.id.item_week_update -> {
-                weekId ?: return true
                 if (isNetworkAccessible(context!!.applicationContext)) {
-                    presenter.updateSchedule(weekId!!)
+                    if (weekId == -1) return true
+                    presenter.updateSchedule(weekId)
                 } else {
                     showSnackbarNetworkInaccessible(getView()!!)
                 }
@@ -233,13 +231,13 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     }
 
     companion object {
-        private const val WEEK_ID = "weekID"
+        private const val ARG_WEEK_ID = "weekID"
         private const val ARG_IS_CURRENT_WEEK = "isCurrentWeek"
 
         fun newInstance(weekId: Int, isCurrentWeek: Boolean): WeekFragment {
             return WeekFragment().apply {
                 arguments = Bundle().apply {
-                    putInt(WEEK_ID, weekId)
+                    putInt(ARG_WEEK_ID, weekId)
                     putBoolean(ARG_IS_CURRENT_WEEK, isCurrentWeek)
                 }
             }

@@ -1,5 +1,6 @@
 package by.ntnk.msluschedule.di.modules
 
+import android.annotation.SuppressLint
 import by.ntnk.msluschedule.ui.addgroup.AddGroupFragment
 import by.ntnk.msluschedule.ui.addteacher.AddTeacherFragment
 import by.ntnk.msluschedule.ui.main.MainActivity
@@ -9,6 +10,8 @@ import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
 @Module
+@Suppress("UNUSED")
+@SuppressLint
 abstract class BuildersModule {
     @ContributesAndroidInjector
     abstract fun bindMainActivity(): MainActivity

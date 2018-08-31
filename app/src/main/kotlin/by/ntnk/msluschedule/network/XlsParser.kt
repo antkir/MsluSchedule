@@ -57,7 +57,7 @@ class XlsParser @Inject constructor() {
                     teacher = pair.second
                 }
                 3 -> {
-                    classroom = cell.stringCellValue
+                    classroom = cell.stringCellValue.replace(" ", EMPTY_STRING)
 
                     if (startTime.isNotEmpty()) {
                         val lesson = StudyGroupLesson(subject, teacher, classroom, startTime, endTime)
@@ -112,7 +112,8 @@ class XlsParser @Inject constructor() {
                 WeekdayWithTeacherLessons(WEDNESDAY),
                 WeekdayWithTeacherLessons(THURSDAY),
                 WeekdayWithTeacherLessons(FRIDAY),
-                WeekdayWithTeacherLessons(SATURDAY)
+                WeekdayWithTeacherLessons(SATURDAY),
+                WeekdayWithTeacherLessons(SUNDAY)
         )
         var startTime = EMPTY_STRING
         var endTime = EMPTY_STRING
@@ -146,28 +147,28 @@ class XlsParser @Inject constructor() {
 
         val groups = fullString[0].dropLastWhile { it.isWhitespace() }
 
-        val subString = fullString[1].split("\\)".toRegex(), 2)
+        val facultiesClassroomSubjectLessontype = fullString[1].split(" {2}".toRegex())
 
-        val faculty = subString[0]
+        val faculties = facultiesClassroomSubjectLessontype[0].substringBeforeLast(")")
 
-        val subString2 = subString[1].split(" {2}".toRegex())
+        val classroom = facultiesClassroomSubjectLessontype[0]
+                .substringAfterLast(")")
+                .replace(" ", EMPTY_STRING)
 
-        val classroom = subString2[0].replace(" ", EMPTY_STRING)
-
-        val subString3 = subString2[1].split(" ".toRegex())
+        val subjectLessontype = facultiesClassroomSubjectLessontype[1].split(" ".toRegex())
 
         var subject = EMPTY_STRING
         var lessonType = EMPTY_STRING
-        for (i in subString3.indices) {
-            if (i == subString3.size - 1) {
-                lessonType = subString3[i]
+        for (i in subjectLessontype.indices) {
+            if (i == subjectLessontype.size - 1) {
+                lessonType = subjectLessontype[i]
             } else {
-                subject += (subString3[i] + " ")
+                subject += (subjectLessontype[i] + " ")
             }
         }
         subject = subject.dropLastWhile { it.isWhitespace() }
 
-        return TeacherLesson(subject, faculty, groups, lessonType, classroom, startTime, endTime)
+        return TeacherLesson(subject, faculties, groups, lessonType, classroom, startTime, endTime)
     }
 
     private fun dayHasMoreLessons(hssfRows: List<Row>, rowIndex: Int, columnIndex: Int) =

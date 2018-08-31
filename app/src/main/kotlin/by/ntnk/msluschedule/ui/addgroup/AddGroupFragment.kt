@@ -60,10 +60,10 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
                 facultyView.progressBarVisibility = View.VISIBLE
                 presenter.getFacultyScheduleFilter()
             }
-            presenter.isFacultiesNotEmpty -> {
+            presenter.isFacultiesNotEmpty() -> {
                 presenter.populateFacultiesAdapter()
-                if (presenter.isFacultySelected) groupView.progressBarVisibility = View.VISIBLE
-                if (presenter.isGroupsNotEmpty) presenter.populateGroupsAdapter()
+                if (presenter.isFacultySelected()) groupView.progressBarVisibility = View.VISIBLE
+                if (presenter.isGroupsNotEmpty()) presenter.populateGroupsAdapter()
             }
             else -> dismiss()
         }
@@ -87,7 +87,6 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
         facultyView.progressBar = layout.findViewById(R.id.progressbar_dialog_faculty)
         groupView = layout.findViewById(R.id.actv_dialog_group)
         groupView.progressBar = layout.findViewById(R.id.progressbar_dialog_group)
-        val groupTextInputLayout: TextInputLayout = layout.findViewById(R.id.textinputlayout_group)
 
         facultyView.setEnabledFocusable(false)
         groupView.setEnabledFocusable(false)
@@ -100,8 +99,9 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
             presenter.getScheduleGroups()
             groupView.text.clear()
         }
-
         groupView.setOnItemClickListener { _, _, _, id -> presenter.setGroupValue(id.toInt()) }
+
+        val groupTextInputLayout: TextInputLayout = layout.findViewById(R.id.textinputlayout_group)
         groupView.addTextChangedListener(object : SimpleTextWatcher {
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
                 groupTextInputLayout.error = EMPTY_STRING
@@ -133,7 +133,7 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
         groupView.progressBarVisibility = View.GONE
         groupView.setEnabledFocusable(true)
         val adapter = initAdapter(data)
-        adapter.isStartsWithFilter = true
+        adapter.isStartsWithFilterActive = true
         groupView.setAdapter(adapter)
         groupView.requestFocus()
     }

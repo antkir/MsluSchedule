@@ -24,25 +24,17 @@ class AddGroupPresenter @Inject constructor(
     private var faculties: ScheduleFilter? = null
     private var groups: ScheduleFilter? = null
     private val course: Int
-        get() =
-            if (group == 0) {
-                COURSE_VALUE
-            } else {
-                Character.getNumericValue(groups!!.getEntry(group).value[0])
-            }
+        get() = Character.getNumericValue(groups!!.getEntry(group).value[0])
     private var faculty: Int = 0
     private var group: Int = 0
 
     private lateinit var scheduleContaners: List<ScheduleContainer>
 
-    val isFacultiesNotEmpty: Boolean
-        get() = faculties != null
+    fun isFacultiesNotEmpty(): Boolean = faculties != null
 
-    val isGroupsNotEmpty: Boolean
-        get() = groups != null
+    fun isGroupsNotEmpty(): Boolean = groups != null
 
-    val isFacultySelected: Boolean
-        get() = faculty != 0
+    fun isFacultySelected(): Boolean = faculty != 0
 
     fun setFacultyValueFromPosition(position: Int) {
         faculty = faculties!!.keyAt(position)
@@ -60,7 +52,7 @@ class AddGroupPresenter @Inject constructor(
         disposables += networkRepository.getFaculties()
                 .subscribeOn(schedulerProvider.single())
                 .observeOn(schedulerProvider.ui())
-                .subscribeBy (
+                .subscribeBy(
                         onSuccess = {
                             faculties = it
                             populateFacultiesAdapter()
@@ -73,7 +65,7 @@ class AddGroupPresenter @Inject constructor(
     }
 
     fun getScheduleGroups() {
-        disposables += networkRepository.getGroups(faculty, course)
+        disposables += networkRepository.getGroups(faculty, COURSE_VALUE)
                 .subscribeOn(schedulerProvider.single())
                 .observeOn(schedulerProvider.ui())
                 .subscribeBy(

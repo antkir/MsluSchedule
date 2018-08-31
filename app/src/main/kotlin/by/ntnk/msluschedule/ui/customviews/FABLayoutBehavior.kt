@@ -14,6 +14,9 @@ import by.ntnk.msluschedule.R
 class FABLayoutBehavior(
         context: Context, attrs: AttributeSet
 ) : CoordinatorLayout.Behavior<LinearLayout>(context, attrs) {
+    private val famSlideDownAnim = AnimationUtils.loadAnimation(context, R.anim.fam_slide_down)
+    private val famSlideUpAnim = AnimationUtils.loadAnimation(context, R.anim.fam_slide_up)
+
     override fun onStartNestedScroll(
             coordinatorLayout: CoordinatorLayout, child: LinearLayout,
             directTargetChild: View, target: View, axes: Int, type: Int
@@ -30,13 +33,12 @@ class FABLayoutBehavior(
             coordinatorLayout: CoordinatorLayout, child: LinearLayout, target: View,
             dxConsumed: Int, dyConsumed: Int, dxUnconsumed: Int, dyUnconsumed: Int, type: Int
     ) {
-        if (child.visibility == View.VISIBLE && dyConsumed > 0) {
+        if (child.visibility == View.VISIBLE && (dyConsumed > 0 || dyUnconsumed > 0)) {
             child.visibility = View.INVISIBLE
-            child.startAnimation(AnimationUtils.loadAnimation(child.context, R.anim.fam_slide_down))
-
+            child.startAnimation(famSlideDownAnim)
         } else if (child.visibility == View.INVISIBLE && dyConsumed < 0) {
             child.visibility = View.VISIBLE
-            child.startAnimation(AnimationUtils.loadAnimation(child.context, R.anim.fam_slide_up))
+            child.startAnimation(famSlideUpAnim)
         }
     }
 }
