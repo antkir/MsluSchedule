@@ -79,7 +79,10 @@ class WeeksContainerFragment :
         tabLayout.setupWithViewPager(viewPager)
     }
 
-    fun swapTabs() = presenter.initWeeksAdapter()
+    fun swapTabs() {
+        savedCurrentPosition = -1
+        presenter.initWeeksAdapter()
+    }
 
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putInt(SELECTED_TAB_POSITION, tabLayout.selectedTabPosition)
