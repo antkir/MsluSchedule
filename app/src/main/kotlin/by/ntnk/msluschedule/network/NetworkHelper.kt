@@ -20,11 +20,11 @@ import javax.inject.Inject
 @PerApp
 class NetworkHelper @Inject constructor(private val currentDate: CurrentDate) {
     val facultyRequestInfo = RequestInfo("faculty", studyGroupZone)
+    val courseRequestInfo = RequestInfo("course", studyWeekZone)
     val groupRequestInfo = RequestInfo("studygroups", buttonZone)
     val weekRequestInfo = RequestInfo("studyweeks", buttonZone)
     val teacherRequestInfo = RequestInfo("teachers", buttonZone)
     private val yearRequestInfo = RequestInfo("studyyears", studyWeekZone)
-    private val courseRequestInfo = RequestInfo("course", studyWeekZone)
 
     private fun createYearRequestDataInstance(value: Int) = RequestData(yearRequestInfo, value)
 
@@ -41,12 +41,12 @@ class NetworkHelper @Inject constructor(private val currentDate: CurrentDate) {
     fun getYearsFilterDataList(): List<RequestData> =
             Collections.singletonList(createYearRequestDataInstance(currentDate.academicYear))
 
-    fun getStudyGroupsFilterDataList(faculty: Int, course: Int): List<RequestData> =
+    fun getStudyGroupsFilterDataList(faculty: Int, course: Int, year: Int = 0): List<RequestData> =
             listOf(
                     createFacultyRequestDataInstance(faculty),
                     createCourseRequestDataInstance(course),
                     // When passing 0, groups for all courses are returned
-                    createYearRequestDataInstance(0)
+                    createYearRequestDataInstance(year)
             )
 
     fun getStudyGroupRequestDataList(studyGroup: StudyGroup, weekKey: Int): List<RequestData> =
@@ -96,7 +96,7 @@ class NetworkHelper @Inject constructor(private val currentDate: CurrentDate) {
                 .children()
         val data = SparseArray<String>()
         elements
-                .filter { it.`val`().isNotBlank() && it.text().length > 1 }
+                .filter { it.`val`().isNotBlank() }
                 .forEach { data.put(it.`val`().toInt(), it.text()) }
         return ScheduleFilter(data)
     }

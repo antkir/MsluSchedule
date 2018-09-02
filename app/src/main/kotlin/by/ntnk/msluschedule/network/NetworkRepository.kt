@@ -31,8 +31,14 @@ class NetworkRepository @Inject constructor(
         }
     }
 
-    fun getGroups(faculty: Int, course: Int): Single<ScheduleFilter> {
-        val requestDataList = networkHelper.getStudyGroupsFilterDataList(faculty, course)
+    fun getCourses(): Single<ScheduleFilter> {
+        return wrapRequest {
+            getDataFromHtmlRequest(NetworkHelper.groupSchedule, networkHelper.courseRequestInfo)
+        }
+    }
+
+    fun getGroups(faculty: Int, course: Int, year: Int = 0): Single<ScheduleFilter> {
+        val requestDataList = networkHelper.getStudyGroupsFilterDataList(faculty, course, year)
         return wrapRequest {
             getDataFromJsonRequest(networkHelper.groupRequestInfo, NetworkHelper.groupSchedule, requestDataList)
         }

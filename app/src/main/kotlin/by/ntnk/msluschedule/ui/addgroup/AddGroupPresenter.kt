@@ -22,22 +22,40 @@ class AddGroupPresenter @Inject constructor(
 ) : Presenter<AddGroupView>() {
     private val disposables: CompositeDisposable = CompositeDisposable()
     private var faculties: ScheduleFilter? = null
+    private var courses: ScheduleFilter? = null
     private var groups: ScheduleFilter? = null
-    private val course: Int
-        get() = Character.getNumericValue(groups!!.getEntry(group).value[0])
     private var faculty: Int = 0
+    private var course: Int = 0
     private var group: Int = 0
 
     private lateinit var scheduleContaners: List<ScheduleContainer>
 
-    fun isFacultiesNotEmpty(): Boolean = faculties != null
+    fun isFacultiesInitialized(): Boolean = faculties != null
 
-    fun isGroupsNotEmpty(): Boolean = groups != null
+    fun isCoursesInitialized(): Boolean = courses != null
 
-    fun isFacultySelected(): Boolean = faculty != 0
+    fun isGroupsInitialized(): Boolean = groups != null
 
-    fun setFacultyValueFromPosition(position: Int) {
+    fun isFacultySet(): Boolean = faculty != 0
+
+    fun isCourseSet(): Boolean = course > 0
+
+    fun setFacultyKeyFromPosition(position: Int) {
         faculty = faculties!!.keyAt(position)
+    }
+
+    fun setCourseKeyFromPosition(position: Int) {
+        course = courses!!.keyAt(position)
+    }
+
+    fun setCoursesNull() {
+        courses = null
+        course = 0
+    }
+
+    fun setGroupsNull() {
+        groups = null
+        group = 0
     }
 
     fun getFacultyScheduleFilter() {
@@ -64,14 +82,39 @@ class AddGroupPresenter @Inject constructor(
                 )
     }
 
-    fun getScheduleGroups() {
-        disposables += networkRepository.getGroups(faculty, COURSE_VALUE)
+    private fun getCourseScheduleFilter() {
+        disposables += networkRepository.getCourses()
                 .subscribeOn(schedulerProvider.single())
                 .observeOn(schedulerProvider.ui())
                 .subscribeBy(
                         onSuccess = {
-                            groups = it
-                            populateGroupsAdapter()
+                            courses = it
+                            populateCoursesAdapter()
+                        },
+                        onError = {
+                            it.printStackTrace()
+                            view?.showError(it)
+                        }
+                )
+    }
+
+    fun getScheduleGroups(showGroupsForAllCourses: Boolean = true) {
+        val courseKey = if (course > 0) course else COURSE_VALUE
+        val year = if (!showGroupsForAllCourses) currentDate.academicYear else 0
+        disposables += networkRepository.getGroups(faculty, courseKey, year)
+                .subscribeOn(schedulerProvider.single())
+                .observeOn(schedulerProvider.ui())
+                .subscribeBy(
+                        onSuccess = {
+                            if (it.size > 0
+                                    && course == 0
+                                    && !it.valueAt(0).first().isDigit()
+                                    && !it.valueAt(1).first().isDigit()) {
+                                getCourseScheduleFilter()
+                            } else {
+                                groups = it
+                                populateGroupsAdapter()
+                            }
                         },
                         onError = {
                             it.printStackTrace()
@@ -95,9 +138,17 @@ class AddGroupPresenter @Inject constructor(
                 .any { it == string }
     }
 
-    fun getStudyGroup() = StudyGroup(group, groups!!.getValue(group), faculty, course, currentDate.academicYear)
-
+    fun getStudyGroup(): StudyGroup {
+        val courseKey = if (course > 0) {
+            course
+        } else {
+            Character.getNumericValue(groups!!.getEntry(group).value[0])
+        }
+        return StudyGroup(group, groups!!.getValue(group), faculty, courseKey, currentDate.academicYear)
+    }
     fun populateFacultiesAdapter() = view?.populateFacultiesAdapter(faculties!!)
+
+    fun populateCoursesAdapter() = view?.populateCoursesAdapter(courses!!)
 
     fun populateGroupsAdapter() = view?.populateGroupsAdapter(groups!!)
 
