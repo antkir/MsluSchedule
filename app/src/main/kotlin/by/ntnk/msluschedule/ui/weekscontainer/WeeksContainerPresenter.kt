@@ -7,7 +7,6 @@ import by.ntnk.msluschedule.utils.ImmutableEntry
 import by.ntnk.msluschedule.utils.SchedulerProvider
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
 import io.reactivex.rxkotlin.subscribeBy
-import org.threeten.bp.DayOfWeek
 import javax.inject.Inject
 
 class WeeksContainerPresenter @Inject constructor(
@@ -25,7 +24,6 @@ class WeeksContainerPresenter @Inject constructor(
                 .toList()
                 .map { weeks ->
                     val index = when {
-                        currentDate.date.dayOfWeek == DayOfWeek.SUNDAY -> currentDate.academicWeek + 1
                         currentDate.academicWeek < 0 -> 0
                         else -> currentDate.academicWeek
                     }
