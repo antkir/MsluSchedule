@@ -95,19 +95,19 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
                 text_week_nolessons.visibility = View.VISIBLE
                 rv_week_days.setOnTouchListener { _, _ -> true }
             } else {
-                text_week_nolessons.visibility = View.INVISIBLE
+                text_week_nolessons.visibility = View.GONE
                 rv_week_days.setOnTouchListener(null)
             }
             rv_week_days.addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
                     if (button_week_weekdays_visibility.visibility == View.VISIBLE && dy > 0) {
-                        button_week_weekdays_visibility.visibility = View.INVISIBLE
+                        button_week_weekdays_visibility.visibility = View.GONE
                         val anim = AnimationUtils.loadAnimation(
                                 button_week_weekdays_visibility.context,
                                 R.anim.button_week_slide_down
                         )
                         button_week_weekdays_visibility.startAnimation(anim)
-                    } else if (button_week_weekdays_visibility.visibility == View.INVISIBLE && dy < 0) {
+                    } else if (button_week_weekdays_visibility.visibility != View.VISIBLE && dy < 0) {
                         button_week_weekdays_visibility.visibility = View.VISIBLE
                         val anim = AnimationUtils.loadAnimation(
                                 button_week_weekdays_visibility.context,
@@ -120,7 +120,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
             button_week_weekdays_visibility.setOnClickListener {
                 if (!isEmptyScheduleDaysVisible) {
                     isEmptyScheduleDaysVisible = true
-                    text_week_nolessons.visibility = View.INVISIBLE
+                    text_week_nolessons.visibility = View.GONE
 
                     button_week_weekdays_visibility.text = context!!.getString(R.string.button_week_hide_weekdays)
                     rv_week_days.setOnTouchListener(null)
@@ -160,7 +160,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
                 .setListener(object : SimpleAnimatorListener {
                     override fun onAnimationEnd(animation: Animator?) {
                         progressbar_week.animate().setListener(null)
-                        progressbar_week.visibility = View.INVISIBLE
+                        progressbar_week.visibility = View.GONE
                     }
                 })
                 .start()
@@ -180,7 +180,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     }
 
     override fun hideInitProgressBar() {
-        progressbar_week_init.visibility = View.INVISIBLE
+        progressbar_week_init.visibility = View.GONE
     }
 
     override fun showInitProgressBar() {

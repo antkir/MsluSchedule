@@ -116,7 +116,7 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
             viewpager_weekscontainer?.alpha = slideOffset
             if (slideOffset < 0.03) {
                 isUpdatingWeeksContainer = false
-                viewpager_weekscontainer?.visibility = View.INVISIBLE
+                viewpager_weekscontainer?.visibility = View.GONE
                 viewpager_weekscontainer?.alpha = 1f
                 initMainContent()
             }
@@ -211,9 +211,9 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
             weeksContainerFragment.swapTabs()
         }
 
-        progressbar_main.visibility = View.INVISIBLE
-        image_main_smileyface.visibility = View.INVISIBLE
-        text_main_advice.visibility = View.INVISIBLE
+        progressbar_main.visibility = View.GONE
+        image_main_smileyface.visibility = View.GONE
+        text_main_advice.visibility = View.GONE
     }
 
     override fun addScheduleContainerMenuItem(scheduleContainerInfo: ScheduleContainerInfo) {
@@ -252,15 +252,15 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
         removeWeeksContainerFragment()
 
         progressbar_main.visibility = View.VISIBLE
-        image_main_smileyface.visibility = View.INVISIBLE
-        text_main_advice.visibility = View.INVISIBLE
+        image_main_smileyface.visibility = View.GONE
+        text_main_advice.visibility = View.GONE
     }
 
     override fun showError() {
         supportActionBar?.title = EMPTY_STRING
         removeWeeksContainerFragment()
 
-        progressbar_main.visibility = View.INVISIBLE
+        progressbar_main.visibility = View.GONE
         image_main_smileyface.visibility = View.VISIBLE
         text_main_advice.visibility = View.VISIBLE
 

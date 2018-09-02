@@ -36,7 +36,7 @@ class FABLayoutBehavior(
         if (child.visibility == View.VISIBLE && (dyConsumed > 0 || dyUnconsumed > 0)) {
             child.visibility = View.INVISIBLE
             child.startAnimation(famSlideDownAnim)
-        } else if (child.visibility == View.INVISIBLE && dyConsumed < 0) {
+        } else if (child.visibility != View.VISIBLE && dyConsumed < 0) {
             child.visibility = View.VISIBLE
             child.startAnimation(famSlideUpAnim)
         }

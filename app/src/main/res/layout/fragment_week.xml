@@ -18,7 +18,7 @@
         android:gravity="center"
         android:text="@string/text_week_no_classes"
         android:textAlignment="center"
-        android:visibility="invisible" />
+        android:visibility="gone" />
 
     <ProgressBar
         android:id="@+id/progressbar_week"
@@ -41,7 +41,7 @@
         android:layout_gravity="center"
         android:elevation="2dp"
         android:indeterminate="true"
-        android:visibility="invisible"
+        android:visibility="gone"
         tools:ignore="UnusedAttribute" />
 
     <android.support.v7.widget.AppCompatButton
@@ -54,7 +54,7 @@
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
         android:text="@string/button_week_show_weekdays"
-        android:visibility="invisible"
+        android:visibility="gone"
         app:elevation="2dp" />
 
 </FrameLayout>
