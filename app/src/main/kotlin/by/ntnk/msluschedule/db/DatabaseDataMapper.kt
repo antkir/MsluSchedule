@@ -53,7 +53,7 @@ class DatabaseDataMapper @Inject constructor() {
                     )
             )
         }
-        return WeekdayWithTeacherLessons(weekdayWithLessons.weekday.value, lessons)
+        return WeekdayWithTeacherLessons(weekdayWithLessons.weekday.id, weekdayWithLessons.weekday.value, lessons)
     }
 
     fun map(weekdayWithLessons: DbWeekdayWithStudyGroupLessons): WeekdayWithStudyGroupLessons {
@@ -69,6 +69,6 @@ class DatabaseDataMapper @Inject constructor() {
                     )
             )
         }
-        return WeekdayWithStudyGroupLessons(weekdayWithLessons.weekday.value, lessons)
+        return WeekdayWithStudyGroupLessons(weekdayWithLessons.weekday.id, weekdayWithLessons.weekday.value, lessons)
     }
 }

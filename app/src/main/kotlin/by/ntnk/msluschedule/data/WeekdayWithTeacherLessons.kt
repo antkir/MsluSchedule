@@ -3,9 +3,13 @@ package by.ntnk.msluschedule.data
 import java.util.Arrays
 
 data class WeekdayWithTeacherLessons(override val weekday: String) : WeekdayWithLessons<TeacherLesson> {
+    override var weekdayId: Int = -1
+        private set
+
     override val lessons: MutableList<TeacherLesson> = ArrayList()
 
-    constructor(weekday: String, lessons: List<TeacherLesson>) : this(weekday) {
+    constructor(weekdayId: Int, weekday: String, lessons: List<TeacherLesson>) : this(weekday) {
+        this.weekdayId = weekdayId
         this.lessons.addAll(lessons)
     }
 
