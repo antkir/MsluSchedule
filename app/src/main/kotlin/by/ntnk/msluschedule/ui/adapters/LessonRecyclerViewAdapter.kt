@@ -15,22 +15,28 @@ import by.ntnk.msluschedule.data.StudyGroupLesson
 import by.ntnk.msluschedule.data.TeacherLesson
 import by.ntnk.msluschedule.data.WeekdayWithLessons
 import by.ntnk.msluschedule.utils.*
+import io.reactivex.Observable
+import io.reactivex.subjects.PublishSubject
 import java.util.ArrayList
 
 private const val VIEWTYPE_BLANK = R.layout.item_blanklesson
 private const val VIEWTYPE_STUDYGROUP = R.layout.item_studygrouplesson
 private const val VIEWTYPE_TEACHER = R.layout.item_teacherlesson
-private const val VIEWTYPE_WEEKDAY = R.layout.item_day
 private const val VIEWTYPE_DAYEND = R.layout.item_dayend
+const val VIEWTYPE_WEEKDAY = R.layout.item_day
 
 class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val data = ArrayList<LessonView>()
+    private val onClickSubject = PublishSubject.create<LessonView>()
+
+    val onClickObservable: Observable<LessonView>
+        get() = onClickSubject
 
     @Throws(NullPointerException::class)
     fun initData(days: List<WeekdayWithLessons<Lesson>>) {
         data.clear()
         for (day in days) {
-            data.add(DayLessonView(day.weekday))
+            data.add(DayView(day.weekdayId, day.weekday))
             if (day.lessons.isNotEmpty()) {
                 for (lesson in day.lessons) {
                     val lessonLesson: LessonView =
@@ -52,7 +58,7 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
     fun getWeekDayViewIndex(weekdayNumber: Int): Int {
         var dayIndex = 0
         for (i in 0 until data.size) {
-            if (data[i] is DayLessonView) {
+            if (data[i] is DayView) {
                 if (dayIndex == weekdayNumber - 1) {
                     return i
                 }
@@ -90,6 +96,10 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
 
     override fun onBindViewHolder(viewHolder: RecyclerView.ViewHolder, position: Int) {
         data[position].bindViewHolder(viewHolder)
+        when (viewHolder.itemViewType) {
+            VIEWTYPE_WEEKDAY -> viewHolder.itemView.setOnClickListener { _ -> onClickSubject.onNext(data[position]) }
+            else -> Unit
+        }
     }
 
     override fun getItemCount(): Int = data.size
@@ -108,7 +118,7 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
         override fun bindViewHolder(viewHolder: RecyclerView.ViewHolder) = Unit
     }
 
-    private class DayLessonView(private val weekday: String) : LessonView {
+    class DayView(val weekdayId: Int, private val weekday: String) : LessonView {
         override val viewType: Int = VIEWTYPE_WEEKDAY
 
         override fun bindViewHolder(viewHolder: RecyclerView.ViewHolder) {
@@ -168,7 +178,7 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
         }
     }
 
-    private interface LessonView {
+    interface LessonView {
         val viewType: Int
         fun bindViewHolder(viewHolder: RecyclerView.ViewHolder)
     }

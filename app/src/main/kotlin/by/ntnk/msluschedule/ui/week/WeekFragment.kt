@@ -15,12 +15,15 @@ import by.ntnk.msluschedule.data.Lesson
 import by.ntnk.msluschedule.data.WeekdayWithLessons
 import by.ntnk.msluschedule.mvp.views.MvpFragment
 import by.ntnk.msluschedule.ui.adapters.LessonRecyclerViewAdapter
+import by.ntnk.msluschedule.ui.adapters.VIEWTYPE_WEEKDAY
+import by.ntnk.msluschedule.ui.weekday.WeekdayActivity
 import by.ntnk.msluschedule.utils.SimpleAnimatorListener
 import by.ntnk.msluschedule.utils.getErrorMessageResId
 import by.ntnk.msluschedule.utils.isNetworkAccessible
 import by.ntnk.msluschedule.utils.showSnackbarNetworkInaccessible
 import dagger.Lazy
 import dagger.android.support.AndroidSupportInjection
+import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.fragment_week.*
 import javax.inject.Inject
 
@@ -64,6 +67,15 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
             layoutManager = LinearLayoutManager(activity)
             setHasFixedSize(true)
             adapter = LessonRecyclerViewAdapter()
+            (adapter as LessonRecyclerViewAdapter).onClickObservable
+                    .subscribeBy(
+                            onNext = {
+                                if (it.viewType == VIEWTYPE_WEEKDAY) {
+                                    val weekdayId = (it as LessonRecyclerViewAdapter.DayView).weekdayId
+                                    WeekdayActivity.startActivity(context.applicationContext, weekdayId)
+                                }
+                            }
+                    )
             addItemDecoration(itemDivider)
         }
         smoothScroller = object : LinearSmoothScroller(context!!.applicationContext) {
