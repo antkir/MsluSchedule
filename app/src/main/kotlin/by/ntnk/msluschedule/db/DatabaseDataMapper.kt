@@ -10,12 +10,6 @@ import javax.inject.Inject
 
 @PerApp
 class DatabaseDataMapper @Inject constructor() {
-    fun map(data: StudyGroup): ScheduleContainer =
-            ScheduleContainer(data.key, data.name, ScheduleType.STUDYGROUP, data.year, data.faculty, data.course)
-
-    fun map(data: Teacher): ScheduleContainer =
-            ScheduleContainer(data.key, data.name, ScheduleType.TEACHER, data.year)
-
     fun mapToStudyGroup(data: ScheduleContainer): StudyGroup =
             StudyGroup(data.key, data.name, data.faculty, data.course, data.year)
 
