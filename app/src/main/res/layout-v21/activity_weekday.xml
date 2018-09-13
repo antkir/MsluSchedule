@@ -28,12 +28,6 @@
 
         </android.support.design.widget.AppBarLayout>
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:background="@drawable/toolbar_shadow"
-            app:layout_constraintTop_toTopOf="@+id/textview_subhead_notes" />
-
         <TextView
             android:id="@+id/textview_subhead_notes"
             android:layout_width="match_parent"
@@ -75,19 +69,12 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textview_subhead_notes" />
 
-        <View
-            android:id="@+id/edittext_note_shadow"
-            android:layout_width="match_parent"
-            android:layout_height="4dp"
-            android:background="@drawable/edittext_note_shadow"
-            android:visibility="invisible"
-            app:layout_constraintBottom_toTopOf="@+id/edittext_note" />
-
         <android.support.v7.widget.AppCompatEditText
             android:id="@+id/edittext_note"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:background="@color/note_edit_surface"
+            android:elevation="8dp"
             android:gravity="center_vertical"
             android:hint="@string/edittext_weekday_note"
             android:imeOptions="flagNoExtractUi"
@@ -96,8 +83,6 @@
             android:minHeight="@dimen/edittext_note_minheight"
             android:paddingBottom="@dimen/edittext_note_marginvertical"
             android:paddingEnd="@dimen/edittext_note_marginend"
-            android:paddingLeft="@dimen/edittext_note_marginstart"
-            android:paddingRight="@dimen/edittext_note_marginend"
             android:paddingStart="@dimen/edittext_note_marginstart"
             android:paddingTop="@dimen/edittext_note_marginvertical"
             android:scrollbarStyle="insideInset"
@@ -111,8 +96,8 @@
             android:layout_width="@dimen/button_note_save_width"
             android:layout_height="@dimen/button_note_save_height"
             android:layout_marginEnd="@dimen/button_note_save_margin"
-            android:layout_marginRight="@dimen/button_note_save_margin"
             android:background="@android:color/transparent"
+            android:elevation="8dp"
             android:src="@drawable/ic_save_note"
             android:visibility="invisible"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -126,7 +111,6 @@
         android:layout_gravity="bottom|end"
         android:layout_marginBottom="@dimen/fab_weekday_margin"
         android:layout_marginEnd="@dimen/fab_weekday_margin"
-        android:layout_marginRight="@dimen/fab_weekday_margin"
         android:src="@drawable/ic_edit_note"
         app:fabSize="normal"
         app:useCompatPadding="true" />

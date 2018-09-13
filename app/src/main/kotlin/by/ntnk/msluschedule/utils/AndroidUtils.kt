@@ -7,6 +7,7 @@ import android.support.design.widget.Snackbar
 import android.support.v4.widget.DrawerLayout
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.TypedValue
 import android.view.View
 import by.ntnk.msluschedule.R
 import java.net.ConnectException
@@ -28,6 +29,22 @@ fun getErrorMessageResId(t: Throwable): Int {
         else -> R.string.error_general
     }
 }
+
+fun getWeekdayFromTag(weekDayTag: String, context: Context): String {
+    return when (weekDayTag) {
+        MONDAY -> context.resources.getString(R.string.monday)
+        TUESDAY -> context.resources.getString(R.string.tuesday)
+        WEDNESDAY -> context.resources.getString(R.string.wednesday)
+        THURSDAY -> context.resources.getString(R.string.thursday)
+        FRIDAY -> context.resources.getString(R.string.friday)
+        SATURDAY -> context.resources.getString(R.string.saturday)
+        SUNDAY -> context.resources.getString(R.string.sunday)
+        else -> EMPTY_STRING
+    }
+}
+
+fun Context.dipToPixels(dipValue: Float) =
+        TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dipValue, resources.displayMetrics).toInt()
 
 interface SimpleAnimatorListener : Animator.AnimatorListener {
     override fun onAnimationRepeat(animation: Animator?) = Unit

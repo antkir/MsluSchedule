@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="note_colors">
+        <item name="purple_A400" type="color">#d500f9</item>
+        <item name="deep_purple_A400" type="color">#651fff</item>
+        <item name="indigo_A400" type="color">#3d5afe</item>
+        <item name="blue_A400" type="color">#4d73ff</item>
+        <item name="light_blue_A400" type="color">#00b0ff</item>
+        <item name="cyan_A400" type="color">#00e5ff</item>
+        <item name="teal_A400" type="color">#1de9b6</item>
+        <item name="green_A400" type="color">#14e715</item>
+        <item name="light_green_A400" type="color">#76ff03</item>
+        <item name="lime_A400" type="color">#c6ff00</item>
+        <item name="yellow_A400" type="color">#ffea00</item>
+        <item name="orange_A400" type="color">#ff9100</item>
+        <item name="deep_orange_A400" type="color">#ff3d00</item>
+        <item name="red_A700" type="color">#e00032</item>
+        <item name="pink_A700" type="color">#c51162</item>
+        <item name="purple_A700" type="color">#aa00ff</item>
+        <item name="deep_purple_A700" type="color">#6200ea</item>
+        <item name="indigo_A700" type="color">#304ffe</item>
+        <item name="blue_A700" type="color">#4d69ff</item>
+        <item name="light_blue_A700" type="color">#0091ea</item>
+        <item name="cyan_A700" type="color">#00b8d4</item>
+        <item name="teal_A700" type="color">#00bfa5</item>
+        <item name="green_A700" type="color">#12c700</item>
+        <item name="light_green_A700" type="color">#64dd17</item>
+        <item name="lime_A700" type="color">#aeea00</item>
+        <item name="yellow_A700" type="color">#ffd600</item>
+        <item name="orange_A700" type="color">#ff6d00</item>
+        <item name="deep_orange_A700" type="color">#dd2c00</item>
+    </array>
+</resources>
