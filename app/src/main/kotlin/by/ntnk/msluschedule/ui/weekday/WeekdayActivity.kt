@@ -133,9 +133,6 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
                 val note: Note = adapter.getNote(deletedNoteIndex)
                 val color: Int = adapter.getColor(deletedNoteIndex)
                 adapter.removeAt(deletedNoteIndex)
-                if (adapter.itemCount == 0) {
-                    textview_zeronotes.visibility = View.VISIBLE
-                }
                 val noteDeleted = resources.getString(R.string.snackbar_note_deleted)
                 Snackbar.make(constraintlayout_weekday, noteDeleted, Snackbar.LENGTH_LONG)
                         .setAction(resources.getString(R.string.snackbar_action_undo)) {
@@ -145,6 +142,9 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
                         .addCallback(object : Snackbar.Callback() {
                             override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
                                 if (event != DISMISS_EVENT_ACTION && !isChangingConfigurations) {
+                                    if (adapter.itemCount == 0) {
+                                        textview_zeronotes.visibility = View.VISIBLE
+                                    }
                                     presenter.deleteNote(note.id)
                                 }
                             }
@@ -175,9 +175,9 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
             } else {
                 if (keyboardIsShown) {
                     hideEditNoteView()
+                    updatedNoteIndex = INVALID_VALUE
                 }
                 keyboardIsShown = false
-                updatedNoteIndex = INVALID_VALUE
             }
         }
     }
