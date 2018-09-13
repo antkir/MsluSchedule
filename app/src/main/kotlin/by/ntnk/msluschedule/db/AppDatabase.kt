@@ -11,9 +11,10 @@ import by.ntnk.msluschedule.db.data.*
             Week::class,
             Weekday::class,
             DbStudyGroupLesson::class,
-            DbTeacherLesson::class
+            DbTeacherLesson::class,
+            DbNote::class
         ],
-        version = 6,
+        version = 8,
         exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -22,4 +23,5 @@ abstract class AppDatabase : RoomDatabase() {
     abstract val weekdayDao: WeekdayDao
     abstract val studyGroupLessonDao: StudyGroupLessonDao
     abstract val teacherLessonDao: TeacherLessonDao
+    abstract val noteDao: NoteDao
 }
