@@ -8,6 +8,8 @@ const val EMPTY_STRING = ""
 // allows to get all groups of the selected faculty
 const val COURSE_VALUE = 1
 
+const val INVALID_VALUE = -1
+
 const val PRESENTER_ID_KEY = "PresenterID"
 
 const val MONDAY = "ПН"

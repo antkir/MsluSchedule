@@ -9,4 +9,17 @@
 
     <dimen name="dialog_margin">24dp</dimen>
     <dimen name="dialog_corner_radius">8dp</dimen>
+
+    <dimen name="item_note_deleteicon_margin_right">24dp</dimen>
+    <dimen name="textview_subhead_notes_height">60dp</dimen>
+    <dimen name="textview_subhead_notes_margin">16dp</dimen>
+    <dimen name="textview_zeronotes_margin">16dp</dimen>
+    <dimen name="edittext_note_minheight">60dp</dimen>
+    <dimen name="edittext_note_marginstart">16dp</dimen>
+    <dimen name="edittext_note_marginend">40dp</dimen>
+    <dimen name="edittext_note_marginvertical">8dp</dimen>
+    <dimen name="button_note_save_margin">8dp</dimen>
+    <dimen name="button_note_save_height">60dp</dimen>
+    <dimen name="button_note_save_width">24dp</dimen>
+    <dimen name="fab_weekday_margin">16dp</dimen>
 </resources>

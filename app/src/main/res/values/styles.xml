@@ -11,6 +11,8 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <style name="MsluTheme.NoActionBarTransparent" parent="MsluTheme.NoActionBar" />
+
     <style name="MsluTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="MsluTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />

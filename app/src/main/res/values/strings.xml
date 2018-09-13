@@ -57,4 +57,10 @@
     <string name="text_week_no_classes">No classes this week.\nGood luck!</string>
     <string name="button_week_show_weekdays">Show weekdays</string>
     <string name="button_week_hide_weekdays">Hide weekdays</string>
+
+    <string name="edittext_weekday_note">Enter your note</string>
+    <string name="textview_notes_subhead">Notes</string>
+    <string name="textview_zeronotes">You haven\'t added any notes yet</string>
+    <string name="snackbar_note_deleted">The note was deleted</string>
+    <string name="snackbar_action_undo">Undo</string>
 </resources>

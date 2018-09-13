@@ -20,4 +20,5 @@
 
     <color name="warning">#B00020</color>
     <color name="button_secondary">#E0EBF9</color>
+    <color name="note_edit_surface">#FFFFFF</color>
 </resources>
