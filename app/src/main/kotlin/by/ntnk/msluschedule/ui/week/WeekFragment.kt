@@ -17,10 +17,7 @@ import by.ntnk.msluschedule.mvp.views.MvpFragment
 import by.ntnk.msluschedule.ui.adapters.LessonRecyclerViewAdapter
 import by.ntnk.msluschedule.ui.adapters.VIEWTYPE_WEEKDAY
 import by.ntnk.msluschedule.ui.weekday.WeekdayActivity
-import by.ntnk.msluschedule.utils.SimpleAnimatorListener
-import by.ntnk.msluschedule.utils.getErrorMessageResId
-import by.ntnk.msluschedule.utils.isNetworkAccessible
-import by.ntnk.msluschedule.utils.showSnackbarNetworkInaccessible
+import by.ntnk.msluschedule.utils.*
 import dagger.Lazy
 import dagger.android.support.AndroidSupportInjection
 import io.reactivex.rxkotlin.subscribeBy
@@ -31,7 +28,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     private lateinit var recyclerView: RecyclerView
     private lateinit var smoothScroller: RecyclerView.SmoothScroller
     private var isEmptyScheduleDaysVisible: Boolean = false
-    private var weekId: Int = -1
+    private var weekId: Int = INVALID_VALUE
     private var isCurrentWeek: Boolean = false
 
     override val view: WeekView
@@ -50,7 +47,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-        weekId = arguments?.getInt(ARG_WEEK_ID) ?: -1
+        weekId = arguments?.getInt(ARG_WEEK_ID) ?: INVALID_VALUE
         isCurrentWeek = arguments?.getBoolean(ARG_IS_CURRENT_WEEK) == true
     }
 
@@ -96,7 +93,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        if (weekId == -1) return
+        if (weekId == INVALID_VALUE) return
         presenter.getSchedule(weekId)
     }
 
@@ -208,7 +205,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     }
 
     override fun showError(t: Throwable, shouldSetupViews: Boolean) {
-        if (weekId == -1) return
+        if (weekId == INVALID_VALUE) return
         if (shouldSetupViews) {
             presenter.getSchedule(weekId)
         }
@@ -231,7 +228,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         return when (item?.itemId) {
             R.id.item_week_update -> {
                 if (isNetworkAccessible(context!!.applicationContext)) {
-                    if (weekId == -1) return true
+                    if (weekId == INVALID_VALUE) return true
                     presenter.updateSchedule(weekId)
                 } else {
                     showSnackbarNetworkInaccessible(getView()!!)

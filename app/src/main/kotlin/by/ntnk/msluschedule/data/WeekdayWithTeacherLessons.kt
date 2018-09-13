@@ -1,9 +1,10 @@
 package by.ntnk.msluschedule.data
 
+import by.ntnk.msluschedule.utils.INVALID_VALUE
 import java.util.Arrays
 
 data class WeekdayWithTeacherLessons(override val weekday: String) : WeekdayWithLessons<TeacherLesson> {
-    override var weekdayId: Int = -1
+    override var weekdayId: Int = INVALID_VALUE
         private set
 
     override val lessons: MutableList<TeacherLesson> = ArrayList()

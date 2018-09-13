@@ -11,6 +11,7 @@ import by.ntnk.msluschedule.data.ScheduleContainerInfo
 import by.ntnk.msluschedule.mvp.views.MvpFragment
 import by.ntnk.msluschedule.ui.adapters.WeekFragmentViewPagerAdapter
 import by.ntnk.msluschedule.ui.warningdialog.WarningDialogFragment
+import by.ntnk.msluschedule.utils.INVALID_VALUE
 import by.ntnk.msluschedule.utils.ImmutableEntry
 import dagger.Lazy
 import dagger.android.support.AndroidSupportInjection
@@ -26,7 +27,7 @@ class WeeksContainerFragment :
         WarningDialogFragment.DialogListener {
     private lateinit var viewPager: ViewPager
     private lateinit var tabLayout: TabLayout
-    private var savedCurrentPosition = -1
+    private var savedCurrentPosition = INVALID_VALUE
 
     private lateinit var listener: OnScheduleContainerDeletedListener
 
@@ -64,7 +65,7 @@ class WeeksContainerFragment :
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        savedCurrentPosition = savedInstanceState?.getInt(SELECTED_TAB_POSITION) ?: -1
+        savedCurrentPosition = savedInstanceState?.getInt(SELECTED_TAB_POSITION) ?: INVALID_VALUE
         presenter.initWeeksAdapter()
     }
 
@@ -74,13 +75,13 @@ class WeeksContainerFragment :
         with(viewPager) {
             adapter = viewPagerAdapter
             offscreenPageLimit = weekIds.size - 1
-            currentItem = if (savedCurrentPosition == -1) currentWeekItemIndex else savedCurrentPosition
+            currentItem = if (savedCurrentPosition == INVALID_VALUE) currentWeekItemIndex else savedCurrentPosition
         }
         tabLayout.setupWithViewPager(viewPager)
     }
 
     fun swapTabs() {
-        savedCurrentPosition = -1
+        savedCurrentPosition = INVALID_VALUE
         presenter.initWeeksAdapter()
     }
 
