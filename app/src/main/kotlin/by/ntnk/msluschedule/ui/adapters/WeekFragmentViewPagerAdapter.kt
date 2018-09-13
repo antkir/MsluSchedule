@@ -3,6 +3,7 @@ package by.ntnk.msluschedule.ui.adapters
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentStatePagerAdapter
+import android.view.ViewGroup
 import by.ntnk.msluschedule.ui.week.WeekFragment
 import by.ntnk.msluschedule.utils.ImmutableEntry
 
@@ -17,11 +18,17 @@ class WeekFragmentViewPagerAdapter(
         fragmentsInfo.forEach { fragments.add(null) }
     }
 
-    fun getWeekFragment(index: Int): WeekFragment? = fragments[index]
+    fun getWeekFragment(index: Int): WeekFragment? {
+        return if (index >= 0) fragments[index] else null
+    }
 
     override fun getItem(position: Int): Fragment {
         val weekId = fragmentsInfo[position].key
-        val fragment = WeekFragment.newInstance(weekId, isCurrentWeek = position == currentWeekIndex)
+        return WeekFragment.newInstance(weekId, isCurrentWeek = position == currentWeekIndex)
+    }
+
+    override fun instantiateItem(container: ViewGroup, position: Int): Any {
+        val fragment = super.instantiateItem(container, position) as WeekFragment
         fragments[position] = fragment
         return fragment
     }
