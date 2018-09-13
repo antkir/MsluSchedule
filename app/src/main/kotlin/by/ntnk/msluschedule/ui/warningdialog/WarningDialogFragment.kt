@@ -49,24 +49,20 @@ class WarningDialogFragment : DialogFragment() {
 
     private fun initPositiveButtonCountdown(button: Button) {
         button.isEnabled = false
+        val buttonDeleteString = resources.getString(R.string.button_delete)
+        val buttonDeleteColor = ContextCompat.getColor(context!!, R.color.warning)
         val timeout = 5L
         disposable = Observable
                 .intervalRange(1, timeout, 0, 1, TimeUnit.SECONDS)
                 .map { timePassed -> timeout - timePassed }
-                .map { timeLeft ->
-                    String.format(
-                            Locale.getDefault(),
-                            "%s (%d)",
-                            resources.getString(R.string.button_delete),
-                            timeLeft)
-                }
+                .map { timeLeft -> String.format(Locale.getDefault(), "%s (%d)", buttonDeleteString, timeLeft) }
                 .observeOn(SchedulerProvider.ui())
                 .subscribeBy(
                         onNext = { button.text = it },
                         onComplete = {
-                            button.setTextColor(ContextCompat.getColor(context!!, R.color.warning))
+                            button.setTextColor(buttonDeleteColor)
                             button.isEnabled = true
-                            button.text = resources.getString(R.string.button_delete)
+                            button.text = buttonDeleteString
                         }
                 )
     }
