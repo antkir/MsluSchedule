@@ -69,7 +69,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
                             onNext = {
                                 if (it.viewType == VIEWTYPE_WEEKDAY) {
                                     val weekdayId = (it as LessonRecyclerViewAdapter.DayView).weekdayId
-                                    WeekdayActivity.startActivity(context.applicationContext, weekdayId)
+                                    WeekdayActivity.startActivity(context, weekdayId)
                                 }
                             }
                     )
