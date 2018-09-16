@@ -5,7 +5,7 @@
     <color name="colorPrimaryLight">#303030</color>
     <color name="colorAccent">#FFD740</color>
 
-    <color name="surface">#2e2e2e</color>
+    <color name="surface">#2E2E2E</color>
 
     <color name="primary_text">#FFFFFF</color>
     <color name="primary_text_inverted">#000000</color>
@@ -16,5 +16,5 @@
     <color name="item_separator">#4F4F4F</color>
 
     <color name="button_secondary">#424242</color>
-    <color name="note_edit_surface">#424242</color>
+    <color name="note_edit_surface">#5F6267</color>
 </resources>

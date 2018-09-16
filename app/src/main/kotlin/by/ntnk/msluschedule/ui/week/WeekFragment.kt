@@ -59,7 +59,6 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
 
     private fun initRecyclerView(rootView: View) {
         recyclerView = rootView.findViewById(R.id.rv_week_days)
-        val itemDivider = LessonRecyclerViewAdapter.Divider(recyclerView.context, RecyclerView.VERTICAL)
         with(recyclerView) {
             layoutManager = LinearLayoutManager(activity)
             setHasFixedSize(true)
@@ -73,7 +72,6 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
                                 }
                             }
                     )
-            addItemDecoration(itemDivider)
         }
         smoothScroller = object : LinearSmoothScroller(context!!) {
             override fun getVerticalSnapPreference(): Int {
@@ -112,54 +110,62 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
                 text_week_nolessons.visibility = View.GONE
                 rv_week_days.setOnTouchListener(null)
             }
-            rv_week_days.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-                override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
-                    if (button_week_weekdays_visibility.visibility == View.VISIBLE && dy > 0) {
-                        button_week_weekdays_visibility.visibility = View.GONE
-                        val anim = AnimationUtils.loadAnimation(
-                                button_week_weekdays_visibility.context,
-                                R.anim.button_week_slide_down
-                        )
-                        button_week_weekdays_visibility.startAnimation(anim)
-                    } else if (button_week_weekdays_visibility.visibility != View.VISIBLE && dy < 0) {
-                        button_week_weekdays_visibility.visibility = View.VISIBLE
-                        val anim = AnimationUtils.loadAnimation(
-                                button_week_weekdays_visibility.context,
-                                R.anim.button_week_slide_up
-                        )
-                        button_week_weekdays_visibility.startAnimation(anim)
-                    }
-                }
-            })
-            button_week_weekdays_visibility.setOnClickListener {
-                if (!isEmptyScheduleDaysVisible) {
-                    isEmptyScheduleDaysVisible = true
-                    text_week_nolessons.visibility = View.GONE
-
-                    button_week_weekdays_visibility.text = context!!.getString(R.string.button_week_hide_weekdays)
-                    rv_week_days.setOnTouchListener(null)
-                } else {
-                    isEmptyScheduleDaysVisible = false
-                    text_week_nolessons.visibility = View.VISIBLE
-
-                    // workaround the edge case, when the button is pressed during
-                    // the hiding animation and won't show again
-                    rv_week_days.smoothScrollBy(0, -1)
-
-                    button_week_weekdays_visibility.text = context!!.getString(R.string.button_week_show_weekdays)
-                    rv_week_days.setOnTouchListener { _, _ -> true }
-                }
-            }
+            rv_week_days.addOnScrollListener(initRecyclerViewScrollListener())
+            button_week_weekdays_visibility.setOnClickListener { initButtonWeekdays() }
         } else {
             button_week_weekdays_visibility.visibility = View.GONE
             text_week_nolessons.visibility = View.GONE
             rv_week_days.setOnTouchListener(null)
         }
+
         val adapter = recyclerView.adapter as LessonRecyclerViewAdapter
         adapter.initData(data)
+
         if (isCurrentWeek && isNewlyCreated) {
             val index = adapter.getWeekDayViewIndex(presenter.getCurrentDayOfWeek())
             recyclerView.layoutManager.scrollToPosition(index)
+        }
+    }
+
+    private fun initRecyclerViewScrollListener(): RecyclerView.OnScrollListener {
+        return object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
+                if (button_week_weekdays_visibility.visibility == View.VISIBLE && dy > 0) {
+                    button_week_weekdays_visibility.visibility = View.GONE
+                    val anim = AnimationUtils.loadAnimation(
+                            button_week_weekdays_visibility.context,
+                            R.anim.button_week_slide_down
+                    )
+                    button_week_weekdays_visibility.startAnimation(anim)
+                } else if (button_week_weekdays_visibility.visibility != View.VISIBLE && dy < 0) {
+                    button_week_weekdays_visibility.visibility = View.VISIBLE
+                    val anim = AnimationUtils.loadAnimation(
+                            button_week_weekdays_visibility.context,
+                            R.anim.button_week_slide_up
+                    )
+                    button_week_weekdays_visibility.startAnimation(anim)
+                }
+            }
+        }
+    }
+
+    private fun initButtonWeekdays() {
+        if (!isEmptyScheduleDaysVisible) {
+            isEmptyScheduleDaysVisible = true
+            text_week_nolessons.visibility = View.GONE
+
+            button_week_weekdays_visibility.text = context!!.getString(R.string.button_week_hide_weekdays)
+            rv_week_days.setOnTouchListener(null)
+        } else {
+            isEmptyScheduleDaysVisible = false
+            text_week_nolessons.visibility = View.VISIBLE
+
+            // workaround the edge case, when the button is pressed during
+            // the hiding animation and won't show again
+            rv_week_days.smoothScrollBy(0, -1)
+
+            button_week_weekdays_visibility.text = context!!.getString(R.string.button_week_show_weekdays)
+            rv_week_days.setOnTouchListener { _, _ -> true }
         }
     }
 

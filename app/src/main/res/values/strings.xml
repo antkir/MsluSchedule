@@ -63,4 +63,6 @@
     <string name="textview_zeronotes">You haven\'t added any notes yet</string>
     <string name="snackbar_note_deleted">The note was deleted</string>
     <string name="snackbar_action_undo">Undo</string>
+
+    <string name="imageview_dayitem_description">Notes</string>
 </resources>

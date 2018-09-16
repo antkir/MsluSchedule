@@ -13,7 +13,7 @@
         android:layout_marginLeft="16dp"
         android:layout_marginStart="16dp"
         android:gravity="start|center_vertical"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:textColor="@color/primary_text"
         android:textStyle="bold"
         tools:text="Monday" />
@@ -26,7 +26,7 @@
         android:layout_alignParentRight="true"
         android:layout_marginRight="16dp"
         android:layout_marginEnd="16dp"
-        android:contentDescription=""
+        android:contentDescription="@string/imageview_dayitem_description"
         android:layout_centerVertical="true"
         android:background="@drawable/ic_day_note" />
 
