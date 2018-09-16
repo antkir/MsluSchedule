@@ -13,6 +13,8 @@ import by.ntnk.msluschedule.utils.SchedulerProvider
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
 import io.reactivex.Observable
 import io.reactivex.Single
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import org.threeten.bp.DayOfWeek
 import javax.inject.Inject
@@ -25,16 +27,29 @@ class WeekPresenter @Inject constructor(
         private val schedulerProvider: SchedulerProvider,
         private val networkRepository: NetworkRepository
 ) : Presenter<WeekView>() {
+    private val disposables: CompositeDisposable = CompositeDisposable()
     private var scheduler = schedulerProvider.cachedThreadPool()
 
     fun getSchedule(weekId: Int) {
         val containerInfo = sharedPreferencesRepository.getSelectedScheduleContainerInfo()
-        databaseRepository.getScheduleContainer(containerInfo.id)
+        disposables += databaseRepository.getScheduleContainer(containerInfo.id)
                 .flatMap { getScheduleData(it, weekId) }
                 .subscribeOn(scheduler)
                 .observeOn(schedulerProvider.ui())
                 .subscribeBy(
-                        onSuccess = { weekDayEntities -> view?.showSchedule(weekDayEntities) },
+                        onSuccess = {
+                            it.forEach { weekday ->
+                                disposables += databaseRepository.getNotesForWeekdayObservable(weekday.weekdayId)
+                                        .subscribeOn(scheduler)
+                                        .observeOn(schedulerProvider.ui())
+                                        .subscribeBy(
+                                                onNext = { notesList ->
+                                                    view?.updateNotesStatus(weekday.weekdayId, notesList.isNotEmpty())
+                                                }
+                                        )
+                            }
+                            view?.showSchedule(it)
+                        },
                         onError = {
                             it.printStackTrace()
                             view?.showError(it, shouldSetupViews = true)
@@ -134,4 +149,6 @@ class WeekPresenter @Inject constructor(
             DayOfWeek.MONDAY.value
         }
     }
+
+    fun clearDisposables() = disposables.clear()
 }

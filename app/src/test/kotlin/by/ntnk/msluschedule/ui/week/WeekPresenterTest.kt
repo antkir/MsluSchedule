@@ -61,6 +61,7 @@ class WeekPresenterTest {
     private val getStudyGroupScheduleTest = TestObserver.create<List<WeekdayWithStudyGroupLessons>>()
     private val getTeacherScheduleTest = TestObserver.create<List<WeekdayWithTeacherLessons>>()
     private val insertWeekdaysTest = TestObserver.create<Int>()
+    private val getNotesForWeekdayObservableTest = TestObserver.create<Int>()
 
     @Before
     fun setUp() {
@@ -93,6 +94,9 @@ class WeekPresenterTest {
         whenever(databaseRepository.insertWeekdays(anyInt()))
                 .thenReturn(Completable.complete()
                                     .doOnSubscribe { insertWeekdaysTest.onSubscribe(it) })
+        whenever(databaseRepository.getNotesForWeekdayObservable(anyInt()))
+                .thenReturn(Observable.just(List(1) { return@List Note(0, "") } )
+                                    .doOnSubscribe { getNotesForWeekdayObservableTest.onSubscribe(it) })
         whenever(networkRepository.getSchedule(any<StudyGroup>(), anyInt()))
                 .thenReturn(Observable.just(WeekdayWithStudyGroupLessons(""))
                                     .doOnSubscribe { getStudyGroupScheduleTest.onSubscribe(it) })
@@ -139,6 +143,7 @@ class WeekPresenterTest {
         getWeekKeyTest.assertSubscribed()
         getStudyGroupScheduleTest.assertSubscribed()
         insertStudyGroupScheduleTest.assertSubscribed()
+        getNotesForWeekdayObservableTest.assertSubscribed()
 
         verify(sharedPreferencesRepository).getSelectedScheduleContainerInfo()
         verify(databaseDataMapper).mapToStudyGroup(any())
@@ -166,6 +171,7 @@ class WeekPresenterTest {
         getWeekKeyTest.assertSubscribed()
         getStudyGroupScheduleTest.assertNotSubscribed()
         insertStudyGroupScheduleTest.assertNotSubscribed()
+        getNotesForWeekdayObservableTest.assertNotSubscribed()
 
         verify(sharedPreferencesRepository).getSelectedScheduleContainerInfo()
         verify(databaseDataMapper).mapToStudyGroup(any())

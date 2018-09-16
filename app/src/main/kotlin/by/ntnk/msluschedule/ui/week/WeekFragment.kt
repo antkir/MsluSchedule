@@ -75,7 +75,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
                     )
             addItemDecoration(itemDivider)
         }
-        smoothScroller = object : LinearSmoothScroller(context!!.applicationContext) {
+        smoothScroller = object : LinearSmoothScroller(context!!) {
             override fun getVerticalSnapPreference(): Int {
                 return LinearSmoothScroller.SNAP_TO_START
             }
@@ -91,10 +91,15 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         }
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onStart() {
+        super.onStart()
         if (weekId == INVALID_VALUE) return
         presenter.getSchedule(weekId)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        presenter.clearDisposables()
     }
 
     override fun showSchedule(data: List<WeekdayWithLessons<Lesson>>) {
@@ -152,7 +157,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         }
         val adapter = recyclerView.adapter as LessonRecyclerViewAdapter
         adapter.initData(data)
-        if (isCurrentWeek && !isFragmentRecreated) {
+        if (isCurrentWeek && isNewlyCreated) {
             val index = adapter.getWeekDayViewIndex(presenter.getCurrentDayOfWeek())
             recyclerView.layoutManager.scrollToPosition(index)
         }
@@ -198,7 +203,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
 
     override fun showUpdateSuccessMessage() {
         Toast.makeText(
-                context?.applicationContext,
+                context,
                 resources.getString(R.string.messsage_schedule_update_successful),
                 Toast.LENGTH_SHORT
         ).show()
@@ -233,10 +238,15 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
                 } else {
                     showSnackbarNetworkInaccessible(getView()!!)
                 }
-                true
+                return true
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    override fun updateNotesStatus(weekdayId: Int, hasNotes: Boolean) {
+        val adapter = recyclerView.adapter as LessonRecyclerViewAdapter
+        adapter.updateWeekdayNotesStatus(weekdayId, hasNotes)
     }
 
     companion object {

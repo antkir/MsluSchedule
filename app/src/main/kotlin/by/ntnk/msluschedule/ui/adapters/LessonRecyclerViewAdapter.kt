@@ -1,20 +1,23 @@
 package by.ntnk.msluschedule.ui.adapters
 
 import android.content.Context
+import android.graphics.PorterDuff
 import android.graphics.Rect
+import android.graphics.drawable.Drawable
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.data.Lesson
 import by.ntnk.msluschedule.data.StudyGroupLesson
 import by.ntnk.msluschedule.data.TeacherLesson
 import by.ntnk.msluschedule.data.WeekdayWithLessons
-import by.ntnk.msluschedule.utils.*
+import by.ntnk.msluschedule.utils.getWeekdayFromTag
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import java.util.ArrayList
@@ -68,6 +71,19 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
         return 0
     }
 
+    fun updateWeekdayNotesStatus(weekdayId: Int, hasNotes: Boolean) {
+        for (i in 0 until data.size) {
+            val view = data[i]
+            if (view is DayView && view.weekdayId == weekdayId) {
+                val hadNotes = view.hasNotes
+                if (hadNotes != hasNotes) {
+                    view.hasNotes = hasNotes
+                    notifyItemChanged(i)
+                }
+            }
+        }
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
@@ -119,25 +135,19 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
     }
 
     class DayView(val weekdayId: Int, private val weekday: String) : LessonView {
+        internal var hasNotes: Boolean = false
+
         override val viewType: Int = VIEWTYPE_WEEKDAY
 
         override fun bindViewHolder(viewHolder: RecyclerView.ViewHolder) {
             with(viewHolder as DayViewHolder) {
-                weekDay.text = weekdayFromTag(weekday, itemView.context)
-            }
-        }
-
-        @Throws(NullPointerException::class)
-        private fun weekdayFromTag(weekDayTag: String, context: Context): String {
-            return when (weekDayTag) {
-                MONDAY -> context.resources.getString(R.string.monday)
-                TUESDAY -> context.resources.getString(R.string.tuesday)
-                WEDNESDAY -> context.resources.getString(R.string.wednesday)
-                THURSDAY -> context.resources.getString(R.string.thursday)
-                FRIDAY -> context.resources.getString(R.string.friday)
-                SATURDAY -> context.resources.getString(R.string.saturday)
-                SUNDAY -> context.resources.getString(R.string.sunday)
-                else -> throw NullPointerException()
+                weekDay.text = getWeekdayFromTag(weekday, itemView.context)
+                if (hasNotes) {
+                    notesIconDrawable?.mutate()?.setColorFilter(accentColor, PorterDuff.Mode.SRC_IN)
+                } else {
+                    notesIconDrawable?.mutate()?.setColorFilter(accentColor, PorterDuff.Mode.DST_IN)
+                }
+                notesIcon.setImageDrawable(notesIconDrawable)
             }
         }
     }
@@ -203,6 +213,9 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
 
     private class DayViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val weekDay: TextView = view.findViewById(R.id.text_day)
+        val notesIcon: ImageView = view.findViewById(R.id.imageview_notes_day)
+        val notesIconDrawable: Drawable? = ContextCompat.getDrawable(view.context, R.drawable.ic_day_note)
+        val accentColor = ContextCompat.getColor(view.context, R.color.colorAccent)
     }
 
     private class BlankViewHolder(view: View) : RecyclerView.ViewHolder(view)

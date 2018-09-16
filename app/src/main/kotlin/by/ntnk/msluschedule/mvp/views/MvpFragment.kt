@@ -11,7 +11,7 @@ import javax.inject.Inject
 abstract class MvpFragment<out P : Presenter<V>, V : View> : Fragment() {
     private var presenterId: Int? = null
     private lateinit var presenterManager: PresenterManager
-    protected var isFragmentRecreated: Boolean = false
+    protected var isNewlyCreated: Boolean = false
 
     @Inject
     fun setPresenter(presenterManager: PresenterManager) {
@@ -35,9 +35,14 @@ abstract class MvpFragment<out P : Presenter<V>, V : View> : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        isFragmentRecreated = savedInstanceState != null
+        isNewlyCreated = savedInstanceState == null
         presenterId = restoreId(savedInstanceState)
         attachViewToPresenter()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        isNewlyCreated = false
     }
 
     private fun restoreId(savedInstanceState: Bundle?): Int? {

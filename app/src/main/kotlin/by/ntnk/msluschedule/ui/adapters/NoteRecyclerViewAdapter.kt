@@ -34,7 +34,7 @@ class NoteRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() 
     fun addNote(note: Note, resources: Resources) {
         data.add(note)
         viewColors.add(getViewColor(resources))
-        notifyDataSetChanged()
+        notifyItemInserted(data.size - 1)
     }
 
     private fun getViewColor(resources: Resources): Int {

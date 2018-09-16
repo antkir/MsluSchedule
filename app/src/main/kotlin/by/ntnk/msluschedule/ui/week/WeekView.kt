@@ -12,4 +12,5 @@ interface WeekView : View {
     fun showUpdateProgressBar()
     fun showUpdateSuccessMessage()
     fun showError(t: Throwable, shouldSetupViews: Boolean)
+    fun updateNotesStatus(weekdayId: Int, hasNotes: Boolean)
 }
