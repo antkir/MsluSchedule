@@ -20,6 +20,8 @@ const val FRIDAY = "ПТ"
 const val SATURDAY = "СБ"
 const val SUNDAY = "ВС"
 
+const val WEEKDAYS_NUMBER = 7
+
 typealias ImmutableEntry = AbstractMap.SimpleImmutableEntry<Int, String>
 
 class InvalidYearException : Exception()

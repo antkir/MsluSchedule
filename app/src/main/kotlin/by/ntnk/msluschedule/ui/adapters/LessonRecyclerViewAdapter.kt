@@ -1,11 +1,8 @@
 package by.ntnk.msluschedule.ui.adapters
 
-import android.content.Context
 import android.graphics.PorterDuff
-import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import android.support.v4.content.ContextCompat
-import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -17,6 +14,7 @@ import by.ntnk.msluschedule.data.Lesson
 import by.ntnk.msluschedule.data.StudyGroupLesson
 import by.ntnk.msluschedule.data.TeacherLesson
 import by.ntnk.msluschedule.data.WeekdayWithLessons
+import by.ntnk.msluschedule.utils.WEEKDAYS_NUMBER
 import by.ntnk.msluschedule.utils.getWeekdayFromTag
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
@@ -37,9 +35,24 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
 
     @Throws(NullPointerException::class)
     fun initData(days: List<WeekdayWithLessons<Lesson>>) {
+        val hasNotesList = ArrayList<Boolean>()
+        for (view in data) {
+            if (view is DayView) {
+                hasNotesList.add(view.hasNotes)
+            }
+        }
+
         data.clear()
+
+        var hasNotesListCounter = 0
         for (day in days) {
-            data.add(DayView(day.weekdayId, day.weekday))
+            val dayView = DayView(day.weekdayId, day.weekday)
+            if (hasNotesList.size == WEEKDAYS_NUMBER) {
+                dayView.hasNotes = hasNotesList[hasNotesListCounter]
+                hasNotesListCounter++
+            }
+            data.add(dayView)
+
             if (day.lessons.isNotEmpty()) {
                 for (lesson in day.lessons) {
                     val lessonLesson: LessonView =
@@ -78,7 +91,7 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
                 val hadNotes = view.hasNotes
                 if (hadNotes != hasNotes) {
                     view.hasNotes = hasNotes
-                    notifyItemChanged(i)
+                    notifyItemChanged(i, hasNotes)
                 }
             }
         }
@@ -134,14 +147,14 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
         override fun bindViewHolder(viewHolder: RecyclerView.ViewHolder) = Unit
     }
 
-    class DayView(val weekdayId: Int, private val weekday: String) : LessonView {
+    class DayView(val weekdayId: Int, private val weekdayTag: String) : LessonView {
         internal var hasNotes: Boolean = false
 
         override val viewType: Int = VIEWTYPE_WEEKDAY
 
         override fun bindViewHolder(viewHolder: RecyclerView.ViewHolder) {
             with(viewHolder as DayViewHolder) {
-                weekDay.text = getWeekdayFromTag(weekday, itemView.context)
+                weekDay.text = getWeekdayFromTag(weekdayTag, itemView.context)
                 if (hasNotes) {
                     notesIconDrawable?.mutate()?.setColorFilter(accentColor, PorterDuff.Mode.SRC_IN)
                 } else {
@@ -221,13 +234,4 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
     private class BlankViewHolder(view: View) : RecyclerView.ViewHolder(view)
 
     private class DayEndViewHolder(view: View) : RecyclerView.ViewHolder(view)
-
-    class Divider(context: Context?, orientation: Int) : DividerItemDecoration(context, orientation) {
-        override fun getItemOffsets(outRect: Rect?, view: View?, parent: RecyclerView?, state: RecyclerView.State?) {
-            val viewHolder = parent!!.getChildViewHolder(view)
-            if (viewHolder is LessonRecyclerViewAdapter.DayEndViewHolder) {
-                super.getItemOffsets(outRect, view, parent, state)
-            }
-        }
-    }
 }
