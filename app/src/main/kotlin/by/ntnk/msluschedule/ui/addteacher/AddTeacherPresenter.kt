@@ -22,7 +22,7 @@ class AddTeacherPresenter @Inject constructor(
     private var teachers: ScheduleFilter? = null
     private var teacher: Int = 0
 
-    private lateinit var scheduleContaners: List<ScheduleContainer>
+    private var scheduleContaners: List<ScheduleContainer>? = null
 
     fun isTeachersNotEmpty(): Boolean = teachers != null
 
@@ -60,9 +60,9 @@ class AddTeacherPresenter @Inject constructor(
 
     fun isTeacherStored(string: String): Boolean {
         return scheduleContaners
-                .filter { it.year == currentDate.academicYear }
-                .map { it.name }
-                .any { it == string }
+                ?.filter { it.year == currentDate.academicYear }
+                ?.map { it.name }
+                ?.any { it == string } == true
     }
 
     fun getTeacher() = Teacher(teacher, teachers!!.getValue(teacher), currentDate.academicYear)

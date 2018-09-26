@@ -28,7 +28,7 @@ class AddGroupPresenter @Inject constructor(
     private var course: Int = 0
     private var group: Int = 0
 
-    private lateinit var scheduleContaners: List<ScheduleContainer>
+    private var scheduleContaners: List<ScheduleContainer>? = null
 
     fun isFacultiesInitialized(): Boolean = faculties != null
 
@@ -133,9 +133,9 @@ class AddGroupPresenter @Inject constructor(
 
     fun isGroupStored(string: String): Boolean {
         return scheduleContaners
-                .filter { it.year == currentDate.academicYear }
-                .map { it.name }
-                .any { it == string }
+                ?.filter { it.year == currentDate.academicYear }
+                ?.map { it.name }
+                ?.any { it == string } == true
     }
 
     fun getStudyGroup(): StudyGroup {
@@ -146,6 +146,7 @@ class AddGroupPresenter @Inject constructor(
         }
         return StudyGroup(group, groups!!.getValue(group), faculty, courseKey, currentDate.academicYear)
     }
+
     fun populateFacultiesAdapter() = view?.populateFacultiesAdapter(faculties!!)
 
     fun populateCoursesAdapter() = view?.populateCoursesAdapter(courses!!)
