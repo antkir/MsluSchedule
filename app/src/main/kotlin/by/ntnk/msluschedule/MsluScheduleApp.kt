@@ -4,6 +4,7 @@ import android.app.Activity
 import android.support.multidex.MultiDexApplication
 import android.support.v7.app.AppCompatDelegate
 import by.ntnk.msluschedule.di.DaggerAppComponent
+import com.squareup.leakcanary.LeakCanary
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasActivityInjector
@@ -16,6 +17,12 @@ class MsluScheduleApp : MultiDexApplication(), HasActivityInjector {
 
     override fun onCreate() {
         super.onCreate()
+        if (BuildConfig.DEBUG) {
+            if (LeakCanary.isInAnalyzerProcess(this)) {
+                return
+            }
+            LeakCanary.install(this)
+        }
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         Timber.plant(Timber.DebugTree())
         buildAppComponent().inject(this)
