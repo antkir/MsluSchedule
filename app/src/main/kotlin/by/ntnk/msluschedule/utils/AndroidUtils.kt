@@ -12,6 +12,7 @@ import android.view.View
 import by.ntnk.msluschedule.R
 import java.net.ConnectException
 import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 
 fun isNetworkAccessible(context: Context): Boolean {
     val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -26,6 +27,7 @@ fun getErrorMessageResId(t: Throwable): Int {
         is ConnectException -> R.string.error_website_unavailable
         is HttpStatusException -> R.string.error_website_unavailable
         is SocketTimeoutException -> R.string.error_website_unavailable
+        is UnknownHostException -> R.string.error_website_unavailable
         else -> R.string.error_general
     }
 }
