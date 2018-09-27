@@ -144,7 +144,7 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
             viewPagerWeeksContainer?.alpha = slideOffset
             if (slideOffset < 0.03) {
                 isUpdatingWeeksContainer = false
-                viewPagerWeeksContainer?.visibility = View.GONE
+                viewPagerWeeksContainer?.visibility = View.INVISIBLE
                 viewPagerWeeksContainer?.alpha = 1f
                 swapMainContent()
             }
@@ -221,19 +221,13 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
 
     @Suppress("UNUSED_PARAMETER")
     fun onGroupFabClick(view: View) {
-        with(AddGroupFragment()) {
-            isCancelable = false
-            show(supportFragmentManager, ADD_GROUP_FRAGMENT_TAG)
-        }
+        AddGroupFragment().show(supportFragmentManager, ADD_GROUP_FRAGMENT_TAG)
         if (isFamOpen) collapseFam()
     }
 
     @Suppress("UNUSED_PARAMETER")
     fun onTeacherFabClick(view: View) {
-        with(AddTeacherFragment()) {
-            isCancelable = false
-            show(supportFragmentManager, ADD_TEACHER_FRAGMENT_TAG)
-        }
+        AddTeacherFragment().show(supportFragmentManager, ADD_TEACHER_FRAGMENT_TAG)
         if (isFamOpen) collapseFam()
     }
 
