@@ -154,17 +154,6 @@ class DatabaseRepository @Inject constructor(
                 .map { Note(it.id, it.text) }
     }
 
-    fun getNotesForWeekdayObservable(weekdayId: Int): Observable<List<Note>> {
-        return appDatabase.noteDao.getNotesForWeekdayObservable(weekdayId)
-                .toObservable()
-                .flatMap {
-                    Observable.fromIterable(it)
-                            .map { dbNote -> Note(dbNote.id, dbNote.text) }
-                            .toList()
-                            .toObservable()
-                }
-    }
-
     fun insertNote(note: String, weekdayId: Int): Single<Int> {
         return Single.just(note)
                 .map { DbNote(it, weekdayId) }

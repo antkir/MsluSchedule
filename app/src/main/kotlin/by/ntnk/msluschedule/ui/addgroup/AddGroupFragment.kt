@@ -47,23 +47,6 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
         val layout = View.inflate(activity, R.layout.add_group_view, null)
         initViews(layout)
 
-        when {
-            savedInstanceState == null -> {
-                facultyView.progressBarVisibility = View.VISIBLE
-                presenter.getFacultyScheduleFilter()
-            }
-            presenter.isFacultiesInitialized() -> {
-                presenter.populateFacultiesAdapter()
-                if (presenter.isCoursesInitialized()) presenter.populateCoursesAdapter()
-                if ((presenter.isFacultySet() && textinputlayoutCourseView.visibility != View.VISIBLE) ||
-                        (presenter.isFacultySet() && presenter.isCourseSet() && !presenter.isGroupsInitialized())) {
-                    groupView.progressBarVisibility = View.VISIBLE
-                }
-                if (presenter.isGroupsInitialized()) presenter.populateGroupsAdapter()
-            }
-            else -> dismiss()
-        }
-
         val dialog = initMaterialDialog(layout)
         dialog.window.attributes.windowAnimations = R.style.DialogAnimation
         dialog.setOnShowListener {
@@ -140,6 +123,25 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
                 presenter.setCoursesNull()
                 presenter.setGroupsNull()
                 presenter.getScheduleGroups()
+            }
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        when {
+            presenter.isFacultiesInitialized() -> {
+                presenter.populateFacultiesAdapter()
+                if (presenter.isCoursesInitialized()) presenter.populateCoursesAdapter()
+                if ((presenter.isFacultySet() && textinputlayoutCourseView.visibility != View.VISIBLE) ||
+                        (presenter.isFacultySet() && presenter.isCourseSet() && !presenter.isGroupsInitialized())) {
+                    groupView.progressBarVisibility = View.VISIBLE
+                }
+                if (presenter.isGroupsInitialized()) presenter.populateGroupsAdapter()
+            }
+            else -> {
+                facultyView.progressBarVisibility = View.VISIBLE
+                presenter.getFacultyScheduleFilter()
             }
         }
     }

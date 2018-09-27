@@ -7,4 +7,5 @@ interface WeekdayView : View {
     fun setToolbar(weekday: String)
     fun showNotes(data: List<Note>)
     fun addNote(note: Note)
+    fun restoreNote(note: Note, position: Int, color: Int)
 }

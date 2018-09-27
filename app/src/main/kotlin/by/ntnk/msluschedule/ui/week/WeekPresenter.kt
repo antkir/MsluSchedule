@@ -13,8 +13,6 @@ import by.ntnk.msluschedule.utils.SchedulerProvider
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
 import io.reactivex.Observable
 import io.reactivex.Single
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import org.threeten.bp.DayOfWeek
 import javax.inject.Inject
@@ -27,27 +25,22 @@ class WeekPresenter @Inject constructor(
         private val schedulerProvider: SchedulerProvider,
         private val networkRepository: NetworkRepository
 ) : Presenter<WeekView>() {
-    private val disposables: CompositeDisposable = CompositeDisposable()
     private var scheduler = schedulerProvider.cachedThreadPool()
+    private val weekdayIds: MutableList<Int> = ArrayList()
 
     fun getSchedule(weekId: Int) {
         val containerInfo = sharedPreferencesRepository.getSelectedScheduleContainerInfo()
-        disposables += databaseRepository.getScheduleContainer(containerInfo.id)
+        databaseRepository.getScheduleContainer(containerInfo.id)
                 .flatMap { getScheduleData(it, weekId) }
                 .subscribeOn(scheduler)
                 .observeOn(schedulerProvider.ui())
                 .subscribeBy(
                         onSuccess = {
-                            it.forEach { weekday ->
-                                disposables += databaseRepository.getNotesForWeekdayObservable(weekday.weekdayId)
-                                        .subscribeOn(scheduler)
-                                        .observeOn(schedulerProvider.ui())
-                                        .subscribeBy(
-                                                onNext = { notesList ->
-                                                    view?.updateNotesStatus(weekday.weekdayId, notesList.isNotEmpty())
-                                                }
-                                        )
+                            weekdayIds.clear()
+                            for (weekday in it) {
+                                weekdayIds.add(weekday.weekdayId)
                             }
+                            getNotesStatus()
                             view?.showSchedule(it)
                         },
                         onError = {
@@ -55,6 +48,19 @@ class WeekPresenter @Inject constructor(
                             view?.showError(it, shouldSetupViews = true)
                         }
                 )
+    }
+
+    fun getNotesStatus() {
+        for (id in weekdayIds) {
+            databaseRepository.getNotesForWeekday(id)
+                    .toList()
+                    .map { notes -> notes.isNotEmpty() }
+                    .subscribeOn(scheduler)
+                    .observeOn(schedulerProvider.ui())
+                    .subscribeBy(
+                            onSuccess = { isNotesListNotEmpty -> view?.updateNotesStatus(id, isNotesListNotEmpty) }
+                    )
+        }
     }
 
     private fun getScheduleData(container: ScheduleContainer, weekId: Int): Single<List<WeekdayWithLessons<Lesson>>> {
@@ -149,6 +155,4 @@ class WeekPresenter @Inject constructor(
             DayOfWeek.MONDAY.value
         }
     }
-
-    fun clearDisposables() = disposables.clear()
 }

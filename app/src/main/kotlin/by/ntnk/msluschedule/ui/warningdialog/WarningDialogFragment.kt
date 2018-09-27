@@ -1,6 +1,7 @@
 package by.ntnk.msluschedule.ui.warningdialog
 
 import android.app.Dialog
+import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.DialogFragment
 import android.support.v4.content.ContextCompat
@@ -18,8 +19,8 @@ class WarningDialogFragment : DialogFragment() {
     private lateinit var disposable: Disposable
     private lateinit var listener: DialogListener
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
         try {
             listener = parentFragment as DialogListener
         } catch (e: ClassCastException) {

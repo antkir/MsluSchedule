@@ -60,4 +60,14 @@ class WeekdayPresenter @Inject constructor(
                         onError = { it.printStackTrace() }
                 )
     }
+
+    fun restoreNote(note: String, position: Int, color: Int, weekdayId: Int) {
+        databaseRepository.insertNote(note, weekdayId)
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.ui())
+                .subscribeBy(
+                        onSuccess = { view?.restoreNote(Note(it, note), position, color) },
+                        onError = { it.printStackTrace() }
+                )
+    }
 }

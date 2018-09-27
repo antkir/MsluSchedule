@@ -1,16 +1,19 @@
 package by.ntnk.msluschedule.mvp
 
-class PresenterManager {
+import by.ntnk.msluschedule.di.PerApp
+import javax.inject.Inject
+
+@PerApp
+class PresenterManager @Inject constructor() {
     private val presenters = HashMap<Int, Presenter<*>>()
-    private var presenterId: Int = 0
 
     internal fun getPresenter(id: Int): Presenter<*>? {
         return presenters[id]
     }
 
-    internal fun addPresenter(presenter: Presenter<*>): Int {
-        presenters[++presenterId] = presenter
-        return presenterId
+    internal fun addPresenter(id: Int, presenter: Presenter<*>): Int {
+        presenters[id] = presenter
+        return id
     }
 
     internal fun removePresenter(id: Int) {

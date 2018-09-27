@@ -2,24 +2,28 @@ package by.ntnk.msluschedule.ui.adapters
 
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
-import android.support.v4.app.FragmentStatePagerAdapter
-import android.view.ViewGroup
+import android.support.v4.view.PagerAdapter
 import by.ntnk.msluschedule.ui.week.WeekFragment
 import by.ntnk.msluschedule.utils.ImmutableEntry
 
 class WeekFragmentViewPagerAdapter(
         fragmentManager: FragmentManager,
-        private val fragmentsInfo: List<ImmutableEntry>,
-        private val currentWeekIndex: Int
+        private var fragmentsInfo: List<ImmutableEntry>,
+        private var currentWeekIndex: Int
 ) : FragmentStatePagerAdapter(fragmentManager) {
-    private val fragments: MutableList<WeekFragment?> = ArrayList()
 
-    init {
-        fragmentsInfo.forEach { fragments.add(null) }
+    fun swapData(fragmentsInfo: List<ImmutableEntry>, currentWeekIndex: Int): Boolean {
+        if (this.fragmentsInfo != fragmentsInfo) {
+            this.fragmentsInfo = fragmentsInfo
+            this.currentWeekIndex = currentWeekIndex
+            notifyDataSetChanged()
+            return true
+        }
+        return false
     }
 
-    fun getWeekFragment(index: Int): WeekFragment? {
-        return if (index >= 0) fragments[index] else null
+    override fun getFragment(position: Int): WeekFragment? {
+        return super.getFragment(position) as WeekFragment?
     }
 
     override fun getItem(position: Int): Fragment {
@@ -27,11 +31,7 @@ class WeekFragmentViewPagerAdapter(
         return WeekFragment.newInstance(weekId, isCurrentWeek = position == currentWeekIndex)
     }
 
-    override fun instantiateItem(container: ViewGroup, position: Int): Any {
-        val fragment = super.instantiateItem(container, position) as WeekFragment
-        fragments[position] = fragment
-        return fragment
-    }
+    override fun getItemPosition(any: Any) = PagerAdapter.POSITION_NONE
 
     override fun getCount(): Int = fragmentsInfo.size
 

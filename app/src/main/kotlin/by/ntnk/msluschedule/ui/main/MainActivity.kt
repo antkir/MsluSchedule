@@ -6,6 +6,7 @@ import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v4.view.GravityCompat
 import android.support.v4.view.ViewCompat
+import android.support.v4.view.ViewPager
 import android.support.v7.app.ActionBarDrawerToggle
 import android.view.Menu
 import android.view.MenuItem
@@ -29,11 +30,11 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import kotlinx.android.synthetic.main.fam_main.*
-import kotlinx.android.synthetic.main.fragment_weekscontainer.*
 import javax.inject.Inject
 
 private const val ADD_GROUP_FRAGMENT_TAG = "AddGroupFragment"
 private const val ADD_TEACHER_FRAGMENT_TAG = "AddTeacherFragment"
+private const val ARG_ACTIONBAR_TITLE = "ActionBarTitle"
 
 class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
         NavigationView.OnNavigationItemSelectedListener,
@@ -80,13 +81,33 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
             }
         }
 
-        presenter.initContainerListView()
-        if (savedInstanceState == null && !presenter.isSelectedContainerNull()) {
-            initMainContent()
-        } else if (presenter.isSelectedContainerNull()) {
+        supportActionBar?.title = savedInstanceState?.getString(ARG_ACTIONBAR_TITLE)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        if (isContainerListViewEmpty()) {
+            presenter.initContainerListView()
+        }
+
+        if (presenter.isSelectedContainerNull()) {
             image_main_smileyface.visibility = View.VISIBLE
             text_main_advice.visibility = View.VISIBLE
+        } else {
+            initMainContent()
         }
+    }
+
+    private fun isContainerListViewEmpty(): Boolean {
+        var size = 0
+        for (type in ScheduleType.values()) {
+            val subMenuSize = nav_view.menu
+                    .findItem(getContainerMenuViewId(ScheduleType.STUDYGROUP))
+                    .subMenu
+                    .size()
+            size += subMenuSize
+        }
+        return size == 0
     }
 
     override fun onBackPressed() {
@@ -99,28 +120,56 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         // Handle navigation view item clicks here.
-        val isStudyGroupItem = nav_view.menu
-                .findItem(getContainerMenuViewId(ScheduleType.STUDYGROUP))
-                .subMenu
-                .findItem(item.itemId) != null
-        val type = if (isStudyGroupItem) ScheduleType.STUDYGROUP else ScheduleType.TEACHER
-        supportActionBar?.title = item.title
-        presenter.setSelectedSheduleContainer(item.itemId, item.title.toString(), type)
-        isUpdatingWeeksContainer = true
-        drawer_layout.closeDrawer(GravityCompat.START)
+        if (!item.isChecked) {
+            val isStudyGroupItem = nav_view.menu
+                    .findItem(getContainerMenuViewId(ScheduleType.STUDYGROUP))
+                    .subMenu
+                    .findItem(item.itemId) != null
+            val type = if (isStudyGroupItem) ScheduleType.STUDYGROUP else ScheduleType.TEACHER
+            supportActionBar?.title = item.title
+            presenter.setSelectedSheduleContainer(item.itemId, item.title.toString(), type)
+            isUpdatingWeeksContainer = true
+            drawer_layout.closeDrawer(GravityCompat.START)
+        }
         return true
     }
 
     override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
         if (isUpdatingWeeksContainer) {
-            viewpager_weekscontainer?.alpha = slideOffset
+            var viewPagerWeeksContainer: ViewPager? = null
+            val weeksContainerFragment = supportFragmentManager.findFragmentById(R.id.framelayout_main)
+            if (weeksContainerFragment != null) {
+                viewPagerWeeksContainer = weeksContainerFragment.view?.findViewById(R.id.viewpager_weekscontainer)
+            }
+            viewPagerWeeksContainer?.alpha = slideOffset
             if (slideOffset < 0.03) {
                 isUpdatingWeeksContainer = false
-                viewpager_weekscontainer?.visibility = View.GONE
-                viewpager_weekscontainer?.alpha = 1f
-                initMainContent()
+                viewPagerWeeksContainer?.visibility = View.GONE
+                viewPagerWeeksContainer?.alpha = 1f
+                swapMainContent()
             }
         }
+    }
+
+    private fun swapMainContent() {
+        val weeksContainerFragment = supportFragmentManager.findFragmentById(R.id.framelayout_main)
+        if (weeksContainerFragment == null) {
+            supportFragmentManager.beginTransaction()
+                    .replace(R.id.framelayout_main, WeeksContainerFragment())
+                    .commit()
+        } else {
+            weeksContainerFragment as WeeksContainerFragment
+            weeksContainerFragment.swapTabs()
+        }
+
+        progressbar_main.visibility = View.GONE
+        image_main_smileyface.visibility = View.GONE
+        text_main_advice.visibility = View.GONE
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putString(ARG_ACTIONBAR_TITLE, supportActionBar?.title.toString())
+        super.onSaveInstanceState(outState)
     }
 
     @Suppress("UNUSED_PARAMETER")
@@ -206,9 +255,6 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
             supportFragmentManager.beginTransaction()
                     .replace(R.id.framelayout_main, WeeksContainerFragment())
                     .commit()
-        } else {
-            weeksContainerFragment as WeeksContainerFragment
-            weeksContainerFragment.swapTabs()
         }
 
         progressbar_main.visibility = View.GONE

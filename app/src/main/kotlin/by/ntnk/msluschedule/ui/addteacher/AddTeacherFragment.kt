@@ -43,7 +43,6 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val layout = View.inflate(activity, R.layout.add_teacher_view, null)
         initViews(layout)
-        getData(savedInstanceState)
         val dialog = initMaterialDialog(layout)
         dialog.window.attributes.windowAnimations = R.style.DialogAnimation
         dialog.setOnShowListener {
@@ -72,17 +71,6 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
         })
     }
 
-    private fun getData(savedInstanceState: Bundle?) {
-        when {
-            savedInstanceState == null -> {
-                teacherView.progressBarVisibility = View.VISIBLE
-                presenter.getTeachersScheduleFilter()
-            }
-            presenter.isTeachersNotEmpty() -> presenter.populateTeachersAdapter()
-            else -> dismiss()
-        }
-    }
-
     private fun initMaterialDialog(layout: View): Dialog {
         return AlertDialog.Builder(activity!!, R.style.MsluTheme_Dialog_Alert)
                 .setTitle((R.string.add_teacher_title))
@@ -94,6 +82,17 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
                     dismiss()
                 }
                 .create()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        when {
+            presenter.isTeachersNotEmpty() -> presenter.populateTeachersAdapter()
+            else -> {
+                teacherView.progressBarVisibility = View.VISIBLE
+                presenter.getTeachersScheduleFilter()
+            }
+        }
     }
 
     override fun populateTeachersView(data: ScheduleFilter) {

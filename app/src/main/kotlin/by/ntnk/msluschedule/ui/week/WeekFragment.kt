@@ -80,24 +80,24 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         }
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        if (weekId == INVALID_VALUE) return
+        presenter.getSchedule(weekId)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        presenter.getNotesStatus()
+    }
+
     fun showToday() {
         if (text_week_nolessons.visibility != View.VISIBLE) {
             val adapter = recyclerView.adapter as LessonRecyclerViewAdapter
             val index = adapter.getWeekDayViewIndex(presenter.getCurrentDayOfWeek())
             smoothScroller.targetPosition = index
-            recyclerView.layoutManager.startSmoothScroll(smoothScroller)
+            recyclerView.layoutManager?.startSmoothScroll(smoothScroller)
         }
-    }
-
-    override fun onStart() {
-        super.onStart()
-        if (weekId == INVALID_VALUE) return
-        presenter.getSchedule(weekId)
-    }
-
-    override fun onStop() {
-        super.onStop()
-        presenter.clearDisposables()
     }
 
     override fun showSchedule(data: List<WeekdayWithLessons<Lesson>>) {
@@ -110,44 +110,44 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
                 text_week_nolessons.visibility = View.GONE
                 rv_week_days.setOnTouchListener(null)
             }
-            rv_week_days.addOnScrollListener(initRecyclerViewScrollListener())
+            rv_week_days.addOnScrollListener(recyclerViewScrollListener)
             button_week_weekdays_visibility.setOnClickListener { initButtonWeekdays() }
         } else {
             button_week_weekdays_visibility.visibility = View.GONE
             text_week_nolessons.visibility = View.GONE
             rv_week_days.setOnTouchListener(null)
+            rv_week_days.removeOnScrollListener(recyclerViewScrollListener)
         }
 
         val adapter = recyclerView.adapter as LessonRecyclerViewAdapter
         adapter.initData(data)
 
-        if (isCurrentWeek && isNewlyCreated) {
+        if (isRecentlyCreated && isCurrentWeek) {
             val index = adapter.getWeekDayViewIndex(presenter.getCurrentDayOfWeek())
-            recyclerView.layoutManager.scrollToPosition(index)
+            recyclerView.layoutManager?.scrollToPosition(index)
         }
     }
 
-    private fun initRecyclerViewScrollListener(): RecyclerView.OnScrollListener {
-        return object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
-                if (button_week_weekdays_visibility.visibility == View.VISIBLE && dy > 0) {
-                    button_week_weekdays_visibility.visibility = View.GONE
-                    val anim = AnimationUtils.loadAnimation(
-                            button_week_weekdays_visibility.context,
-                            R.anim.button_week_slide_down
-                    )
-                    button_week_weekdays_visibility.startAnimation(anim)
-                } else if (button_week_weekdays_visibility.visibility != View.VISIBLE && dy < 0) {
-                    button_week_weekdays_visibility.visibility = View.VISIBLE
-                    val anim = AnimationUtils.loadAnimation(
-                            button_week_weekdays_visibility.context,
-                            R.anim.button_week_slide_up
-                    )
-                    button_week_weekdays_visibility.startAnimation(anim)
+    private val recyclerViewScrollListener: RecyclerView.OnScrollListener =
+            object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
+                    if (button_week_weekdays_visibility.visibility == View.VISIBLE && dy > 0) {
+                        button_week_weekdays_visibility.visibility = View.GONE
+                        val anim = AnimationUtils.loadAnimation(
+                                button_week_weekdays_visibility.context,
+                                R.anim.button_week_slide_down
+                        )
+                        button_week_weekdays_visibility.startAnimation(anim)
+                    } else if (button_week_weekdays_visibility.visibility != View.VISIBLE && dy < 0) {
+                        button_week_weekdays_visibility.visibility = View.VISIBLE
+                        val anim = AnimationUtils.loadAnimation(
+                                button_week_weekdays_visibility.context,
+                                R.anim.button_week_slide_up
+                        )
+                        button_week_weekdays_visibility.startAnimation(anim)
+                    }
                 }
             }
-        }
-    }
 
     private fun initButtonWeekdays() {
         if (!isEmptyScheduleDaysVisible) {

@@ -28,6 +28,7 @@ class WeeksContainerFragment :
     private lateinit var viewPager: ViewPager
     private lateinit var tabLayout: TabLayout
     private var savedCurrentPosition = INVALID_VALUE
+    private var currentWeekItemIndex = INVALID_VALUE
 
     private lateinit var listener: OnScheduleContainerDeletedListener
 
@@ -52,6 +53,7 @@ class WeeksContainerFragment :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+        savedCurrentPosition = savedInstanceState?.getInt(SELECTED_TAB_POSITION) ?: INVALID_VALUE
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -60,24 +62,41 @@ class WeeksContainerFragment :
         viewPager = view.findViewById(R.id.viewpager_weekscontainer)
         tabLayout = view.findViewById(R.id.tabs_weekscontainer)
         tabLayout.setOnTouchListener { _, _ -> true }
+        tabLayout.setupWithViewPager(viewPager)
         return view
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        savedCurrentPosition = savedInstanceState?.getInt(SELECTED_TAB_POSITION) ?: INVALID_VALUE
+    override fun onStart() {
+        super.onStart()
         presenter.initWeeksAdapter()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        savedCurrentPosition = tabLayout.selectedTabPosition
     }
 
     override fun initWeeksAdapter(weekIds: List<ImmutableEntry>, currentWeekItemIndex: Int) {
         viewpager_weekscontainer.visibility = View.VISIBLE
-        val viewPagerAdapter = WeekFragmentViewPagerAdapter(childFragmentManager, weekIds, currentWeekItemIndex)
+        this.currentWeekItemIndex = currentWeekItemIndex
+
         with(viewPager) {
-            adapter = viewPagerAdapter
             offscreenPageLimit = weekIds.size - 1
-            currentItem = if (savedCurrentPosition == INVALID_VALUE) currentWeekItemIndex else savedCurrentPosition
+            if (adapter == null) {
+                val viewPagerAdapter = WeekFragmentViewPagerAdapter(childFragmentManager, weekIds, currentWeekItemIndex)
+                adapter = viewPagerAdapter
+                if (savedCurrentPosition == INVALID_VALUE) {
+                    savedCurrentPosition = currentWeekItemIndex
+                }
+            } else {
+                val adapter = adapter as WeekFragmentViewPagerAdapter
+                val haveDataChanged = adapter.swapData(weekIds, currentWeekItemIndex)
+                if (haveDataChanged || savedCurrentPosition == INVALID_VALUE) {
+                    savedCurrentPosition = currentWeekItemIndex
+                }
+            }
+            setCurrentItem(savedCurrentPosition, false)
         }
-        tabLayout.setupWithViewPager(viewPager)
     }
 
     fun swapTabs() {
@@ -98,12 +117,9 @@ class WeeksContainerFragment :
         super.onOptionsItemSelected(item)
         return when (item?.itemId) {
             R.id.item_weekscontainer_today -> {
-                val index = presenter.getCurrentWeekIndex()
-                        .coerceAtLeast(0)
-                        .coerceAtMost((viewPager.adapter?.count ?: 1) - 1)
-                viewPager.currentItem = index
+                viewPager.currentItem = currentWeekItemIndex
                 val adapter = viewPager.adapter as WeekFragmentViewPagerAdapter?
-                adapter?.getWeekFragment(index)?.showToday()
+                adapter?.getFragment(currentWeekItemIndex)?.showToday()
                 return true
             }
             R.id.item_weekscontainer_delete -> {

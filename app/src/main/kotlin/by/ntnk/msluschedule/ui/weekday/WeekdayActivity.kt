@@ -76,7 +76,10 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
 
         initOnLongClickNoteListener()
         initOnKeyboardStateChangeListener()
+    }
 
+    override fun onStart() {
+        super.onStart()
         presenter.getWeekday(weekdayId)
         presenter.getNotes(weekdayId)
     }
@@ -122,6 +125,7 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
             }
 
             hideEditNoteView()
+            edittext_note.text.clear()
         }
     }
 
@@ -132,23 +136,19 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
                 val deletedNoteIndex = viewHolder!!.adapterPosition
                 val note: Note = adapter.getNote(deletedNoteIndex)
                 val color: Int = adapter.getColor(deletedNoteIndex)
-                adapter.removeAt(deletedNoteIndex)
                 val noteDeleted = resources.getString(R.string.snackbar_note_deleted)
+
+                adapter.removeAt(deletedNoteIndex)
+                if (adapter.itemCount == 0) {
+                    textview_zeronotes.visibility = View.VISIBLE
+                }
+                presenter.deleteNote(note.id)
+
                 Snackbar.make(constraintlayout_weekday, noteDeleted, Snackbar.LENGTH_LONG)
                         .setAction(resources.getString(R.string.snackbar_action_undo)) {
-                            adapter.restoreItem(deletedNoteIndex, note, color)
+                            presenter.restoreNote(note.text, deletedNoteIndex, color, weekdayId)
                             textview_zeronotes.visibility = View.GONE
                         }
-                        .addCallback(object : Snackbar.Callback() {
-                            override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
-                                if (event != DISMISS_EVENT_ACTION && !isChangingConfigurations) {
-                                    if (adapter.itemCount == 0) {
-                                        textview_zeronotes.visibility = View.VISIBLE
-                                    }
-                                    presenter.deleteNote(note.id)
-                                }
-                            }
-                        })
                         .show()
             }
         }
@@ -186,7 +186,6 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(edittext_note.windowToken, 0)
 
-        edittext_note.text.clear()
         edittext_note.visibility = View.INVISIBLE
         button_save_note.visibility = View.INVISIBLE
         edittext_note_shadow?.visibility = View.GONE
@@ -251,11 +250,16 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
         adapter.addNote(note, resources)
     }
 
+    override fun restoreNote(note: Note, position: Int, color: Int) {
+        val adapter = recyclerView.adapter as NoteRecyclerViewAdapter
+        adapter.restoreItem(position, note, color)
+    }
+
     companion object {
         private const val ARG_WEEKDAY_ID = "weekdayId"
 
         fun startActivity(context: Context, weekdayId: Int) {
-            val intent = Intent(context.applicationContext, WeekdayActivity::class.java).apply {
+            val intent = Intent(context, WeekdayActivity::class.java).apply {
                 putExtra(ARG_WEEKDAY_ID, weekdayId)
             }
             context.startActivity(intent)

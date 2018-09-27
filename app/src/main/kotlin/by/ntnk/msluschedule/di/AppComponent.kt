@@ -12,7 +12,6 @@ import dagger.android.support.AndroidSupportInjectionModule
     BuildersModule::class,
     DatabaseModule::class,
     NetworkModule::class,
-    PresenterManagerModule::class,
     UtilsModule::class
 ])
 interface AppComponent : AndroidInjector<MsluScheduleApp> {

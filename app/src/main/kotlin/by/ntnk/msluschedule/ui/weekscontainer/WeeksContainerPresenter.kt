@@ -15,9 +15,6 @@ class WeeksContainerPresenter @Inject constructor(
         private val currentDate: CurrentDate,
         private val schedulerProvider: SchedulerProvider
 ) : Presenter<WeeksContainerView>() {
-    private var savedWeekItemIndex: Int = 0
-    private val academicWeek: Int = currentDate.academicWeek
-
     fun initWeeksAdapter() {
         val info = sharedPreferencesRepository.getSelectedScheduleContainerInfo()
         databaseRepository.getWeeksForContainer(info.id)
@@ -39,15 +36,10 @@ class WeeksContainerPresenter @Inject constructor(
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
                 .subscribeBy(
-                        onSuccess = {
-                            savedWeekItemIndex = it.second
-                            view?.initWeeksAdapter(it.first, it.second)
-                        },
+                        onSuccess = { view?.initWeeksAdapter(it.first, it.second) },
                         onError = { it.printStackTrace() }
                 )
     }
-
-    fun getCurrentWeekIndex(): Int = savedWeekItemIndex + (currentDate.academicWeek - academicWeek)
 
     fun deleteSelectedScheduleContainer() {
         val info = sharedPreferencesRepository.getSelectedScheduleContainerInfo()
