@@ -4,11 +4,13 @@ import android.animation.Animator
 import android.content.Context
 import android.os.Bundle
 import android.support.design.widget.Snackbar
+import android.support.v4.view.ViewPager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.LinearSmoothScroller
 import android.support.v7.widget.RecyclerView
 import android.view.*
 import android.view.animation.AnimationUtils
+import android.widget.ProgressBar
 import android.widget.Toast
 import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.data.Lesson
@@ -125,6 +127,11 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         if (isRecentlyCreated && isCurrentWeek) {
             val index = adapter.getWeekDayViewIndex(presenter.getCurrentDayOfWeek())
             recyclerView.layoutManager?.scrollToPosition(index)
+        }
+
+        if (isCurrentWeek) {
+            activity?.findViewById<ProgressBar>(R.id.progressbar_main)?.visibility = View.GONE
+            parentFragment?.view?.findViewById<ViewPager>(R.id.viewpager_weekscontainer)?.visibility = View.VISIBLE
         }
     }
 

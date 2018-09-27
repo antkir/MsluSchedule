@@ -142,6 +142,7 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
                 viewPagerWeeksContainer = weeksContainerFragment.view?.findViewById(R.id.viewpager_weekscontainer)
             }
             viewPagerWeeksContainer?.alpha = slideOffset
+            progressbar_main.visibility = View.VISIBLE
             if (slideOffset < 0.03) {
                 isUpdatingWeeksContainer = false
                 viewPagerWeeksContainer?.visibility = View.INVISIBLE
@@ -162,7 +163,6 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
             weeksContainerFragment.swapTabs()
         }
 
-        progressbar_main.visibility = View.GONE
         image_main_smileyface.visibility = View.GONE
         text_main_advice.visibility = View.GONE
     }
@@ -251,7 +251,6 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
                     .commit()
         }
 
-        progressbar_main.visibility = View.GONE
         image_main_smileyface.visibility = View.GONE
         text_main_advice.visibility = View.GONE
     }

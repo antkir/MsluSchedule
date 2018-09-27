@@ -15,7 +15,6 @@ import by.ntnk.msluschedule.utils.INVALID_VALUE
 import by.ntnk.msluschedule.utils.ImmutableEntry
 import dagger.Lazy
 import dagger.android.support.AndroidSupportInjection
-import kotlinx.android.synthetic.main.fragment_weekscontainer.*
 import javax.inject.Inject
 
 private const val SELECTED_TAB_POSITION = "tab_position"
@@ -77,7 +76,6 @@ class WeeksContainerFragment :
     }
 
     override fun initWeeksAdapter(weekIds: List<ImmutableEntry>, currentWeekItemIndex: Int) {
-        viewpager_weekscontainer.visibility = View.VISIBLE
         this.currentWeekItemIndex = currentWeekItemIndex
 
         with(viewPager) {
