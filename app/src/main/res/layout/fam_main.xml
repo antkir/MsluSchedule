@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:layout_gravity="bottom|end"
     android:orientation="vertical"
-    app:layout_behavior=".ui.customviews.FABLayoutBehavior">
+    app:layout_behavior="by.ntnk.msluschedule.ui.customviews.FABLayoutBehavior">
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/groupfab_main"

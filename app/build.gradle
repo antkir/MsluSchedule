@@ -12,6 +12,8 @@ android {
     }
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
+        debug.java.srcDirs += 'src/debug/kotlin'
+        release.java.srcDirs += 'src/release/kotlin'
         test.java.srcDirs += 'src/test/kotlin'
         androidTest.java.srcDirs += 'src/androidTest/kotlin'
     }
@@ -32,7 +34,7 @@ android {
     buildTypes {
         debug {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            applicationIdSuffix ".debug"
         }
         release {
             minifyEnabled false
@@ -100,9 +102,10 @@ dependencies {
     implementation "com.jakewharton.timber:timber:$timberVersion"
     // Time
     implementation "org.threeten:threetenbp:$threetenbpVersion:no-tzdb"
-    // Debug
+    // LeakCanary
     debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakcanaryVersion"
     debugImplementation "com.squareup.leakcanary:leakcanary-support-fragment:$leakcanaryVersion"
+    releaseImplementation "com.squareup.leakcanary:leakcanary-android-no-op:$leakcanaryVersion"
     // Testing
     testImplementation "org.mockito:mockito-core:$mockitoVersion"
     testImplementation "junit:junit:$junitVersion"

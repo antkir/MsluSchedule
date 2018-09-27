@@ -17,14 +17,14 @@ class MsluScheduleApp : MultiDexApplication(), HasActivityInjector {
 
     override fun onCreate() {
         super.onCreate()
-        if (BuildConfig.DEBUG) {
-            if (LeakCanary.isInAnalyzerProcess(this)) {
-                return
-            }
-            LeakCanary.install(this)
+        if (LeakCanary.isInAnalyzerProcess(this)) {
+            return
         }
+        LeakCanary.install(this)
+
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-        Timber.plant(Timber.DebugTree())
+        Timber.plant(AppTimberTree())
+
         buildAppComponent().inject(this)
     }
 

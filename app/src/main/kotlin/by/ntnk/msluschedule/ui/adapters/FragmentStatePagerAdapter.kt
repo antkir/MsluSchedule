@@ -24,7 +24,6 @@ import android.support.v4.app.FragmentStatePagerAdapter
 import android.support.v4.view.PagerAdapter
 import android.view.View
 import android.view.ViewGroup
-import by.ntnk.msluschedule.BuildConfig
 import timber.log.Timber
 import java.util.ArrayList
 
@@ -96,9 +95,7 @@ abstract class FragmentStatePagerAdapter(private val mFragmentManager: FragmentM
         }
 
         val fragment = getItem(position)
-        if (BuildConfig.DEBUG) {
-            Timber.v("Adding item #$position: fragment=$fragment")
-        }
+        Timber.v("Adding item #$position: fragment=$fragment")
         while (mFragments.size <= position) {
             mFragments.add(null)
         }
@@ -117,9 +114,7 @@ abstract class FragmentStatePagerAdapter(private val mFragmentManager: FragmentM
         if (mCurTransaction == null) {
             mCurTransaction = mFragmentManager.beginTransaction()
         }
-        if (BuildConfig.DEBUG) {
-            Timber.v("Removing item #$position: fragment=$fragment, view=${fragment.view}")
-        }
+        Timber.v("Removing item #$position: fragment=$fragment, view=${fragment.view}")
         mFragments[position] = null
         mCurTransaction!!.remove(fragment)
     }

@@ -1,5 +1,6 @@
 package by.ntnk.msluschedule.di.modules
 
+import by.ntnk.msluschedule.BuildConfig
 import by.ntnk.msluschedule.di.PerApp
 import by.ntnk.msluschedule.network.LocalCookieJar
 import by.ntnk.msluschedule.network.ScheduleApi
@@ -10,6 +11,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
+import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 @Module
@@ -17,7 +19,15 @@ class NetworkModule {
     @Provides
     @PerApp
     fun provideHttpLoggingInterceptor(): HttpLoggingInterceptor {
-        return HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
+        val logger: (message: String) -> Unit = {
+            Timber.tag("OkHttp").d(it)
+        }
+        val loggerLevel = if (BuildConfig.DEBUG) {
+            HttpLoggingInterceptor.Level.BODY
+        } else {
+            HttpLoggingInterceptor.Level.NONE
+        }
+        return HttpLoggingInterceptor(logger).setLevel(loggerLevel)
     }
 
     @Provides
