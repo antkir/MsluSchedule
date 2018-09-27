@@ -91,12 +91,13 @@ class WeekPresenter @Inject constructor(
                 .observeOn(schedulerProvider.ui())
                 .doOnComplete { view?.showInitProgressBar() }
                 .observeOn(scheduler)
-                .andThen(downloadSchedule(container, weekId))
+                .andThen(downloadSchedule(isUpdate = false, container = container, weekId = weekId))
                 .observeOn(schedulerProvider.ui())
                 .doOnEvent { _, _ -> view?.hideInitProgressBar() }
     }
 
-    private fun downloadSchedule(container: ScheduleContainer, weekId: Int): Single<List<WeekdayWithLessons<Lesson>>> {
+    private fun downloadSchedule(isUpdate: Boolean, container: ScheduleContainer,
+                                 weekId: Int): Single<List<WeekdayWithLessons<Lesson>>> {
         return when (container.type) {
             ScheduleType.STUDYGROUP -> {
                 databaseRepository.getWeekKey(weekId)
@@ -105,6 +106,14 @@ class WeekPresenter @Inject constructor(
                             return@flatMapObservable networkRepository.getSchedule(studyGroup, it)
                         }
                         .toList()
+                        .flatMap { weekdaysWithLessons ->
+                            return@flatMap if (isUpdate) {
+                                databaseRepository.deleteLessonsForWeek(weekId, container.type)
+                                        .andThen(Single.just(weekdaysWithLessons))
+                            } else {
+                                Single.just(weekdaysWithLessons)
+                            }
+                        }
                         .flatMap { weekdaysWithLessons ->
                             databaseRepository.insertStudyGroupSchedule(weekdaysWithLessons, weekId)
                         }
@@ -117,6 +126,14 @@ class WeekPresenter @Inject constructor(
                         }
                         .toList()
                         .flatMap { weekdaysWithLessons ->
+                            return@flatMap if (isUpdate) {
+                                databaseRepository.deleteLessonsForWeek(weekId, container.type)
+                                        .andThen(Single.just(weekdaysWithLessons))
+                            } else {
+                                Single.just(weekdaysWithLessons)
+                            }
+                        }
+                        .flatMap { weekdaysWithLessons ->
                             databaseRepository.insertTeacherSchedule(weekdaysWithLessons, weekId)
                         }
             }
@@ -127,12 +144,8 @@ class WeekPresenter @Inject constructor(
         val containerInfo = sharedPreferencesRepository.getSelectedScheduleContainerInfo()
         databaseRepository.getScheduleContainer(containerInfo.id)
                 .flatMap { scheduleContainer ->
-                    databaseRepository.deleteLessonsForWeek(weekId, containerInfo.type!!)
-                            .andThen(downloadSchedule(scheduleContainer, weekId))
-                            .flatMap {
-                                getWeekdaysWithLessonsForWeek(containerInfo.type, weekId)
-                                        .toList()
-                            }
+                    downloadSchedule(isUpdate = true, container = scheduleContainer, weekId = weekId)
+                            .flatMap { getWeekdaysWithLessonsForWeek(containerInfo.type!!, weekId).toList() }
                 }
                 .subscribeOn(schedulerProvider.cachedThreadPool())
                 .observeOn(schedulerProvider.ui())
