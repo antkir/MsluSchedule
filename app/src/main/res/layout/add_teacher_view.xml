@@ -1,43 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="@dimen/dialog_margin"
     android:theme="@style/MsluTheme.Dialog.Alert">
 
-    <android.support.constraint.ConstraintLayout
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/textinputlayout_teacher"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/dialog_margin"
-        android:orientation="vertical">
+        android:layout_height="wrap_content">
 
-        <android.support.design.widget.TextInputLayout
-            android:id="@+id/textinputlayout_teacher"
+        <by.ntnk.msluschedule.ui.customviews.LoadingAutoCompleteTextView
+            android:id="@+id/actv_dialog_teacher"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:completionThreshold="3"
+            android:hint="@string/teacher"
+            android:imeOptions="actionDone|flagNoExtractUi"
+            android:inputType="textAutoComplete" />
 
-            <by.ntnk.msluschedule.ui.customviews.LoadingAutoCompleteTextView
-                android:id="@+id/actv_dialog_teacher"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:completionThreshold="3"
-                android:hint="@string/teacher"
-                android:imeOptions="actionDone|flagNoExtractUi"
-                android:inputType="textAutoComplete" />
+    </android.support.design.widget.TextInputLayout>
 
-        </android.support.design.widget.TextInputLayout>
+    <ProgressBar
+        android:id="@+id/progressbar_dialog_teacher"
+        android:layout_width="@dimen/actv_progressbar_size"
+        android:layout_height="@dimen/actv_progressbar_size"
+        android:layout_marginBottom="@dimen/actv_progressbar_margin"
+        android:layout_marginEnd="@dimen/actv_progressbar_margin"
+        android:layout_marginRight="@dimen/actv_progressbar_margin"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/textinputlayout_teacher"
+        app:layout_constraintEnd_toEndOf="@id/textinputlayout_teacher" />
 
-        <ProgressBar
-            android:id="@+id/progressbar_dialog_teacher"
-            android:layout_width="@dimen/actv_progressbar_size"
-            android:layout_height="@dimen/actv_progressbar_size"
-            android:layout_marginBottom="@dimen/actv_progressbar_margin"
-            android:layout_marginEnd="@dimen/actv_progressbar_margin"
-            android:layout_marginRight="@dimen/actv_progressbar_margin"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@id/textinputlayout_teacher"
-            app:layout_constraintEnd_toEndOf="@id/textinputlayout_teacher" />
-
-    </android.support.constraint.ConstraintLayout>
-
-</ScrollView>
+</android.support.constraint.ConstraintLayout>
