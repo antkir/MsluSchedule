@@ -82,49 +82,62 @@ class DatabaseRepository @Inject constructor(
                 .map { databaseDataMapper.map(it) }
     }
 
-    fun insertStudyGroupSchedule(
-            weekdays: List<WeekdayWithStudyGroupLessons>, weekId: Int
-    ): Single<List<WeekdayWithStudyGroupLessons>> {
+    fun insertStudyGroupSchedule(weekdays: List<WeekdayWithStudyGroupLessons>,
+                                 weekId: Int): Single<List<WeekdayWithStudyGroupLessons>> {
         return getWeekdaysForWeek(weekId)
                 .flatMapObservable { Observable.fromIterable(it) }
-                .flatMapCompletable { weekday ->
-                    Observable.fromIterable(weekdays)
-                            .filter { it.weekday == weekday.value }
-                            .firstElement()
-                            .flatMapCompletable { insertStudyGroupLessons(it.lessons, weekday.id) }
+                .flatMapSingle { weekday ->
+                    val weekdayWithLessons = weekdays.firstOrNull { it.weekday == weekday.value }
+                    val lessons = weekdayWithLessons?.lessons ?: ArrayList()
+                    return@flatMapSingle insertStudyGroupLessons(lessons, weekday.id)
+                            .flatMap { Single.just(WeekdayWithStudyGroupLessons(weekday.id, weekday.value, it)) }
                 }
-                .andThen(Single.just(weekdays))
+                .toList()
     }
 
-    private fun insertStudyGroupLessons(lessons: List<StudyGroupLesson>, weekdayId: Int): Completable {
+    private fun insertStudyGroupLessons(lessons: List<StudyGroupLesson>,
+                                        weekdayId: Int): Single<List<StudyGroupLesson>> {
         return Observable.fromIterable(lessons)
                 .map { lesson -> DbStudyGroupLesson(lesson, weekdayId) }
                 .toList()
-                .flatMapCompletable {
-                    Completable.fromCallable { appDatabase.studyGroupLessonDao.insert(it) }
+                .flatMap { dbLessons ->
+                    Single.fromCallable { appDatabase.studyGroupLessonDao.insert(dbLessons) }
+                            .flatMapObservable { ids ->
+                                for (i in 0 until ids.size) {
+                                    lessons[i].id = ids[i].toInt()
+                                }
+                                return@flatMapObservable Observable.fromIterable(lessons)
+                            }
+                            .toList()
                 }
     }
 
-    fun insertTeacherSchedule(
-            weekdays: List<WeekdayWithTeacherLessons>, weekId: Int
-    ): Single<List<WeekdayWithTeacherLessons>> {
+    fun insertTeacherSchedule(weekdays: List<WeekdayWithTeacherLessons>,
+                              weekId: Int): Single<List<WeekdayWithTeacherLessons>> {
         return getWeekdaysForWeek(weekId)
                 .flatMapObservable { Observable.fromIterable(it) }
-                .flatMapCompletable { weekday ->
-                    Observable.fromIterable(weekdays)
-                            .filter { it.weekday == weekday.value }
-                            .firstElement()
-                            .flatMapCompletable { insertTeacherLessons(it.lessons, weekday.id) }
+                .flatMapSingle { weekday ->
+                    val weekdayWithLessons = weekdays.firstOrNull { it.weekday == weekday.value }
+                    val lessons = weekdayWithLessons?.lessons ?: ArrayList()
+                    return@flatMapSingle insertTeacherLessons(lessons, weekday.id)
+                            .flatMap { Single.just(WeekdayWithTeacherLessons(weekday.id, weekday.value, it)) }
                 }
-                .andThen(Single.just(weekdays))
+                .toList()
     }
 
-    private fun insertTeacherLessons(lessons: List<TeacherLesson>, weekdayId: Int): Completable {
+    private fun insertTeacherLessons(lessons: List<TeacherLesson>, weekdayId: Int): Single<List<TeacherLesson>> {
         return Observable.fromIterable(lessons)
                 .map { lesson -> DbTeacherLesson(lesson, weekdayId) }
                 .toList()
-                .flatMapCompletable {
-                    Completable.fromCallable { appDatabase.teacherLessonDao.insert(it) }
+                .flatMap { dbLessons ->
+                    Single.fromCallable { appDatabase.teacherLessonDao.insert(dbLessons) }
+                            .flatMapObservable { ids ->
+                                for (i in 0 until ids.size) {
+                                    lessons[i].id = ids[i].toInt()
+                                }
+                                return@flatMapObservable Observable.fromIterable(lessons)
+                            }
+                            .toList()
                 }
     }
 

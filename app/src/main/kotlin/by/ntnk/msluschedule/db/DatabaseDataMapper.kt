@@ -43,7 +43,8 @@ class DatabaseDataMapper @Inject constructor() {
                             lesson.type,
                             lesson.classroom,
                             lesson.startTime,
-                            lesson.endTime
+                            lesson.endTime,
+                            lesson.id
                     )
             )
         }
@@ -59,7 +60,8 @@ class DatabaseDataMapper @Inject constructor() {
                             lesson.teacher,
                             lesson.classroom,
                             lesson.startTime,
-                            lesson.endTime
+                            lesson.endTime,
+                            lesson.id
                     )
             )
         }
