@@ -3,6 +3,7 @@ package by.ntnk.msluschedule.di.modules
 import android.annotation.SuppressLint
 import by.ntnk.msluschedule.ui.addgroup.AddGroupFragment
 import by.ntnk.msluschedule.ui.addteacher.AddTeacherFragment
+import by.ntnk.msluschedule.ui.lessoninfo.LessonInfoActivity
 import by.ntnk.msluschedule.ui.main.MainActivity
 import by.ntnk.msluschedule.ui.week.WeekFragment
 import by.ntnk.msluschedule.ui.weekday.WeekdayActivity
@@ -31,4 +32,7 @@ abstract class BuildersModule {
 
     @ContributesAndroidInjector
     abstract fun bindWeekdayActivity(): WeekdayActivity
+
+    @ContributesAndroidInjector
+    abstract fun bindLessonInfoActivity(): LessonInfoActivity
 }

@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/MsluTheme.AppBarOverlay"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar_lessoninfo_teacher"
+            android:layout_width="match_parent"
+            android:layout_height="?android:attr/actionBarSize"
+            android:background="@color/colorPrimary"
+            app:navigationIcon="@drawable/ic_arrow_back" />
+
+    </android.support.design.widget.AppBarLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/surface">
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/textview_subject_lessoninfo_teacher"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/textview_lessoninfo_margin"
+                android:layout_marginEnd="@dimen/textview_lessoninfo_margin"
+                android:layout_marginLeft="@dimen/textview_lessoninfo_margin_start"
+                android:layout_marginRight="@dimen/textview_lessoninfo_margin"
+                android:layout_marginStart="@dimen/textview_lessoninfo_margin_start"
+                android:layout_marginTop="@dimen/textview_lessoninfo_margin"
+                android:gravity="center_vertical"
+                android:lineSpacingMultiplier="@dimen/textview_lessoninfo_line_space_multiplier"
+                android:minHeight="@dimen/item_lessoninfo_minheight"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="@color/primary_text"
+                android:textIsSelectable="true"
+                app:layout_constraintBottom_toTopOf="@id/textview_time_lessoninfo_teacher"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/imageview_subject_lessoninfo_teacher"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Осн. метод. науч. иссл-я" />
+
+            <TextView
+                android:id="@+id/textview_time_lessoninfo_teacher"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/item_lessoninfo_minheight"
+                android:layout_marginBottom="@dimen/textview_lessoninfo_margin"
+                android:layout_marginEnd="@dimen/textview_lessoninfo_margin"
+                android:layout_marginLeft="@dimen/textview_lessoninfo_margin_start"
+                android:layout_marginRight="@dimen/textview_lessoninfo_margin"
+                android:layout_marginStart="@dimen/textview_lessoninfo_margin_start"
+                android:layout_marginTop="@dimen/textview_lessoninfo_margin"
+                android:gravity="center_vertical"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="@color/primary_text"
+                android:textIsSelectable="true"
+                app:layout_constraintBottom_toTopOf="@id/textview_faculties_lessoninfo_teacher"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/imageview_time_lessoninfo_teacher"
+                app:layout_constraintTop_toBottomOf="@id/textview_subject_lessoninfo_teacher"
+                tools:text="11:15 - 12:35" />
+
+            <TextView
+                android:id="@+id/textview_faculties_lessoninfo_teacher"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:layout_marginEnd="@dimen/textview_lessoninfo_margin"
+                android:layout_marginLeft="@dimen/textview_lessoninfo_margin_start"
+                android:layout_marginRight="@dimen/textview_lessoninfo_margin"
+                android:layout_marginStart="@dimen/textview_lessoninfo_margin_start"
+                android:layout_marginTop="@dimen/textview_lessoninfo_margin"
+                android:gravity="center_vertical"
+                android:lineSpacingMultiplier="@dimen/textview_lessoninfo_line_space_multiplier"
+                android:minHeight="26dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="@color/primary_text"
+                android:textIsSelectable="true"
+                app:layout_constraintBottom_toTopOf="@id/textview_groups_lessoninfo_teacher"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/imageview_groups_lessoninfo_teacher"
+                app:layout_constraintTop_toBottomOf="@id/textview_time_lessoninfo_teacher"
+                tools:text="Англ.яз., Кит.яз., Нем.яз." />
+
+            <ImageView
+                android:id="@+id/imageview_subject_lessoninfo_teacher"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/imageview_lessoninfo_margin_start"
+                android:layout_marginStart="@dimen/imageview_lessoninfo_margin_start"
+                android:contentDescription="@string/imageview_subject_description"
+                android:src="@drawable/ic_subject_info"
+                android:tint="@color/icon_tint"
+                app:layout_constraintBottom_toBottomOf="@id/textview_subject_lessoninfo_teacher"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/textview_subject_lessoninfo_teacher" />
+
+            <ImageView
+                android:id="@+id/imageview_time_lessoninfo_teacher"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/imageview_lessoninfo_margin_start"
+                android:layout_marginStart="@dimen/imageview_lessoninfo_margin_start"
+                android:contentDescription="@string/imageview_time_description"
+                android:src="@drawable/ic_time_info"
+                android:tint="@color/icon_tint"
+                app:layout_constraintBottom_toBottomOf="@id/textview_time_lessoninfo_teacher"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/textview_time_lessoninfo_teacher" />
+
+            <ImageView
+                android:id="@+id/imageview_groups_lessoninfo_teacher"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/imageview_lessoninfo_margin_start"
+                android:layout_marginStart="@dimen/imageview_lessoninfo_margin_start"
+                android:contentDescription="@string/imageview_groups_description"
+                android:src="@drawable/ic_studygroup"
+                android:tint="@color/icon_tint"
+                app:layout_constraintBottom_toBottomOf="@id/textview_groups_lessoninfo_teacher"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/textview_faculties_lessoninfo_teacher" />
+
+            <TextView
+                android:id="@+id/textview_groups_lessoninfo_teacher"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/textview_lessoninfo_margin"
+                android:layout_marginEnd="@dimen/textview_lessoninfo_margin"
+                android:layout_marginLeft="@dimen/textview_lessoninfo_margin_start"
+                android:layout_marginRight="@dimen/textview_lessoninfo_margin"
+                android:layout_marginStart="@dimen/textview_lessoninfo_margin_start"
+                android:layout_marginTop="4dp"
+                android:gravity="center_vertical"
+                android:lineSpacingMultiplier="@dimen/textview_lessoninfo_line_space_multiplier"
+                android:minHeight="26dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="@color/primary_text"
+                android:textIsSelectable="true"
+                app:layout_constraintBottom_toTopOf="@id/textview_classroom_lessoninfo_teacher"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/imageview_groups_lessoninfo_teacher"
+                app:layout_constraintTop_toBottomOf="@id/textview_faculties_lessoninfo_teacher"
+                tools:text="424 а.нем, 425 а.фр_кл, 426 а.исп, 403 к.а./ 1 КЛ, 402 н." />
+
+            <ImageView
+                android:id="@+id/imageview_classroom_lessoninfo_teacher"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/imageview_lessoninfo_margin_start"
+                android:layout_marginStart="@dimen/imageview_lessoninfo_margin_start"
+                android:contentDescription="@string/imageview_classroom_description"
+                android:src="@drawable/ic_place_info"
+                android:tint="@color/icon_tint"
+                app:layout_constraintBottom_toBottomOf="@id/textview_classroom_lessoninfo_teacher"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/textview_classroom_lessoninfo_teacher" />
+
+            <TextView
+                android:id="@+id/textview_classroom_lessoninfo_teacher"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/item_lessoninfo_minheight"
+                android:layout_marginBottom="@dimen/textview_lessoninfo_margin"
+                android:layout_marginEnd="@dimen/textview_lessoninfo_margin"
+                android:layout_marginLeft="@dimen/textview_lessoninfo_margin_start"
+                android:layout_marginRight="@dimen/textview_lessoninfo_margin"
+                android:layout_marginStart="@dimen/textview_lessoninfo_margin_start"
+                android:layout_marginTop="@dimen/textview_lessoninfo_margin"
+                android:gravity="center_vertical"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="@color/primary_text"
+                android:textIsSelectable="true"
+                app:layout_constraintBottom_toTopOf="@id/textview_weekdays_lessoninfo_teacher"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/imageview_classroom_lessoninfo_teacher"
+                app:layout_constraintTop_toBottomOf="@id/textview_groups_lessoninfo_teacher"
+                tools:text="Д409" />
+
+            <ImageView
+                android:id="@+id/imageview_weekdays_lessoninfo_teacher"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/imageview_lessoninfo_margin_start"
+                android:layout_marginStart="@dimen/imageview_lessoninfo_margin_start"
+                android:contentDescription="@string/imageview_weekdays_description"
+                android:src="@drawable/ic_today"
+                android:tint="@color/icon_tint"
+                app:layout_constraintBottom_toBottomOf="@id/textview_weekdays_lessoninfo_teacher"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/textview_weekdays_lessoninfo_teacher" />
+
+            <TextView
+                android:id="@+id/textview_weekdays_lessoninfo_teacher"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/textview_lessoninfo_margin"
+                android:layout_marginLeft="@dimen/textview_lessoninfo_margin_start"
+                android:layout_marginRight="@dimen/textview_lessoninfo_margin"
+                android:layout_marginStart="@dimen/textview_lessoninfo_margin_start"
+                android:layout_marginTop="@dimen/textview_lessoninfo_margin"
+                android:gravity="center_vertical"
+                android:lineSpacingMultiplier="@dimen/textview_lessoninfo_line_space_multiplier"
+                android:minHeight="@dimen/item_lessoninfo_minheight"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="@color/primary_text"
+                android:textIsSelectable="true"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/imageview_weekdays_lessoninfo_teacher"
+                app:layout_constraintTop_toBottomOf="@id/textview_classroom_lessoninfo_teacher"
+                tools:text="Monday, Friday, Saturday" />
+
+        </android.support.constraint.ConstraintLayout>
+
+    </ScrollView>
+
+</LinearLayout>

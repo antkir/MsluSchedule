@@ -65,4 +65,9 @@
     <string name="snackbar_action_undo">Undo</string>
 
     <string name="imageview_dayitem_description">Notes</string>
+    <string name="imageview_subject_description">Subject</string>
+    <string name="imageview_time_description">Time</string>
+    <string name="imageview_groups_description">Group</string>
+    <string name="imageview_classroom_description">Classroom</string>
+    <string name="imageview_weekdays_description">Weekdays</string>
 </resources>

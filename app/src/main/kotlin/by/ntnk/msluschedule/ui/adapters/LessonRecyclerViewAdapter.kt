@@ -14,17 +14,18 @@ import by.ntnk.msluschedule.data.Lesson
 import by.ntnk.msluschedule.data.StudyGroupLesson
 import by.ntnk.msluschedule.data.TeacherLesson
 import by.ntnk.msluschedule.data.WeekdayWithLessons
+import by.ntnk.msluschedule.utils.EMPTY_STRING
 import by.ntnk.msluschedule.utils.WEEKDAYS_NUMBER
 import by.ntnk.msluschedule.utils.getWeekdayFromTag
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import java.util.ArrayList
 
-private const val VIEWTYPE_BLANK = R.layout.item_blanklesson
-private const val VIEWTYPE_STUDYGROUP = R.layout.item_studygrouplesson
-private const val VIEWTYPE_TEACHER = R.layout.item_teacherlesson
-private const val VIEWTYPE_DAYEND = R.layout.item_dayend
+const val VIEWTYPE_STUDYGROUP = R.layout.item_studygrouplesson
+const val VIEWTYPE_TEACHER = R.layout.item_teacherlesson
 const val VIEWTYPE_WEEKDAY = R.layout.item_day
+private const val VIEWTYPE_BLANK = R.layout.item_blanklesson
+private const val VIEWTYPE_DAYEND = R.layout.item_dayend
 
 class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val data = ArrayList<LessonView>()
@@ -102,15 +103,29 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
         return when (viewType) {
             VIEWTYPE_STUDYGROUP -> {
                 val view = inflater.inflate(R.layout.item_studygrouplesson, parent, false)
-                StudyGroupLessonViewHolder(view)
+                StudyGroupLessonViewHolder(view).apply {
+                    itemView.setOnClickListener { _ ->
+                        if ((data[adapterPosition] as StudyGroupLessonView).lesson.subject != EMPTY_STRING) {
+                            onClickSubject.onNext(data[adapterPosition])
+                        }
+                    }
+                }
             }
             VIEWTYPE_TEACHER -> {
                 val view = inflater.inflate(R.layout.item_teacherlesson, parent, false)
-                TeacherLessonViewHolder(view)
+                TeacherLessonViewHolder(view).apply {
+                    itemView.setOnClickListener { _ ->
+                        if ((data[adapterPosition] as TeacherLessonView).lesson.subject != EMPTY_STRING) {
+                            onClickSubject.onNext(data[adapterPosition])
+                        }
+                    }
+                }
             }
             VIEWTYPE_WEEKDAY -> {
                 val view = inflater.inflate(R.layout.item_day, parent, false)
-                DayViewHolder(view)
+                DayViewHolder(view).apply {
+                    itemView.setOnClickListener { _ -> onClickSubject.onNext(data[adapterPosition]) }
+                }
             }
             VIEWTYPE_DAYEND -> {
                 val view = inflater.inflate(R.layout.item_dayend, parent, false)
@@ -165,7 +180,7 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
         }
     }
 
-    private class StudyGroupLessonView(private val lesson: StudyGroupLesson) : LessonView {
+    class StudyGroupLessonView(val lesson: StudyGroupLesson) : LessonView {
         override val viewType: Int = VIEWTYPE_STUDYGROUP
 
         override fun bindViewHolder(viewHolder: RecyclerView.ViewHolder) {
@@ -179,7 +194,7 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
         }
     }
 
-    private class TeacherLessonView(private val lesson: TeacherLesson) : LessonView {
+    class TeacherLessonView(val lesson: TeacherLesson) : LessonView {
         override val viewType: Int = VIEWTYPE_TEACHER
 
         override fun bindViewHolder(viewHolder: RecyclerView.ViewHolder) {
@@ -227,7 +242,7 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
     private class DayViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val weekDay: TextView = view.findViewById(R.id.text_day)
         val notesIcon: ImageView = view.findViewById(R.id.imageview_notes_day)
-        val notesIconDrawable: Drawable? = ContextCompat.getDrawable(view.context, R.drawable.ic_day_note)
+        val notesIconDrawable: Drawable? = ContextCompat.getDrawable(view.context, R.drawable.ic_note_day)
         val accentColor = ContextCompat.getColor(view.context, R.color.colorAccent)
     }
 

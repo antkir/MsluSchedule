@@ -17,7 +17,10 @@ import by.ntnk.msluschedule.data.Lesson
 import by.ntnk.msluschedule.data.WeekdayWithLessons
 import by.ntnk.msluschedule.mvp.views.MvpFragment
 import by.ntnk.msluschedule.ui.adapters.LessonRecyclerViewAdapter
+import by.ntnk.msluschedule.ui.adapters.VIEWTYPE_STUDYGROUP
+import by.ntnk.msluschedule.ui.adapters.VIEWTYPE_TEACHER
 import by.ntnk.msluschedule.ui.adapters.VIEWTYPE_WEEKDAY
+import by.ntnk.msluschedule.ui.lessoninfo.LessonInfoActivity
 import by.ntnk.msluschedule.ui.weekday.WeekdayActivity
 import by.ntnk.msluschedule.utils.*
 import dagger.Lazy
@@ -65,21 +68,35 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
             layoutManager = LinearLayoutManager(activity)
             setHasFixedSize(true)
             adapter = LessonRecyclerViewAdapter()
-            (adapter as LessonRecyclerViewAdapter).onClickObservable
-                    .subscribeBy(
-                            onNext = {
-                                if (it.viewType == VIEWTYPE_WEEKDAY) {
-                                    val weekdayId = (it as LessonRecyclerViewAdapter.DayView).weekdayId
-                                    WeekdayActivity.startActivity(context, weekdayId)
-                                }
-                            }
-                    )
+            initAdapterOnClickListener()
         }
         smoothScroller = object : LinearSmoothScroller(context!!) {
             override fun getVerticalSnapPreference(): Int {
                 return LinearSmoothScroller.SNAP_TO_START
             }
         }
+    }
+
+    private fun initAdapterOnClickListener() {
+        val adapter = recyclerView.adapter as LessonRecyclerViewAdapter
+        adapter.onClickObservable.subscribeBy(
+                onNext = {
+                    when (it.viewType) {
+                        VIEWTYPE_WEEKDAY -> {
+                            val weekdayId = (it as LessonRecyclerViewAdapter.DayView).weekdayId
+                            WeekdayActivity.startActivity(context!!, weekdayId)
+                        }
+                        VIEWTYPE_STUDYGROUP -> {
+                            val lessonId = (it as LessonRecyclerViewAdapter.StudyGroupLessonView).lesson.id
+                            LessonInfoActivity.startActivity(context!!, lessonId, ScheduleType.STUDYGROUP, weekId)
+                        }
+                        VIEWTYPE_TEACHER -> {
+                            val lessonId = (it as LessonRecyclerViewAdapter.TeacherLessonView).lesson.id
+                            LessonInfoActivity.startActivity(context!!, lessonId, ScheduleType.TEACHER, weekId)
+                        }
+                    }
+                }
+        )
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

@@ -141,6 +141,43 @@ class DatabaseRepository @Inject constructor(
                 }
     }
 
+    fun getStudyGroupLesson(id: Int): Single<StudyGroupLesson> {
+        return appDatabase.studyGroupLessonDao.getLesson(id)
+                .map { StudyGroupLesson(it.subject, it.teacher, it.classroom, it.startTime, it.endTime, it.id) }
+    }
+
+    fun getTeacherLesson(id: Int): Single<TeacherLesson> {
+        return appDatabase.teacherLessonDao.getLesson(id)
+                .map {
+                    TeacherLesson(it.subject, it.faculty, it.groups, it.type,
+                                  it.classroom, it.startTime, it.endTime, it.id)
+                }
+    }
+
+    fun getWeekdaysWithStudyGroupLesson(subject: String, weekId: Int): Single<List<String>> {
+        return appDatabase.weekdayDao.getWeekdaysForWeek(weekId)
+                .flatMapObservable { Observable.fromIterable(it) }
+                .flatMapMaybe { weekday ->
+                    return@flatMapMaybe appDatabase.studyGroupLessonDao.getLesson(weekday.id, subject)
+                            .map { lessons -> Pair(weekday.value, lessons.isNotEmpty()) }
+                            .filter { it.second }
+                }
+                .map { it.first }
+                .toList()
+    }
+
+    fun getWeekdaysWithTeacherLesson(groups: String, weekId: Int): Single<List<String>> {
+        return appDatabase.weekdayDao.getWeekdaysForWeek(weekId)
+                .flatMapObservable { Observable.fromIterable(it) }
+                .flatMapMaybe { weekday ->
+                    return@flatMapMaybe appDatabase.teacherLessonDao.getLesson(weekday.id, groups)
+                            .map { lessons -> Pair(weekday.value, lessons.isNotEmpty()) }
+                            .filter { it.second }
+                }
+                .map { it.first }
+                .toList()
+    }
+
     fun deleteLessonsForWeek(weekId: Int, scheduleType: ScheduleType): Completable {
         return getWeekdaysForWeek(weekId)
                 .flatMapObservable { Observable.fromIterable(it) }

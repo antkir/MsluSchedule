@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:onClick="onGroupFabClick"
-        android:src="@drawable/ic_fab_group"
+        android:src="@drawable/ic_studygroup"
         android:visibility="invisible"
         app:fabSize="mini"
         app:useCompatPadding="true" />
@@ -24,7 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:onClick="onTeacherFabClick"
-        android:src="@drawable/ic_fab_teacher"
+        android:src="@drawable/ic_teacher"
         android:visibility="invisible"
         app:fabSize="mini"
         app:useCompatPadding="true" />

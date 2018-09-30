@@ -36,6 +36,9 @@
         <activity
             android:name="by.ntnk.msluschedule.ui.weekday.WeekdayActivity"
             android:theme="@style/MsluTheme.NoActionBar" />
+        <activity
+            android:name="by.ntnk.msluschedule.ui.lessoninfo.LessonInfoActivity"
+            android:theme="@style/MsluTheme.NoActionBar" />
     </application>
 
 </manifest>
