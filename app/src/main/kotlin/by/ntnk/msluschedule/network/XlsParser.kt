@@ -69,6 +69,11 @@ class XlsParser @Inject constructor() {
             }
         }
 
+        if (weekdaysWithLessons.firstOrNull { it.weekday == SUNDAY } == null) {
+            weekday = WeekdayWithStudyGroupLessons(SUNDAY)
+            weekdaysWithLessons.add(weekday)
+        }
+
         return weekdaysWithLessons
     }
 
