@@ -253,6 +253,7 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
 
         image_main_smileyface.visibility = View.GONE
         text_main_advice.visibility = View.GONE
+        progressbar_main.visibility = View.GONE
     }
 
     override fun addScheduleContainerMenuItem(scheduleContainerInfo: ScheduleContainerInfo) {
