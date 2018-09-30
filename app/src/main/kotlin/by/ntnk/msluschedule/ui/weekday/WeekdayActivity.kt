@@ -75,13 +75,6 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
         }
 
         initOnLongClickNoteListener()
-        initOnKeyboardStateChangeListener()
-    }
-
-    override fun onStart() {
-        super.onStart()
-        presenter.getWeekday(weekdayId)
-        presenter.getNotes(weekdayId)
     }
 
     private fun onNoteChangeFabClick() {
@@ -166,22 +159,6 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
         )
     }
 
-    private fun initOnKeyboardStateChangeListener() {
-        val activityRootView: View = findViewById(R.id.constraintlayout_weekday)
-        activityRootView.viewTreeObserver.addOnGlobalLayoutListener {
-            val heightDiff = activityRootView.rootView.height - activityRootView.height
-            if (heightDiff > applicationContext.dipToPixels(200f)) {
-                keyboardIsShown = true
-            } else {
-                if (keyboardIsShown) {
-                    hideEditNoteView()
-                    updatedNoteIndex = INVALID_VALUE
-                }
-                keyboardIsShown = false
-            }
-        }
-    }
-
     private fun hideEditNoteView() {
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(edittext_note.windowToken, 0)
@@ -198,6 +175,39 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
                     }
                 })
                 .start()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        if (weekdayId <= 0) {
+            finish()
+            return
+        }
+        presenter.getWeekday(weekdayId)
+        presenter.getNotes(weekdayId)
+
+        findViewById<View>(R.id.constraintlayout_weekday).viewTreeObserver
+                .addOnGlobalLayoutListener(onKeyboardStateChangeListener)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        findViewById<View>(R.id.constraintlayout_weekday).viewTreeObserver
+                .removeOnGlobalLayoutListener(onKeyboardStateChangeListener)
+    }
+
+    private val onKeyboardStateChangeListener: () -> Unit = {
+        val mainView: View = findViewById(R.id.constraintlayout_weekday)
+        val heightDiff = mainView.rootView.height - mainView.height
+        if (heightDiff > applicationContext.dipToPixels(200f)) {
+            keyboardIsShown = true
+        } else {
+            if (keyboardIsShown) {
+                hideEditNoteView()
+                updatedNoteIndex = INVALID_VALUE
+            }
+            keyboardIsShown = false
+        }
     }
 
     override fun onBackPressed() {
