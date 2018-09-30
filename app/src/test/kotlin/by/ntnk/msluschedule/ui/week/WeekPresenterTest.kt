@@ -211,8 +211,8 @@ class WeekPresenterTest {
         presenter.updateSchedule(weekId)
         // then
         getScheduleContainerTest.assertSubscribed()
-        deleteLessonsForWeekTest.assertSubscribed()
         getWeekKeyTest.assertSubscribed()
+        deleteLessonsForWeekTest.assertNotSubscribed()
         getStudyGroupScheduleTest.assertNotSubscribed()
         insertStudyGroupScheduleTest.assertNotSubscribed()
         getWeekdayWithStudyGroupLessonsForWeekTest.assertNotSubscribed()

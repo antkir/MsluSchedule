@@ -48,14 +48,14 @@ class XlsParserTest {
         weekdayWithStudyGroupLessons.lessons.add(lesson1)
         weekdayWithStudyGroupLessons.lessons.add(lesson2)
         weekdayWithStudyGroupLessons.lessons.add(lesson3)
-        val weekdays = 6
+        val weekdays = 7
         val xlsBody = this.javaClass.getResource("/sample_studygroup_schedule.xls").openStream()
         // when
         val observable = xlsParser.parseStudyGroupXls(xlsBody)
         // then
         observable.test().assertNoErrors()
         observable.test().assertValueCount(weekdays)
-        observable.test().assertValueAt(weekdays - 1, weekdayWithStudyGroupLessons)
+        observable.test().assertValueAt(weekdays - 2, weekdayWithStudyGroupLessons)
     }
 
     @Test
