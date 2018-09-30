@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,6 +7,7 @@
     android:orientation="vertical">
 
     <android.support.design.widget.AppBarLayout
+        android:id="@+id/appbarlayout_lessoninfo_teacher"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:theme="@style/MsluTheme.AppBarOverlay"
@@ -24,6 +25,7 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@id/appbarlayout_lessoninfo_teacher"
         android:background="@color/surface">
 
         <android.support.constraint.ConstraintLayout
@@ -225,4 +227,10 @@
 
     </ScrollView>
 
-</LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/shadow_toolbar_height"
+        android:layout_below="@id/appbarlayout_lessoninfo_teacher"
+        android:background="@drawable/toolbar_shadow" />
+
+</RelativeLayout>

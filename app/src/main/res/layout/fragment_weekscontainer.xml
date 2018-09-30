@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -9,9 +10,11 @@
         android:layout_width="match_parent"
         android:layout_height="?android:attr/actionBarSize"
         android:background="@color/colorPrimary"
+        android:elevation="4dp"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:tabGravity="center"
-        app:tabMode="scrollable" />
+        app:tabMode="scrollable"
+        tools:ignore="UnusedAttribute" />
 
     <android.support.v4.view.ViewPager
         android:id="@+id/viewpager_weekscontainer"
@@ -21,7 +24,7 @@
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="2dp"
+        android:layout_height="@dimen/shadow_toolbar_height"
         android:layout_alignTop="@id/viewpager_weekscontainer"
         android:background="@drawable/toolbar_shadow" />
 

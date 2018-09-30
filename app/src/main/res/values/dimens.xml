@@ -1,5 +1,5 @@
 <resources>
-    <dimen name="nav_header_height">24dp</dimen>
+    <dimen name="nav_header_height">0dp</dimen>
     <dimen name="nav_view_footer_height">64dp</dimen>
     <dimen name="nav_view_footer_textview_padding_side">16dp</dimen>
     <dimen name="nav_view_footer_image_padding_end">32dp</dimen>
@@ -28,4 +28,6 @@
     <dimen name="textview_lessoninfo_margin">8dp</dimen>
     <dimen name="textview_lessoninfo_line_space_multiplier">1.1</dimen>
     <dimen name="imageview_lessoninfo_margin_start">16dp</dimen>
+
+    <dimen name="shadow_toolbar_height">2dp</dimen>
 </resources>

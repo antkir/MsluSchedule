@@ -5,16 +5,19 @@
     <color name="colorPrimaryLight">#303030</color>
     <color name="colorAccent">#FFD740</color>
 
-    <color name="surface">#2E2E2E</color>
+    <color name="surface">#1E1F21</color>
 
     <color name="primary_text">#FFFFFF</color>
     <color name="primary_text_inverted">#000000</color>
     <color name="tertiary_text">#BEBEBE</color>
 
-    <color name="state_pressed">#646464</color>
-    <color name="menuitem_highlight">#646464</color>
+    <color name="state_pressed">#3C4043</color>
+    <color name="menuitem_highlight">#3C4043</color>
     <color name="item_separator">#4F4F4F</color>
 
     <color name="button_secondary">#424242</color>
-    <color name="note_edit_surface">#5F6267</color>
+    <color name="note_edit_surface">#3C4043</color>
+    <color name="icon_tint">#C1C1C1</color>
+
+    <color name="ic_save_note_tint">#FDD835</color>
 </resources>

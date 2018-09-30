@@ -9,6 +9,7 @@
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/surface"
         android:orientation="vertical"
         tools:context="by.ntnk.msluschedule.ui.weekday.WeekdayActivity">
 
@@ -99,6 +100,7 @@
             android:background="@android:color/transparent"
             android:elevation="8dp"
             android:src="@drawable/ic_save_note"
+            android:tint="@color/ic_save_note_tint"
             android:visibility="invisible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />

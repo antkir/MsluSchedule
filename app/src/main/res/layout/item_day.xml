@@ -24,10 +24,10 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_marginRight="16dp"
-        android:layout_marginEnd="16dp"
-        android:contentDescription="@string/imageview_dayitem_description"
         android:layout_centerVertical="true"
-        android:background="@drawable/ic_note_day" />
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:background="@drawable/ic_note_day"
+        android:contentDescription="@string/imageview_dayitem_description" />
 
 </RelativeLayout>

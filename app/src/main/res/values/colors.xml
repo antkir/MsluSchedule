@@ -16,10 +16,11 @@
     <color name="menuitem_highlight">#E0EBF9</color>
     <color name="item_separator">#E5E5E5</color>
 
-    <color name="ic_launcher_background">#005BCC</color>
-
     <color name="warning">#B00020</color>
     <color name="button_secondary">#E0EBF9</color>
     <color name="note_edit_surface">#FFFFFF</color>
-    <color name="icon_tint">#000000</color>
+    <color name="icon_tint">#757575</color>
+
+    <color name="ic_launcher_background">#005BCC</color>
+    <color name="ic_save_note_tint">#006DDE</color>
 </resources>
