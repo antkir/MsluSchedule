@@ -162,13 +162,13 @@ abstract class FragmentStatePagerAdapter(private val mFragmentManager: FragmentM
 
     override fun restoreState(state: Parcelable?, loader: ClassLoader?) {
         if (state != null) {
-            val bundle = state as Bundle?
-            bundle!!.classLoader = loader
+            state as Bundle?
+            state.classLoader = loader
             mFragments.clear()
-            for (key in bundle.keySet()) {
+            for (key in state.keySet()) {
                 if (key.startsWith("f")) {
                     val index = Integer.parseInt(key.substring(1))
-                    val f = mFragmentManager.getFragment(bundle, key)
+                    val f = mFragmentManager.getFragment(state, key)
                     if (f != null) {
                         while (mFragments.size <= index) {
                             mFragments.add(null)

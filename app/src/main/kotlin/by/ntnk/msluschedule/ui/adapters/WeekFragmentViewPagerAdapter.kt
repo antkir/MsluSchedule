@@ -1,10 +1,14 @@
 package by.ntnk.msluschedule.ui.adapters
 
+import android.os.Bundle
+import android.os.Parcelable
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.view.PagerAdapter
 import by.ntnk.msluschedule.ui.week.WeekFragment
 import by.ntnk.msluschedule.utils.ImmutableEntry
+
+private const val ARG_WEEK_ID = "weekId"
 
 class WeekFragmentViewPagerAdapter(
         fragmentManager: FragmentManager,
@@ -36,4 +40,20 @@ class WeekFragmentViewPagerAdapter(
     override fun getCount(): Int = fragmentsInfo.size
 
     override fun getPageTitle(position: Int): CharSequence? = fragmentsInfo[position].value
+
+    override fun restoreState(state: Parcelable?, loader: ClassLoader?) {
+        state as Bundle?
+        if (!(fragmentsInfo.isNotEmpty() && state?.getInt(ARG_WEEK_ID) != fragmentsInfo[currentWeekIndex].key)) {
+            super.restoreState(state, loader)
+        }
+    }
+
+    override fun saveState(): Parcelable? {
+        var superState = super.saveState() as Bundle?
+        if (superState == null) {
+            superState = Bundle()
+        }
+        superState.putInt(ARG_WEEK_ID, fragmentsInfo[currentWeekIndex].key)
+        return superState
+    }
 }
