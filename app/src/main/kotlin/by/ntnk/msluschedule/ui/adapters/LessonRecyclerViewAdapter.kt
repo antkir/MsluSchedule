@@ -72,7 +72,7 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
         notifyDataSetChanged()
     }
 
-    fun getWeekDayViewIndex(weekdayNumber: Int): Int {
+    fun getWeekdayViewIndex(weekdayNumber: Int): Int {
         var dayIndex = 0
         for (i in 0 until data.size) {
             if (data[i] is DayView) {

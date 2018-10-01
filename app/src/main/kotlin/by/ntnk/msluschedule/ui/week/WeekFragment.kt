@@ -1,9 +1,12 @@
 package by.ntnk.msluschedule.ui.week
 
 import android.animation.Animator
+import android.animation.ArgbEvaluator
+import android.animation.ValueAnimator
 import android.content.Context
 import android.os.Bundle
 import android.support.design.widget.Snackbar
+import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewPager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.LinearSmoothScroller
@@ -113,9 +116,20 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     fun showToday() {
         if (text_week_nolessons.visibility != View.VISIBLE) {
             val adapter = recyclerView.adapter as LessonRecyclerViewAdapter
-            val index = adapter.getWeekDayViewIndex(presenter.getCurrentDayOfWeek())
+            val index = adapter.getWeekdayViewIndex(presenter.getCurrentDayOfWeek())
             smoothScroller.targetPosition = index
             recyclerView.layoutManager?.startSmoothScroll(smoothScroller)
+            val fromColor = ContextCompat.getColor(context!!, R.color.surface)
+            val toColor = ContextCompat.getColor(context!!, R.color.menuitem_highlight)
+            val highlightAnimation = ValueAnimator.ofObject(ArgbEvaluator(), fromColor, toColor)
+            highlightAnimation.duration = 500
+            highlightAnimation.addUpdateListener { animator ->
+                val view: View? = recyclerView.layoutManager?.findViewByPosition(index)
+                view?.setBackgroundColor(animator.animatedValue as Int)
+            }
+            highlightAnimation.repeatMode = ValueAnimator.REVERSE
+            highlightAnimation.repeatCount = 1
+            highlightAnimation.start()
         }
     }
 
@@ -142,7 +156,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         adapter.initData(data)
 
         if (isRecentlyCreated && isCurrentWeek) {
-            val index = adapter.getWeekDayViewIndex(presenter.getCurrentDayOfWeek())
+            val index = adapter.getWeekdayViewIndex(presenter.getCurrentDayOfWeek())
             recyclerView.layoutManager?.scrollToPosition(index)
         }
 
