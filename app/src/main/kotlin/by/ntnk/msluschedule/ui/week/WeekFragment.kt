@@ -5,6 +5,7 @@ import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.os.Bundle
+import android.os.Handler
 import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewPager
@@ -246,11 +247,15 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     }
 
     override fun showUpdateSuccessMessage() {
-        Toast.makeText(
-                context,
-                resources.getString(R.string.messsage_schedule_update_successful),
-                Toast.LENGTH_SHORT
-        ).show()
+        Handler().postDelayed(
+                {
+                    Toast.makeText(
+                            context,
+                            resources.getString(R.string.messsage_schedule_update_successful),
+                            Toast.LENGTH_SHORT
+                    ).show()
+                },
+                250)
     }
 
     override fun showError(t: Throwable, shouldSetupViews: Boolean) {
