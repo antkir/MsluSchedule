@@ -12,6 +12,7 @@ import by.ntnk.msluschedule.utils.SchedulerProvider
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
+import timber.log.Timber
 import javax.inject.Inject
 
 class AddGroupPresenter @Inject constructor(
@@ -64,7 +65,7 @@ class AddGroupPresenter @Inject constructor(
                 .subscribeOn(schedulerProvider.io())
                 .subscribeBy(
                         onSuccess = { scheduleContaners = it },
-                        onError = { it.printStackTrace() }
+                        onError = { throwable -> Timber.e(throwable) }
                 )
 
         disposables += networkRepository.getFaculties()

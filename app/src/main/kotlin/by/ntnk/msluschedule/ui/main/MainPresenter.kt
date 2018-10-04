@@ -12,6 +12,7 @@ import by.ntnk.msluschedule.utils.SchedulerProvider
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
 import io.reactivex.Single
 import io.reactivex.rxkotlin.subscribeBy
+import timber.log.Timber
 import javax.inject.Inject
 
 class MainPresenter @Inject constructor(
@@ -41,7 +42,7 @@ class MainPresenter @Inject constructor(
                             view?.addScheduleContainerMenuItem(info)
                             view?.checkScheduleContainerMenuItem(info)
                         },
-                        onError = { it.printStackTrace() }
+                        onError = { throwable -> Timber.e(throwable) }
                 )
     }
 
@@ -65,7 +66,7 @@ class MainPresenter @Inject constructor(
                             view?.addScheduleContainerMenuItem(info)
                             view?.checkScheduleContainerMenuItem(info)
                         },
-                        onError = { it.printStackTrace() }
+                        onError = { throwable -> Timber.e(throwable) }
                 )
     }
 
@@ -73,7 +74,10 @@ class MainPresenter @Inject constructor(
         return networkRepository.get().getWeeks()
                 .flatMapObservable { databaseRepository.insertWeeksGetIds(it, containerId) }
                 .ignoreElements()
-                .doOnError { databaseRepository.deleteScheduleContainer(containerId).subscribe() }
+                .doOnError {
+                    databaseRepository.deleteScheduleContainer(containerId)
+                            .subscribeBy(onError = { throwable -> Timber.e(throwable) })
+                }
                 .andThen(Single.just(containerId))
     }
 
@@ -91,7 +95,7 @@ class MainPresenter @Inject constructor(
                             val info = ScheduleContainerInfo(scheduleContainer.id, name, scheduleContainer.type)
                             view?.addScheduleContainerMenuItem(info)
                         },
-                        onError = { it.printStackTrace() },
+                        onError = { throwable -> Timber.e(throwable) },
                         onComplete = {
                             val info = sharedPreferencesRepository.getSelectedScheduleContainerInfo()
                             view?.checkScheduleContainerMenuItem(info)

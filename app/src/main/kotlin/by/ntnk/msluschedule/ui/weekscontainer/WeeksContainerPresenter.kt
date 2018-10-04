@@ -7,6 +7,7 @@ import by.ntnk.msluschedule.utils.ImmutableEntry
 import by.ntnk.msluschedule.utils.SchedulerProvider
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
 import io.reactivex.rxkotlin.subscribeBy
+import timber.log.Timber
 import javax.inject.Inject
 
 class WeeksContainerPresenter @Inject constructor(
@@ -37,7 +38,7 @@ class WeeksContainerPresenter @Inject constructor(
                 .observeOn(schedulerProvider.ui())
                 .subscribeBy(
                         onSuccess = { view?.initWeeksAdapter(it.first, it.second) },
-                        onError = { it.printStackTrace() }
+                        onError = { throwable -> Timber.e(throwable) }
                 )
     }
 
@@ -51,7 +52,7 @@ class WeeksContainerPresenter @Inject constructor(
                             sharedPreferencesRepository.selectEmptyScheduleContainer()
                             view?.removeScheduleContainerFromView(info)
                         },
-                        onError = { it.printStackTrace() }
+                        onError = { throwable -> Timber.e(throwable) }
                 )
     }
 }

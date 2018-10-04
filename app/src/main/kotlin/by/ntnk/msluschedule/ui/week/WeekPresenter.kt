@@ -15,6 +15,7 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.subscribeBy
 import org.threeten.bp.DayOfWeek
+import timber.log.Timber
 import javax.inject.Inject
 
 class WeekPresenter @Inject constructor(
@@ -58,7 +59,8 @@ class WeekPresenter @Inject constructor(
                     .subscribeOn(scheduler)
                     .observeOn(schedulerProvider.ui())
                     .subscribeBy(
-                            onSuccess = { isNotesListNotEmpty -> view?.updateNotesStatus(id, isNotesListNotEmpty) }
+                            onSuccess = { isNotesListNotEmpty -> view?.updateNotesStatus(id, isNotesListNotEmpty) },
+                            onError = { throwable -> Timber.e(throwable) }
                     )
         }
     }

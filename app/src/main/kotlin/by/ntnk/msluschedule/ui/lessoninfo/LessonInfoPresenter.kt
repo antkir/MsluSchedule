@@ -5,6 +5,7 @@ import by.ntnk.msluschedule.mvp.Presenter
 import by.ntnk.msluschedule.utils.ScheduleType
 import by.ntnk.msluschedule.utils.SchedulerProvider
 import io.reactivex.rxkotlin.subscribeBy
+import timber.log.Timber
 import javax.inject.Inject
 
 class LessonInfoPresenter @Inject constructor(
@@ -23,7 +24,7 @@ class LessonInfoPresenter @Inject constructor(
                         .observeOn(schedulerProvider.ui())
                         .subscribeBy(
                                 onSuccess = { view?.showInfo(it.first, it.second) },
-                                onError = { it.printStackTrace() }
+                                onError = { throwable -> Timber.e(throwable) }
                         )
             }
             ScheduleType.TEACHER -> {
@@ -36,7 +37,7 @@ class LessonInfoPresenter @Inject constructor(
                         .observeOn(schedulerProvider.ui())
                         .subscribeBy(
                                 onSuccess = { view?.showInfo(it.first, it.second) },
-                                onError = { it.printStackTrace() }
+                                onError = { throwable -> Timber.e(throwable) }
                         )
             }
         }

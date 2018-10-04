@@ -29,6 +29,7 @@ import dagger.android.DispatchingAndroidInjector
 import dagger.android.support.HasSupportFragmentInjector
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.activity_weekday.*
+import timber.log.Timber
 import javax.inject.Inject
 
 class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
@@ -155,7 +156,7 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
                     fab_weekday.performClick()
                     updatedNoteIndex = adapter.findNotePosition(it.text)
                 },
-                onError = { it.printStackTrace() }
+                onError = { throwable -> Timber.e(throwable) }
         )
     }
 

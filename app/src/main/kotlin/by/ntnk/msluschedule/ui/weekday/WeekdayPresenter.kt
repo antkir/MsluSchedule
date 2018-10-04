@@ -5,6 +5,7 @@ import by.ntnk.msluschedule.db.DatabaseRepository
 import by.ntnk.msluschedule.mvp.Presenter
 import by.ntnk.msluschedule.utils.SchedulerProvider
 import io.reactivex.rxkotlin.subscribeBy
+import timber.log.Timber
 import javax.inject.Inject
 
 class WeekdayPresenter @Inject constructor(
@@ -18,7 +19,7 @@ class WeekdayPresenter @Inject constructor(
                 .observeOn(schedulerProvider.ui())
                 .subscribeBy(
                         onSuccess = { weekday -> view?.setToolbar(weekday) },
-                        onError = { it.printStackTrace() }
+                        onError = { throwable -> Timber.e(throwable) }
                 )
     }
 
@@ -29,7 +30,7 @@ class WeekdayPresenter @Inject constructor(
                 .observeOn(schedulerProvider.ui())
                 .subscribeBy(
                         onSuccess = { view?.showNotes(it) },
-                        onError = { it.printStackTrace() }
+                        onError = { throwable -> Timber.e(throwable) }
                 )
     }
 
@@ -39,7 +40,7 @@ class WeekdayPresenter @Inject constructor(
                 .observeOn(schedulerProvider.ui())
                 .subscribeBy(
                         onSuccess = { view?.addNote(Note(it, note)) },
-                        onError = { it.printStackTrace() }
+                        onError = { throwable -> Timber.e(throwable) }
                 )
     }
 
@@ -48,7 +49,7 @@ class WeekdayPresenter @Inject constructor(
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
                 .subscribeBy(
-                        onError = { it.printStackTrace() }
+                        onError = { throwable -> Timber.e(throwable) }
                 )
     }
 
@@ -57,7 +58,7 @@ class WeekdayPresenter @Inject constructor(
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
                 .subscribeBy(
-                        onError = { it.printStackTrace() }
+                        onError = { throwable -> Timber.e(throwable) }
                 )
     }
 
@@ -67,7 +68,7 @@ class WeekdayPresenter @Inject constructor(
                 .observeOn(schedulerProvider.ui())
                 .subscribeBy(
                         onSuccess = { view?.restoreNote(Note(it, note), position, color) },
-                        onError = { it.printStackTrace() }
+                        onError = { throwable -> Timber.e(throwable) }
                 )
     }
 }

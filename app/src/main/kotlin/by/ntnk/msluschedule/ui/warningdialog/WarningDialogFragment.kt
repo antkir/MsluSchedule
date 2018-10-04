@@ -12,6 +12,7 @@ import by.ntnk.msluschedule.utils.SchedulerProvider
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
+import timber.log.Timber
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
@@ -65,7 +66,8 @@ class WarningDialogFragment : DialogFragment() {
                             button.setTextColor(buttonDeleteColor)
                             button.isEnabled = true
                             button.text = buttonDeleteString
-                        }
+                        },
+                        onError = { throwable -> Timber.e(throwable) }
                 )
     }
 

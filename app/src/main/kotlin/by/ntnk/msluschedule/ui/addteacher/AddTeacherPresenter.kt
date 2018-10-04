@@ -10,6 +10,7 @@ import by.ntnk.msluschedule.utils.CurrentDate
 import by.ntnk.msluschedule.utils.SchedulerProvider
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
+import timber.log.Timber
 import javax.inject.Inject
 
 class AddTeacherPresenter @Inject constructor(
@@ -32,7 +33,7 @@ class AddTeacherPresenter @Inject constructor(
                 .subscribeOn(schedulerProvider.io())
                 .subscribeBy(
                         onSuccess = { scheduleContaners = it },
-                        onError = { it.printStackTrace() }
+                        onError = { throwable -> Timber.e(throwable) }
                 )
 
         disposable = networkRequestRepository.getTeachers()

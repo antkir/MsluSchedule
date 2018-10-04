@@ -31,6 +31,7 @@ import dagger.Lazy
 import dagger.android.support.AndroidSupportInjection
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.fragment_week.*
+import timber.log.Timber
 import javax.inject.Inject
 
 class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
@@ -99,7 +100,8 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
                             LessonInfoActivity.startActivity(context!!, lessonId, ScheduleType.TEACHER, weekId)
                         }
                     }
-                }
+                },
+                onError = { throwable -> Timber.e(throwable) }
         )
     }
 
