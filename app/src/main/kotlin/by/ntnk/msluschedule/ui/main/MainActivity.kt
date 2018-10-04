@@ -1,5 +1,6 @@
 package by.ntnk.msluschedule.ui.main
 
+import android.animation.Animator
 import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.design.widget.Snackbar
@@ -7,6 +8,7 @@ import android.support.v4.app.Fragment
 import android.support.v4.view.GravityCompat
 import android.support.v4.view.ViewCompat
 import android.support.v4.view.ViewPager
+import android.support.v4.view.animation.FastOutSlowInInterpolator
 import android.support.v7.app.ActionBarDrawerToggle
 import android.view.Menu
 import android.view.MenuItem
@@ -196,27 +198,78 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
 
         with(groupfab_main) {
             visibility = View.VISIBLE
-            y = basefab_main.y
-            animate().translationY(0f).setDuration(200).start()
+            scaleX = 0f
+            scaleY = 0f
+            translationY = height / 4f
+            animate()
+                    .setStartDelay(75)
+                    .scaleY(1f)
+                    .scaleX(1f)
+                    .translationY(0f)
+                    .setDuration(200)
+                    .setInterpolator(FastOutSlowInInterpolator())
+                    .start()
         }
         with(teacherfab_main) {
             visibility = View.VISIBLE
-            y = basefab_main.y
-            animate().translationY(0f).setDuration(200).start()
+            scaleX = 0f
+            scaleY = 0f
+            translationY = height / 4f
+            animate()
+                    .setStartDelay(0)
+                    .scaleY(1f)
+                    .scaleX(1f)
+                    .translationY(0f)
+                    .setDuration(200)
+                    .setInterpolator(FastOutSlowInInterpolator())
+                    .start()
         }
+
+        fam_layout_main.isFocusable = true
+        fam_layout_main.isClickable = true
+        fam_layout_main.setOnClickListener { collapseFam() }
     }
 
     private fun collapseFam() {
         isFamOpen = false
 
-        groupfab_main.animate().y(basefab_main.y).setDuration(200).start()
-        teacherfab_main.animate().y(basefab_main.y).setDuration(200).start()
+        groupfab_main.animate()
+                .setStartDelay(0)
+                .scaleY(0f)
+                .scaleX(0f)
+                .setDuration(100)
+                .setInterpolator(FastOutSlowInInterpolator())
+                .setListener(object : SimpleAnimatorListener {
+                    override fun onAnimationEnd(animation: Animator?) {
+                        groupfab_main.visibility = View.INVISIBLE
+                        groupfab_main.animate().setListener(null)
+                    }
+                })
+                .start()
+
+        teacherfab_main.animate()
+                .scaleY(0f)
+                .scaleX(0f)
+                .setStartDelay(0)
+                .setDuration(100)
+                .setInterpolator(FastOutSlowInInterpolator())
+                .setListener(object : SimpleAnimatorListener {
+                    override fun onAnimationEnd(animation: Animator?) {
+                        teacherfab_main.visibility = View.INVISIBLE
+                        teacherfab_main.animate().setListener(null)
+                    }
+                })
+                .start()
 
         ViewCompat.animate(basefab_main)
                 .rotation(0f)
                 .setDuration(300)
                 .setInterpolator(OvershootInterpolator(2f))
                 .start()
+
+        fam_layout_main.setOnClickListener(null)
+        fam_layout_main.isClickable = false
+        fam_layout_main.isFocusable = false
     }
 
     @Suppress("UNUSED_PARAMETER")

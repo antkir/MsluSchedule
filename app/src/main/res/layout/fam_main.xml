@@ -1,17 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_gravity="bottom|end"
-    android:orientation="vertical"
+    android:id="@+id/fam_layout_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     app:layout_behavior="by.ntnk.msluschedule.ui.customviews.FABLayoutBehavior">
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/groupfab_main"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
+        android:layout_above="@id/teacherfab_main"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
         android:onClick="onGroupFabClick"
         android:src="@drawable/ic_studygroup"
         android:visibility="invisible"
@@ -22,7 +25,11 @@
         android:id="@+id/teacherfab_main"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
+        android:layout_above="@id/basefab_main"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
         android:onClick="onTeacherFabClick"
         android:src="@drawable/ic_teacher"
         android:visibility="invisible"
@@ -33,9 +40,12 @@
         android:id="@+id/basefab_main"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
         android:onClick="onBaseFabClick"
         android:src="@drawable/ic_fab_add"
         app:fabSize="normal"
         app:useCompatPadding="true" />
 
-</LinearLayout>
+</RelativeLayout>
