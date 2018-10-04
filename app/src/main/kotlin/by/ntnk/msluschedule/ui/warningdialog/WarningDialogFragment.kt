@@ -30,6 +30,7 @@ class WarningDialogFragment : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = initMaterialDialog()
+        dialog.window.attributes.windowAnimations = R.style.DialogAnimation
         dialog.setOnShowListener {
             val positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
             initPositiveButtonCountdown(positiveButton)
