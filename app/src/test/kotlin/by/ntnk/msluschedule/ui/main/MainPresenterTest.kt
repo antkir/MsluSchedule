@@ -19,6 +19,7 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentMatchers.eq
 import org.mockito.Mock
+import org.mockito.Mockito
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import org.mockito.MockitoAnnotations
@@ -34,7 +35,10 @@ class MainPresenterTest {
     private lateinit var databaseRepository: DatabaseRepository
 
     @Mock
-    private lateinit var networkRepository: NetworkRepository
+    private lateinit var networkRepositoryLazy: dagger.Lazy<NetworkRepository>
+
+    private val networkRepository: NetworkRepository
+        get() = networkRepositoryLazy.get()
 
     @Mock
     private lateinit var sharedPreferencesRepository: SharedPreferencesRepository
@@ -58,6 +62,7 @@ class MainPresenterTest {
         Timber.plant(TestTree())
         MockitoAnnotations.initMocks(this)
 
+        whenever(networkRepositoryLazy.get()).thenReturn(Mockito.mock(NetworkRepository::class.java))
         whenever(networkRepository.getWeeks())
                 .thenReturn(Single.just(ScheduleFilter()).doOnSubscribe { getWeeksTest.onSubscribe(it) })
         whenever(databaseRepository.insertStudyGroup(any()))
@@ -79,7 +84,7 @@ class MainPresenterTest {
         presenter = MainPresenter(
                 currentDate,
                 databaseRepository,
-                networkRepository,
+                networkRepositoryLazy,
                 sharedPreferencesRepository,
                 schedulerProvider
         )

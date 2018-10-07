@@ -21,6 +21,7 @@ import org.junit.Test
 import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.ArgumentMatchers.eq
 import org.mockito.Mock
+import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 import org.mockito.MockitoAnnotations
 import timber.log.Timber
@@ -38,7 +39,10 @@ class WeekPresenterTest {
     private lateinit var databaseDataMapper: DatabaseDataMapper
 
     @Mock
-    private lateinit var networkRepository: NetworkRepository
+    private lateinit var networkRepositoryLazy: dagger.Lazy<NetworkRepository>
+
+    private val networkRepository: NetworkRepository
+        get() = networkRepositoryLazy.get()
 
     @Mock
     private lateinit var sharedPreferencesRepository: SharedPreferencesRepository
@@ -68,6 +72,7 @@ class WeekPresenterTest {
         Timber.plant(TestTree())
         MockitoAnnotations.initMocks(this)
 
+        whenever(networkRepositoryLazy.get()).thenReturn(mock(NetworkRepository::class.java))
         whenever(sharedPreferencesRepository.getSelectedScheduleContainerInfo())
                 .thenReturn(ScheduleContainerInfo(0, "", ScheduleType.STUDYGROUP))
         whenever(databaseRepository.getScheduleContainer(anyInt()))
@@ -121,7 +126,7 @@ class WeekPresenterTest {
                 databaseDataMapper,
                 sharedPreferencesRepository,
                 schedulerProvider,
-                networkRepository
+                networkRepositoryLazy
         )
         presenter.bindView(view)
     }
