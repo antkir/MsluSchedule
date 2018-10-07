@@ -13,6 +13,8 @@ import by.ntnk.msluschedule.utils.SchedulerProvider
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
 import io.reactivex.Observable
 import io.reactivex.Single
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import org.threeten.bp.DayOfWeek
 import timber.log.Timber
@@ -26,12 +28,13 @@ class WeekPresenter @Inject constructor(
         private val schedulerProvider: SchedulerProvider,
         private val networkRepository: dagger.Lazy<NetworkRepository>
 ) : Presenter<WeekView>() {
+    private val disposables: CompositeDisposable = CompositeDisposable()
     private var scheduler = schedulerProvider.cachedThreadPool()
     private val weekdayIds: MutableList<Int> = ArrayList()
 
     fun getSchedule(weekId: Int) {
         val containerInfo = sharedPreferencesRepository.getSelectedScheduleContainerInfo()
-        databaseRepository.getScheduleContainer(containerInfo.id)
+        disposables += databaseRepository.getScheduleContainer(containerInfo.id)
                 .flatMap { getScheduleData(it, weekId) }
                 .subscribeOn(scheduler)
                 .observeOn(schedulerProvider.ui())
@@ -95,6 +98,7 @@ class WeekPresenter @Inject constructor(
                 .observeOn(scheduler)
                 .andThen(downloadSchedule(isUpdate = false, container = container, weekId = weekId))
                 .observeOn(schedulerProvider.ui())
+                .doOnDispose { view?.hideUpdateProgressBar() }
                 .doOnEvent { _, _ -> view?.hideInitProgressBar() }
     }
 
@@ -144,7 +148,7 @@ class WeekPresenter @Inject constructor(
 
     fun updateSchedule(weekId: Int) {
         val containerInfo = sharedPreferencesRepository.getSelectedScheduleContainerInfo()
-        databaseRepository.getScheduleContainer(containerInfo.id)
+        disposables += databaseRepository.getScheduleContainer(containerInfo.id)
                 .flatMap { scheduleContainer ->
                     downloadSchedule(isUpdate = true, container = scheduleContainer, weekId = weekId)
                             .flatMap { getWeekdaysWithLessonsForWeek(containerInfo.type!!, weekId).toList() }
@@ -152,6 +156,7 @@ class WeekPresenter @Inject constructor(
                 .subscribeOn(schedulerProvider.cachedThreadPool())
                 .observeOn(schedulerProvider.ui())
                 .doOnSubscribe { view?.showUpdateProgressBar() }
+                .doOnDispose { view?.hideUpdateProgressBar() }
                 .doOnEvent { _, _ -> view?.hideUpdateProgressBar() }
                 .doOnSuccess { _ -> view?.showUpdateSuccessMessage() }
                 .subscribeBy(
@@ -170,4 +175,6 @@ class WeekPresenter @Inject constructor(
             DayOfWeek.MONDAY.value
         }
     }
+
+    fun clearDisposables() = disposables.clear()
 }

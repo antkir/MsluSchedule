@@ -76,9 +76,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
             initAdapterOnClickListener()
         }
         smoothScroller = object : LinearSmoothScroller(context!!) {
-            override fun getVerticalSnapPreference(): Int {
-                return LinearSmoothScroller.SNAP_TO_START
-            }
+            override fun getVerticalSnapPreference() = LinearSmoothScroller.SNAP_TO_START
         }
     }
 
@@ -114,6 +112,11 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     override fun onStart() {
         super.onStart()
         presenter.getNotesStatus()
+    }
+
+    override fun onStop() {
+        presenter.clearDisposables()
+        super.onStop()
     }
 
     fun showToday() {
