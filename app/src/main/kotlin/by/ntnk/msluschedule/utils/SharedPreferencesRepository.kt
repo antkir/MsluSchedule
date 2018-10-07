@@ -1,6 +1,7 @@
 package by.ntnk.msluschedule.utils
 
 import android.content.SharedPreferences
+import android.support.v7.app.AppCompatDelegate
 import by.ntnk.msluschedule.data.ScheduleContainerInfo
 import by.ntnk.msluschedule.di.PerApp
 
@@ -11,9 +12,7 @@ const val SCHEDULECONTAINER_VALUE = "scheduleContainerValue"
 const val SCHEDULECONTAINER_TYPE = "scheduleContainerType"
 
 @PerApp
-class SharedPreferencesRepository @Inject constructor(
-        private val sharedPreferences: SharedPreferences
-) {
+class SharedPreferencesRepository @Inject constructor(private val sharedPreferences: SharedPreferences) {
     fun getSelectedScheduleContainerInfo(): ScheduleContainerInfo {
         val id = sharedPreferences.getInt(SCHEDULECONTAINER_ID, 0)
         val value = sharedPreferences.getString(SCHEDULECONTAINER_VALUE, EMPTY_STRING)
@@ -46,5 +45,12 @@ class SharedPreferencesRepository @Inject constructor(
                 .putString(SCHEDULECONTAINER_VALUE, EMPTY_STRING)
                 .putString(SCHEDULECONTAINER_TYPE, null)
                 .apply()
+    }
+
+    fun getThemeMode(themeKey: String): String {
+        val intValue = sharedPreferences
+                .getString(themeKey, EMPTY_STRING)
+                .toIntOrNull() ?: AppCompatDelegate.MODE_NIGHT_NO
+        return intValue.toString()
     }
 }

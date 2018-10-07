@@ -21,6 +21,7 @@ import by.ntnk.msluschedule.data.Teacher
 import by.ntnk.msluschedule.mvp.views.MvpActivity
 import by.ntnk.msluschedule.ui.addgroup.AddGroupFragment
 import by.ntnk.msluschedule.ui.addteacher.AddTeacherFragment
+import by.ntnk.msluschedule.ui.settings.SettingsActivity
 import by.ntnk.msluschedule.ui.weekscontainer.WeeksContainerFragment
 import by.ntnk.msluschedule.utils.*
 import dagger.Lazy
@@ -82,6 +83,8 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
                 insets
             }
         }
+
+        button_settings_main.setOnClickListener { SettingsActivity.startActivity(this) }
 
         supportActionBar?.title = savedInstanceState?.getString(ARG_ACTIONBAR_TITLE)
     }

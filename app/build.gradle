@@ -52,7 +52,7 @@ ext {
     jsoupVersion = '1.11.3'
     junitVersion = '4.12'
     leakcanaryVersion = '1.6.1'
-    mockitoVersion = '2.15.0'
+    mockitoVersion = '2.23.0'
     multidexVersion = '1.0.3'
     okhttpVersion = '3.11.0'
     poiVersion = '3.17'
@@ -73,6 +73,7 @@ dependencies {
     implementation "com.android.support.constraint:constraint-layout:$constraintlayoutVersion"
     implementation "com.android.support:design:$androidsupportVersion"
     implementation "com.android.support:multidex:$multidexVersion"
+    implementation "com.android.support:preference-v14:$androidsupportVersion"
     // Dagger
     implementation "com.google.dagger:dagger:$daggerVersion"
     implementation "com.google.dagger:dagger-android-support:$daggerVersion"

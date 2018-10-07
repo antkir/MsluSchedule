@@ -39,6 +39,9 @@
         <activity
             android:name="by.ntnk.msluschedule.ui.lessoninfo.LessonInfoActivity"
             android:theme="@style/MsluTheme.NoActionBar" />
+        <activity
+            android:name="by.ntnk.msluschedule.ui.settings.SettingsActivity"
+            android:label="@string/activity_settings_title" />
     </application>
 
 </manifest>

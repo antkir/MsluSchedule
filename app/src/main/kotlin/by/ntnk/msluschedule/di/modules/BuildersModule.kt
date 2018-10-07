@@ -5,6 +5,7 @@ import by.ntnk.msluschedule.ui.addgroup.AddGroupFragment
 import by.ntnk.msluschedule.ui.addteacher.AddTeacherFragment
 import by.ntnk.msluschedule.ui.lessoninfo.LessonInfoActivity
 import by.ntnk.msluschedule.ui.main.MainActivity
+import by.ntnk.msluschedule.ui.settings.SettingsActivity
 import by.ntnk.msluschedule.ui.week.WeekFragment
 import by.ntnk.msluschedule.ui.weekday.WeekdayActivity
 import by.ntnk.msluschedule.ui.weekscontainer.WeeksContainerFragment
@@ -35,4 +36,10 @@ abstract class BuildersModule {
 
     @ContributesAndroidInjector
     abstract fun bindLessonInfoActivity(): LessonInfoActivity
+
+    @ContributesAndroidInjector
+    abstract fun bindSettingsActivity(): SettingsActivity
+
+    @ContributesAndroidInjector
+    abstract fun bindSettingsFragment(): SettingsActivity.SettingsFragment
 }

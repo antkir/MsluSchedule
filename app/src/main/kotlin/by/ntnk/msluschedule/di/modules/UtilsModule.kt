@@ -1,7 +1,7 @@
 package by.ntnk.msluschedule.di.modules
 
 import android.content.SharedPreferences
-import android.preference.PreferenceManager
+import android.support.v7.preference.PreferenceManager
 import by.ntnk.msluschedule.MsluScheduleApp
 import by.ntnk.msluschedule.di.PerApp
 import dagger.Module

@@ -20,4 +20,5 @@
     <color name="icon_tint">#C1C1C1</color>
 
     <color name="ic_save_note_tint">#FDD835</color>
+    <color name="text_pref_category">#FDD835</color>
 </resources>

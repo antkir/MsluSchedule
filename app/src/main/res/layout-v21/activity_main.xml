@@ -32,6 +32,7 @@
             app:menu="@menu/activity_main_drawer" />
 
         <TextView
+            android:id="@+id/button_settings_main"
             android:layout_width="match_parent"
             android:layout_height="@dimen/nav_view_footer_height"
             android:layout_alignParentBottom="true"

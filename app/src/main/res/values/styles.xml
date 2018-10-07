@@ -4,6 +4,18 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="actionBarTheme">@style/MsluTheme.AppBarOverlay</item>
+        <item name="preferenceTheme">@style/MsluTheme.PreferenceThemeOverlay</item>
+    </style>
+
+    <style name="MsluTheme.PreferenceThemeOverlay" parent="@style/PreferenceThemeOverlay.v14.Material">
+        <item name="preferenceCategoryStyle">@style/MsluTheme.PreferenceCategory</item>
+    </style>
+
+    <style name="MsluTheme.PreferenceCategory">
+        <item name="android:layout">@layout/pref_category_layout</item>
+        <item name="android:shouldDisableView">false</item>
+        <item name="android:selectable">false</item>
     </style>
 
     <style name="MsluTheme.NoActionBar">
