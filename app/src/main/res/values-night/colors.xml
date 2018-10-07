@@ -5,14 +5,14 @@
     <color name="colorPrimaryLight">#303030</color>
     <color name="colorAccent">#FFD740</color>
 
-    <color name="surface">#1E1F21</color>
+    <color name="surface">#303030</color>
 
     <color name="primary_text">#FFFFFF</color>
     <color name="primary_text_inverted">#000000</color>
     <color name="tertiary_text">#BEBEBE</color>
 
-    <color name="state_pressed">#3C4043</color>
-    <color name="menuitem_highlight">#3C4043</color>
+    <color name="state_pressed">#444444</color>
+    <color name="menuitem_highlight">#444444</color>
     <color name="item_separator">#4F4F4F</color>
 
     <color name="button_secondary">#424242</color>

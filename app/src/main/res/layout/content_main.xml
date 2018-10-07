@@ -50,6 +50,7 @@
         android:layout_marginStart="32dp"
         android:alpha="0.3"
         android:text="@string/view_main_empty_message"
+        android:gravity="center"
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:visibility="gone"
