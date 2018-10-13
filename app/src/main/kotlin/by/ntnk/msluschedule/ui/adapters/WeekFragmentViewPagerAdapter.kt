@@ -43,9 +43,11 @@ class WeekFragmentViewPagerAdapter(
 
     override fun restoreState(state: Parcelable?, loader: ClassLoader?) {
         state as Bundle?
-        if (!(fragmentsInfo.isNotEmpty() && state?.getInt(ARG_WEEK_ID) != fragmentsInfo[currentWeekIndex].key)) {
-            super.restoreState(state, loader)
+        var s = state
+        if (fragmentsInfo.isNotEmpty() && state?.getInt(ARG_WEEK_ID) != fragmentsInfo[currentWeekIndex].key) {
+            s = null
         }
+        super.restoreState(s, loader)
     }
 
     override fun saveState(): Parcelable? {

@@ -34,6 +34,7 @@ import java.util.ArrayList
  * This class differs from the original one in that it:
  *  - is converted to Kotlin.
  *  - does not save [Fragment] states.
+ *  - in [restoreState] removes fragments that does not belong to this adapter from the passed [FragmentManager].
  *  - has a new method [getFragment].
  *
  * This version of the pager is more useful when there are a large number
@@ -136,7 +137,7 @@ abstract class FragmentStatePagerAdapter(private val mFragmentManager: FragmentM
 
     override fun finishUpdate(container: ViewGroup) {
         if (mCurTransaction != null) {
-            mCurTransaction!!.commitNowAllowingStateLoss()
+            mCurTransaction!!.commitNow()
             mCurTransaction = null
         }
     }
@@ -160,6 +161,7 @@ abstract class FragmentStatePagerAdapter(private val mFragmentManager: FragmentM
         return state
     }
 
+    @SuppressLint("CommitTransaction")
     override fun restoreState(state: Parcelable?, loader: ClassLoader?) {
         if (state != null) {
             state as Bundle?
@@ -178,6 +180,18 @@ abstract class FragmentStatePagerAdapter(private val mFragmentManager: FragmentM
                     } else {
                         Timber.w("Bad fragment at key $key")
                     }
+                }
+            }
+        }
+
+        if (mCurTransaction == null) {
+            mCurTransaction = mFragmentManager.beginTransaction()
+        }
+
+        if (mFragmentManager.fragments.isNotEmpty()) {
+            for (f in mFragmentManager.fragments) {
+                if (!mFragments.contains(f)) {
+                    mCurTransaction!!.remove(f)
                 }
             }
         }
