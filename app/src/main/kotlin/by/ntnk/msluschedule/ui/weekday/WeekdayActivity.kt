@@ -4,6 +4,7 @@ import android.animation.Animator
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Parcelable
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v4.app.NavUtils
@@ -33,6 +34,8 @@ import kotlinx.android.synthetic.main.activity_weekday.*
 import timber.log.Timber
 import javax.inject.Inject
 
+private const val ARG_LAYOUT_MANAGER_SAVED_STATE = "argLayoutManagerSavedState"
+
 class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
         WeekdayView,
         HasSupportFragmentInjector {
@@ -40,6 +43,7 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
     private var weekdayId: Int = INVALID_VALUE
     private var updatedNoteIndex: Int = INVALID_VALUE
     private var keyboardIsShown = false
+    private var layoutManagerSavedState: Parcelable? = null
 
     override val view: WeekdayView
         get() = this
@@ -61,6 +65,7 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         weekdayId = intent?.getIntExtra(ARG_WEEKDAY_ID, INVALID_VALUE) ?: INVALID_VALUE
+        layoutManagerSavedState = savedInstanceState?.getParcelable(ARG_LAYOUT_MANAGER_SAVED_STATE)
 
         fab_weekday.setOnClickListener { onNoteChangeFabClick() }
 
@@ -198,6 +203,12 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
                 .removeOnGlobalLayoutListener(onKeyboardStateChangeListener)
     }
 
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putParcelable(ARG_LAYOUT_MANAGER_SAVED_STATE, recyclerView.layoutManager.onSaveInstanceState())
+    }
+
     private val onKeyboardStateChangeListener: () -> Unit = {
         val mainView: View = findViewById(R.id.constraintlayout_weekday)
         val heightDiff = mainView.rootView.height - mainView.height
@@ -256,6 +267,7 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
         if (adapter.itemCount > 0) {
             textview_zeronotes.visibility = View.GONE
         }
+        recyclerView.layoutManager.onRestoreInstanceState(layoutManagerSavedState)
     }
 
     override fun addNote(note: Note) {

@@ -6,6 +6,7 @@ import android.animation.ValueAnimator
 import android.content.Context
 import android.os.Bundle
 import android.os.Handler
+import android.os.Parcelable
 import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewPager
@@ -34,12 +35,15 @@ import kotlinx.android.synthetic.main.fragment_week.*
 import timber.log.Timber
 import javax.inject.Inject
 
+private const val ARG_LAYOUT_MANAGER_SAVED_STATE = "argLayoutManagerSavedState"
+
 class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     private lateinit var recyclerView: RecyclerView
     private lateinit var smoothScroller: RecyclerView.SmoothScroller
     private var isEmptyScheduleDaysVisible: Boolean = false
     private var weekId: Int = INVALID_VALUE
     private var isCurrentWeek: Boolean = false
+    private var layoutManagerSavedState: Parcelable? = null
     private var isScheduleShown: Boolean = false
 
     override val view: WeekView
@@ -60,6 +64,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         setHasOptionsMenu(true)
         weekId = arguments?.getInt(ARG_WEEK_ID) ?: INVALID_VALUE
         isCurrentWeek = arguments?.getBoolean(ARG_IS_CURRENT_WEEK) == true
+        layoutManagerSavedState = savedInstanceState?.getParcelable(ARG_LAYOUT_MANAGER_SAVED_STATE)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -112,15 +117,22 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
 
     override fun onStart() {
         super.onStart()
-        if (!isScheduleShown && weekId != INVALID_VALUE) {
+        if (weekId == INVALID_VALUE) return
+        if (!isScheduleShown) {
             presenter.getSchedule(weekId)
+        } else {
+            presenter.getNotesStatus()
         }
-        presenter.getNotesStatus()
     }
 
     override fun onStop() {
         super.onStop()
         presenter.clearDisposables()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putParcelable(ARG_LAYOUT_MANAGER_SAVED_STATE, recyclerView.layoutManager.onSaveInstanceState())
     }
 
     fun showToday() {
@@ -166,9 +178,11 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         val adapter = recyclerView.adapter as LessonRecyclerViewAdapter
         adapter.initData(data)
 
+        val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+        layoutManager.onRestoreInstanceState(layoutManagerSavedState)
         if (isRecentlyCreated && isCurrentWeek) {
             val index = adapter.getWeekdayViewIndex(presenter.getCurrentDayOfWeek())
-            recyclerView.layoutManager?.scrollToPosition(index)
+            layoutManager.scrollToPosition(index)
         }
 
         if (isCurrentWeek) {
