@@ -6,6 +6,7 @@ import by.ntnk.msluschedule.mvp.Presenter
 import by.ntnk.msluschedule.mvp.PresenterManager
 import by.ntnk.msluschedule.mvp.View
 import by.ntnk.msluschedule.utils.PRESENTER_ID_KEY
+import by.ntnk.msluschedule.utils.random
 import javax.inject.Inject
 
 /**
@@ -41,20 +42,18 @@ abstract class MvpDialogFragment<out P : Presenter<V>, V : View> : DialogFragmen
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         presenterId = savedInstanceState?.getSerializable(PRESENTER_ID_KEY) as Int?
-        if (isInvalidPresenter()) presenterId = null
+        validatePresenter()
         if (presenterId == null) {
-            presenterId = presenterManager.addPresenter(hashCode(), presenter)
+            val id = (0 until Int.MAX_VALUE).random()
+            presenterId = presenterManager.addPresenter(id, presenter)
         }
     }
 
-    @Suppress("UNCHECKED_CAST")
-    private fun isInvalidPresenter(): Boolean {
-        if (presenterId != null) {
-            if (presenterManager.getPresenter(presenterId!!) == null) {
-                return true
-            }
+    private fun validatePresenter() {
+        if (presenterId != null && presenterManager.getPresenter(presenterId!!) == null) {
+            presenterManager.removePresenter(presenterId!!)
+            presenterId = null
         }
-        return false
     }
 
     override fun onStart() {
@@ -68,14 +67,14 @@ abstract class MvpDialogFragment<out P : Presenter<V>, V : View> : DialogFragmen
     }
 
     override fun onDestroy() {
+        super.onDestroy()
         if (presenterId != null && !activity!!.isChangingConfigurations) {
             presenterManager.removePresenter(presenterId!!)
         }
-        super.onDestroy()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        outState.putSerializable(PRESENTER_ID_KEY, presenterId)
         super.onSaveInstanceState(outState)
+        outState.putSerializable(PRESENTER_ID_KEY, presenterId)
     }
 }

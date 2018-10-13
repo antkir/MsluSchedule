@@ -14,6 +14,8 @@ import io.reactivex.subjects.PublishSubject
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
+import java.util.Random
+import java.util.concurrent.ThreadLocalRandom
 
 val onThemeChanged = PublishSubject.create<Boolean>()
 
@@ -50,6 +52,14 @@ fun getWeekdayFromTag(weekDayTag: String, context: Context): String {
 
 fun Context.dipToPixels(dipValue: Float) =
         TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dipValue, resources.displayMetrics).toInt()
+
+fun IntRange.random(): Int {
+    return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+        ThreadLocalRandom.current().nextInt((endInclusive + 1) - start) + start
+    } else {
+        Random().nextInt((endInclusive + 1) - start) + start
+    }
+}
 
 interface SimpleAnimatorListener : Animator.AnimatorListener {
     override fun onAnimationRepeat(animation: Animator?) = Unit
