@@ -13,28 +13,6 @@
         android:orientation="vertical"
         tools:context="by.ntnk.msluschedule.ui.weekday.WeekdayActivity">
 
-        <android.support.design.widget.AppBarLayout
-            android:id="@+id/appbarlayout_weekday"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:theme="@style/MsluTheme.AppBarOverlay"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar_weekday"
-                android:layout_width="match_parent"
-                android:layout_height="?android:attr/actionBarSize"
-                android:background="@color/colorPrimary"
-                app:navigationIcon="@drawable/ic_arrow_back" />
-
-        </android.support.design.widget.AppBarLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:background="@drawable/toolbar_shadow"
-            app:layout_constraintTop_toTopOf="@+id/textview_subhead_notes" />
-
         <TextView
             android:id="@+id/textview_subhead_notes"
             android:layout_width="match_parent"
@@ -48,7 +26,7 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             android:textColor="@color/primary_text"
             android:textStyle="bold"
-            app:layout_constraintTop_toBottomOf="@+id/appbarlayout_weekday" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/textview_zeronotes"

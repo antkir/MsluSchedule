@@ -35,13 +35,15 @@
         </activity>
         <activity
             android:name="by.ntnk.msluschedule.ui.weekday.WeekdayActivity"
-            android:theme="@style/MsluTheme.NoActionBar" />
+            android:parentActivityName="by.ntnk.msluschedule.ui.main.MainActivity" />
         <activity
             android:name="by.ntnk.msluschedule.ui.lessoninfo.LessonInfoActivity"
-            android:theme="@style/MsluTheme.NoActionBar" />
+            android:label="@string/activity_lesson_info_title"
+            android:parentActivityName="by.ntnk.msluschedule.ui.main.MainActivity" />
         <activity
             android:name="by.ntnk.msluschedule.ui.settings.SettingsActivity"
-            android:label="@string/activity_settings_title" />
+            android:label="@string/activity_settings_title"
+            android:parentActivityName="by.ntnk.msluschedule.ui.main.MainActivity" />
     </application>
 
 </manifest>

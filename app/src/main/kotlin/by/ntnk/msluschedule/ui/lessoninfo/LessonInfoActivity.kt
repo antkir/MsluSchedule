@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v4.app.NavUtils
 import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
@@ -45,28 +46,22 @@ class LessonInfoActivity : MvpActivity<LessonInfoPresenter, LessonInfoView>(),
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         lessonId = intent?.getIntExtra(ARG_LESSON_ID, INVALID_VALUE) ?: INVALID_VALUE
         weekId = intent?.getIntExtra(ARG_WEEK_ID, INVALID_VALUE) ?: INVALID_VALUE
         scheduleType = ScheduleTypeConverter.stringToScheduleType(intent?.getStringExtra(ARG_SCHEDULE_TYPE))
 
         when (scheduleType) {
-            ScheduleType.STUDYGROUP -> {
-                setContentView(R.layout.activity_lessoninfo_studygroup)
-                setSupportActionBar(toolbar_lessoninfo_studygroup)
-            }
-            ScheduleType.TEACHER -> {
-                setContentView(R.layout.activity_lessoninfo_teacher)
-                setSupportActionBar(toolbar_lessoninfo_teacher)
-            }
+            ScheduleType.STUDYGROUP -> setContentView(R.layout.activity_lessoninfo_studygroup)
+            ScheduleType.TEACHER -> setContentView(R.layout.activity_lessoninfo_teacher)
         }
-        supportActionBar?.title = null
     }
 
     override fun onStart() {
         super.onStart()
         if (scheduleType == null || lessonId <= 0) {
-            finish()
+            NavUtils.navigateUpFromSameTask(this)
             return
         }
         presenter.getLesson(lessonId, scheduleType!!, weekId)
@@ -126,9 +121,10 @@ class LessonInfoActivity : MvpActivity<LessonInfoPresenter, LessonInfoView>(),
         }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        if (item?.itemId == android.R.id.home) {
-            finish()
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == android.R.id.home) {
+            NavUtils.navigateUpFromSameTask(this)
+            return true
         }
         return super.onOptionsItemSelected(item)
     }

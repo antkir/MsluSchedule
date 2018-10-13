@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.ListFragment
+import android.support.v4.app.NavUtils
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.app.AppCompatDelegate
@@ -118,9 +119,8 @@ class SettingsActivity : AppCompatActivity(), HasSupportFragmentInjector {
         }
 
         override fun onOptionsItemSelected(item: MenuItem): Boolean {
-            val id = item.itemId
-            if (id == android.R.id.home) {
-                activity?.finish()
+            if (item.itemId == android.R.id.home) {
+                NavUtils.navigateUpFromSameTask(activity!!)
                 return true
             }
             return super.onOptionsItemSelected(item)

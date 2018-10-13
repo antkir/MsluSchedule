@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
+import android.support.v4.app.NavUtils
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
@@ -57,7 +58,7 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
         AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_weekday)
-        setSupportActionBar(toolbar_weekday)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         weekdayId = intent?.getIntExtra(ARG_WEEKDAY_ID, INVALID_VALUE) ?: INVALID_VALUE
 
@@ -181,7 +182,7 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
     override fun onStart() {
         super.onStart()
         if (weekdayId <= 0) {
-            finish()
+            NavUtils.navigateUpFromSameTask(this)
             return
         }
         presenter.getWeekday(weekdayId)
@@ -237,15 +238,16 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
         }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        if (item?.itemId == android.R.id.home) {
-            finish()
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == android.R.id.home) {
+            NavUtils.navigateUpFromSameTask(this)
+            return true
         }
         return super.onOptionsItemSelected(item)
     }
 
     override fun setToolbar(weekday: String) {
-        toolbar_weekday.title = getWeekdayFromTag(weekday, applicationContext)
+        supportActionBar?.title = getWeekdayFromTag(weekday, applicationContext)
     }
 
     override fun showNotes(data: List<Note>) {

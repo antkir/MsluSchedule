@@ -66,6 +66,8 @@
     <string name="imageview_classroom_description">Classroom</string>
     <string name="imageview_weekdays_description">Weekdays</string>
 
+    <string name="activity_lesson_info_title">Details</string>
+
     <!-- Settings -->
     <string name="activity_settings_title">Settings</string>
     <string name="pref_header_appearence">Appearance</string>
