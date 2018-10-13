@@ -40,6 +40,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     private var isEmptyScheduleDaysVisible: Boolean = false
     private var weekId: Int = INVALID_VALUE
     private var isCurrentWeek: Boolean = false
+    private var isScheduleShown: Boolean = false
 
     override val view: WeekView
         get() = this
@@ -111,12 +112,15 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
 
     override fun onStart() {
         super.onStart()
+        if (!isScheduleShown && weekId != INVALID_VALUE) {
+            presenter.getSchedule(weekId)
+        }
         presenter.getNotesStatus()
     }
 
     override fun onStop() {
-        presenter.clearDisposables()
         super.onStop()
+        presenter.clearDisposables()
     }
 
     fun showToday() {
@@ -140,6 +144,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     }
 
     override fun showSchedule(data: List<WeekdayWithLessons<Lesson>>) {
+        isScheduleShown = true
         if (data.map { it.lessons.size }.sum() == 0) {
             button_week_weekdays_visibility.visibility = View.VISIBLE
             if (!isEmptyScheduleDaysVisible) {

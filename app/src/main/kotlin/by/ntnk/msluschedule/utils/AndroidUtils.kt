@@ -10,9 +10,12 @@ import android.text.TextWatcher
 import android.util.TypedValue
 import android.view.View
 import by.ntnk.msluschedule.R
+import io.reactivex.subjects.PublishSubject
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
+
+val onThemeChanged = PublishSubject.create<Boolean>()
 
 fun isNetworkAccessible(context: Context): Boolean {
     val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager

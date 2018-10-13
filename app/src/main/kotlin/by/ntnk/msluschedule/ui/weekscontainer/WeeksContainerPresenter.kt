@@ -6,6 +6,8 @@ import by.ntnk.msluschedule.utils.CurrentDate
 import by.ntnk.msluschedule.utils.ImmutableEntry
 import by.ntnk.msluschedule.utils.SchedulerProvider
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import timber.log.Timber
 import javax.inject.Inject
@@ -16,9 +18,11 @@ class WeeksContainerPresenter @Inject constructor(
         private val currentDate: CurrentDate,
         private val schedulerProvider: SchedulerProvider
 ) : Presenter<WeeksContainerView>() {
+    private val disposables: CompositeDisposable = CompositeDisposable()
+
     fun initWeeksAdapter() {
         val info = sharedPreferencesRepository.getSelectedScheduleContainerInfo()
-        databaseRepository.getWeeksForContainer(info.id)
+        disposables += databaseRepository.getWeeksForContainer(info.id)
                 .toList()
                 .map { weeks ->
                     val index = when {
@@ -55,4 +59,6 @@ class WeeksContainerPresenter @Inject constructor(
                         onError = { throwable -> Timber.e(throwable) }
                 )
     }
+
+    fun clearDisposables() = disposables.clear()
 }

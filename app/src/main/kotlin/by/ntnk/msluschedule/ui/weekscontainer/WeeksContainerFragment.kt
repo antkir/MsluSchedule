@@ -72,6 +72,7 @@ class WeeksContainerFragment :
 
     override fun onStop() {
         super.onStop()
+        presenter.clearDisposables()
         savedCurrentPosition = tabLayout.selectedTabPosition
     }
 
@@ -103,8 +104,8 @@ class WeeksContainerFragment :
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        outState.putInt(SELECTED_TAB_POSITION, tabLayout.selectedTabPosition)
         super.onSaveInstanceState(outState)
+        outState.putInt(SELECTED_TAB_POSITION, tabLayout.selectedTabPosition)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {

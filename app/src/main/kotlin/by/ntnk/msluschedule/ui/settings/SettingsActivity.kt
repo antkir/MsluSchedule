@@ -22,6 +22,7 @@ import android.widget.ArrayAdapter
 import by.ntnk.msluschedule.BuildConfig
 import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
+import by.ntnk.msluschedule.utils.onThemeChanged
 import dagger.android.AndroidInjection
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
@@ -82,10 +83,8 @@ class SettingsActivity : AppCompatActivity(), HasSupportFragmentInjector {
                 }
                 if (value != sharedPreferencesRepository.getThemeMode(getString(R.string.key_theme))) {
                     AppCompatDelegate.setDefaultNightMode(value.toInt())
-                    val packageName = activity?.baseContext?.packageName
-                    val i = activity?.baseContext?.packageManager?.getLaunchIntentForPackage(packageName)
-                    i?.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                    if (i != null) startActivity(i)
+                    onThemeChanged.onNext(true)
+                    activity?.recreate()
                 }
                 return@OnPreferenceChangeListener true
             }

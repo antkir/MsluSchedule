@@ -11,6 +11,8 @@ import by.ntnk.msluschedule.utils.ScheduleType
 import by.ntnk.msluschedule.utils.SchedulerProvider
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
 import io.reactivex.Single
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import timber.log.Timber
 import javax.inject.Inject
@@ -22,6 +24,8 @@ class MainPresenter @Inject constructor(
         private val sharedPreferencesRepository: SharedPreferencesRepository,
         private val schedulerProvider: SchedulerProvider
 ) : Presenter<MainView>() {
+    private val disposables: CompositeDisposable = CompositeDisposable()
+
     fun addGroup(studyGroup: StudyGroup) {
         databaseRepository.insertStudyGroup(studyGroup)
                 .observeOn(schedulerProvider.ui())
@@ -82,7 +86,7 @@ class MainPresenter @Inject constructor(
     }
 
     fun initContainerListView() {
-        databaseRepository.getScheduleContainers()
+        disposables += databaseRepository.getScheduleContainers()
                 .subscribeOn(schedulerProvider.single())
                 .observeOn(schedulerProvider.ui())
                 .subscribeBy(
@@ -108,4 +112,6 @@ class MainPresenter @Inject constructor(
 
     fun isSelectedContainerNull() =
             sharedPreferencesRepository.getSelectedScheduleContainerInfo().type == null
+
+    fun clearDisposables() = disposables.clear()
 }

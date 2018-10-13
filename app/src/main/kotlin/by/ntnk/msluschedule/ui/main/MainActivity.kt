@@ -29,6 +29,7 @@ import dagger.android.AndroidInjection
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.support.HasSupportFragmentInjector
+import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.content_main.*
@@ -46,11 +47,12 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
         AddGroupFragment.DialogListener,
         AddTeacherFragment.DialogListener,
         WeeksContainerFragment.OnScheduleContainerDeletedListener {
-    override val view: MainView
-        get() = this
-
     private var isFamOpen = false
     private var isUpdatingWeeksContainer = false
+    private lateinit var onThemeChangedDisposable: Disposable
+
+    override val view: MainView
+        get() = this
 
     @Inject
     lateinit var fragmentDispatchingAndroidInjector: DispatchingAndroidInjector<Fragment>
@@ -87,6 +89,10 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
         button_settings_main.setOnClickListener { SettingsActivity.startActivity(this) }
 
         supportActionBar?.title = savedInstanceState?.getString(ARG_ACTIONBAR_TITLE)
+
+        onThemeChangedDisposable = onThemeChanged
+                .filter { it }
+                .subscribe { recreate() }
     }
 
     override fun onStart() {
@@ -101,6 +107,16 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
         } else {
             initMainContent()
         }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        presenter.clearDisposables()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        onThemeChangedDisposable.dispose()
     }
 
     private fun isContainerListViewEmpty(): Boolean {
