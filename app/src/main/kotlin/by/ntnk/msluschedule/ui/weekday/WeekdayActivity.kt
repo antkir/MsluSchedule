@@ -172,8 +172,8 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
         fab_weekday.animate()
                 .setListener(object : SimpleAnimatorListener {
                     override fun onAnimationEnd(animation: Animator?) {
-                        fab_weekday.animate().setListener(null)
-                        fab_weekday.visibility = View.VISIBLE
+                        fab_weekday?.animate()?.setListener(null)
+                        fab_weekday?.visibility = View.VISIBLE
                     }
                 })
                 .start()
@@ -224,12 +224,12 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
                     .setDuration(100)
                     .setListener(object : SimpleAnimatorListener {
                         override fun onAnimationEnd(animation: Animator?) {
-                            edittext_note.animate().setListener(null)
-                            edittext_note.visibility = View.INVISIBLE
-                            edittext_note.translationY = 0f
-                            edittext_note.text.clear()
+                            edittext_note?.animate()?.setListener(null)
+                            edittext_note?.visibility = View.INVISIBLE
+                            edittext_note?.translationY = 0f
+                            edittext_note?.text?.clear()
 
-                            fab_weekday.visibility = View.VISIBLE
+                            fab_weekday?.visibility = View.VISIBLE
                         }
                     })
                     .start()

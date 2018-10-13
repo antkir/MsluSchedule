@@ -260,8 +260,8 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
                 .setInterpolator(FastOutSlowInInterpolator())
                 .setListener(object : SimpleAnimatorListener {
                     override fun onAnimationEnd(animation: Animator?) {
-                        groupfab_main.visibility = View.INVISIBLE
-                        groupfab_main.animate().setListener(null)
+                        groupfab_main?.visibility = View.INVISIBLE
+                        groupfab_main?.animate()?.setListener(null)
                     }
                 })
                 .start()
@@ -274,8 +274,8 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
                 .setInterpolator(FastOutSlowInInterpolator())
                 .setListener(object : SimpleAnimatorListener {
                     override fun onAnimationEnd(animation: Animator?) {
-                        teacherfab_main.visibility = View.INVISIBLE
-                        teacherfab_main.animate().setListener(null)
+                        teacherfab_main?.visibility = View.INVISIBLE
+                        teacherfab_main?.animate()?.setListener(null)
                     }
                 })
                 .start()

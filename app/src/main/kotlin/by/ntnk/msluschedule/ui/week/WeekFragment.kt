@@ -228,8 +228,8 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
                 .setDuration(200)
                 .setListener(object : SimpleAnimatorListener {
                     override fun onAnimationEnd(animation: Animator?) {
-                        progressbar_week.animate().setListener(null)
-                        progressbar_week.visibility = View.INVISIBLE
+                        progressbar_week?.animate()?.setListener(null)
+                        progressbar_week?.visibility = View.INVISIBLE
                     }
                 })
                 .start()
