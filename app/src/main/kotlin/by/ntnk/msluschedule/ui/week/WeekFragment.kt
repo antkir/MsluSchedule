@@ -44,7 +44,6 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     private var weekId: Int = INVALID_VALUE
     private var isCurrentWeek: Boolean = false
     private var layoutManagerSavedState: Parcelable? = null
-    private var isScheduleShown: Boolean = false
 
     override val view: WeekView
         get() = this
@@ -109,20 +108,9 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         )
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        if (weekId == INVALID_VALUE) return
-        presenter.getSchedule(weekId)
-    }
-
     override fun onStart() {
         super.onStart()
-        if (weekId == INVALID_VALUE) return
-        if (!isScheduleShown) {
-            presenter.getSchedule(weekId)
-        } else {
-            presenter.getNotesStatus()
-        }
+        presenter.getSchedule(weekId)
     }
 
     override fun onStop() {
@@ -156,7 +144,6 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     }
 
     override fun showSchedule(data: List<WeekdayWithLessons<Lesson>>) {
-        isScheduleShown = true
         if (data.map { it.lessons.size }.sum() == 0) {
             button_week_weekdays_visibility.visibility = View.VISIBLE
             if (!isEmptyScheduleDaysVisible) {
@@ -179,7 +166,9 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         adapter.initData(data)
 
         val layoutManager = recyclerView.layoutManager as LinearLayoutManager
-        layoutManager.onRestoreInstanceState(layoutManagerSavedState)
+        if (isRecentlyRecreated) {
+            layoutManager.onRestoreInstanceState(layoutManagerSavedState)
+        }
         if (isRecentlyCreated && isCurrentWeek) {
             val index = adapter.getWeekdayViewIndex(presenter.getCurrentDayOfWeek())
             layoutManager.scrollToPosition(index)

@@ -30,7 +30,6 @@ class WeekPresenter @Inject constructor(
 ) : Presenter<WeekView>() {
     private val disposables: CompositeDisposable = CompositeDisposable()
     private var scheduler = schedulerProvider.cachedThreadPool()
-    private val weekdayIds: MutableList<Int> = ArrayList()
 
     fun getSchedule(weekId: Int) {
         val containerInfo = sharedPreferencesRepository.getSelectedScheduleContainerInfo()
@@ -40,12 +39,10 @@ class WeekPresenter @Inject constructor(
                 .observeOn(schedulerProvider.ui())
                 .subscribeBy(
                         onSuccess = {
-                            weekdayIds.clear()
-                            for (weekday in it) {
-                                weekdayIds.add(weekday.weekdayId)
-                            }
-                            getNotesStatus()
                             view?.showSchedule(it)
+                            for (weekday in it) {
+                                getNotesStatus(weekday.weekdayId)
+                            }
                         },
                         onError = {
                             it.printStackTrace()
@@ -54,18 +51,16 @@ class WeekPresenter @Inject constructor(
                 )
     }
 
-    fun getNotesStatus() {
-        for (id in weekdayIds) {
-            databaseRepository.getNotesForWeekday(id)
-                    .toList()
-                    .map { notes -> notes.isNotEmpty() }
-                    .subscribeOn(scheduler)
-                    .observeOn(schedulerProvider.ui())
-                    .subscribeBy(
-                            onSuccess = { isNotesListNotEmpty -> view?.updateNotesStatus(id, isNotesListNotEmpty) },
-                            onError = { throwable -> Timber.e(throwable) }
-                    )
-        }
+    private fun getNotesStatus(weekdayId: Int) {
+        databaseRepository.getNotesForWeekday(weekdayId)
+                .toList()
+                .map { notes -> notes.isNotEmpty() }
+                .subscribeOn(scheduler)
+                .observeOn(schedulerProvider.ui())
+                .subscribeBy(
+                        onSuccess = { isNotesListNotEmpty -> view?.updateNotesStatus(weekdayId, isNotesListNotEmpty) },
+                        onError = { throwable -> Timber.e(throwable) }
+                )
     }
 
     private fun getScheduleData(container: ScheduleContainer, weekId: Int): Single<List<WeekdayWithLessons<Lesson>>> {

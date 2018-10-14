@@ -25,6 +25,12 @@ abstract class MvpFragment<out P : Presenter<V>, V : View> : Fragment() {
      */
     protected var isRecentlyCreated: Boolean = false
 
+    /**
+     * Checks if this fragment has already called [onCreate] with non-null [Bundle] and
+     * hasn't called [onStop] yet.
+     */
+    protected var isRecentlyRecreated: Boolean = false
+
     @Inject
     fun setPresenter(presenterManager: PresenterManager) {
         this.presenterManager = presenterManager
@@ -50,6 +56,7 @@ abstract class MvpFragment<out P : Presenter<V>, V : View> : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         isRecentlyCreated = savedInstanceState == null
+        isRecentlyRecreated = savedInstanceState != null
         presenterId = savedInstanceState?.getSerializable(PRESENTER_ID_KEY) as Int?
         if (retainPresenter) {
             validatePresenter()
@@ -76,6 +83,7 @@ abstract class MvpFragment<out P : Presenter<V>, V : View> : Fragment() {
     override fun onStop() {
         super.onStop()
         isRecentlyCreated = false
+        isRecentlyRecreated = false
         presenter.unbindView()
     }
 
