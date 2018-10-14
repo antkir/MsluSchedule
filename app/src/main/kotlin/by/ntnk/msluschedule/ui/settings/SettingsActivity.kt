@@ -82,7 +82,7 @@ class SettingsActivity : AppCompatActivity(), HasSupportFragmentInjector {
                 if (index in preference.entries.indices) {
                     preference.setSummary(preference.entries[index])
                 }
-                if (value != sharedPreferencesRepository.getThemeMode(getString(R.string.key_theme))) {
+                if (value != sharedPreferencesRepository.getThemeMode()) {
                     AppCompatDelegate.setDefaultNightMode(value.toInt())
                     onThemeChanged.onNext(true)
                     activity?.recreate()
@@ -90,7 +90,7 @@ class SettingsActivity : AppCompatActivity(), HasSupportFragmentInjector {
                 return@OnPreferenceChangeListener true
             }
             // Trigger the listener immediately with the preference's current value.
-            val value = sharedPreferencesRepository.getThemeMode(getString(R.string.key_theme))
+            val value = sharedPreferencesRepository.getThemeMode()
             themePreference.onPreferenceChangeListener.onPreferenceChange(themePreference, value)
 
             val sendFeedback = findPreference(getString(R.string.key_send_feedback))

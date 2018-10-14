@@ -107,6 +107,8 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
         } else {
             initMainContent()
         }
+
+        fam_layout_main.visibility = if (presenter.isFabShown()) View.VISIBLE else View.GONE
     }
 
     override fun onStop() {

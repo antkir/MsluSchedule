@@ -82,7 +82,7 @@
     <string name="pref_theme_default_summary">Light</string>
     <string name="pref_full_subjects_title">Full subject names</string>
     <string name="pref_full_subjects_summary">Will take effect after the next schedule update.</string>
-    <string name="pref_hide_add_schedule_title">Hide \'Add Schedule\' button</string>
+    <string name="pref_show_add_schedule_title">Show \'Add Schedule\' button</string>
     <string name="pref_header_about">About</string>
     <string name="send_feedback_title">Send Feedback</string>
     <string name="privacy_policy">Privacy Policy</string>
@@ -91,7 +91,7 @@
 
     <string name="key_theme" translatable="false">key_theme</string>
     <string name="key_full_subjects" translatable="false">key_full_subjects</string>
-    <string name="key_hide_add_schedule" translatable="false">key_hide_add_schedule</string>
+    <string name="key_show_add_schedule" translatable="false">key_show_add_schedule</string>
     <string name="key_send_feedback" translatable="false">key_send_feedback</string>
     <string name="key_libraries" translatable="false">key_libraries</string>
     <string name="key_about" translatable="false">key_about</string>

@@ -107,6 +107,8 @@ class MainPresenter @Inject constructor(
                 )
     }
 
+    fun isFabShown(): Boolean = sharedPreferencesRepository.isMainFabShown()
+
     fun setSelectedSheduleContainer(id: Int, value: String, type: ScheduleType) =
             sharedPreferencesRepository.putSelectedScheduleContainer(id, value, type)
 
