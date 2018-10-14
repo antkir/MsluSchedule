@@ -93,15 +93,14 @@ class LessonInfoActivity : MvpActivity<LessonInfoPresenter, LessonInfoView>(),
         setFieldText(lesson.classroom, textview_classroom_lessoninfo_teacher, imageview_classroom_lessoninfo_teacher)
         setFieldText(String.format("%s - %s", lesson.startTime, lesson.endTime),
                      textview_time_lessoninfo_teacher, imageview_time_lessoninfo_teacher)
-        setFieldText(lesson.faculty, textview_faculties_lessoninfo_teacher, imageView = null)
-        setFieldText(lesson.groups, textview_groups_lessoninfo_teacher, imageView = null)
+        setFieldText(lesson.type, textview_type_lessoninfo_teacher, imageView = null)
+        val faculties = lesson.faculty.replace(", ", "\n")
+        setFieldText(faculties, textview_faculties_lessoninfo_teacher, imageView = null)
+        val groups = lesson.groups.replace(", ", "\n")
+        setFieldText(groups, textview_groups_lessoninfo_teacher, imageView = null)
 
-        if (lesson.faculty == EMPTY_STRING && lesson.groups == EMPTY_STRING) {
+        if (lesson.type == EMPTY_STRING && lesson.faculty == EMPTY_STRING && lesson.groups == EMPTY_STRING) {
             imageview_groups_lessoninfo_teacher.visibility = View.GONE
-        }
-
-        if (lesson.type != EMPTY_STRING) {
-            supportActionBar?.title = lesson.type
         }
 
         var weekdays: String = EMPTY_STRING

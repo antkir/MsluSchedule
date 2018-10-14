@@ -46,7 +46,7 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             android:textColor="@color/primary_text"
             android:textIsSelectable="true"
-            app:layout_constraintBottom_toTopOf="@id/textview_faculties_lessoninfo_teacher"
+            app:layout_constraintBottom_toTopOf="@id/textview_type_lessoninfo_teacher"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/imageview_time_lessoninfo_teacher"
             app:layout_constraintTop_toBottomOf="@id/textview_subject_lessoninfo_teacher"
@@ -61,7 +61,7 @@
             android:layout_marginLeft="@dimen/textview_lessoninfo_margin_start"
             android:layout_marginRight="@dimen/textview_lessoninfo_margin"
             android:layout_marginStart="@dimen/textview_lessoninfo_margin_start"
-            android:layout_marginTop="@dimen/textview_lessoninfo_margin"
+            android:layout_marginTop="4dp"
             android:gravity="center_vertical"
             android:lineSpacingMultiplier="@dimen/textview_lessoninfo_line_space_multiplier"
             android:minHeight="26dp"
@@ -71,8 +71,8 @@
             app:layout_constraintBottom_toTopOf="@id/textview_groups_lessoninfo_teacher"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/imageview_groups_lessoninfo_teacher"
-            app:layout_constraintTop_toBottomOf="@id/textview_time_lessoninfo_teacher"
-            tools:text="Англ.яз., Кит.яз., Нем.яз." />
+            app:layout_constraintTop_toBottomOf="@id/textview_type_lessoninfo_teacher"
+            tools:text="Англ.яз.\nКит.яз.\nНем.яз." />
 
         <ImageView
             android:id="@+id/imageview_subject_lessoninfo_teacher"
@@ -111,7 +111,7 @@
             android:tint="@color/icon_tint"
             app:layout_constraintBottom_toBottomOf="@id/textview_groups_lessoninfo_teacher"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/textview_faculties_lessoninfo_teacher" />
+            app:layout_constraintTop_toTopOf="@id/textview_type_lessoninfo_teacher" />
 
         <TextView
             android:id="@+id/textview_groups_lessoninfo_teacher"
@@ -133,7 +133,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/imageview_groups_lessoninfo_teacher"
             app:layout_constraintTop_toBottomOf="@id/textview_faculties_lessoninfo_teacher"
-            tools:text="424 а.нем, 425 а.фр_кл, 426 а.исп, 403 к.а./ 1 КЛ, 402 н." />
+            tools:text="424 а.нем\n425 а.фр_кл\n426 а.исп\n403 к.а./ 1 КЛ\n402 н." />
 
         <ImageView
             android:id="@+id/imageview_classroom_lessoninfo_teacher"
@@ -200,6 +200,28 @@
             app:layout_constraintStart_toEndOf="@+id/imageview_weekdays_lessoninfo_teacher"
             app:layout_constraintTop_toBottomOf="@id/textview_classroom_lessoninfo_teacher"
             tools:text="Monday, Friday, Saturday" />
+
+        <TextView
+            android:id="@+id/textview_type_lessoninfo_teacher"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:layout_marginEnd="@dimen/textview_lessoninfo_margin"
+            android:layout_marginLeft="@dimen/textview_lessoninfo_margin_start"
+            android:layout_marginRight="@dimen/textview_lessoninfo_margin"
+            android:layout_marginStart="@dimen/textview_lessoninfo_margin_start"
+            android:layout_marginTop="@dimen/textview_lessoninfo_margin"
+            android:gravity="center_vertical"
+            android:lineSpacingMultiplier="@dimen/textview_lessoninfo_line_space_multiplier"
+            android:minHeight="26dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textColor="@color/primary_text"
+            android:textIsSelectable="true"
+            app:layout_constraintBottom_toTopOf="@+id/textview_faculties_lessoninfo_teacher"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/imageview_groups_lessoninfo_teacher"
+            app:layout_constraintTop_toBottomOf="@+id/textview_time_lessoninfo_teacher"
+            tools:text="ЛК" />
 
     </android.support.constraint.ConstraintLayout>
 
