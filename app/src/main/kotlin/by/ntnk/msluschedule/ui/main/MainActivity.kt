@@ -189,8 +189,8 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        outState.putString(ARG_ACTIONBAR_TITLE, supportActionBar?.title.toString())
         super.onSaveInstanceState(outState)
+        outState.putString(ARG_ACTIONBAR_TITLE, supportActionBar?.title.toString())
     }
 
     @Suppress("UNUSED_PARAMETER")

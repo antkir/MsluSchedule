@@ -104,11 +104,11 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
         teacherView.requestFocus()
     }
 
-    private fun initAdapter(response: ScheduleFilter): ScheduleFilterAdapter {
+    private fun initAdapter(data: ScheduleFilter): ScheduleFilterAdapter {
         return ScheduleFilterAdapter(
                 activity!!,
                 android.R.layout.simple_spinner_dropdown_item,
-                response
+                data
         )
     }
 
@@ -118,8 +118,8 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
     }
 
     override fun dismiss() {
-        presenter.clearDisposables()
         super.dismiss()
+        presenter.clearDisposables()
     }
 
     interface DialogListener {

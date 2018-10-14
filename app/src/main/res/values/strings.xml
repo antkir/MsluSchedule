@@ -104,7 +104,7 @@
         <item>Apache POI</item>
         <item>Dagger</item>
         <item>jsoup</item>
-        <item>JUnit 4</item>
+        <item>JUnit</item>
         <item>Kotlin</item>
         <item>LeakCanary</item>
         <item>Mockito</item>

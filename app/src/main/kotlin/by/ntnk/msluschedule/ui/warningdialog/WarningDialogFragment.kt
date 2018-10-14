@@ -72,8 +72,8 @@ class WarningDialogFragment : DialogFragment() {
     }
 
     override fun dismiss() {
-        disposable.dispose()
         super.dismiss()
+        disposable.dispose()
     }
 
     interface DialogListener {

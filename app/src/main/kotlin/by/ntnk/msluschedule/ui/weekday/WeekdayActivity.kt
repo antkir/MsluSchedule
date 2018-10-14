@@ -8,6 +8,7 @@ import android.os.Parcelable
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v4.app.NavUtils
+import android.support.v4.view.animation.FastOutSlowInInterpolator
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
@@ -174,13 +175,14 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
         button_save_note.visibility = View.INVISIBLE
         edittext_note_shadow?.visibility = View.GONE
 
+        fab_weekday.visibility = View.VISIBLE
+        fab_weekday.scaleX = 0f
+        fab_weekday.scaleY = 0f
         fab_weekday.animate()
-                .setListener(object : SimpleAnimatorListener {
-                    override fun onAnimationEnd(animation: Animator?) {
-                        fab_weekday?.animate()?.setListener(null)
-                        fab_weekday?.visibility = View.VISIBLE
-                    }
-                })
+                .setDuration(300)
+                .scaleY(1f)
+                .scaleX(1f)
+                .setInterpolator(FastOutSlowInInterpolator())
                 .start()
     }
 

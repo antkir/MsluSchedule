@@ -188,17 +188,17 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
         }
     }
 
-    private fun initAdapter(response: ScheduleFilter): ScheduleFilterAdapter {
+    private fun initAdapter(data: ScheduleFilter): ScheduleFilterAdapter {
         return ScheduleFilterAdapter(
                 activity!!,
                 android.R.layout.simple_spinner_dropdown_item,
-                response
+                data
         )
     }
 
     override fun dismiss() {
-        presenter.clearDisposables()
         super.dismiss()
+        presenter.clearDisposables()
     }
 
     interface DialogListener {
