@@ -11,6 +11,7 @@ import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.utils.CurrentDate
 import by.ntnk.msluschedule.utils.EMPTY_STRING
 import by.ntnk.msluschedule.utils.InvalidYearException
+import by.ntnk.msluschedule.utils.toInt
 import io.reactivex.Single
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -25,6 +26,7 @@ class NetworkHelper @Inject constructor(private val currentDate: CurrentDate) {
     val weekRequestInfo = RequestInfo("studyweeks", buttonZone)
     val teacherRequestInfo = RequestInfo("teachers", buttonZone)
     private val yearRequestInfo = RequestInfo("studyyears", studyWeekZone)
+    private val subjectLengthRequestInfo = RequestInfo("printnamesubject", buttonZone)
 
     private fun createYearRequestDataInstance(value: Int) = RequestData(yearRequestInfo, value)
 
@@ -37,6 +39,11 @@ class NetworkHelper @Inject constructor(private val currentDate: CurrentDate) {
     private fun createStudyGroupRequestDataInstance(value: Int) = RequestData(groupRequestInfo, value)
 
     private fun createTeacherRequestDataInstance(value: Int) = RequestData(teacherRequestInfo, value)
+
+    private fun createSubjectLengthRequestDataInstance(value: Int) = RequestData(subjectLengthRequestInfo, value)
+
+    fun getSubjectLengthFilterData(isFullSubjectName: Boolean): RequestData =
+            createSubjectLengthRequestDataInstance(isFullSubjectName.toInt())
 
     fun getYearsFilterDataList(): List<RequestData> =
             Collections.singletonList(createYearRequestDataInstance(currentDate.academicYear))

@@ -13,7 +13,7 @@ import org.apache.poi.ss.usermodel.Row
 import java.io.InputStream
 import javax.inject.Inject
 
-class XlsParser @Inject constructor() {
+class XlsParser @Inject constructor(private val sharedPreferencesRepository: SharedPreferencesRepository) {
     fun parseStudyGroupXls(xlsStream: InputStream): Observable<WeekdayWithStudyGroupLessons> {
         val poifsFileSystem = POIFSFileSystem(xlsStream)
         val hssfWorkbook = HSSFWorkbook(poifsFileSystem)
@@ -36,6 +36,7 @@ class XlsParser @Inject constructor() {
         lateinit var subject: String
         lateinit var teacher: String
         lateinit var classroom: String
+        var isPreviousLessonPhysEd = false
 
         for (cell in cells) {
             when (cell.columnIndex) {
@@ -61,10 +62,30 @@ class XlsParser @Inject constructor() {
 
                     if (startTime.isNotEmpty()) {
                         val lesson = StudyGroupLesson(subject, teacher, classroom, startTime, endTime)
-                        weekday.lessons.add(lesson)
+                        if (sharedPreferencesRepository.isPhysEdClassHidden()) {
+                            if (subject.contains("физ", true) && subject.contains("культура", true)) {
+                                isPreviousLessonPhysEd = true
+                            } else if (!(isPreviousLessonPhysEd && subject.isBlank())) {
+                                isPreviousLessonPhysEd = false
+                                weekday.lessons.add(lesson)
+                            }
+                        } else {
+                            weekday.lessons.add(lesson)
+                        }
                     }
                 }
-                else -> {
+                else -> Unit
+            }
+        }
+
+        // Cut empty lessons, if they are the last ones in the list
+        for (weekdayWithLessons in weekdaysWithLessons) {
+            val size = weekdayWithLessons.lessons.size
+            for (i in weekdayWithLessons.lessons.indices) {
+                if (weekdayWithLessons.lessons[size - 1 - i].subject.isBlank()) {
+                    weekdayWithLessons.lessons.removeAt(size - 1 - i)
+                } else {
+                    break
                 }
             }
         }

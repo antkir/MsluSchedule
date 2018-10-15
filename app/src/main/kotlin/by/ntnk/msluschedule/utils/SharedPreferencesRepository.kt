@@ -61,4 +61,14 @@ class SharedPreferencesRepository @Inject constructor(
         return sharedPreferences
                 .getBoolean(applicationContext.getString(R.string.key_show_add_schedule), true)
     }
+
+    fun isFullSubjectNameUsed(): Boolean {
+        return sharedPreferences
+                .getBoolean(applicationContext.getString(R.string.key_full_subjects), false)
+    }
+
+    fun isPhysEdClassHidden(): Boolean {
+        return sharedPreferences
+                .getBoolean(applicationContext.getString(R.string.key_hide_pe_classes), false)
+    }
 }

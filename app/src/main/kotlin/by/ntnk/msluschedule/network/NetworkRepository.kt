@@ -11,6 +11,7 @@ import by.ntnk.msluschedule.network.data.RequestInfo
 import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.utils.EMPTY_STRING
 import by.ntnk.msluschedule.utils.HttpStatusException
+import by.ntnk.msluschedule.utils.SharedPreferencesRepository
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -20,9 +21,10 @@ import javax.inject.Inject
 
 @PerApp
 class NetworkRepository @Inject constructor(
-        private val scheduleApi: ScheduleApi,
-        private val networkHelper: NetworkHelper,
         private val localCookieJar: LocalCookieJar,
+        private val networkHelper: NetworkHelper,
+        private val sharedPreferencesRepository: SharedPreferencesRepository,
+        private val scheduleApi: ScheduleApi,
         private val xlsParser: XlsParser
 ) {
     fun getFaculties(): Single<ScheduleFilter> {
@@ -110,7 +112,15 @@ class NetworkRepository @Inject constructor(
     ): Single<InputStream> {
         return Observable.fromIterable(requestDataList)
                 .flatMapSingle { changeScheduleFilter(requestedScheduleType, it) }
-                .ignoreElements()
+                .flatMapCompletable {
+                    val isFullSubjectNameUsed = sharedPreferencesRepository.isFullSubjectNameUsed()
+                    return@flatMapCompletable if (isFullSubjectNameUsed) {
+                        val filterData = networkHelper.getSubjectLengthFilterData(isFullSubjectNameUsed)
+                        changeScheduleFilter(NetworkHelper.groupSchedule, filterData).ignoreElement()
+                    } else {
+                        Completable.complete()
+                    }
+                }
                 .andThen(getScheduleInputStream(requestedScheduleType))
     }
 

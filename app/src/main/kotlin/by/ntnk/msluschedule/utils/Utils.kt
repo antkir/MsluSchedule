@@ -22,6 +22,8 @@ const val SUNDAY = "ВС"
 
 const val WEEKDAYS_NUMBER = 7
 
+fun Boolean.toInt() = if (this) 1 else 0
+
 typealias ImmutableEntry = AbstractMap.SimpleImmutableEntry<Int, String>
 
 class InvalidYearException : Exception()

@@ -100,7 +100,7 @@ class SettingsActivity : AppCompatActivity(), HasSupportFragmentInjector {
                                          BuildConfig.VERSION_NAME, Build.MODEL, Build.VERSION.RELEASE)
                 emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Feedback")
                 emailIntent.putExtra(Intent.EXTRA_TEXT, text)
-                startActivity(Intent.createChooser(emailIntent, getString(R.string.send_feedback_title)))
+                startActivity(Intent.createChooser(emailIntent, getString(R.string.pref_send_feedback_title)))
                 return@setOnPreferenceClickListener true
             }
 
