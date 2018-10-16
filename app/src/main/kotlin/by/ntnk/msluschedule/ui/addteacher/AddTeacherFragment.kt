@@ -3,9 +3,8 @@ package by.ntnk.msluschedule.ui.addteacher
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
-import android.support.design.widget.TextInputLayout
-import android.support.v7.app.AlertDialog
 import android.view.View
+import androidx.appcompat.app.AlertDialog
 import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.data.Teacher
 import by.ntnk.msluschedule.mvp.views.MvpDialogFragment
@@ -14,6 +13,7 @@ import by.ntnk.msluschedule.ui.adapters.ScheduleFilterAdapter
 import by.ntnk.msluschedule.ui.customviews.LoadingAutoCompleteTextView
 import by.ntnk.msluschedule.utils.EMPTY_STRING
 import by.ntnk.msluschedule.utils.SimpleTextWatcher
+import com.google.android.material.textfield.TextInputLayout
 import dagger.Lazy
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
@@ -44,7 +44,7 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
         val layout = View.inflate(activity, R.layout.add_teacher_view, null)
         initViews(layout)
         val dialog = initMaterialDialog(layout)
-        dialog.window.attributes.windowAnimations = R.style.DialogAnimation
+        dialog.window?.attributes?.windowAnimations = R.style.DialogAnimation
         dialog.setOnShowListener {
             (it as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE).isEnabled =
                     presenter.isValidTeacher(teacherView.text.toString())

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/constraintlayout_weekday"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/surface"
@@ -18,10 +18,10 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/textview_subhead_notes_height"
             android:gravity="start|center_vertical"
-            android:paddingEnd="@dimen/textview_subhead_notes_margin"
-            android:paddingLeft="@dimen/textview_subhead_notes_margin"
-            android:paddingRight="@dimen/textview_subhead_notes_margin"
             android:paddingStart="@dimen/textview_subhead_notes_margin"
+            android:paddingLeft="@dimen/textview_subhead_notes_margin"
+            android:paddingEnd="@dimen/textview_subhead_notes_margin"
+            android:paddingRight="@dimen/textview_subhead_notes_margin"
             android:text="@string/textview_notes_subhead"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             android:textColor="@color/primary_text"
@@ -33,10 +33,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="start|center_vertical"
-            android:paddingEnd="@dimen/textview_zeronotes_margin"
-            android:paddingLeft="@dimen/textview_zeronotes_margin"
-            android:paddingRight="@dimen/textview_zeronotes_margin"
             android:paddingStart="@dimen/textview_zeronotes_margin"
+            android:paddingLeft="@dimen/textview_zeronotes_margin"
+            android:paddingEnd="@dimen/textview_zeronotes_margin"
+            android:paddingRight="@dimen/textview_zeronotes_margin"
             android:text="@string/textview_zeronotes"
             android:textAppearance="@style/TextAppearance.AppCompat.Small"
             android:textColor="@color/tertiary_text"
@@ -44,7 +44,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/recyclerview_weekday" />
 
-        <android.support.v7.widget.RecyclerView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerview_weekday"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -55,7 +55,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textview_subhead_notes" />
 
-        <android.support.v7.widget.AppCompatEditText
+        <androidx.appcompat.widget.AppCompatEditText
             android:id="@+id/edittext_note"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -67,17 +67,17 @@
             android:inputType="textMultiLine"
             android:maxLines="8"
             android:minHeight="@dimen/edittext_note_minheight"
-            android:paddingBottom="@dimen/edittext_note_marginvertical"
-            android:paddingEnd="@dimen/edittext_note_marginend"
             android:paddingStart="@dimen/edittext_note_marginstart"
             android:paddingTop="@dimen/edittext_note_marginvertical"
+            android:paddingEnd="@dimen/edittext_note_marginend"
+            android:paddingBottom="@dimen/edittext_note_marginvertical"
             android:scrollbarStyle="insideInset"
             android:visibility="invisible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
-        <android.support.v7.widget.AppCompatImageButton
+        <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/button_save_note"
             android:layout_width="@dimen/button_note_save_width"
             android:layout_height="@dimen/button_note_save_height"
@@ -89,17 +89,17 @@
             android:visibility="invisible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <android.support.design.widget.FloatingActionButton
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_weekday"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_marginBottom="@dimen/fab_weekday_margin"
         android:layout_marginEnd="@dimen/fab_weekday_margin"
+        android:layout_marginBottom="@dimen/fab_weekday_margin"
         android:src="@drawable/ic_edit_note"
         app:fabSize="normal"
         app:useCompatPadding="true" />
 
-</android.support.design.widget.CoordinatorLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

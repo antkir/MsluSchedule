@@ -1,7 +1,7 @@
 package by.ntnk.msluschedule.mvp.views
 
 import android.os.Bundle
-import android.support.v4.app.DialogFragment
+import androidx.fragment.app.DialogFragment
 import by.ntnk.msluschedule.mvp.Presenter
 import by.ntnk.msluschedule.mvp.PresenterManager
 import by.ntnk.msluschedule.mvp.View

@@ -13,7 +13,7 @@
     </style>
 
     <style name="MsluTheme.PreferenceCategory">
-        <item name="android:layout">@layout/pref_category_layout</item>
+        <item name="layout">@layout/pref_category_layout</item>
         <item name="android:shouldDisableView">false</item>
         <item name="android:selectable">false</item>
     </style>

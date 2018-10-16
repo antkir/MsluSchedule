@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <android.support.v7.widget.RecyclerView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_week_days"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -30,8 +30,8 @@
         android:background="@color/colorPrimaryLight"
         android:elevation="2dp"
         android:indeterminate="true"
-        android:paddingBottom="16dp"
         android:paddingTop="16dp"
+        android:paddingBottom="16dp"
         android:visibility="invisible"
         tools:ignore="UnusedAttribute" />
 
@@ -45,7 +45,7 @@
         android:visibility="gone"
         tools:ignore="UnusedAttribute" />
 
-    <android.support.v7.widget.AppCompatButton
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/button_week_weekdays_visibility"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -1,6 +1,6 @@
 package by.ntnk.msluschedule.db.data
 
-import android.arch.persistence.room.*
+import androidx.room.*
 import by.ntnk.msluschedule.data.TeacherLesson
 
 @Entity(

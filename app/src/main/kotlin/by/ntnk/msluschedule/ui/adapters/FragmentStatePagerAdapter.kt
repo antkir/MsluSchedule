@@ -19,11 +19,12 @@ package by.ntnk.msluschedule.ui.adapters
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.Parcelable
-import android.support.v4.app.*
-import android.support.v4.app.FragmentStatePagerAdapter
-import android.support.v4.view.PagerAdapter
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentTransaction
+import androidx.viewpager.widget.PagerAdapter
 import timber.log.Timber
 import java.util.ArrayList
 
@@ -42,11 +43,11 @@ import java.util.ArrayList
  * the user, their entire fragment may be destroyed, only keeping the saved
  * state of that fragment. This allows the pager to hold on to much less
  * memory associated with each visited page as compared to
- * [FragmentPagerAdapter] at the cost of potentially more overhead when
+ * [androidx.fragment.app.FragmentPagerAdapter] at the cost of potentially more overhead when
  * switching between pages.
  *
  * When using [FragmentStatePagerAdapter]
- * the host [android.support.v4.view.ViewPager] must have a valid ID set.
+ * the host [androidx.viewpager.widget.ViewPager] must have a valid ID set.
  *
  * Subclasses only need to implement [getItem] and [getCount] to have a working adapter.
  */

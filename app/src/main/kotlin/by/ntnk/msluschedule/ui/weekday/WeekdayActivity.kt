@@ -5,18 +5,17 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Parcelable
-import android.support.design.widget.Snackbar
-import android.support.v4.app.Fragment
-import android.support.v4.app.NavUtils
-import android.support.v4.view.animation.FastOutSlowInInterpolator
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewTreeObserver
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
+import androidx.core.app.NavUtils
+import androidx.fragment.app.Fragment
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.data.Note
 import by.ntnk.msluschedule.mvp.views.MvpActivity
@@ -26,11 +25,14 @@ import by.ntnk.msluschedule.utils.INVALID_VALUE
 import by.ntnk.msluschedule.utils.SimpleAnimatorListener
 import by.ntnk.msluschedule.utils.dipToPixels
 import by.ntnk.msluschedule.utils.getWeekdayFromTag
+import com.google.android.material.snackbar.Snackbar
 import dagger.Lazy
 import dagger.android.AndroidInjection
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.support.HasSupportFragmentInjector
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.activity_weekday.*
 import timber.log.Timber
@@ -46,6 +48,7 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
     private var updatedNoteIndex: Int = INVALID_VALUE
     private var keyboardIsShown = false
     private var layoutManagerSavedState: Parcelable? = null
+    private val disposables = CompositeDisposable()
 
     override val view: WeekdayView
         get() = this
@@ -87,7 +90,7 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
     }
 
     private fun onNoteChangeFabClick() {
-        fab_weekday.visibility = View.INVISIBLE
+        (fab_weekday as View).visibility = View.INVISIBLE
         edittext_note.visibility = View.VISIBLE
         edittext_note.translationY = edittext_note.height.toFloat()
         edittext_note.animate()
@@ -112,7 +115,7 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
     }
 
     private fun onSaveNoteClick() {
-        if (edittext_note.text.isNotBlank()) {
+        if (edittext_note.text?.isNotBlank() == true) {
             val adapter = recyclerView.adapter as NoteRecyclerViewAdapter
             if (updatedNoteIndex >= 0) {
                 val noteId = adapter.getNote(updatedNoteIndex).id
@@ -127,15 +130,15 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
             }
 
             hideEditNoteView()
-            edittext_note.text.clear()
+            edittext_note.text?.clear()
         }
     }
 
     private fun createSwipeHandler(): ItemSwipeCallback {
         return object : ItemSwipeCallback(recyclerView.context) {
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder?, direction: Int) {
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val adapter = recyclerView.adapter as NoteRecyclerViewAdapter
-                val deletedNoteIndex = viewHolder!!.adapterPosition
+                val deletedNoteIndex = viewHolder.adapterPosition
                 val note: Note = adapter.getNote(deletedNoteIndex)
                 val color: Int = adapter.getColor(deletedNoteIndex)
                 val noteDeleted = resources.getString(R.string.snackbar_note_deleted)
@@ -158,7 +161,7 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
 
     private fun initOnLongClickNoteListener() {
         val adapter = recyclerView.adapter as NoteRecyclerViewAdapter
-        adapter.onLongClickObservable.subscribeBy(
+        disposables += adapter.onLongClickObservable.subscribeBy(
                 onNext = {
                     edittext_note.setText(it.text, TextView.BufferType.EDITABLE)
                     onNoteChangeFabClick()
@@ -176,7 +179,7 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
         button_save_note.visibility = View.INVISIBLE
         edittext_note_shadow?.visibility = View.GONE
 
-        fab_weekday.visibility = View.VISIBLE
+        (fab_weekday as View).visibility = View.VISIBLE
         fab_weekday.scaleX = 0f
         fab_weekday.scaleY = 0f
         fab_weekday.animate()
@@ -210,6 +213,11 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
         outState.putParcelable(ARG_LAYOUT_MANAGER_SAVED_STATE, recyclerView.layoutManager?.onSaveInstanceState())
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        disposables.clear()
+    }
+
     private val onKeyboardStateChangeListener = ViewTreeObserver.OnGlobalLayoutListener {
         val heightDiff = constraintlayout_weekday.rootView.height - constraintlayout_weekday.height
         if (heightDiff > applicationContext.dipToPixels(200f)) {
@@ -240,7 +248,7 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
                             edittext_note?.translationY = 0f
                             edittext_note?.text?.clear()
 
-                            fab_weekday?.visibility = View.VISIBLE
+                            (fab_weekday as View?)?.visibility = View.VISIBLE
                         }
                     })
                     .start()
@@ -267,7 +275,7 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
         if (adapter.itemCount > 0) {
             textview_zeronotes.visibility = View.GONE
         }
-        recyclerView.layoutManager.onRestoreInstanceState(layoutManagerSavedState)
+        recyclerView.layoutManager?.onRestoreInstanceState(layoutManagerSavedState)
     }
 
     override fun addNote(note: Note) {

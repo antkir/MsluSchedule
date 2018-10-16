@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
@@ -7,7 +7,7 @@
     android:padding="@dimen/dialog_margin"
     android:theme="@style/MsluTheme.Dialog.Alert">
 
-    <android.support.design.widget.TextInputLayout
+    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/textinputlayout_faculty"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -28,25 +28,25 @@
             android:inputType="textAutoComplete|textNoSuggestions"
             android:longClickable="false" />
 
-    </android.support.design.widget.TextInputLayout>
+    </com.google.android.material.textfield.TextInputLayout>
 
     <ProgressBar
         android:id="@+id/progressbar_dialog_faculty"
         android:layout_width="@dimen/actv_progressbar_size"
         android:layout_height="@dimen/actv_progressbar_size"
-        android:layout_marginBottom="@dimen/actv_progressbar_margin"
         android:layout_marginEnd="@dimen/actv_progressbar_margin"
         android:layout_marginRight="@dimen/actv_progressbar_margin"
+        android:layout_marginBottom="@dimen/actv_progressbar_margin"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/textinputlayout_faculty"
         app:layout_constraintEnd_toEndOf="@id/textinputlayout_faculty" />
 
-    <android.support.design.widget.TextInputLayout
+    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/textinputlayout_course"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@+id/textinputlayout_group"
         app:layout_constraintEnd_toEndOf="parent"
@@ -64,14 +64,14 @@
             android:inputType="textAutoComplete|textNoSuggestions"
             android:longClickable="false" />
 
-    </android.support.design.widget.TextInputLayout>
+    </com.google.android.material.textfield.TextInputLayout>
 
-    <android.support.design.widget.TextInputLayout
+    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/textinputlayout_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textinputlayout_course">
 
@@ -84,17 +84,17 @@
             android:imeOptions="actionDone|flagNoExtractUi"
             android:inputType="textAutoComplete|textNoSuggestions" />
 
-    </android.support.design.widget.TextInputLayout>
+    </com.google.android.material.textfield.TextInputLayout>
 
     <ProgressBar
         android:id="@+id/progressbar_dialog_group"
         android:layout_width="@dimen/actv_progressbar_size"
         android:layout_height="@dimen/actv_progressbar_size"
-        android:layout_marginBottom="@dimen/actv_progressbar_margin"
         android:layout_marginEnd="@dimen/actv_progressbar_margin"
         android:layout_marginRight="@dimen/actv_progressbar_margin"
+        android:layout_marginBottom="@dimen/actv_progressbar_margin"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/textinputlayout_group"
         app:layout_constraintEnd_toEndOf="@id/textinputlayout_group" />
 
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

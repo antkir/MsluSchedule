@@ -1,7 +1,7 @@
 package by.ntnk.msluschedule.db
 
-import android.arch.persistence.room.Database
-import android.arch.persistence.room.RoomDatabase
+import androidx.room.Database
+import androidx.room.RoomDatabase
 import by.ntnk.msluschedule.db.dao.*
 import by.ntnk.msluschedule.db.data.*
 

@@ -1,9 +1,9 @@
 package by.ntnk.msluschedule
 
 import android.app.Activity
-import android.support.multidex.MultiDexApplication
-import android.support.v7.app.AppCompatDelegate
-import android.support.v7.preference.PreferenceManager
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.multidex.MultiDexApplication
+import androidx.preference.PreferenceManager
 import by.ntnk.msluschedule.di.DaggerAppComponent
 import by.ntnk.msluschedule.utils.EMPTY_STRING
 import com.squareup.leakcanary.LeakCanary
@@ -27,7 +27,7 @@ class MsluScheduleApp : MultiDexApplication(), HasActivityInjector {
         val themeMode = PreferenceManager
                 .getDefaultSharedPreferences(this)
                 .getString(getString(R.string.key_theme), EMPTY_STRING)
-                .toIntOrNull() ?: AppCompatDelegate.MODE_NIGHT_NO
+                ?.toIntOrNull() ?: AppCompatDelegate.MODE_NIGHT_NO
         AppCompatDelegate.setDefaultNightMode(themeMode)
         Timber.plant(AppTimberTree())
 

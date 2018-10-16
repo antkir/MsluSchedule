@@ -2,7 +2,7 @@ package by.ntnk.msluschedule.utils
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.support.v7.app.AppCompatDelegate
+import androidx.appcompat.app.AppCompatDelegate
 import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.data.ScheduleContainerInfo
 import by.ntnk.msluschedule.di.PerApp
@@ -18,7 +18,7 @@ class SharedPreferencesRepository @Inject constructor(
         private val applicationContext: Context, private val sharedPreferences: SharedPreferences) {
     fun getSelectedScheduleContainerInfo(): ScheduleContainerInfo {
         val id = sharedPreferences.getInt(SCHEDULECONTAINER_ID, 0)
-        val value = sharedPreferences.getString(SCHEDULECONTAINER_VALUE, EMPTY_STRING)
+        val value = sharedPreferences.getString(SCHEDULECONTAINER_VALUE, EMPTY_STRING) ?: EMPTY_STRING
         val typeString = sharedPreferences.getString(SCHEDULECONTAINER_TYPE, null)
         val type = ScheduleTypeConverter.stringToScheduleType(typeString)
         return ScheduleContainerInfo(id, value, type)
@@ -53,7 +53,7 @@ class SharedPreferencesRepository @Inject constructor(
     fun getThemeMode(): String {
         val intValue = sharedPreferences
                 .getString(applicationContext.getString(R.string.key_theme), EMPTY_STRING)
-                .toIntOrNull() ?: AppCompatDelegate.MODE_NIGHT_NO
+                ?.toIntOrNull() ?: AppCompatDelegate.MODE_NIGHT_NO
         return intValue.toString()
     }
 

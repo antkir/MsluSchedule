@@ -3,9 +3,8 @@ package by.ntnk.msluschedule.ui.weekscontainer
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
-import android.support.design.widget.TabLayout
-import android.support.v4.view.ViewPager
 import android.view.*
+import androidx.viewpager.widget.ViewPager
 import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.data.ScheduleContainerInfo
 import by.ntnk.msluschedule.mvp.views.MvpFragment
@@ -13,6 +12,7 @@ import by.ntnk.msluschedule.ui.adapters.WeekFragmentViewPagerAdapter
 import by.ntnk.msluschedule.ui.warningdialog.WarningDialogFragment
 import by.ntnk.msluschedule.utils.INVALID_VALUE
 import by.ntnk.msluschedule.utils.ImmutableEntry
+import com.google.android.material.tabs.TabLayout
 import dagger.Lazy
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject

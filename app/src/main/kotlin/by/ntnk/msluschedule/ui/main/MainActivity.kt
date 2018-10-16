@@ -2,18 +2,16 @@ package by.ntnk.msluschedule.ui.main
 
 import android.animation.Animator
 import android.os.Bundle
-import android.support.design.widget.NavigationView
-import android.support.design.widget.Snackbar
-import android.support.v4.app.Fragment
-import android.support.v4.view.GravityCompat
-import android.support.v4.view.ViewCompat
-import android.support.v4.view.ViewPager
-import android.support.v4.view.animation.FastOutSlowInInterpolator
-import android.support.v7.app.ActionBarDrawerToggle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.animation.OvershootInterpolator
+import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.core.view.GravityCompat
+import androidx.core.view.ViewCompat
+import androidx.fragment.app.Fragment
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator
+import androidx.viewpager.widget.ViewPager
 import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.data.ScheduleContainerInfo
 import by.ntnk.msluschedule.data.StudyGroup
@@ -24,6 +22,8 @@ import by.ntnk.msluschedule.ui.addteacher.AddTeacherFragment
 import by.ntnk.msluschedule.ui.settings.SettingsActivity
 import by.ntnk.msluschedule.ui.weekscontainer.WeeksContainerFragment
 import by.ntnk.msluschedule.utils.*
+import com.google.android.material.navigation.NavigationView
+import com.google.android.material.snackbar.Snackbar
 import dagger.Lazy
 import dagger.android.AndroidInjection
 import dagger.android.AndroidInjector
@@ -217,7 +217,7 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
                 .setInterpolator(OvershootInterpolator(2f))
                 .start()
 
-        with(groupfab_main) {
+        with(groupfab_main as View) {
             visibility = View.VISIBLE
             scaleX = 0f
             scaleY = 0f
@@ -231,7 +231,7 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
                     .setInterpolator(FastOutSlowInInterpolator())
                     .start()
         }
-        with(teacherfab_main) {
+        with(teacherfab_main as View) {
             visibility = View.VISIBLE
             scaleX = 0f
             scaleY = 0f
@@ -262,7 +262,7 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
                 .setInterpolator(FastOutSlowInInterpolator())
                 .setListener(object : SimpleAnimatorListener {
                     override fun onAnimationEnd(animation: Animator?) {
-                        groupfab_main?.visibility = View.INVISIBLE
+                        (groupfab_main as View?)?.visibility = View.INVISIBLE
                         groupfab_main?.animate()?.setListener(null)
                     }
                 })
@@ -276,7 +276,7 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
                 .setInterpolator(FastOutSlowInInterpolator())
                 .setListener(object : SimpleAnimatorListener {
                     override fun onAnimationEnd(animation: Animator?) {
-                        teacherfab_main?.visibility = View.INVISIBLE
+                        (teacherfab_main as View?)?.visibility = View.INVISIBLE
                         teacherfab_main?.animate()?.setListener(null)
                     }
                 })

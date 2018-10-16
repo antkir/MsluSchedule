@@ -3,9 +3,8 @@ package by.ntnk.msluschedule.ui.addgroup
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
-import android.support.design.widget.TextInputLayout
-import android.support.v7.app.AlertDialog
 import android.view.View
+import androidx.appcompat.app.AlertDialog
 import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.data.StudyGroup
 import by.ntnk.msluschedule.mvp.views.MvpDialogFragment
@@ -14,6 +13,7 @@ import by.ntnk.msluschedule.ui.adapters.ScheduleFilterAdapter
 import by.ntnk.msluschedule.ui.customviews.LoadingAutoCompleteTextView
 import by.ntnk.msluschedule.utils.EMPTY_STRING
 import by.ntnk.msluschedule.utils.SimpleTextWatcher
+import com.google.android.material.textfield.TextInputLayout
 import dagger.Lazy
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
@@ -48,7 +48,7 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
         initViews(layout)
 
         val dialog = initMaterialDialog(layout)
-        dialog.window.attributes.windowAnimations = R.style.DialogAnimation
+        dialog.window?.attributes?.windowAnimations = R.style.DialogAnimation
         dialog.setOnShowListener {
             (it as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE).isEnabled =
                     presenter.isValidGroup(groupView.text.toString())

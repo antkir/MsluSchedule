@@ -1,6 +1,6 @@
 package by.ntnk.msluschedule.di.modules
 
-import android.arch.persistence.room.Room
+import androidx.room.Room
 import by.ntnk.msluschedule.MsluScheduleApp
 import by.ntnk.msluschedule.db.AppDatabase
 import by.ntnk.msluschedule.di.PerApp

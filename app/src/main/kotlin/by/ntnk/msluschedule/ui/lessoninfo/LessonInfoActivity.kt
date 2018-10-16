@@ -3,12 +3,12 @@ package by.ntnk.msluschedule.ui.lessoninfo
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v4.app.NavUtils
 import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.app.NavUtils
+import androidx.fragment.app.Fragment
 import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.data.StudyGroupLesson
 import by.ntnk.msluschedule.data.TeacherLesson

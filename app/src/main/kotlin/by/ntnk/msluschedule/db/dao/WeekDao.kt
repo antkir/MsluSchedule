@@ -1,7 +1,7 @@
 package by.ntnk.msluschedule.db.dao
 
-import android.arch.persistence.room.Dao
-import android.arch.persistence.room.Query
+import androidx.room.Dao
+import androidx.room.Query
 import by.ntnk.msluschedule.db.data.Week
 import io.reactivex.Single
 

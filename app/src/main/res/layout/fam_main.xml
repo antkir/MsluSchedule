@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     app:layout_behavior="by.ntnk.msluschedule.ui.customviews.FABLayoutBehavior">
 
-    <android.support.design.widget.FloatingActionButton
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/groupfab_main"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -21,7 +21,7 @@
         app:fabSize="mini"
         app:useCompatPadding="true" />
 
-    <android.support.design.widget.FloatingActionButton
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/teacherfab_main"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -36,13 +36,13 @@
         app:fabSize="mini"
         app:useCompatPadding="true" />
 
-    <android.support.design.widget.FloatingActionButton
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/basefab_main"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
         android:onClick="onBaseFabClick"
         android:src="@drawable/ic_fab_add"
         app:fabSize="normal"

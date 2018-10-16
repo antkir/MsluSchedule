@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory android:title="@string/pref_header_appearence">
         <ListPreference
             android:defaultValue="1"
             android:entries="@array/pref_theme_entries"
+            android:icon="@drawable/ic_theme_change"
             android:key="@string/key_theme"
             android:summary="@string/pref_theme_default_summary"
             android:title="@string/pref_theme_title" />
 
-        <android.support.v7.preference.SwitchPreferenceCompat
+        <androidx.preference.SwitchPreferenceCompat
             android:defaultValue="true"
             android:key="@string/key_show_add_schedule"
             android:title="@string/pref_show_add_schedule_title" />
@@ -30,16 +31,20 @@
 
     <PreferenceCategory android:title="@string/pref_header_about">
         <Preference
+            android:icon="@drawable/ic_feedback"
             android:key="@string/key_send_feedback"
             android:title="@string/pref_send_feedback_title" />
 
-        <Preference android:title="@string/pref_privacy_policy_title">
+        <Preference
+            android:icon="@drawable/ic_document"
+            android:title="@string/pref_privacy_policy_title">
             <intent
                 android:action="android.intent.action.VIEW"
                 android:data="@string/privacy_policy_url" />
         </Preference>
 
         <Preference
+            android:icon="@drawable/ic_libraries"
             android:key="@string/key_libraries"
             android:title="@string/pref_libraries_title" />
 
@@ -48,4 +53,4 @@
             android:selectable="false"
             android:title="@string/pref_app_version_title" />
     </PreferenceCategory>
-</android.support.v7.preference.PreferenceScreen>
+</androidx.preference.PreferenceScreen>

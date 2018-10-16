@@ -1,13 +1,13 @@
 package by.ntnk.msluschedule.ui.customviews
 
 import android.content.Context
-import android.support.design.widget.CoordinatorLayout
-import android.support.v4.view.ViewCompat
 import android.util.AttributeSet
 import android.view.Gravity
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.RelativeLayout
+import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.ViewCompat
 import by.ntnk.msluschedule.R
 
 @Suppress("UNUSED")

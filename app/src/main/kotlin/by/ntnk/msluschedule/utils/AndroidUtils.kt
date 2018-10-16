@@ -3,13 +3,13 @@ package by.ntnk.msluschedule.utils
 import android.animation.Animator
 import android.content.Context
 import android.net.ConnectivityManager
-import android.support.design.widget.Snackbar
-import android.support.v4.widget.DrawerLayout
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.TypedValue
 import android.view.View
+import androidx.drawerlayout.widget.DrawerLayout
 import by.ntnk.msluschedule.R
+import com.google.android.material.snackbar.Snackbar
 import io.reactivex.subjects.PublishSubject
 import java.net.ConnectException
 import java.net.SocketTimeoutException

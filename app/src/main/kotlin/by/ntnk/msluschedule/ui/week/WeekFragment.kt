@@ -7,16 +7,15 @@ import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.Parcelable
-import android.support.design.widget.Snackbar
-import android.support.v4.content.ContextCompat
-import android.support.v4.view.ViewPager
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.LinearSmoothScroller
-import android.support.v7.widget.RecyclerView
 import android.view.*
 import android.view.animation.AnimationUtils
 import android.widget.ProgressBar
 import android.widget.Toast
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearSmoothScroller
+import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager.widget.ViewPager
 import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.data.Lesson
 import by.ntnk.msluschedule.data.WeekdayWithLessons
@@ -28,8 +27,11 @@ import by.ntnk.msluschedule.ui.adapters.VIEWTYPE_WEEKDAY
 import by.ntnk.msluschedule.ui.lessoninfo.LessonInfoActivity
 import by.ntnk.msluschedule.ui.weekday.WeekdayActivity
 import by.ntnk.msluschedule.utils.*
+import com.google.android.material.snackbar.Snackbar
 import dagger.Lazy
 import dagger.android.support.AndroidSupportInjection
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.fragment_week.*
 import timber.log.Timber
@@ -44,6 +46,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     private var weekId: Int = INVALID_VALUE
     private var isCurrentWeek: Boolean = false
     private var layoutManagerSavedState: Parcelable? = null
+    private val disposables = CompositeDisposable()
 
     override val view: WeekView
         get() = this
@@ -74,7 +77,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
 
     private fun initRecyclerView(rootView: View) {
         recyclerView = rootView.findViewById(R.id.rv_week_days)
-        with(recyclerView) {
+        recyclerView.apply {
             layoutManager = LinearLayoutManager(activity)
             setHasFixedSize(true)
             adapter = LessonRecyclerViewAdapter()
@@ -87,7 +90,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
 
     private fun initAdapterOnClickListener() {
         val adapter = recyclerView.adapter as LessonRecyclerViewAdapter
-        adapter.onClickObservable.subscribeBy(
+        disposables += adapter.onClickObservable.subscribeBy(
                 onNext = {
                     when (it.viewType) {
                         VIEWTYPE_WEEKDAY -> {
@@ -120,7 +123,12 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putParcelable(ARG_LAYOUT_MANAGER_SAVED_STATE, recyclerView.layoutManager.onSaveInstanceState())
+        outState.putParcelable(ARG_LAYOUT_MANAGER_SAVED_STATE, recyclerView.layoutManager?.onSaveInstanceState())
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        disposables.clear()
     }
 
     fun showToday() {
@@ -144,7 +152,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     }
 
     override fun showSchedule(data: List<WeekdayWithLessons<Lesson>>) {
-        if (data.map { it.lessons.size }.sum() == 0) {
+        if (data.asSequence().map { it.lessons.size }.sum() == 0) {
             button_week_weekdays_visibility.visibility = View.VISIBLE
             if (!isEmptyScheduleDaysVisible) {
                 text_week_nolessons.visibility = View.VISIBLE
@@ -182,7 +190,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
 
     private val recyclerViewScrollListener: RecyclerView.OnScrollListener =
             object : RecyclerView.OnScrollListener() {
-                override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                     if (button_week_weekdays_visibility.visibility == View.VISIBLE && dy > 0) {
                         button_week_weekdays_visibility.visibility = View.GONE
                         val anim = AnimationUtils.loadAnimation(

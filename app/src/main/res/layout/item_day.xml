@@ -4,14 +4,14 @@
     android:layout_width="match_parent"
     android:layout_height="48dp"
     android:background="@drawable/item_surface"
-    android:foreground="?android:attr/selectableItemBackground">
+    android:foreground="?attr/selectableItemBackground">
 
     <TextView
         android:id="@+id/text_day"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginLeft="16dp"
         android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
         android:gravity="start|center_vertical"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:textColor="@color/primary_text"

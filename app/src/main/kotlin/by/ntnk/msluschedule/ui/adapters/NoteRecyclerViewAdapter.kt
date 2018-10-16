@@ -2,11 +2,11 @@ package by.ntnk.msluschedule.ui.adapters
 
 import android.content.res.Resources
 import android.graphics.Color
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
 import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.data.Note
 import io.reactivex.Observable
@@ -27,7 +27,7 @@ class NoteRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() 
         data.clear()
         data.addAll(notes)
         viewColors.clear()
-        data.forEach { viewColors.add(getViewColor(resources)) }
+        data.onEach { viewColors.add(getViewColor(resources)) }
         notifyDataSetChanged()
     }
 
