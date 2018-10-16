@@ -14,6 +14,7 @@ import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewTreeObserver
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import by.ntnk.msluschedule.R
@@ -160,7 +161,7 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
         adapter.onLongClickObservable.subscribeBy(
                 onNext = {
                     edittext_note.setText(it.text, TextView.BufferType.EDITABLE)
-                    fab_weekday.performClick()
+                    onNoteChangeFabClick()
                     updatedNoteIndex = adapter.findNotePosition(it.text)
                 },
                 onError = { throwable -> Timber.e(throwable) }
@@ -195,25 +196,22 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
         presenter.getWeekday(weekdayId)
         presenter.getNotes(weekdayId)
 
-        findViewById<View>(R.id.constraintlayout_weekday).viewTreeObserver
-                .addOnGlobalLayoutListener(onKeyboardStateChangeListener)
+        constraintlayout_weekday.viewTreeObserver.addOnGlobalLayoutListener(onKeyboardStateChangeListener)
     }
 
     override fun onStop() {
         super.onStop()
-        findViewById<View>(R.id.constraintlayout_weekday).viewTreeObserver
-                .removeOnGlobalLayoutListener(onKeyboardStateChangeListener)
+        constraintlayout_weekday.viewTreeObserver.removeOnGlobalLayoutListener(onKeyboardStateChangeListener)
     }
 
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putParcelable(ARG_LAYOUT_MANAGER_SAVED_STATE, recyclerView.layoutManager.onSaveInstanceState())
+        outState.putParcelable(ARG_LAYOUT_MANAGER_SAVED_STATE, recyclerView.layoutManager?.onSaveInstanceState())
     }
 
-    private val onKeyboardStateChangeListener: () -> Unit = {
-        val mainView: View = findViewById(R.id.constraintlayout_weekday)
-        val heightDiff = mainView.rootView.height - mainView.height
+    private val onKeyboardStateChangeListener = ViewTreeObserver.OnGlobalLayoutListener {
+        val heightDiff = constraintlayout_weekday.rootView.height - constraintlayout_weekday.height
         if (heightDiff > applicationContext.dipToPixels(200f)) {
             keyboardIsShown = true
         } else {
