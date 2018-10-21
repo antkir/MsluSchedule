@@ -23,7 +23,7 @@
             android:paddingEnd="@dimen/textview_subhead_notes_margin"
             android:paddingRight="@dimen/textview_subhead_notes_margin"
             android:text="@string/textview_notes_subhead"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
             android:textColor="@color/primary_text"
             android:textStyle="bold"
             app:layout_constraintTop_toTopOf="parent" />
@@ -38,7 +38,7 @@
             android:paddingEnd="@dimen/textview_zeronotes_margin"
             android:paddingRight="@dimen/textview_zeronotes_margin"
             android:text="@string/textview_zeronotes"
-            android:textAppearance="@style/TextAppearance.AppCompat.Small"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
             android:textColor="@color/tertiary_text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -55,49 +55,48 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textview_subhead_notes" />
 
-        <View
-            android:id="@+id/edittext_note_shadow"
+        <FrameLayout
+            android:id="@+id/layout_edit_note"
             android:layout_width="match_parent"
-            android:layout_height="4dp"
-            android:background="@drawable/edittext_note_shadow"
-            android:visibility="invisible"
-            app:layout_constraintBottom_toTopOf="@+id/edittext_note" />
+            android:layout_height="match_parent"
+            android:visibility="invisible">
 
-        <androidx.appcompat.widget.AppCompatEditText
-            android:id="@+id/edittext_note"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:background="@color/note_edit_surface"
-            android:gravity="center_vertical"
-            android:hint="@string/edittext_weekday_note"
-            android:imeOptions="flagNoExtractUi"
-            android:inputType="textMultiLine"
-            android:maxLines="8"
-            android:minHeight="@dimen/edittext_note_minheight"
-            android:paddingStart="@dimen/edittext_note_marginstart"
-            android:paddingLeft="@dimen/edittext_note_marginstart"
-            android:paddingTop="@dimen/edittext_note_marginvertical"
-            android:paddingEnd="@dimen/edittext_note_marginend"
-            android:paddingRight="@dimen/edittext_note_marginend"
-            android:paddingBottom="@dimen/edittext_note_marginvertical"
-            android:scrollbarStyle="insideInset"
-            android:visibility="invisible"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/edittext_note"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:background="@color/note_edit_surface"
+                android:elevation="8dp"
+                android:hint="@string/edittext_weekday_note"
+                android:imeOptions="flagNoExtractUi"
+                android:inputType="textMultiLine"
+                android:maxLines="8"
+                android:minHeight="@dimen/edittext_note_minheight"
+                android:paddingStart="@dimen/edittext_note_marginstart"
+                android:paddingLeft="@dimen/edittext_note_marginstart"
+                android:paddingTop="@dimen/edittext_note_marginvertical"
+                android:paddingEnd="@dimen/edittext_note_marginend"
+                android:paddingRight="@dimen/edittext_note_marginend"
+                android:paddingBottom="@dimen/edittext_note_marginvertical"
+                android:scrollbarStyle="insideInset"
+                tools:ignore="UnusedAttribute" />
 
-        <androidx.appcompat.widget.AppCompatImageButton
-            android:id="@+id/button_save_note"
-            android:layout_width="@dimen/button_note_save_width"
-            android:layout_height="@dimen/button_note_save_height"
-            android:layout_marginEnd="@dimen/button_note_save_margin"
-            android:layout_marginRight="@dimen/button_note_save_margin"
-            android:background="@android:color/transparent"
-            android:src="@drawable/ic_save_note"
-            android:tint="@color/ic_save_note_tint"
-            android:visibility="invisible"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/button_save_note"
+                android:layout_width="@dimen/button_note_save_width"
+                android:layout_height="@dimen/button_note_save_height"
+                android:layout_gravity="bottom|end"
+                android:layout_marginEnd="@dimen/button_note_save_margin"
+                android:layout_marginRight="@dimen/button_note_save_margin"
+                android:background="@android:color/transparent"
+                android:elevation="8dp"
+                android:src="@drawable/ic_save_note"
+                android:tint="@color/ic_save_note_tint"
+                tools:ignore="UnusedAttribute" />
+
+        </FrameLayout>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton

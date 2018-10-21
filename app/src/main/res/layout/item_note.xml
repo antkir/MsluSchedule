@@ -23,8 +23,9 @@
         android:layout_marginBottom="8dp"
         android:gravity="center_vertical"
         android:minHeight="60dp"
-        android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textColor="@color/tertiary_text"
+        android:textSize="16sp"
         tools:text="@tools:sample/lorem/random" />
 
 </LinearLayout>

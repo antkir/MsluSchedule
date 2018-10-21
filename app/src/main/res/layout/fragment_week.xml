@@ -45,17 +45,21 @@
         android:visibility="gone"
         tools:ignore="UnusedAttribute" />
 
-    <androidx.appcompat.widget.AppCompatButton
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/button_week_weekdays_visibility"
+        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|center_horizontal"
-        android:layout_marginBottom="24dp"
-        android:background="@drawable/rounded_corners_button"
+        android:layout_marginBottom="13dp"
         android:paddingLeft="16dp"
+        android:paddingTop="18dp"
         android:paddingRight="16dp"
+        android:paddingBottom="18dp"
         android:text="@string/button_week_show_weekdays"
+        android:textColor="@color/primary_text"
         android:visibility="gone"
-        app:elevation="2dp" />
+        app:backgroundTint="@color/button_secondary"
+        app:cornerRadius="32dp" />
 
 </FrameLayout>

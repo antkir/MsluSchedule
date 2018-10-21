@@ -7,13 +7,16 @@
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabs_weekscontainer"
+        style="@style/Widget.Design.TabLayout"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/colorPrimary"
         android:elevation="4dp"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:tabGravity="center"
+        app:tabIndicatorColor="@color/colorAccent"
         app:tabMode="scrollable"
+        app:tabSelectedTextColor="@color/weeks_tablayout_selected_text"
+        app:tabTextColor="@color/weeks_tablayout_text"
         tools:ignore="UnusedAttribute" />
 
     <androidx.viewpager.widget.ViewPager

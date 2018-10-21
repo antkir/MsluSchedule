@@ -9,6 +9,7 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/textinputlayout_teacher"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -16,10 +17,14 @@
             android:id="@+id/actv_dialog_teacher"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:completionThreshold="3"
             android:hint="@string/teacher"
             android:imeOptions="actionDone|flagNoExtractUi"
-            android:inputType="textAutoComplete" />
+            android:inputType="textAutoComplete"
+            android:paddingStart="@dimen/actv_padding_side"
+            android:paddingLeft="@dimen/actv_padding_side"
+            android:paddingEnd="@dimen/actv_padding_side"
+            android:paddingRight="@dimen/actv_padding_side"
+            android:textCursorDrawable="@drawable/cursor_dialog" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -27,8 +32,8 @@
         android:id="@+id/progressbar_dialog_teacher"
         android:layout_width="@dimen/actv_progressbar_size"
         android:layout_height="@dimen/actv_progressbar_size"
-        android:layout_marginEnd="@dimen/actv_progressbar_margin"
-        android:layout_marginRight="@dimen/actv_progressbar_margin"
+        android:layout_marginEnd="@dimen/actv_progressbar_margin_end"
+        android:layout_marginRight="@dimen/actv_progressbar_margin_end"
         android:layout_marginBottom="@dimen/actv_progressbar_margin"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/textinputlayout_teacher"

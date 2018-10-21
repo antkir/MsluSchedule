@@ -31,6 +31,13 @@
             app:itemTextColor="@drawable/nav_view_item_textcolor"
             app:menu="@menu/activity_main_drawer" />
 
+        <View
+            android:id="@+id/nav_statusbar_main"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_alignParentTop="true"
+            android:background="@color/nav_statusbar" />
+
         <TextView
             android:id="@+id/button_settings_main"
             android:layout_width="match_parent"
@@ -49,7 +56,7 @@
             android:paddingEnd="@dimen/nav_view_footer_textview_padding_side"
             android:paddingRight="@dimen/nav_view_footer_textview_padding_side"
             android:text="@string/navigation_drawer_settings"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body2" />
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Button" />
 
     </RelativeLayout>
 

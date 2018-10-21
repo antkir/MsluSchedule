@@ -11,6 +11,7 @@
 
         <androidx.preference.SwitchPreferenceCompat
             android:defaultValue="true"
+            android:icon="@drawable/ic_null"
             android:key="@string/key_show_add_schedule"
             android:title="@string/pref_show_add_schedule_title" />
     </PreferenceCategory>
@@ -18,12 +19,14 @@
     <PreferenceCategory android:title="@string/pref_header_schedule">
         <CheckBoxPreference
             android:defaultValue="false"
+            android:icon="@drawable/ic_null"
             android:key="@string/key_full_subjects"
             android:summary="@string/pref_next_update_summary"
             android:title="@string/pref_full_subjects_title" />
 
         <CheckBoxPreference
             android:defaultValue="false"
+            android:icon="@drawable/ic_null"
             android:key="@string/key_hide_pe_classes"
             android:summary="@string/pref_next_update_summary"
             android:title="@string/pref_hide_pe_classes_title" />
@@ -49,6 +52,7 @@
             android:title="@string/pref_libraries_title" />
 
         <Preference
+            android:icon="@drawable/ic_null"
             android:key="@string/key_about"
             android:selectable="false"
             android:title="@string/pref_app_version_title" />

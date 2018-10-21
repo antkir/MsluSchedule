@@ -53,7 +53,7 @@ ext {
     daggerVersion = '2.16'
     jsoupVersion = '1.11.3'
     junitVersion = '4.12'
-    leakcanaryVersion = '1.6.1'
+    leakcanaryVersion = '1.6.2'
     mockitoVersion = '2.23.0'
     multidexVersion = '2.0.0'
     okhttpVersion = '3.11.0'

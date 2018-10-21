@@ -102,14 +102,15 @@
     <string name="privacy_policy_url" translatable="false">"https://sites.google.com/view/msluapp"</string>
 
     <string-array name="library_list" translatable="false">
-        <item>Android Architecture Components</item>
-        <item>Android Support Library</item>
+        <item>Android Jetpack</item>
         <item>Apache POI</item>
         <item>Dagger</item>
         <item>jsoup</item>
         <item>JUnit</item>
         <item>Kotlin</item>
         <item>LeakCanary</item>
+        <item>Material Components for Android</item>
+        <item>Material Design Icons</item>
         <item>Mockito</item>
         <item>Retrofit</item>
         <item>RxAndroid</item>
@@ -120,14 +121,15 @@
     </string-array>
 
     <string-array name="library_urls" translatable="false">
-        <item>https://developer.android.com/topic/libraries/architecture/</item>
-        <item>https://developer.android.com/topic/libraries/support-library/</item>
+        <item>https://developer.android.com/jetpack</item>
         <item>https://github.com/apache/poi</item>
         <item>https://github.com/google/dagger</item>
-        <item>https://github.com/jhy/jsoup/</item>
+        <item>https://github.com/jhy/jsoup</item>
         <item>https://github.com/junit-team/junit4</item>
         <item>https://github.com/JetBrains/kotlin</item>
         <item>https://github.com/square/leakcanary</item>
+        <item>https://github.com/material-components/material-components-android</item>
+        <item>https://github.com/templarian/MaterialDesign</item>
         <item>https://github.com/mockito/mockito</item>
         <item>https://github.com/square/retrofit</item>
         <item>https://github.com/ReactiveX/RxAndroid</item>

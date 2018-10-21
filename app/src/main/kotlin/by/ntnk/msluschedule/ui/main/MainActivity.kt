@@ -6,6 +6,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.animation.OvershootInterpolator
+import android.widget.RelativeLayout
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
@@ -80,9 +81,12 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
 
         nav_view.setNavigationItemSelectedListener(this)
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            nav_layout_main.setOnApplyWindowInsetsListener { v, insets ->
-                v!!.setPaddingRelative(v.paddingStart, insets!!.stableInsetTop, v.paddingEnd, v.paddingBottom)
-                insets
+            nav_layout_main.setOnApplyWindowInsetsListener { _, insets ->
+                if (nav_statusbar_main.width > 0) {
+                    nav_statusbar_main?.layoutParams =
+                            RelativeLayout.LayoutParams(nav_statusbar_main.width, insets.systemWindowInsetTop)
+                }
+                return@setOnApplyWindowInsetsListener insets
             }
         }
 

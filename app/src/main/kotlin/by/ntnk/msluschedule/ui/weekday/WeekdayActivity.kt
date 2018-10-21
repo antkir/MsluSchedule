@@ -8,9 +8,11 @@ import android.os.Parcelable
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewTreeObserver
+import android.view.animation.AlphaAnimation
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import androidx.core.app.NavUtils
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -91,23 +93,32 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
 
     private fun onNoteChangeFabClick() {
         (fab_weekday as View).visibility = View.INVISIBLE
-        edittext_note.visibility = View.VISIBLE
-        edittext_note.translationY = edittext_note.height.toFloat()
-        edittext_note.animate()
-                .translationY(0f)
-                .setStartDelay(100)
-                .setDuration(100)
-                .start()
 
-        button_save_note.visibility = View.VISIBLE
-        button_save_note.translationY = button_save_note.height.toFloat()
-        button_save_note.animate()
+        layout_edit_note.visibility = View.VISIBLE
+        layout_edit_note.translationY = edittext_note.height.toFloat()
+        layout_edit_note.animate()
                 .translationY(0f)
-                .setStartDelay(100)
+                .setStartDelay(50)
                 .setDuration(100)
-                .start()
+                .setListener(object : SimpleAnimatorListener {
+                    val alphaAnimation = AlphaAnimation(0f, 1f).apply {
+                        startOffset = 50
+                        duration = 100
+                    }
+                    val backgroundColor = ContextCompat.getColor(applicationContext, R.color.unfocused_background)
 
-        edittext_note_shadow?.visibility = View.VISIBLE
+                    override fun onAnimationStart(animation: Animator?) {
+                        layout_edit_note?.startAnimation(alphaAnimation)
+                        layout_edit_note?.isFocusable = true
+                        layout_edit_note?.isClickable = true
+                        layout_edit_note?.setBackgroundColor(backgroundColor)
+                    }
+
+                    override fun onAnimationEnd(animation: Animator?) {
+                        layout_edit_note?.animate()?.setListener(null)
+                    }
+                })
+                .start()
 
         edittext_note.requestFocus()
         val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -175,9 +186,10 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(edittext_note.windowToken, 0)
 
-        edittext_note.visibility = View.INVISIBLE
-        button_save_note.visibility = View.INVISIBLE
-        edittext_note_shadow?.visibility = View.GONE
+        layout_edit_note.isClickable = false
+        layout_edit_note.isFocusable = false
+        layout_edit_note.setBackgroundColor(ContextCompat.getColor(applicationContext, R.color.transparent))
+        layout_edit_note.visibility = View.INVISIBLE
 
         (fab_weekday as View).visibility = View.VISIBLE
         fab_weekday.scaleX = 0f
@@ -232,20 +244,22 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
     }
 
     override fun onBackPressed() {
-        if (edittext_note.visibility == View.VISIBLE) {
+        if (layout_edit_note.visibility == View.VISIBLE) {
             val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.hideSoftInputFromWindow(edittext_note.windowToken, 0)
 
-            button_save_note.visibility = View.INVISIBLE
-            edittext_note_shadow?.visibility = View.GONE
-            edittext_note.animate()
+            layout_edit_note.isClickable = false
+            layout_edit_note.isFocusable = false
+            val backgroundColor = ContextCompat.getColor(applicationContext, R.color.transparent)
+            layout_edit_note.setBackgroundColor(backgroundColor)
+            layout_edit_note.animate()
                     .translationY(edittext_note.height.toFloat())
                     .setDuration(100)
                     .setListener(object : SimpleAnimatorListener {
                         override fun onAnimationEnd(animation: Animator?) {
-                            edittext_note?.animate()?.setListener(null)
-                            edittext_note?.visibility = View.INVISIBLE
-                            edittext_note?.translationY = 0f
+                            layout_edit_note?.animate()?.setListener(null)
+                            layout_edit_note?.visibility = View.INVISIBLE
+                            layout_edit_note?.translationY = 0f
                             edittext_note?.text?.clear()
 
                             (fab_weekday as View?)?.visibility = View.VISIBLE

@@ -123,7 +123,8 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putParcelable(ARG_LAYOUT_MANAGER_SAVED_STATE, recyclerView.layoutManager?.onSaveInstanceState())
+        layoutManagerSavedState = recyclerView.layoutManager?.onSaveInstanceState()
+        outState.putParcelable(ARG_LAYOUT_MANAGER_SAVED_STATE, layoutManagerSavedState)
     }
 
     override fun onDestroyView() {
@@ -174,15 +175,14 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         adapter.initData(data)
 
         val layoutManager = recyclerView.layoutManager as LinearLayoutManager
-        if (isRecentlyRecreated) {
+        if (layoutManagerSavedState != null) {
             layoutManager.onRestoreInstanceState(layoutManagerSavedState)
         }
-        if (isRecentlyCreated && isCurrentWeek) {
-            val index = adapter.getWeekdayViewIndex(presenter.getCurrentDayOfWeek())
-            layoutManager.scrollToPosition(index)
-        }
-
         if (isCurrentWeek) {
+            if (layoutManagerSavedState == null) {
+                val index = adapter.getWeekdayViewIndex(presenter.getCurrentDayOfWeek())
+                layoutManager.scrollToPosition(index)
+            }
             activity?.findViewById<ProgressBar>(R.id.progressbar_main)?.visibility = View.GONE
             parentFragment?.view?.findViewById<ViewPager>(R.id.viewpager_weekscontainer)?.visibility = View.VISIBLE
         }

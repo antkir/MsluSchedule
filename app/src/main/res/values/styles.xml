@@ -1,6 +1,5 @@
 <resources>
-
-    <style name="MsluTheme" parent="Theme.AppCompat.DayNight">
+    <style name="MsluTheme" parent="Theme.MaterialComponents.Light">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
@@ -25,11 +24,11 @@
 
     <style name="MsluTheme.NoActionBarTransparent" parent="MsluTheme.NoActionBar" />
 
-    <style name="MsluTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="MsluTheme.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar" />
 
-    <style name="MsluTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+    <style name="MsluTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Light" />
 
-    <style name="MsluTheme.Dialog.Alert" parent="Theme.AppCompat.DayNight.Dialog.Alert">
+    <style name="MsluTheme.Dialog.Alert" parent="Theme.MaterialComponents.Light.Dialog.Alert">
         <item name="colorAccent">@color/colorPrimaryLight</item>
         <item name="android:windowBackground">@drawable/rounded_corners_rect</item>
     </style>

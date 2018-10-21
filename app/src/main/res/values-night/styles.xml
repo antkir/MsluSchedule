@@ -1,10 +1,15 @@
 <resources>
+    <style name="MsluTheme" parent="Theme.MaterialComponents">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="actionBarTheme">@style/MsluTheme.AppBarOverlay</item>
+        <item name="preferenceTheme">@style/MsluTheme.PreferenceThemeOverlay</item>
+    </style>
 
-    <style name="MsluTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.ActionBar" />
+    <style name="MsluTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Dark" />
 
-    <style name="MsluTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Dark" />
-
-    <style name="MsluTheme.Dialog.Alert" parent="Theme.AppCompat.DayNight.Dialog.Alert">
+    <style name="MsluTheme.Dialog.Alert" parent="Theme.MaterialComponents.Dialog.Alert">
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:windowBackground">@drawable/rounded_corners_rect</item>
     </style>

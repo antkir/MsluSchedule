@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="@dimen/dialog_margin"
@@ -9,6 +9,7 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/textinputlayout_faculty"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
@@ -26,7 +27,11 @@
             android:hint="@string/faculty"
             android:imeOptions="actionDone|flagNoFullscreen|flagNoExtractUi"
             android:inputType="textAutoComplete|textNoSuggestions"
-            android:longClickable="false" />
+            android:longClickable="false"
+            android:paddingStart="@dimen/actv_padding_side"
+            android:paddingLeft="@dimen/actv_padding_side"
+            android:paddingEnd="@dimen/actv_padding_side"
+            android:paddingRight="@dimen/actv_padding_side" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -34,8 +39,8 @@
         android:id="@+id/progressbar_dialog_faculty"
         android:layout_width="@dimen/actv_progressbar_size"
         android:layout_height="@dimen/actv_progressbar_size"
-        android:layout_marginEnd="@dimen/actv_progressbar_margin"
-        android:layout_marginRight="@dimen/actv_progressbar_margin"
+        android:layout_marginEnd="@dimen/actv_progressbar_margin_end"
+        android:layout_marginRight="@dimen/actv_progressbar_margin_end"
         android:layout_marginBottom="@dimen/actv_progressbar_margin"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/textinputlayout_faculty"
@@ -43,6 +48,7 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/textinputlayout_course"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
@@ -62,12 +68,17 @@
             android:hint="@string/course"
             android:imeOptions="actionDone|flagNoFullscreen|flagNoExtractUi"
             android:inputType="textAutoComplete|textNoSuggestions"
-            android:longClickable="false" />
+            android:longClickable="false"
+            android:paddingStart="@dimen/actv_padding_side"
+            android:paddingLeft="@dimen/actv_padding_side"
+            android:paddingEnd="@dimen/actv_padding_side"
+            android:paddingRight="@dimen/actv_padding_side" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/textinputlayout_group"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
@@ -82,7 +93,12 @@
             android:completionThreshold="1"
             android:hint="@string/group"
             android:imeOptions="actionDone|flagNoExtractUi"
-            android:inputType="textAutoComplete|textNoSuggestions" />
+            android:inputType="textAutoComplete|textNoSuggestions"
+            android:paddingStart="@dimen/actv_padding_side"
+            android:paddingLeft="@dimen/actv_padding_side"
+            android:paddingEnd="@dimen/actv_padding_side"
+            android:paddingRight="@dimen/actv_padding_side"
+            android:textCursorDrawable="@drawable/cursor_dialog" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -90,8 +106,8 @@
         android:id="@+id/progressbar_dialog_group"
         android:layout_width="@dimen/actv_progressbar_size"
         android:layout_height="@dimen/actv_progressbar_size"
-        android:layout_marginEnd="@dimen/actv_progressbar_margin"
-        android:layout_marginRight="@dimen/actv_progressbar_margin"
+        android:layout_marginEnd="@dimen/actv_progressbar_margin_end"
+        android:layout_marginRight="@dimen/actv_progressbar_margin_end"
         android:layout_marginBottom="@dimen/actv_progressbar_margin"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/textinputlayout_group"
