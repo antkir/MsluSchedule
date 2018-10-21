@@ -9,10 +9,10 @@ import okhttp3.ResponseBody
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
-import org.mockito.Mockito.`when` as whenever
 import org.mockito.MockitoAnnotations
 import org.threeten.bp.LocalDate
 import timber.log.Timber
+import org.mockito.Mockito.`when` as whenever
 
 class NetworkHelperTest {
     @Mock
@@ -42,7 +42,7 @@ class NetworkHelperTest {
     fun `Throws InvalidYearException() when device year is not present in values parsed from main html page`() {
         // given
         val requestInfo = networkHelper.facultyRequestInfo
-        val htmlBody = this.javaClass.getResource("/main.html").readText()
+        val htmlBody = javaClass.getResource("/main.html")!!.readText()
         val mediaType = MediaType.parse(EMPTY_STRING)
         val responseBody = ResponseBody.create(mediaType, htmlBody).string()
         val date = LocalDate.of(2000, 1, 1)

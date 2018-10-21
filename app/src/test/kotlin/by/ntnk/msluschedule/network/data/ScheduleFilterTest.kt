@@ -1,10 +1,9 @@
 package by.ntnk.msluschedule.network.data
 
 import by.ntnk.msluschedule.TestTree
-import org.junit.Test
-
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
 import org.junit.Before
+import org.junit.Test
 import timber.log.Timber
 
 class ScheduleFilterTest {

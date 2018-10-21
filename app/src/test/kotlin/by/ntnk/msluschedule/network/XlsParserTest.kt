@@ -6,17 +6,22 @@ import by.ntnk.msluschedule.data.TeacherLesson
 import by.ntnk.msluschedule.data.WeekdayWithStudyGroupLessons
 import by.ntnk.msluschedule.data.WeekdayWithTeacherLessons
 import by.ntnk.msluschedule.utils.SATURDAY
-import org.junit.Test
-
+import by.ntnk.msluschedule.utils.SharedPreferencesRepository
 import org.junit.Before
+import org.junit.Test
+import org.mockito.Mock
+import org.mockito.MockitoAnnotations
 import timber.log.Timber
 
 class XlsParserTest {
+    @Mock
+    private lateinit var sharedPreferencesRepository: SharedPreferencesRepository
     private lateinit var xlsParser: XlsParser
 
     @Before
     fun setUp() {
-        xlsParser = XlsParser()
+        MockitoAnnotations.initMocks(this)
+        xlsParser = XlsParser(sharedPreferencesRepository)
         Timber.plant(TestTree())
     }
 
@@ -49,7 +54,7 @@ class XlsParserTest {
         weekdayWithStudyGroupLessons.lessons.add(lesson2)
         weekdayWithStudyGroupLessons.lessons.add(lesson3)
         val weekdays = 7
-        val xlsBody = this.javaClass.getResource("/sample_studygroup_schedule.xls").openStream()
+        val xlsBody = javaClass.getResource("/sample_studygroup_schedule.xls")!!.openStream()
         // when
         val observable = xlsParser.parseStudyGroupXls(xlsBody)
         // then
@@ -103,7 +108,7 @@ class XlsParserTest {
         weekdayWithTeacherLessons.lessons.add(lesson3)
         weekdayWithTeacherLessons.lessons.add(lesson4)
         val weekdays = 7
-        val xlsBody = this.javaClass.getResource("/sample_teacher_schedule.xls").openStream()
+        val xlsBody = javaClass.getResource("/sample_teacher_schedule.xls")!!.openStream()
         // when
         val observable = xlsParser.parseTeacherXls(xlsBody)
         // then

@@ -100,7 +100,7 @@ class WeekPresenterTest {
                 .thenReturn(Completable.complete()
                                     .doOnSubscribe { insertWeekdaysTest.onSubscribe(it) })
         whenever(databaseRepository.getNotesForWeekday(anyInt()))
-                .thenReturn(Observable.fromIterable(List(1) { return@List Note(0, "") } )
+                .thenReturn(Observable.fromIterable(List(1) { return@List Note(0, "") })
                                     .doOnSubscribe { getNotesForWeekdayTest.onSubscribe(it) })
         whenever(networkRepository.getSchedule(any<StudyGroup>(), anyInt()))
                 .thenReturn(Observable.just(WeekdayWithStudyGroupLessons(""))
