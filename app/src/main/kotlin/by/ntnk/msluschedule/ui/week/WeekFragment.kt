@@ -183,7 +183,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         adapter.initData(data)
 
         val layoutManager = recyclerView.layoutManager as LinearLayoutManager
-        if (layoutManagerSavedState != null) {
+        if (isRecentlyRecreated) {
             layoutManager.onRestoreInstanceState(layoutManagerSavedState)
         }
         if (isCurrentWeek) {
