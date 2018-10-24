@@ -1,11 +1,8 @@
 package by.ntnk.msluschedule
 
 import android.app.Activity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.multidex.MultiDexApplication
-import androidx.preference.PreferenceManager
 import by.ntnk.msluschedule.di.DaggerAppComponent
-import by.ntnk.msluschedule.utils.EMPTY_STRING
 import com.squareup.leakcanary.LeakCanary
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
@@ -24,11 +21,6 @@ class MsluScheduleApp : MultiDexApplication(), HasActivityInjector {
         }
         LeakCanary.install(this)
 
-        val themeMode = PreferenceManager
-                .getDefaultSharedPreferences(this)
-                .getString(getString(R.string.key_theme), EMPTY_STRING)
-                ?.toIntOrNull() ?: AppCompatDelegate.MODE_NIGHT_NO
-        AppCompatDelegate.setDefaultNightMode(themeMode)
         Timber.plant(AppTimberTree())
 
         buildAppComponent().inject(this)

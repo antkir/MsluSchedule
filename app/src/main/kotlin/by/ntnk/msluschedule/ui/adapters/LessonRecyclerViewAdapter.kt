@@ -36,6 +36,8 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
 
     @Throws(NullPointerException::class)
     fun initData(days: List<WeekdayWithLessons<Lesson>>) {
+        val dataWasEmpty = data.isEmpty()
+
         val hasNotesList = ArrayList<Boolean>()
         for (view in data) {
             if (view is DayView) {
@@ -69,7 +71,12 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
             }
             data.add(DayEndView())
         }
-        notifyDataSetChanged()
+
+        if (dataWasEmpty) {
+            notifyItemRangeInserted(0, data.size)
+        } else {
+            notifyDataSetChanged()
+        }
     }
 
     fun getWeekdayViewIndex(weekdayNumber: Int): Int {

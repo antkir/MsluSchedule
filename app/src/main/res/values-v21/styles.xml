@@ -5,9 +5,14 @@
         <item name="android:statusBarColor">?attr/colorPrimaryDark</item>
     </style>
 
-    <style name="MsluTheme.NoActionBarTransparent">
+    <style name="MsluTheme.NoActionBarTransparentStatusBar" parent="MsluTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowBackground">@color/surface</item>
+    </style>
+
+    <style name="MsluTheme.LaunchScreen" parent="MsluTheme.NoActionBarTransparentStatusBar">
+        <item name="android:windowBackground">@drawable/launch_screen</item>
     </style>
 </resources>

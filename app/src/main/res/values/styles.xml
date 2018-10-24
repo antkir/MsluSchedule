@@ -22,7 +22,13 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="MsluTheme.NoActionBarTransparent" parent="MsluTheme.NoActionBar" />
+    <style name="MsluTheme.NoActionBarTransparentStatusBar" parent="MsluTheme.NoActionBar">
+        <item name="android:windowBackground">@color/surface</item>
+    </style>
+
+    <style name="MsluTheme.LaunchScreen" parent="MsluTheme.NoActionBarTransparentStatusBar">
+        <item name="android:windowBackground">@drawable/launch_screen</item>
+    </style>
 
     <style name="MsluTheme.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar" />
 

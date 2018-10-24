@@ -107,13 +107,7 @@ class MainPresenter @Inject constructor(
                 )
     }
 
-    fun isFabShown(): Boolean = sharedPreferencesRepository.isMainFabShown()
-
-    fun setSelectedSheduleContainer(id: Int, value: String, type: ScheduleType) =
-            sharedPreferencesRepository.putSelectedScheduleContainer(id, value, type)
-
-    fun isSelectedContainerNull() =
-            sharedPreferencesRepository.getSelectedScheduleContainerInfo().type == null
+    fun isSelectedContainerNull() = sharedPreferencesRepository.getSelectedScheduleContainerInfo().type == null
 
     fun clearDisposables() = disposables.clear()
 }

@@ -8,6 +8,7 @@ import android.view.View
 import android.view.animation.OvershootInterpolator
 import android.widget.RelativeLayout
 import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
@@ -61,12 +62,18 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
     @Inject
     lateinit var injectedPresenter: Lazy<MainPresenter>
 
+    @Inject
+    lateinit var sharedPreferencesRepository: SharedPreferencesRepository
+
     override fun supportFragmentInjector(): AndroidInjector<Fragment> = fragmentDispatchingAndroidInjector
 
     override fun onCreatePresenter(): MainPresenter = injectedPresenter.get()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
+        val themeMode = sharedPreferencesRepository.getThemeMode().toInt()
+        AppCompatDelegate.setDefaultNightMode(themeMode)
+        setTheme(R.style.MsluTheme_NoActionBarTransparentStatusBar)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
@@ -112,7 +119,7 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
             initMainContent()
         }
 
-        fam_layout_main.visibility = if (presenter.isFabShown()) View.VISIBLE else View.GONE
+        fam_layout_main.visibility = if (sharedPreferencesRepository.isMainFabShown()) View.VISIBLE else View.GONE
     }
 
     override fun onStop() {
@@ -154,7 +161,7 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
                     .findItem(item.itemId) != null
             val type = if (isStudyGroupItem) ScheduleType.STUDYGROUP else ScheduleType.TEACHER
             supportActionBar?.title = item.title
-            presenter.setSelectedSheduleContainer(item.itemId, item.title.toString(), type)
+            sharedPreferencesRepository.putSelectedScheduleContainer(item.itemId, item.title.toString(), type)
             isUpdatingWeeksContainer = true
             drawer_layout.closeDrawer(GravityCompat.START)
         }
