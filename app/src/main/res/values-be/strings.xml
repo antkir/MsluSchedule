@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Расклад МДЛУ</string>
+    <string name="monday">Панядзелак</string>
+    <string name="tuesday">Аўторак</string>
+    <string name="wednesday">Серада</string>
+    <string name="thursday">Чацвер</string>
+    <string name="friday">Пятніца</string>
+    <string name="saturday">Субота</string>
+    <string name="sunday">Нядзеля</string>
+    <string name="item_blanklesson">Няма заняткаў у гэты дзень</string>
+    <string name="snackbar_internet_unavailable">Злучэнне з інтэрнэтам недаступна, паспрабуйце пазней.</string>
+    <string name="messsage_schedule_update_successful">Расклад для гэтага тыдня быў абноўлены</string>
+    <string name="course">Курс</string>
+    <string name="group">Група</string>
+    <string name="teacher">Выкладчык</string>
+    <string name="button_delete">Выдаліць</string>
+    <string name="action_update_schedule">Абнавіць</string>
+    <string name="pref_app_version_title">Версія</string>
+    <string name="pref_libraries_title">Бібліятэкі з адкрытым зыходным кодам</string>
+    <string name="pref_privacy_policy_title">Палітыка прыватнасці</string>
+    <string name="pref_send_feedback_title">Пакінуць водгук</string>
+    <string name="pref_next_update_summary">Уступіць у сілу пасля наступнага абнаўлення раскладу</string>
+    <string name="pref_hide_pe_classes_title">Хаваць заняткі па фіз. культуры</string>
+    <string name="pref_full_subjects_title">Поўныя назвы прадметаў</string>
+    <string name="pref_show_add_schedule_title">Паказваць кнопку `Дадаць расклад`</string>
+    <string name="pref_theme_default_value">Светлая</string>
+    <string name="pref_theme_title">Тэма</string>
+    <string name="pref_header_about">Аб прыкладанні</string>
+    <string name="pref_header_schedule">Расклад</string>
+    <string name="pref_header_appearence">"Знешні выгляд "</string>
+    <string name="activity_settings_title">Налады</string>
+    <string name="activity_lesson_info_title">Падрабязнасці</string>
+    <string name="imageview_weekdays_description">Дні</string>
+    <string name="imageview_classroom_description">Аўдыторыя</string>
+    <string name="imageview_groups_description">Група</string>
+    <string name="imageview_time_description">Час</string>
+    <string name="imageview_subject_description">Прадмет</string>
+    <string name="imageview_dayitem_description">Нататкі</string>
+    <string name="snackbar_action_undo">Скасаваць</string>
+    <string name="snackbar_note_deleted">Нататка была выдаленая</string>
+    <string name="textview_zeronotes">Няма нататкаў на гэты дзень</string>
+    <string name="textview_notes_subhead">Нататкі</string>
+    <string name="edittext_weekday_note">Увядзіце нататку</string>
+    <string name="button_week_hide_weekdays">Схаваць дні</string>
+    <string name="button_week_show_weekdays">Паказаць дні</string>
+    <string name="add_group_title">Дадаць групу</string>
+    <string name="group_already_added">Група ўжо была дададзеная.</string>
+    <string name="add_teacher_title">Дадаць выкладчыка</string>
+    <string name="teacher_already_added">Выкладчык ужо быў дададзены.</string>
+    <string name="button_add">Дадаць</string>
+    <string name="button_cancel">Скасаваць</string>
+    <string name="faculty">Факультэт</string>
+    <string name="navigation_drawer_open">Адкрыць бакавое меню</string>
+    <string name="navigation_drawer_close">Закрыць бакавое меню</string>
+    <string name="navigation_drawer_studygroups">Групы</string>
+    <string name="navigation_drawer_teachers">Выкладчыкі</string>
+    <string name="navigation_drawer_settings">Налады</string>
+    <string name="action_delete_schedule">Выдаліць расклад</string>
+    <string name="dialog_delete_container_title">Вы ўпэўненыя, што жадаеце выдаліць гэты расклад?</string>
+    <string name="dialog_delete_container_message">Расклад для выбранай групы ці выкладчыка будзе выдалены, у тым ліку ўсе звесткі для гэтага раскладу (напрыклад, нататкі).</string>
+    <string name="view_main_image_description">Эмодзі з крыху ўсмешлівым тварам</string>
+    <string name="view_main_empty_message">Дадайце новы расклад або абярыце ўжо дададзены са спісу.</string>
+    <string name="action_show_today">Выбраць сённяшні дзень</string>
+    <string name="error_general">Адбылася памылка :(</string>
+    <string name="error_website_unavailable">Памылка: Немагчыма звязацца з серверам :(</string>
+    <string name="snackbar_week_init_retry">Паўтарыць</string>
+    <string name="text_week_no_classes">Няма заняткаў на гэтым тыдні. Удачы!</string>
+
+    <string-array name="pref_theme_entries">
+        <item>Светлая</item>
+        <item>Цёмная</item>
+        <item>Аўтаматычна</item>
+    </string-array>
+</resources>

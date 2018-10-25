@@ -1,10 +1,10 @@
 <resources>
     <string name="app_name">MSLU Schedule</string>
 
-    <string name="add_group_title">Add Group</string>
-    <string name="group_already_added">Group already added.</string>
-    <string name="add_teacher_title">Add Teacher</string>
-    <string name="teacher_already_added">Teacher already added.</string>
+    <string name="add_group_title">Add a Group</string>
+    <string name="group_already_added">The group is already added.</string>
+    <string name="add_teacher_title">Add a Teacher</string>
+    <string name="teacher_already_added">The teacher is already added.</string>
     <string name="button_add">Add</string>
     <string name="button_cancel">Cancel</string>
 
@@ -22,9 +22,7 @@
     <string name="action_delete_schedule">Delete the schedule</string>
 
     <string name="dialog_delete_container_title">Are you sure you want to delete the schedule?</string>
-    <string name="dialog_delete_container_message">
-        The schedule for the selected group/teacher and all the data associated with it will be deleted.
-    </string>
+    <string name="dialog_delete_container_message">The schedule for the selected group/teacher and all the data associated with it (e.g notes) will be deleted.</string>
     <string name="button_delete">Delete</string>
 
     <string name="monday">Monday</string>
@@ -39,23 +37,23 @@
 
     <string name="snackbar_internet_unavailable">Internet connection is unavailable, try again later.</string>
 
-    <string name="messsage_schedule_update_successful">The schedule for this week was updated!</string>
+    <string name="messsage_schedule_update_successful">The schedule for this week was updated</string>
 
     <string name="view_main_image_description">Slightly smiling face emoji</string>
-    <string name="view_main_empty_message">Add a new schedule or\nchoose one from the list.</string>
+    <string name="view_main_empty_message">Add a new schedule or choose one from the list.</string>
 
-    <string name="action_show_today">Scroll to today</string>
+    <string name="action_show_today">Highlight today\'s date</string>
     <string name="action_update_schedule">Update</string>
     <string name="error_general">An error occurred :(</string>
-    <string name="error_website_unavailable">Error: Could not connect to the website :(</string>
+    <string name="error_website_unavailable">Error: Could not connect to the server :(</string>
     <string name="snackbar_week_init_retry">Retry</string>
-    <string name="text_week_no_classes">No classes this week.\nGood luck!</string>
+    <string name="text_week_no_classes">No classes this week. Good luck!</string>
     <string name="button_week_show_weekdays">Show weekdays</string>
     <string name="button_week_hide_weekdays">Hide weekdays</string>
 
-    <string name="edittext_weekday_note">Enter your note</string>
+    <string name="edittext_weekday_note">Enter a note</string>
     <string name="textview_notes_subhead">Notes</string>
-    <string name="textview_zeronotes">You haven\'t added any notes yet</string>
+    <string name="textview_zeronotes">No notes for this day</string>
     <string name="snackbar_note_deleted">The note was deleted</string>
     <string name="snackbar_action_undo">Undo</string>
 
@@ -81,8 +79,8 @@
     </string-array>
 
     <string name="pref_theme_title">Theme</string>
-    <string name="pref_theme_default_summary">Light</string>
-    <string name="pref_show_add_schedule_title">Show `Add Schedule` button</string>
+    <string name="pref_theme_default_value">Light</string>
+    <string name="pref_show_add_schedule_title">Show `Add a Schedule` button</string>
     <string name="pref_full_subjects_title">Full subject names</string>
     <string name="pref_hide_pe_classes_title">Hide Physical Education classes</string>
     <string name="pref_next_update_summary">Will take effect after the next schedule update</string>

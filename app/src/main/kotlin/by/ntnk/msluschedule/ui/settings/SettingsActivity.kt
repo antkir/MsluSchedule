@@ -93,6 +93,9 @@ class SettingsActivity : AppCompatActivity(), HasSupportFragmentInjector {
             val value = sharedPreferencesRepository.getThemeMode()
             themePreference.onPreferenceChangeListener.onPreferenceChange(themePreference, value)
 
+            findPreference(getString(R.string.key_show_add_schedule)).isSingleLineTitle = false
+            findPreference(getString(R.string.key_hide_pe_classes)).isSingleLineTitle = false
+
             val sendFeedback = findPreference(getString(R.string.key_send_feedback))
             sendFeedback.setOnPreferenceClickListener {
                 val emailIntent = Intent(Intent.ACTION_SENDTO, Uri.parse(getString(R.string.send_feedback_uri)))

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Расписание МГЛУ</string>
+    <string name="add_group_title">Добавить группу</string>
+    <string name="group_already_added">Группа уже была добавлена.</string>
+    <string name="add_teacher_title">Добавить преподавателя</string>
+    <string name="teacher_already_added">Преподаватель уже был добавлен.</string>
+    <string name="button_add">Добавить</string>
+    <string name="button_cancel">Отменить</string>
+    <string name="faculty">Факультет</string>
+    <string name="course">Курс</string>
+    <string name="group">Группа</string>
+    <string name="teacher">Преподаватель</string>
+    <string name="navigation_drawer_open">Открыть боковое меню</string>
+    <string name="navigation_drawer_close">Закрыть боковое меню</string>
+    <string name="navigation_drawer_studygroups">Группы</string>
+    <string name="navigation_drawer_teachers">Преподаватели</string>
+    <string name="navigation_drawer_settings">Настройки</string>
+    <string name="action_delete_schedule">Удалить расписание</string>
+    <string name="dialog_delete_container_title">Вы уверены, что хотите удалить это расписание?</string>
+    <string name="dialog_delete_container_message">Расписание для выбранной группы или преподавателя будет удалено, включая все данные для это расписания (в т.ч. заметки).</string>
+    <string name="button_delete">Удалить</string>
+    <string name="monday">Понедельник</string>
+    <string name="tuesday">Вторник</string>
+    <string name="wednesday">Среда</string>
+    <string name="thursday">Четверг</string>
+    <string name="friday">Пятница</string>
+    <string name="saturday">Суббота</string>
+    <string name="sunday">Воскресенье</string>
+    <string name="item_blanklesson">Нет занятий в этот день</string>
+    <string name="snackbar_internet_unavailable">Соединение с интернетом недоступно, повторите позже.</string>
+    <string name="view_main_image_description">Эмодзи с немного улыбающимся лицом</string>
+    <string name="view_main_empty_message">Добавьте новое расписание или выберите уже добавленное из списка.</string>
+    <string name="action_show_today">Выбрать сегодняшний день</string>
+    <string name="action_update_schedule">Обновить</string>
+    <string name="error_general">Произошла ошибка :(</string>
+    <string name="error_website_unavailable">Ошибка: Не удалось подключиться к серверу :(</string>
+    <string name="snackbar_week_init_retry">Повторить</string>
+    <string name="text_week_no_classes">Нет занятий на этой неделе. Удачи!</string>
+    <string name="button_week_show_weekdays">Показать дни</string>
+    <string name="button_week_hide_weekdays">Скрыть дни</string>
+    <string name="edittext_weekday_note">Введите заметку</string>
+    <string name="textview_notes_subhead">Заметки</string>
+    <string name="textview_zeronotes">Нет заметок на этот день</string>
+    <string name="snackbar_note_deleted">Заметка была удалена</string>
+    <string name="snackbar_action_undo">Отменить</string>
+    <string name="imageview_dayitem_description">Заметки</string>
+    <string name="imageview_subject_description">Предмет</string>
+    <string name="imageview_time_description">Время</string>
+    <string name="imageview_groups_description">Группа</string>
+    <string name="imageview_classroom_description">Аудитория</string>
+    <string name="imageview_weekdays_description">Дни</string>
+    <string name="activity_lesson_info_title">Подробности</string>
+    <string name="activity_settings_title">Настройки</string>
+    <string name="pref_header_appearence">Внешний вид</string>
+    <string name="pref_header_schedule">Расписание</string>
+    <string name="pref_header_about">О приложении</string>
+    <string name="pref_theme_title">Тема</string>
+    <string name="pref_theme_default_value">Светлая</string>
+    <string name="pref_show_add_schedule_title">Показывать кнопку `Добавить расписание`</string>
+    <string name="pref_full_subjects_title">Полные названия предметов</string>
+    <string name="pref_hide_pe_classes_title">Прятать занятия по физ. культуре</string>
+    <string name="pref_send_feedback_title">Оставить отзыв</string>
+    <string name="pref_privacy_policy_title">Политика приватности</string>
+    <string name="pref_libraries_title">Библиотеки с открытым исходным кодом</string>
+    <string name="pref_app_version_title">Версия</string>
+    <string name="pref_next_update_summary">Начнёт действовать после следующего обновления расписания</string>
+    <string name="messsage_schedule_update_successful">Расписание для этой недели было обновлено</string>
+
+    <string-array name="pref_theme_entries">
+        <item>Светлая</item>
+        <item>Тёмная</item>
+        <item>Автоматически</item>
+    </string-array>
+</resources>

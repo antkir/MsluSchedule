@@ -6,7 +6,7 @@
             android:entries="@array/pref_theme_entries"
             android:icon="@drawable/ic_theme_change"
             android:key="@string/key_theme"
-            android:summary="@string/pref_theme_default_summary"
+            android:summary="@string/pref_theme_default_value"
             android:title="@string/pref_theme_title" />
 
         <androidx.preference.SwitchPreferenceCompat
