@@ -15,4 +15,8 @@
     <style name="MsluTheme.LaunchScreen" parent="MsluTheme.NoActionBarTransparentStatusBar">
         <item name="android:windowBackground">@drawable/launch_screen</item>
     </style>
+
+    <style name="MsluTheme.ActionModeButton" parent="Widget.AppCompat.Button.Borderless">
+        <item name="android:backgroundTint">@color/transparent</item>
+    </style>
 </resources>

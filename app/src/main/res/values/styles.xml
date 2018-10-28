@@ -34,9 +34,12 @@
 
     <style name="MsluTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Light" />
 
+    <style name="MsluTheme.ActionModeButton" parent="Widget.AppCompat.Button.Borderless" />
+
     <style name="MsluTheme.Dialog.Alert" parent="Theme.MaterialComponents.Light.Dialog.Alert">
         <item name="colorAccent">@color/colorPrimaryLight</item>
         <item name="android:windowBackground">@drawable/rounded_corners_rect</item>
+        <item name="materialButtonStyle">@style/MsluTheme.ActionModeButton</item>
     </style>
 
     <style name="DialogAnimation">

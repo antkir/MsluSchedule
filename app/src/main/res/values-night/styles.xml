@@ -12,6 +12,7 @@
     <style name="MsluTheme.Dialog.Alert" parent="Theme.MaterialComponents.Dialog.Alert">
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:windowBackground">@drawable/rounded_corners_rect</item>
+        <item name="materialButtonStyle">@style/MsluTheme.ActionModeButton</item>
     </style>
 
 </resources>

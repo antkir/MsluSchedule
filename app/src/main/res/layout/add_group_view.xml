@@ -93,7 +93,7 @@
             android:completionThreshold="1"
             android:hint="@string/group"
             android:imeOptions="actionDone|flagNoExtractUi"
-            android:inputType="textAutoComplete|textNoSuggestions"
+            android:inputType="textAutoComplete|textNoSuggestions|numberPassword"
             android:paddingStart="@dimen/actv_padding_side"
             android:paddingLeft="@dimen/actv_padding_side"
             android:paddingEnd="@dimen/actv_padding_side"
