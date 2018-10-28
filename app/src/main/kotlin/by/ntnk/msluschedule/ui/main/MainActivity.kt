@@ -1,10 +1,13 @@
 package by.ntnk.msluschedule.ui.main
 
 import android.animation.Animator
+import android.graphics.Point
 import android.os.Bundle
+import android.os.Handler
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewTreeObserver
 import android.view.animation.OvershootInterpolator
 import android.widget.RelativeLayout
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -21,11 +24,16 @@ import by.ntnk.msluschedule.data.Teacher
 import by.ntnk.msluschedule.mvp.views.MvpActivity
 import by.ntnk.msluschedule.ui.addgroup.AddGroupFragment
 import by.ntnk.msluschedule.ui.addteacher.AddTeacherFragment
+import by.ntnk.msluschedule.ui.customviews.ActionMenuCircle
 import by.ntnk.msluschedule.ui.settings.SettingsActivity
 import by.ntnk.msluschedule.ui.weekscontainer.WeeksContainerFragment
 import by.ntnk.msluschedule.utils.*
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
+import com.takusemba.spotlight.OnSpotlightStateChangedListener
+import com.takusemba.spotlight.Spotlight
+import com.takusemba.spotlight.shape.Circle
+import com.takusemba.spotlight.target.SimpleTarget
 import dagger.Lazy
 import dagger.android.AndroidInjection
 import dagger.android.AndroidInjector
@@ -97,13 +105,69 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
             }
         }
 
-        button_settings_main.setOnClickListener { SettingsActivity.startActivity(this) }
+        button_settings_main.setOnClickListener {
+            SettingsActivity.startActivity(this)
+            Handler().postDelayed({ drawer_layout?.closeDrawer(GravityCompat.START) }, 500)
+        }
 
         supportActionBar?.title = savedInstanceState?.getString(ARG_ACTIONBAR_TITLE)
 
         onThemeChangedDisposable = onThemeChanged
                 .filter { it }
                 .subscribe { recreate() }
+
+        if (!sharedPreferencesRepository.isFirstAppLaunch) return
+
+        val point = Point()
+        windowManager.defaultDisplay.getSize(point)
+
+        drawer_layout.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                drawer_layout?.viewTreeObserver?.removeOnGlobalLayoutListener(this)
+
+                val welcomeTarget = SimpleTarget.Builder(this@MainActivity)
+                        .setPoint(image_main_smileyface)
+                        .setShape(Circle(dipToPixels(60f).toFloat()))
+                        .setTitle(getString(R.string.tutorial_welcome_title))
+                        .setDescription(getString(R.string.tutorial_welcome_description))
+                        .build()
+                val addScheduleTarget = SimpleTarget.Builder(this@MainActivity)
+                        .setPoint(basefab_main)
+                        .setShape(Circle(dipToPixels(60f).toFloat()))
+                        .setTitle(getString(R.string.tutorial_add_schedule_title))
+                        .setDescription(getString(R.string.tutorial_add_schedule_description))
+                        .build()
+                val navigationViewTarget = SimpleTarget.Builder(this@MainActivity)
+                        .setPoint(0f, toolbar.y)
+                        .setShape(Circle(dipToPixels(120f).toFloat()))
+                        .setTitle(getString(R.string.tutorial_navigation_view_title))
+                        .setDescription(getString(R.string.tutorial_navigation_view_description))
+                        .build()
+                val actionMenuTarget = SimpleTarget.Builder(this@MainActivity)
+                        .setPoint(point.x.toFloat(), toolbar.y)
+                        .setShape(ActionMenuCircle(dipToPixels(120f).toFloat(), this@MainActivity, toolbar))
+                        .setTitle(getString(R.string.tutorial_action_menu_title))
+                        .setDescription(getString(R.string.tutorial_action_menu_description))
+                        .build()
+                val finishTarget = SimpleTarget.Builder(this@MainActivity)
+                        .setPoint(image_main_smileyface)
+                        .setShape(Circle(dipToPixels(60f).toFloat()))
+                        .setTitle(getString(R.string.tutorial_finish_title))
+                        .setDescription(getString(R.string.tutorial_finish_description))
+                        .build()
+
+                Spotlight.with(this@MainActivity)
+                        .setTargets(welcomeTarget, addScheduleTarget,
+                                    navigationViewTarget, actionMenuTarget, finishTarget)
+                        .setOnSpotlightStateListener(object : OnSpotlightStateChangedListener {
+                            override fun onStarted() = Unit
+                            override fun onEnded() {
+                                sharedPreferencesRepository.isFirstAppLaunch = false
+                            }
+                        })
+                        .start()
+            }
+        })
     }
 
     override fun onStart() {

@@ -9,13 +9,18 @@ import by.ntnk.msluschedule.di.PerApp
 
 import javax.inject.Inject
 
-const val SCHEDULECONTAINER_ID = "scheduleContainerId"
-const val SCHEDULECONTAINER_VALUE = "scheduleContainerValue"
-const val SCHEDULECONTAINER_TYPE = "scheduleContainerType"
+private const val SCHEDULECONTAINER_ID = "scheduleContainerId"
+private const val SCHEDULECONTAINER_VALUE = "scheduleContainerValue"
+private const val SCHEDULECONTAINER_TYPE = "scheduleContainerType"
+private const val IS_FIRST_APP_LAUNCH = "isFirstAppLaunch"
 
 @PerApp
 class SharedPreferencesRepository @Inject constructor(
         private val applicationContext: Context, private val sharedPreferences: SharedPreferences) {
+    var isFirstAppLaunch: Boolean
+        get() = sharedPreferences.getBoolean(IS_FIRST_APP_LAUNCH, true)
+        set(value) = sharedPreferences.edit().putBoolean(IS_FIRST_APP_LAUNCH, value).apply()
+
     fun getSelectedScheduleContainerInfo(): ScheduleContainerInfo {
         val id = sharedPreferences.getInt(SCHEDULECONTAINER_ID, 0)
         val value = sharedPreferences.getString(SCHEDULECONTAINER_VALUE, EMPTY_STRING) ?: EMPTY_STRING

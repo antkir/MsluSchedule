@@ -89,6 +89,18 @@
     <string name="pref_libraries_title">Open-source libraries</string>
     <string name="pref_app_version_title">Version</string>
 
+    <!-- Walkthrough -->
+    <string name="tutorial_welcome_title">Welcome to `MSLU Schedule`</string>
+    <string name="tutorial_welcome_description">Press to continue.</string>
+    <string name="tutorial_add_schedule_title">Add a schedule</string>
+    <string name="tutorial_add_schedule_description">Schedules for both groups and teachers are supported.</string>
+    <string name="tutorial_navigation_view_title">Navigation view</string>
+    <string name="tutorial_navigation_view_description">Check the list of the added schedules or change the settings here.</string>
+    <string name="tutorial_action_menu_title">Schedule menu</string>
+    <string name="tutorial_action_menu_description">Update the schedule for the week from here or just pull the screen down to update it.</string>
+    <string name="tutorial_finish_title">That\'s all</string>
+    <string name="tutorial_finish_description">Thank you!</string>
+
     <string name="key_theme" translatable="false">key_theme</string>
     <string name="key_full_subjects" translatable="false">key_full_subjects</string>
     <string name="key_show_add_schedule" translatable="false">key_show_add_schedule</string>
@@ -114,6 +126,7 @@
         <item>RxAndroid</item>
         <item>RxJava</item>
         <item>RxKotlin</item>
+        <item>Spotlight</item>
         <item>ThreeTen Backport</item>
         <item>Timber</item>
     </string-array>
@@ -133,6 +146,7 @@
         <item>https://github.com/ReactiveX/RxAndroid</item>
         <item>https://github.com/ReactiveX/RxJava</item>
         <item>https://github.com/ReactiveX/RxKotlin</item>
+        <item>https://github.com/TakuSemba/Spotlight</item>
         <item>https://github.com/ThreeTen/threetenbp</item>
         <item>https://github.com/JakeWharton/timber</item>
     </string-array>

@@ -72,4 +72,14 @@
         <item>Цёмная</item>
         <item>Аўтаматычна</item>
     </string-array>
+    <string name="tutorial_welcome_title">Сардэчна запрашаем у `Расклад МДЛУ`</string>
+    <string name="tutorial_welcome_description">Націсніце, каб працягнуць.</string>
+    <string name="tutorial_navigation_view_title">Бакавое меню</string>
+    <string name="tutorial_navigation_view_description">Тут можна праверыць дададзеныя расклады або змяніць налады.</string>
+    <string name="tutorial_finish_title">На гэтым усё</string>
+    <string name="tutorial_finish_description">Дзякуй!</string>
+    <string name="tutorial_add_schedule_title">Дадаць расклад</string>
+    <string name="tutorial_add_schedule_description">Падтрымліваюцца расклады для груп і выкладчыкаў.</string>
+    <string name="tutorial_action_menu_title">Меню раскладу</string>
+    <string name="tutorial_action_menu_description">Абнаўляйце расклад на тыдзень адсюль ці пацягніце экран уніз, каб абнавіць яго.</string>
 </resources>

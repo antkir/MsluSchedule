@@ -72,4 +72,14 @@
         <item>Тёмная</item>
         <item>Автоматически</item>
     </string-array>
+    <string name="tutorial_welcome_title">Добро пожаловать в `Расписание МГЛУ`</string>
+    <string name="tutorial_welcome_description">Нажмите, чтобы продолжить.</string>
+    <string name="tutorial_add_schedule_description">Поддерживаются расписания для групп и преподавателей.</string>
+    <string name="tutorial_add_schedule_title">Добавить расписание</string>
+    <string name="tutorial_navigation_view_title">Боковое меню</string>
+    <string name="tutorial_action_menu_title">Меню расписания</string>
+    <string name="tutorial_action_menu_description">Обновляйте расписание на неделю отсюда или потяните экран вниз, чтобы обновить его.</string>
+    <string name="tutorial_finish_title">На этом всё</string>
+    <string name="tutorial_finish_description">Спасибо!</string>
+    <string name="tutorial_navigation_view_description">Здесь можно проверить добавленные расписания или поменять настройки.</string>
 </resources>
