@@ -121,7 +121,8 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
 
     override fun onStart() {
         super.onStart()
-        presenter.getSchedule(weekId)
+        val shouldUpdateAdapter = recyclerView.adapter?.itemCount == 0
+        presenter.getSchedule(weekId, shouldUpdateAdapter)
     }
 
     override fun onStop() {
@@ -290,7 +291,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     override fun showError(t: Throwable, shouldSetupViews: Boolean) {
         if (weekId == INVALID_VALUE) return
         if (shouldSetupViews) {
-            presenter.getSchedule(weekId)
+            presenter.getSchedule(weekId, shouldUpdateAdapter = true)
         }
         Snackbar.make(getView()!!, getErrorMessageResId(t), 5000)
                 .setAction(R.string.snackbar_week_init_retry) {
