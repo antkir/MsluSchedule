@@ -19,7 +19,7 @@
     <string name="pref_app_version_title">Версія</string>
     <string name="pref_libraries_title">Бібліятэкі з адкрытым зыходным кодам</string>
     <string name="pref_privacy_policy_title">Палітыка прыватнасці</string>
-    <string name="pref_send_feedback_title">Пакінуць водгук</string>
+    <string name="pref_send_feedback_title">Адправіць водгук</string>
     <string name="pref_next_update_summary">Уступіць у сілу пасля наступнага абнаўлення раскладу</string>
     <string name="pref_hide_pe_classes_title">Хаваць заняткі па фіз. культуры</string>
     <string name="pref_full_subjects_title">Поўныя назвы прадметаў</string>

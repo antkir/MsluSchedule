@@ -112,7 +112,8 @@
     <string name="privacy_policy_url" translatable="false">"https://sites.google.com/view/msluapp"</string>
 
     <string-array name="library_list" translatable="false">
-        <item>Android Jetpack</item>
+        <item>Android SDK</item>
+        <item>AndroidX</item>
         <item>Apache POI</item>
         <item>Dagger</item>
         <item>Fabric</item>
@@ -134,7 +135,8 @@
     </string-array>
 
     <string-array name="library_urls" translatable="false">
-        <item>https://developer.android.com/jetpack</item>
+        <item>https://developer.android.com/studio/terms</item>
+        <item>https://github.com/aosp-mirror/platform_frameworks_support</item>
         <item>https://github.com/apache/poi</item>
         <item>https://github.com/google/dagger</item>
         <item>https://fabric.io/licenses</item>

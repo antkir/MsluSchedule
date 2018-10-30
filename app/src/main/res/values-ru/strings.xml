@@ -60,7 +60,7 @@
     <string name="pref_show_add_schedule_title">Показывать кнопку `Добавить расписание`</string>
     <string name="pref_full_subjects_title">Полные названия предметов</string>
     <string name="pref_hide_pe_classes_title">Прятать занятия по физ. культуре</string>
-    <string name="pref_send_feedback_title">Оставить отзыв</string>
+    <string name="pref_send_feedback_title">Отправить отзыв</string>
     <string name="pref_privacy_policy_title">Политика приватности</string>
     <string name="pref_libraries_title">Библиотеки с открытым исходным кодом</string>
     <string name="pref_app_version_title">Версия</string>

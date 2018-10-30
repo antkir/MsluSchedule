@@ -26,7 +26,6 @@ import org.mockito.MockitoAnnotations
 import timber.log.Timber
 import org.mockito.Mockito.`when` as whenever
 
-
 class MainPresenterTest {
     @Mock
     private lateinit var currentDate: CurrentDate
@@ -90,7 +89,6 @@ class MainPresenterTest {
         )
         presenter.bindView(view)
     }
-
 
     @Test
     fun addGroup() {

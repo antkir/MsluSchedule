@@ -219,7 +219,6 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
         constraintlayout_weekday.viewTreeObserver.removeOnGlobalLayoutListener(onKeyboardStateChangeListener)
     }
 
-
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putParcelable(ARG_LAYOUT_MANAGER_SAVED_STATE, recyclerView.layoutManager?.onSaveInstanceState())

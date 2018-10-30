@@ -26,6 +26,11 @@ android {
     testOptions {
         unitTests.returnDefaultValues = true
     }
+    packagingOptions {
+        exclude 'META-INF/CHANGES'
+        exclude 'META-INF/README.md'
+        exclude 'org/apache/**'
+    }
     compileSdkVersion 28
     buildToolsVersion "28.0.3"
     defaultConfig {

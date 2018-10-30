@@ -145,7 +145,6 @@ class NetworkRepository @Inject constructor(
                 .map { it.body() }
     }
 
-
     private fun getHtmlBody(scheduleType: String): Single<String> {
         return scheduleApi
                 .getHtmlBody(scheduleType)
