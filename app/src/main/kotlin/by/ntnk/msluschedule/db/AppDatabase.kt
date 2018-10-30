@@ -14,8 +14,7 @@ import by.ntnk.msluschedule.db.data.*
             DbTeacherLesson::class,
             DbNote::class
         ],
-        version = 8,
-        exportSchema = false
+        version = 8
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract val scheduleContainerDao: ScheduleContainerDao
