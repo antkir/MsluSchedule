@@ -115,6 +115,8 @@
         <item>Android Jetpack</item>
         <item>Apache POI</item>
         <item>Dagger</item>
+        <item>Fabric</item>
+        <item>Firebase</item>
         <item>jsoup</item>
         <item>JUnit</item>
         <item>Kotlin</item>
@@ -135,6 +137,8 @@
         <item>https://developer.android.com/jetpack</item>
         <item>https://github.com/apache/poi</item>
         <item>https://github.com/google/dagger</item>
+        <item>https://fabric.io/licenses</item>
+        <item>https://www.firebase.com/terms/oss.html</item>
         <item>https://github.com/jhy/jsoup</item>
         <item>https://github.com/junit-team/junit4</item>
         <item>https://github.com/JetBrains/kotlin</item>

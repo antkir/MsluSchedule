@@ -47,6 +47,9 @@
             android:name="by.ntnk.msluschedule.ui.settings.SettingsActivity"
             android:label="@string/activity_settings_title"
             android:parentActivityName="by.ntnk.msluschedule.ui.main.MainActivity" />
+        <meta-data
+            android:name="firebase_crashlytics_collection_enabled"
+            android:value="false" />
     </application>
 
 </manifest>
