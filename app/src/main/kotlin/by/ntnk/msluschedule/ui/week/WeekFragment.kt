@@ -36,6 +36,7 @@ import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.fragment_week.*
 import timber.log.Timber
+import java.lang.ref.WeakReference
 import javax.inject.Inject
 
 private const val ARG_LAYOUT_MANAGER_SAVED_STATE = "argLayoutManagerSavedState"
@@ -47,7 +48,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     private var weekId: Int = INVALID_VALUE
     private var isCurrentWeek: Boolean = false
     private var layoutManagerSavedState: Parcelable? = null
-    private val disposables = CompositeDisposable()
+    private val uiDisposables = CompositeDisposable()
 
     override val view: WeekView
         get() = this
@@ -98,7 +99,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
 
     private fun initAdapterOnClickListener() {
         val adapter = recyclerView.adapter as LessonRecyclerViewAdapter
-        disposables += adapter.onClickObservable.subscribeBy(
+        uiDisposables += adapter.onClickObservable.subscribeBy(
                 onNext = {
                     when (it.viewType) {
                         VIEWTYPE_WEEKDAY -> {
@@ -126,8 +127,8 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     }
 
     override fun onStop() {
-        super.onStop()
         presenter.clearDisposables()
+        super.onStop()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -138,7 +139,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        disposables.clear()
+        uiDisposables.clear()
     }
 
     fun showToday() {
@@ -277,15 +278,22 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     }
 
     override fun showUpdateSuccessMessage() {
-        Handler().postDelayed(
-                {
-                    Toast.makeText(
-                            context,
-                            resources.getString(R.string.messsage_schedule_update_successful),
-                            Toast.LENGTH_SHORT
-                    ).show()
-                },
-                250)
+        Handler().postDelayed(ToastRunnable(context), 250)
+    }
+
+    private class ToastRunnable(context: Context?) : Runnable {
+        private val contextWeakRef: WeakReference<Context?> = WeakReference(context)
+
+        override fun run() {
+            val context = contextWeakRef.get()
+            if (context != null) {
+                Toast.makeText(
+                        context,
+                        context.resources.getString(R.string.messsage_schedule_update_successful),
+                        Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
     }
 
     override fun showError(t: Throwable, shouldSetupViews: Boolean) {

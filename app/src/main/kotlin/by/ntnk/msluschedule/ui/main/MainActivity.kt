@@ -14,6 +14,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.viewpager.widget.ViewPager
@@ -44,6 +45,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import kotlinx.android.synthetic.main.fam_main.*
+import java.lang.ref.WeakReference
 import javax.inject.Inject
 
 private const val ADD_GROUP_FRAGMENT_TAG = "AddGroupFragment"
@@ -107,7 +109,7 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
 
         button_settings_main.setOnClickListener {
             SettingsActivity.startActivity(this)
-            Handler().postDelayed({ drawer_layout?.closeDrawer(GravityCompat.START) }, 500)
+            Handler().postDelayed(ToastRunnable(drawer_layout), 500)
         }
 
         supportActionBar?.title = savedInstanceState?.getString(ARG_ACTIONBAR_TITLE)
@@ -168,6 +170,14 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
                         .start()
             }
         })
+    }
+
+    private class ToastRunnable(context: DrawerLayout?) : Runnable {
+        private val drawerLayoutRef: WeakReference<DrawerLayout?> = WeakReference(context)
+
+        override fun run() {
+            drawerLayoutRef.get()?.closeDrawer(GravityCompat.START)
+        }
     }
 
     override fun onStart() {
