@@ -140,7 +140,7 @@ class WeekPresenterTest {
                 .thenReturn(Single.just(false)
                                     .doOnSubscribe { isWeekInitializedTest.onSubscribe(it) })
         // when
-        presenter.getSchedule(weekId)
+        presenter.getSchedule(weekId, true)
         // then
         getScheduleContainerTest.assertSubscribed()
         isWeekInitializedTest.assertSubscribed()
@@ -168,7 +168,7 @@ class WeekPresenterTest {
         whenever(networkRepository.getSchedule(any<StudyGroup>(), anyInt()))
                 .thenReturn(Observable.error(NullPointerException()))
         // when
-        presenter.getSchedule(weekId)
+        presenter.getSchedule(weekId, true)
         // then
         getScheduleContainerTest.assertSubscribed()
         isWeekInitializedTest.assertSubscribed()
