@@ -17,3 +17,6 @@ android:
 
 script:
    - ./gradlew --no-daemon build
+
+before_install:
+   - yes | sdkmanager "platforms;android-28"
