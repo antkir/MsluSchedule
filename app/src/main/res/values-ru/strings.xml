@@ -82,4 +82,5 @@
     <string name="tutorial_finish_title">На этом всё</string>
     <string name="tutorial_finish_description">Спасибо!</string>
     <string name="tutorial_navigation_view_description">Здесь можно проверить добавленные расписания или поменять настройки.</string>
+    <string name="fab_add_schedule_main_description">Добавить расписание</string>
 </resources>

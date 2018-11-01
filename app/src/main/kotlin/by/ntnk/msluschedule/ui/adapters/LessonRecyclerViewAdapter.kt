@@ -148,7 +148,11 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
     override fun onBindViewHolder(viewHolder: RecyclerView.ViewHolder, position: Int) {
         data[position].bindViewHolder(viewHolder)
         when (viewHolder.itemViewType) {
-            VIEWTYPE_WEEKDAY -> viewHolder.itemView.setOnClickListener { _ -> onClickSubject.onNext(data[position]) }
+            VIEWTYPE_WEEKDAY -> {
+                val surfaceColor = ContextCompat.getColor(viewHolder.itemView.context, R.color.surface)
+                viewHolder.itemView.setBackgroundColor(surfaceColor)
+                viewHolder.itemView.setOnClickListener { _ -> onClickSubject.onNext(data[position]) }
+            }
             else -> Unit
         }
     }

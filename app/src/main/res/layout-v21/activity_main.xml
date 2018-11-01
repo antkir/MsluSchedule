@@ -22,7 +22,7 @@
 
         <com.google.android.material.navigation.NavigationView
             android:id="@+id/nav_view"
-            android:layout_width="match_parent"
+            android:layout_width="@dimen/nav_view_width"
             android:layout_height="match_parent"
             android:layout_marginBottom="@dimen/nav_view_footer_height"
             android:background="@color/surface"
@@ -33,14 +33,14 @@
 
         <View
             android:id="@+id/nav_statusbar_main"
-            android:layout_width="match_parent"
+            android:layout_width="@dimen/nav_view_width"
             android:layout_height="0dp"
             android:layout_alignParentTop="true"
             android:background="@color/nav_statusbar" />
 
         <TextView
             android:id="@+id/button_settings_main"
-            android:layout_width="match_parent"
+            android:layout_width="@dimen/nav_view_width"
             android:layout_height="@dimen/nav_view_footer_height"
             android:layout_alignParentBottom="true"
             android:background="@color/surface"

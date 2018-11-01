@@ -43,6 +43,7 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
+        android:contentDescription="@string/fab_add_schedule_main_description"
         android:onClick="onBaseFabClick"
         android:src="@drawable/ic_fab_add"
         app:fabSize="normal"

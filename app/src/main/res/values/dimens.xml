@@ -3,6 +3,7 @@
     <dimen name="nav_view_footer_height">64dp</dimen>
     <dimen name="nav_view_footer_textview_padding_side">16dp</dimen>
     <dimen name="nav_view_footer_image_padding_end">32dp</dimen>
+    <dimen name="nav_view_width">512dp</dimen>
 
     <dimen name="actv_progressbar_margin">10dp</dimen>
     <dimen name="actv_progressbar_margin_end">16dp</dimen>

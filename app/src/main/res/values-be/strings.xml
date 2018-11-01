@@ -82,4 +82,5 @@
     <string name="tutorial_add_schedule_description">Падтрымліваюцца расклады для груп і выкладчыкаў.</string>
     <string name="tutorial_action_menu_title">Меню раскладу</string>
     <string name="tutorial_action_menu_description">Абнаўляйце расклад на тыдзень адсюль ці пацягніце экран уніз, каб абнавіць яго.</string>
+    <string name="fab_add_schedule_main_description">Дадаць расклад</string>
 </resources>
