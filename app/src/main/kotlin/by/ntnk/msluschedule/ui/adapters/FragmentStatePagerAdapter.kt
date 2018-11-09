@@ -138,7 +138,7 @@ abstract class FragmentStatePagerAdapter(private val mFragmentManager: FragmentM
 
     override fun finishUpdate(container: ViewGroup) {
         if (mCurTransaction != null) {
-            mCurTransaction!!.commitNow()
+            mCurTransaction!!.commitNowAllowingStateLoss()
             mCurTransaction = null
         }
     }
