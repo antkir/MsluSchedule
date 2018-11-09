@@ -7,7 +7,9 @@ import by.ntnk.msluschedule.mvp.PresenterManager
 import by.ntnk.msluschedule.mvp.View
 import by.ntnk.msluschedule.utils.PRESENTER_ID_KEY
 import by.ntnk.msluschedule.utils.random
+import timber.log.Timber
 import javax.inject.Inject
+import kotlin.math.absoluteValue
 
 /**
  * Generic fragment, extended to work with MVP pattern.
@@ -31,17 +33,24 @@ abstract class MvpFragment<out P : Presenter<V>, V : View> : Fragment() {
     }
 
     /** Gets the presenter from [PresenterManager] or creates a new one, if it wasn't found there. */
-    @Suppress("UNCHECKED_CAST")
     protected val presenter: P
         get() =
             if (presenterId != null) {
-                presenterManager.getPresenter(presenterId!!) as P
+                try {
+                    @Suppress("UNCHECKED_CAST")
+                    presenterManager.getPresenter(presenterId!!) as P
+                } catch (e: ClassCastException) {
+                    Timber.w(e)
+                    onCreatePresenter()
+                }
             } else {
                 onCreatePresenter()
             }
 
+    /** Represents this [Fragment]. */
     protected abstract val view: V
 
+    /** Indicates if the presenter should be retained. */
     private var retainPresenter: Boolean = true
 
     /** Called if the presenter for this fragment hasn't been created yet. */
@@ -54,7 +63,8 @@ abstract class MvpFragment<out P : Presenter<V>, V : View> : Fragment() {
         if (retainPresenter) {
             validatePresenter()
             if (presenterId == null) {
-                val id = (0 until Int.MAX_VALUE).random()
+                val hashCode = toString().hashCode().absoluteValue
+                val id = (0 until Int.MAX_VALUE - hashCode).random() + hashCode
                 presenterId = presenterManager.addPresenter(id, presenter)
             }
         }

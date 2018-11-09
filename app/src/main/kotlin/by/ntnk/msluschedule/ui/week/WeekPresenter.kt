@@ -155,7 +155,7 @@ class WeekPresenter @Inject constructor(
                 .doOnSubscribe { view?.showUpdateProgressBar() }
                 .doOnDispose { view?.hideUpdateProgressBar() }
                 .doOnEvent { _, _ -> view?.hideUpdateProgressBar() }
-                .doOnSuccess { _ -> view?.showUpdateSuccessMessage() }
+                .doOnSuccess { view?.showUpdateSuccessMessage() }
                 .subscribeBy(
                         onSuccess = { weekDayEntities -> view?.showSchedule(weekDayEntities) },
                         onError = {
