@@ -7,7 +7,6 @@ import by.ntnk.msluschedule.mvp.PresenterManager
 import by.ntnk.msluschedule.mvp.View
 import by.ntnk.msluschedule.utils.PRESENTER_ID_KEY
 import by.ntnk.msluschedule.utils.random
-import timber.log.Timber
 import javax.inject.Inject
 import kotlin.math.absoluteValue
 
@@ -30,13 +29,9 @@ abstract class MvpActivity<out P : Presenter<V>, V : View> : AppCompatActivity()
     protected val presenter: P
         get() =
             if (presenterId != null) {
-                try {
-                    @Suppress("UNCHECKED_CAST")
-                    presenterManager.getPresenter(presenterId!!) as P
-                } catch (e: ClassCastException) {
-                    Timber.w(e)
-                    onCreatePresenter()
-                }
+                @Suppress("UNCHECKED_CAST")
+                // The invalid presenter issue seems to be fixed, but let's have this check here just in case.
+                presenterManager.getPresenter(presenterId!!) as? P ?: onCreatePresenter().also { presenterId = null }
             } else {
                 onCreatePresenter()
             }
