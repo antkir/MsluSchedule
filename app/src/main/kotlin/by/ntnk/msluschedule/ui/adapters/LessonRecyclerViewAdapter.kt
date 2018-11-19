@@ -111,7 +111,7 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
             VIEWTYPE_STUDYGROUP -> {
                 val view = inflater.inflate(R.layout.item_studygrouplesson, parent, false)
                 StudyGroupLessonViewHolder(view).apply {
-                    itemView.setOnClickListener { _ ->
+                    itemView.setOnClickListener {
                         if ((data[adapterPosition] as StudyGroupLessonView).lesson.subject != EMPTY_STRING) {
                             onClickSubject.onNext(data[adapterPosition])
                         }
@@ -121,7 +121,7 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
             VIEWTYPE_TEACHER -> {
                 val view = inflater.inflate(R.layout.item_teacherlesson, parent, false)
                 TeacherLessonViewHolder(view).apply {
-                    itemView.setOnClickListener { _ ->
+                    itemView.setOnClickListener {
                         if ((data[adapterPosition] as TeacherLessonView).lesson.subject != EMPTY_STRING) {
                             onClickSubject.onNext(data[adapterPosition])
                         }
@@ -131,7 +131,7 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
             VIEWTYPE_WEEKDAY -> {
                 val view = inflater.inflate(R.layout.item_day, parent, false)
                 DayViewHolder(view).apply {
-                    itemView.setOnClickListener { _ -> onClickSubject.onNext(data[adapterPosition]) }
+                    itemView.setOnClickListener { onClickSubject.onNext(data[adapterPosition]) }
                 }
             }
             VIEWTYPE_DAYEND -> {
@@ -151,7 +151,7 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
             VIEWTYPE_WEEKDAY -> {
                 val surfaceColor = ContextCompat.getColor(viewHolder.itemView.context, R.color.surface)
                 viewHolder.itemView.setBackgroundColor(surfaceColor)
-                viewHolder.itemView.setOnClickListener { _ -> onClickSubject.onNext(data[position]) }
+                viewHolder.itemView.setOnClickListener { onClickSubject.onNext(data[position]) }
             }
             else -> Unit
         }

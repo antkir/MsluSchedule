@@ -97,7 +97,7 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
         with(courseView) {
             setEnabledFocusable(false)
             keyListener = null
-            setOnClickListener { _ -> courseView.showDropDown() }
+            setOnClickListener { courseView.showDropDown() }
             setOnItemClickListener { _, _, position, _ ->
                 groupView.progressBarVisibility = View.VISIBLE
                 groupView.text.clear()
@@ -112,7 +112,7 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
             progressBar = layout.findViewById(R.id.progressbar_dialog_faculty)
             setEnabledFocusable(false)
             keyListener = null
-            setOnClickListener { _ -> facultyView.showDropDown() }
+            setOnClickListener { facultyView.showDropDown() }
             setOnItemClickListener { _, _, position, _ ->
                 textinputlayoutCourseView.visibility = View.GONE
                 groupView.progressBarVisibility = View.VISIBLE
