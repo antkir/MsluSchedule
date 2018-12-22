@@ -19,12 +19,17 @@ class LessonInfoPresenter @Inject constructor(
                         .flatMap { lesson ->
                             databaseRepository.getWeekdaysWithStudyGroupLesson(lesson.subject, weekId)
                                     .map { Pair(lesson, it) }
+                                    .toMaybe()
                         }
                         .subscribeOn(schedulerProvider.io())
                         .observeOn(schedulerProvider.ui())
                         .subscribeBy(
                                 onSuccess = { view?.showInfo(it.first, it.second) },
-                                onError = { throwable -> Timber.e(throwable) }
+                                onError = {
+                                    throwable -> Timber.e(throwable)
+                                    view?.destroyView()
+                                },
+                                onComplete = { view?.destroyView() }
                         )
             }
             ScheduleType.TEACHER -> {
@@ -32,12 +37,17 @@ class LessonInfoPresenter @Inject constructor(
                         .flatMap { lesson ->
                             databaseRepository.getWeekdaysWithTeacherLesson(lesson.groups, weekId)
                                     .map { Pair(lesson, it) }
+                                    .toMaybe()
                         }
                         .subscribeOn(schedulerProvider.io())
                         .observeOn(schedulerProvider.ui())
                         .subscribeBy(
                                 onSuccess = { view?.showInfo(it.first, it.second) },
-                                onError = { throwable -> Timber.e(throwable) }
+                                onError = {
+                                    throwable -> Timber.e(throwable)
+                                    view?.destroyView()
+                                },
+                                onComplete = { view?.destroyView() }
                         )
             }
         }

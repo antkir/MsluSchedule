@@ -7,4 +7,5 @@ import by.ntnk.msluschedule.mvp.View
 interface LessonInfoView : View {
     fun showInfo(lesson: StudyGroupLesson, weekdaysWithLesson: List<String>)
     fun showInfo(lesson: TeacherLesson, weekdaysWithLesson: List<String>)
+    fun destroyView()
 }

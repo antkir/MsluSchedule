@@ -5,6 +5,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import by.ntnk.msluschedule.db.data.DbTeacherLesson
 import by.ntnk.msluschedule.db.data.DbWeekdayWithTeacherLessons
+import io.reactivex.Maybe
 import io.reactivex.Single
 
 @Dao
@@ -17,7 +18,7 @@ interface TeacherLessonDao : BaseDao<DbTeacherLesson> {
     fun getWeekdayWithTeacherLessonsForWeek(weekId: Int): Single<List<DbWeekdayWithTeacherLessons>>
 
     @Query("SELECT * FROM DbTeacherLesson WHERE id=:id")
-    fun getLesson(id: Int): Single<DbTeacherLesson>
+    fun getLesson(id: Int): Maybe<DbTeacherLesson>
 
     @Query("SELECT * FROM DbTeacherLesson WHERE weekdayId=:weekdayId AND groups=:groups")
     fun getLesson(weekdayId: Int, groups: String): Single<List<DbTeacherLesson>>

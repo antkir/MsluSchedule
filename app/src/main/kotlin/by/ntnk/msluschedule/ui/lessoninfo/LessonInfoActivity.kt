@@ -60,7 +60,7 @@ class LessonInfoActivity : MvpActivity<LessonInfoPresenter, LessonInfoView>(),
 
     override fun onStart() {
         super.onStart()
-        if (scheduleType == null || lessonId <= 0) {
+        if (scheduleType == null || lessonId <= 0 || weekId <= 0) {
             NavUtils.navigateUpFromSameTask(this)
             return
         }
@@ -119,6 +119,8 @@ class LessonInfoActivity : MvpActivity<LessonInfoPresenter, LessonInfoView>(),
             imageView?.visibility = View.GONE
         }
     }
+
+    override fun destroyView() = NavUtils.navigateUpFromSameTask(this)
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
