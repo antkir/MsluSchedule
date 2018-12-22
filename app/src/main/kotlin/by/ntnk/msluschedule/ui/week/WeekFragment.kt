@@ -303,6 +303,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         }
         Snackbar.make(getView()!!, getErrorMessageResId(t), 5000)
                 .setAction(R.string.snackbar_week_init_retry) {
+                    context ?: return@setAction
                     if (isNetworkAccessible(context!!.applicationContext)) {
                         presenter.updateSchedule(weekId)
                     } else {

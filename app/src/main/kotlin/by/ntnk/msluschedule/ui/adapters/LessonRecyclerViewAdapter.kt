@@ -9,6 +9,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.NO_POSITION
 import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.data.Lesson
 import by.ntnk.msluschedule.data.StudyGroupLesson
@@ -112,7 +113,8 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
                 val view = inflater.inflate(R.layout.item_studygrouplesson, parent, false)
                 StudyGroupLessonViewHolder(view).apply {
                     itemView.setOnClickListener {
-                        if ((data[adapterPosition] as StudyGroupLessonView).lesson.subject != EMPTY_STRING) {
+                        if (adapterPosition != NO_POSITION &&
+                                (data[adapterPosition] as StudyGroupLessonView).lesson.subject != EMPTY_STRING) {
                             onClickSubject.onNext(data[adapterPosition])
                         }
                     }
@@ -122,7 +124,8 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
                 val view = inflater.inflate(R.layout.item_teacherlesson, parent, false)
                 TeacherLessonViewHolder(view).apply {
                     itemView.setOnClickListener {
-                        if ((data[adapterPosition] as TeacherLessonView).lesson.subject != EMPTY_STRING) {
+                        if (adapterPosition != NO_POSITION &&
+                                (data[adapterPosition] as TeacherLessonView).lesson.subject != EMPTY_STRING) {
                             onClickSubject.onNext(data[adapterPosition])
                         }
                     }
@@ -131,7 +134,11 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
             VIEWTYPE_WEEKDAY -> {
                 val view = inflater.inflate(R.layout.item_day, parent, false)
                 DayViewHolder(view).apply {
-                    itemView.setOnClickListener { onClickSubject.onNext(data[adapterPosition]) }
+                    itemView.setOnClickListener {
+                        if (adapterPosition != NO_POSITION) {
+                            onClickSubject.onNext(data[adapterPosition])
+                        }
+                    }
                 }
             }
             VIEWTYPE_DAYEND -> {

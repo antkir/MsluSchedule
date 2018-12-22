@@ -51,6 +51,7 @@ class WarningDialogFragment : DialogFragment() {
     }
 
     private fun initPositiveButtonCountdown(button: Button) {
+        context ?: return
         button.isEnabled = false
         val buttonDeleteString = resources.getString(R.string.button_delete)
         val buttonDeleteColor = ContextCompat.getColor(context!!, R.color.warning)
