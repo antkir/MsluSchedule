@@ -8,6 +8,7 @@ import by.ntnk.msluschedule.network.NetworkRepository
 import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.utils.COURSE_VALUE
 import by.ntnk.msluschedule.utils.CurrentDate
+import by.ntnk.msluschedule.utils.EMPTY_STRING
 import by.ntnk.msluschedule.utils.SchedulerProvider
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
@@ -37,9 +38,11 @@ class AddGroupPresenter @Inject constructor(
 
     fun isGroupsInitialized(): Boolean = groups != null
 
-    fun isFacultySet(): Boolean = faculty != 0
+    fun isFacultySet(): Boolean = faculty > 0
 
     fun isCourseSet(): Boolean = course > 0
+
+    fun isGroupSetAndValid(): Boolean = group > 0 && groups!!.getValue(group) != EMPTY_STRING
 
     fun setFacultyKeyFromPosition(position: Int) {
         faculty = faculties!!.keyAt(position)
@@ -56,6 +59,10 @@ class AddGroupPresenter @Inject constructor(
 
     fun setGroupsNull() {
         groups = null
+        group = 0
+    }
+
+    fun setGroupNull() {
         group = 0
     }
 
@@ -128,24 +135,28 @@ class AddGroupPresenter @Inject constructor(
         group = value
     }
 
-    fun isValidGroup(string: String): Boolean {
-        return groups?.containsValue(string) == true
+    fun isValidGroup(name: String): Boolean {
+        return groups?.containsValue(name) == true
     }
 
-    fun isGroupStored(string: String): Boolean {
+    fun isGroupStored(name: String): Boolean {
         return scheduleContaners
                 ?.filter { it.year == currentDate.academicYear }
                 ?.map { it.name }
-                ?.any { it == string } == true
+                ?.any { it == name } == true
     }
 
-    fun getStudyGroup(): StudyGroup {
+    fun getStudyGroup(): StudyGroup? {
+        val groupValue = groups!!.getValue(group)
+        if (groupValue == EMPTY_STRING) {
+            return null
+        }
         val courseKey = if (course > 0) {
             course
         } else {
-            Character.getNumericValue(groups!!.getEntry(group).value[0])
+            Character.getNumericValue(groupValue[0])
         }
-        return StudyGroup(group, groups!!.getValue(group), faculty, courseKey, currentDate.academicYear)
+        return StudyGroup(group, groupValue, faculty, courseKey, currentDate.academicYear)
     }
 
     fun populateFacultiesAdapter() = view?.populateFacultiesAdapter(faculties!!)

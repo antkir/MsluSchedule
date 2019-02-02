@@ -1,7 +1,6 @@
 package by.ntnk.msluschedule.network.data
 
 import android.util.SparseArray
-import by.ntnk.msluschedule.utils.ImmutableEntry
 import java.util.Arrays
 
 data class ScheduleFilter(private val data: SparseArray<String>) {
@@ -9,11 +8,6 @@ data class ScheduleFilter(private val data: SparseArray<String>) {
         get() = data.size()
 
     constructor() : this(SparseArray<String>())
-
-    fun getEntry(key: Int): Map.Entry<Int, String> {
-        val value = getValue(key)
-        return ImmutableEntry(key, value)
-    }
 
     fun getValue(key: Int): String = data[key]
 

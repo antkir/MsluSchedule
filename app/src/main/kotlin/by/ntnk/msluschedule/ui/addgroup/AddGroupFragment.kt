@@ -61,7 +61,12 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
                 .setTitle((R.string.add_group_title))
                 .setView(layout)
                 .setPositiveButton(R.string.button_add) { _, _ ->
-                    listener.onNewStudyGroup(presenter.getStudyGroup())
+                    val studyGroup = presenter.getStudyGroup()
+                    if (studyGroup != null) {
+                        listener.onNewStudyGroup(studyGroup)
+                    } else {
+                        showError(IllegalStateException("group value must not be an empty string"))
+                    }
                 }
                 .setNegativeButton(R.string.button_cancel) { _, _ ->
                     dismiss()
@@ -137,7 +142,13 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
                         (presenter.isFacultySet() && presenter.isCourseSet() && !presenter.isGroupsInitialized())) {
                     groupView.progressBarVisibility = View.VISIBLE
                 }
-                if (presenter.isGroupsInitialized()) presenter.populateGroupsAdapter()
+                if (presenter.isGroupsInitialized()) {
+                    presenter.populateGroupsAdapter()
+                    if (!presenter.isGroupSetAndValid()) {
+                        groupView.text.clear()
+                        presenter.setGroupNull()
+                    }
+                }
             }
             else -> {
                 facultyView.progressBarVisibility = View.VISIBLE
