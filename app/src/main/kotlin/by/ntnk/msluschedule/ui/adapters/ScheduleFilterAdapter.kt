@@ -4,10 +4,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.BaseAdapter
-import android.widget.Filter
-import android.widget.Filterable
-import android.widget.TextView
+import android.widget.*
 import androidx.annotation.LayoutRes
 import by.ntnk.msluschedule.network.data.ScheduleFilter
 
@@ -20,8 +17,14 @@ class ScheduleFilterAdapter(
     private val filter: DataFilter by lazy { DataFilter() }
     private val dummyFilter: DummyFilter by lazy { DummyFilter() }
     private val layoutInflater: LayoutInflater = LayoutInflater.from(context)
+    /**
+     * Indicates if filtering checks if the string starts with the specified prefix.
+     * By default, filtering checks if the string contains the specified sequence of characters as a substring.
+     */
     var isStartsWithFilterActive = false
+    /** Indicates if filtering ignores character case when comparing strings. */
     var isIgnoreCaseFilterActive = false
+    /** Indicates if filtering is enabled. */
     var isFilteringEnabled = true
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
