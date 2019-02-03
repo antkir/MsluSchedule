@@ -45,7 +45,7 @@ class AddTeacherPresenter @Inject constructor(
                             populateTeachersAdapter()
                         },
                         onError = {
-                            it.printStackTrace()
+                            Timber.i(it)
                             view?.showError(it)
                         }
                 )

@@ -47,7 +47,7 @@ class WeekPresenter @Inject constructor(
                             }
                         },
                         onError = {
-                            it.printStackTrace()
+                            Timber.i(it)
                             view?.showError(it, shouldSetupViews = true)
                         }
                 )
@@ -159,7 +159,7 @@ class WeekPresenter @Inject constructor(
                 .subscribeBy(
                         onSuccess = { weekDayEntities -> view?.showSchedule(weekDayEntities) },
                         onError = {
-                            it.printStackTrace()
+                            Timber.i(it)
                             view?.showError(it, shouldSetupViews = false)
                         }
                 )

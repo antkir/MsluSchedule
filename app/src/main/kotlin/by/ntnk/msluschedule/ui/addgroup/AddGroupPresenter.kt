@@ -84,7 +84,7 @@ class AddGroupPresenter @Inject constructor(
                             populateFacultiesAdapter()
                         },
                         onError = {
-                            it.printStackTrace()
+                            Timber.i(it)
                             view?.showError(it)
                         }
                 )
@@ -100,7 +100,7 @@ class AddGroupPresenter @Inject constructor(
                             populateCoursesAdapter()
                         },
                         onError = {
-                            it.printStackTrace()
+                            Timber.i(it)
                             view?.showError(it)
                         }
                 )
@@ -125,7 +125,7 @@ class AddGroupPresenter @Inject constructor(
                             }
                         },
                         onError = {
-                            it.printStackTrace()
+                            Timber.i(it)
                             view?.showError(it)
                         }
                 )
@@ -149,6 +149,9 @@ class AddGroupPresenter @Inject constructor(
     fun getStudyGroup(): StudyGroup? {
         val groupValue = groups!!.getValue(group)
         if (groupValue == EMPTY_STRING) {
+            val exception = IllegalStateException("group value must not be an empty string")
+            Timber.e(exception)
+            view?.showError(exception)
             return null
         }
         val courseKey = if (course > 0) {
