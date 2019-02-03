@@ -31,8 +31,7 @@ import by.ntnk.msluschedule.utils.*
 import com.google.android.material.snackbar.Snackbar
 import dagger.Lazy
 import dagger.android.support.AndroidSupportInjection
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.plusAssign
+import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.fragment_week.*
 import timber.log.Timber
@@ -48,7 +47,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     private var weekId: Int = INVALID_VALUE
     private var isCurrentWeek: Boolean = false
     private var layoutManagerSavedState: Parcelable? = null
-    private val uiDisposables = CompositeDisposable()
+    private lateinit var adapterOnClickDisposable: Disposable
 
     override val view: WeekView
         get() = this
@@ -99,7 +98,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
 
     private fun initAdapterOnClickListener() {
         val adapter = recyclerView.adapter as LessonRecyclerViewAdapter
-        uiDisposables += adapter.onClickObservable.subscribeBy(
+        adapterOnClickDisposable = adapter.onClickObservable.subscribeBy(
                 onNext = {
                     when (it.viewType) {
                         VIEWTYPE_WEEKDAY -> {
@@ -139,7 +138,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        uiDisposables.clear()
+        adapterOnClickDisposable.dispose()
     }
 
     fun showToday() {
@@ -173,7 +172,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
                 rv_week_days.setOnTouchListener(null)
             }
             rv_week_days.addOnScrollListener(recyclerViewScrollListener)
-            button_week_weekdays_visibility.setOnClickListener { initButtonWeekdays() }
+            button_week_weekdays_visibility.setOnClickListener { onWeekdaysButtonClickListener() }
         } else {
             button_week_weekdays_visibility.visibility = View.GONE
             text_week_nolessons.visibility = View.GONE
@@ -219,7 +218,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
                 }
             }
 
-    private fun initButtonWeekdays() {
+    private fun onWeekdaysButtonClickListener() {
         if (!isEmptyScheduleDaysVisible) {
             isEmptyScheduleDaysVisible = true
             text_week_nolessons.visibility = View.GONE
