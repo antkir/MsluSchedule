@@ -40,13 +40,13 @@ class AddTeacherPresenter @Inject constructor(
                 .subscribeOn(schedulerProvider.single())
                 .observeOn(schedulerProvider.ui())
                 .subscribeBy(
-                        onSuccess = {
-                            teachers = it
+                        onSuccess = { scheduleFilter ->
+                            teachers = scheduleFilter
                             populateTeachersAdapter()
                         },
-                        onError = {
-                            Timber.i(it)
-                            view?.showError(it)
+                        onError = { throwable ->
+                            Timber.i(throwable)
+                            view?.showError(throwable)
                         }
                 )
     }
@@ -55,15 +55,15 @@ class AddTeacherPresenter @Inject constructor(
         teacher = value
     }
 
-    fun isValidTeacher(string: String): Boolean {
-        return teachers?.containsValue(string) == true
+    fun isValidTeacher(name: String): Boolean {
+        return teachers?.containsValue(name) == true
     }
 
-    fun isTeacherStored(string: String): Boolean {
+    fun isTeacherStored(name: String): Boolean {
         return scheduleContaners
-                ?.filter { it.year == currentDate.academicYear }
-                ?.map { it.name }
-                ?.any { it == string } == true
+                ?.filter { scheduleContainer -> scheduleContainer.year == currentDate.academicYear }
+                ?.map { scheduleContainer -> scheduleContainer.name }
+                ?.any { it == name } == true
     }
 
     fun getTeacher() = Teacher(teacher, teachers!!.getValue(teacher), currentDate.academicYear)

@@ -73,13 +73,13 @@ class AddGroupPresenter @Inject constructor(
                 .subscribeOn(schedulerProvider.single())
                 .observeOn(schedulerProvider.ui())
                 .subscribeBy(
-                        onSuccess = {
-                            faculties = it
+                        onSuccess = { scheduleFilter ->
+                            faculties = scheduleFilter
                             populateFacultiesAdapter()
                         },
-                        onError = {
-                            Timber.i(it)
-                            view?.showError(it)
+                        onError = { throwable ->
+                            Timber.i(throwable)
+                            view?.showError(throwable)
                         }
                 )
     }
@@ -89,13 +89,13 @@ class AddGroupPresenter @Inject constructor(
                 .subscribeOn(schedulerProvider.single())
                 .observeOn(schedulerProvider.ui())
                 .subscribeBy(
-                        onSuccess = {
-                            courses = it
+                        onSuccess = { scheduleFilter ->
+                            courses = scheduleFilter
                             populateCoursesAdapter()
                         },
-                        onError = {
-                            Timber.i(it)
-                            view?.showError(it)
+                        onError = { throwable ->
+                            Timber.i(throwable)
+                            view?.showError(throwable)
                         }
                 )
     }
@@ -107,20 +107,20 @@ class AddGroupPresenter @Inject constructor(
                 .subscribeOn(schedulerProvider.single())
                 .observeOn(schedulerProvider.ui())
                 .subscribeBy(
-                        onSuccess = {
-                            if (it.size > 0
+                        onSuccess = { scheduleFilter ->
+                            if (scheduleFilter.size > 0
                                     && course == 0
-                                    && !it.valueAt(0).first().isDigit()
-                                    && !it.valueAt(1).first().isDigit()) {
+                                    && !scheduleFilter.valueAt(0).first().isDigit()
+                                    && !scheduleFilter.valueAt(1).first().isDigit()) {
                                 getCourseScheduleFilter()
                             } else {
-                                groups = it
+                                groups = scheduleFilter
                                 populateGroupsAdapter()
                             }
                         },
-                        onError = {
-                            Timber.i(it)
-                            view?.showError(it)
+                        onError = { throwable ->
+                            Timber.i(throwable)
+                            view?.showError(throwable)
                         }
                 )
     }
@@ -135,8 +135,8 @@ class AddGroupPresenter @Inject constructor(
 
     fun isGroupStored(name: String): Boolean {
         return scheduleContaners
-                ?.filter { it.year == currentDate.academicYear }
-                ?.map { it.name }
+                ?.filter { scheduleContainer -> scheduleContainer.year == currentDate.academicYear }
+                ?.map { scheduleContainer -> scheduleContainer.name }
                 ?.any { it == name } == true
     }
 
