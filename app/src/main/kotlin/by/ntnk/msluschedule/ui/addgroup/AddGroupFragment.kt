@@ -134,17 +134,15 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
         when {
             presenter.isFacultiesInitialized() -> {
                 presenter.populateFacultiesAdapter()
-                if (presenter.isCoursesInitialized()) presenter.populateCoursesAdapter()
+                if (presenter.isCoursesInitialized()) {
+                    presenter.populateCoursesAdapter()
+                }
                 if ((presenter.isFacultySet() && textinputlayoutCourseView.visibility != View.VISIBLE) ||
                         (presenter.isFacultySet() && presenter.isCourseSet() && !presenter.isGroupsInitialized())) {
                     groupView.progressBarVisibility = View.VISIBLE
                 }
                 if (presenter.isGroupsInitialized()) {
                     presenter.populateGroupsAdapter()
-                    if (!presenter.isGroupSetAndValid()) {
-                        groupView.text.clear()
-                        presenter.setGroupNull()
-                    }
                 }
             }
             else -> {

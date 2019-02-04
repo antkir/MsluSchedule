@@ -42,8 +42,6 @@ class AddGroupPresenter @Inject constructor(
 
     fun isCourseSet(): Boolean = course > 0
 
-    fun isGroupSetAndValid(): Boolean = group > 0 && groups!!.getValue(group) != EMPTY_STRING
-
     fun setFacultyKeyFromPosition(position: Int) {
         faculty = faculties!!.keyAt(position)
     }
@@ -59,10 +57,6 @@ class AddGroupPresenter @Inject constructor(
 
     fun setGroupsNull() {
         groups = null
-        group = 0
-    }
-
-    fun setGroupNull() {
         group = 0
     }
 
@@ -149,7 +143,8 @@ class AddGroupPresenter @Inject constructor(
     fun getStudyGroup(): StudyGroup? {
         val groupValue = groups!!.getValue(group)
         if (groupValue == EMPTY_STRING) {
-            val exception = IllegalStateException("group value must not be an empty string")
+            val message = String.format("Group value must not be an empty string.\n%d\n%s", group, groups.toString())
+            val exception = IllegalStateException(message)
             Timber.e(exception)
             view?.showError(exception)
             return null
