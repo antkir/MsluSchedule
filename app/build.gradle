@@ -8,8 +8,8 @@ apply plugin: 'io.fabric'
 android {
     def versionMajor = 1
     def versionMinor = 0
-    def versionPatch = 2
-    def versionBuild = 0
+    def versionPatch = 3
+    def versionBuild = 9
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -71,8 +71,10 @@ ext {
     leakcanaryVersion = '1.6.3'
     mockitoVersion = '2.23.0'
     multidexVersion = '2.0.1'
+    // OkHttp 3.13.0 release bumps minimum requirements to Java 8+ or Android 5+, 3.12.x branch will receive critical fixes through December 31, 2020.
     okhttpVersion = '3.12.1'
-    poiVersion = '4.0.1'
+    // POI 4.0.0 release bumps minimum requirements to Java 8+ or Android 5+.
+    poiVersion = '3.17'
     retrofitVersion = '2.5.0'
     roomVersion = '2.0.0'
     rxandroidVersion = '2.1.0'
