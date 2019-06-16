@@ -35,7 +35,7 @@ class MsluScheduleApp : MultiDexApplication(), HasActivityInjector {
 
     private fun buildAppComponent(): AndroidInjector<MsluScheduleApp> {
         return DaggerAppComponent
-                .builder()
+                .factory()
                 .create(this)
     }
 
