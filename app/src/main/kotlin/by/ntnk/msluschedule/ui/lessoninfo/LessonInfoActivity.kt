@@ -7,6 +7,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.NavUtils
 import androidx.fragment.app.Fragment
 import by.ntnk.msluschedule.R
@@ -39,12 +40,17 @@ class LessonInfoActivity : MvpActivity<LessonInfoPresenter, LessonInfoView>(),
     @Inject
     lateinit var injectedPresenter: Lazy<LessonInfoPresenter>
 
+    @Inject
+    lateinit var sharedPreferencesRepository: SharedPreferencesRepository
+
     override fun supportFragmentInjector(): AndroidInjector<Fragment> = fragmentDispatchingAndroidInjector
 
     override fun onCreatePresenter(): LessonInfoPresenter = injectedPresenter.get()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
+        val themeMode = sharedPreferencesRepository.getThemeMode().toInt()
+        AppCompatDelegate.setDefaultNightMode(themeMode)
         super.onCreate(savedInstanceState)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
