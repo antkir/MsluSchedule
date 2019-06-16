@@ -11,7 +11,11 @@
         android:id="@+id/textinputlayout_teacher"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <by.ntnk.msluschedule.ui.customviews.LoadingAutoCompleteTextView
             android:id="@+id/actv_dialog_teacher"
