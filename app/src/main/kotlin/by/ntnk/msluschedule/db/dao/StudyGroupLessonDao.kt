@@ -5,13 +5,14 @@ import androidx.room.Query
 import androidx.room.Transaction
 import by.ntnk.msluschedule.db.data.DbStudyGroupLesson
 import by.ntnk.msluschedule.db.data.DbWeekdayWithStudyGroupLessons
+import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
 
 @Dao
 interface StudyGroupLessonDao : BaseDao<DbStudyGroupLesson> {
     @Query("DELETE FROM DbStudyGroupLesson WHERE weekdayId=:weekdayId")
-    fun deleteForWeekday(weekdayId: Int): Int
+    fun deleteForWeekday(weekdayId: Int): Completable
 
     @Transaction
     @Query("SELECT * from Weekday WHERE weekId=:weekId")

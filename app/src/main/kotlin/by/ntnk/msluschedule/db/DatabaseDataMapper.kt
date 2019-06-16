@@ -17,7 +17,7 @@ class DatabaseDataMapper @Inject constructor() {
             Teacher(data.key, data.name, data.year)
 
     fun map(data: ScheduleFilter, containerId: Int): List<Week> {
-        val weeks = ArrayList<Week>()
+        val weeks = ArrayList<Week>(data.size)
         for (i in 0 until data.size) {
             val key = data.keyAt(i)
             val value = data.valueAt(i)
@@ -33,7 +33,7 @@ class DatabaseDataMapper @Inject constructor() {
                     .toList()
 
     fun map(weekdayWithLessons: DbWeekdayWithTeacherLessons): WeekdayWithTeacherLessons {
-        val lessons = ArrayList<TeacherLesson>()
+        val lessons = ArrayList<TeacherLesson>(weekdayWithLessons.lessons.size)
         for (lesson in weekdayWithLessons.lessons) {
             lessons.add(
                     TeacherLesson(
@@ -52,7 +52,7 @@ class DatabaseDataMapper @Inject constructor() {
     }
 
     fun map(weekdayWithLessons: DbWeekdayWithStudyGroupLessons): WeekdayWithStudyGroupLessons {
-        val lessons = ArrayList<StudyGroupLesson>()
+        val lessons = ArrayList<StudyGroupLesson>(weekdayWithLessons.lessons.size)
         for (lesson in weekdayWithLessons.lessons) {
             lessons.add(
                     StudyGroupLesson(
