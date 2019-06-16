@@ -79,6 +79,19 @@ class CurrentDateTest {
     }
 
     @Test
+    fun `If it is the last week of August, and the week is shared with September, "academicWeek" must return 0`() {
+        // given
+        val year = 2018
+        val month = 8
+        val day = 30
+        currentDate.date = LocalDate.of(year, month, day)
+        // when
+        val academicWeek = currentDate.academicWeek
+        // then
+        assertTrue(academicWeek == 0)
+    }
+
+    @Test
     fun `If the current month is August, "academicWeek" must return a negative number`() {
         // given
         val year = 1970
