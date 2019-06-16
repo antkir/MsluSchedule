@@ -1,6 +1,5 @@
 package by.ntnk.msluschedule.network
 
-import android.util.SparseArray
 import by.ntnk.msluschedule.data.StudyGroup
 import by.ntnk.msluschedule.data.Teacher
 import by.ntnk.msluschedule.di.PerApp
@@ -101,11 +100,11 @@ class NetworkHelper @Inject constructor(private val currentDate: CurrentDate) {
                 .select("select[id^=" + requestInfo.requestName + "]")
                 .first()
                 .children()
-        val data = SparseArray<String>()
+        val data = ScheduleFilter()
         elements
                 .filter { it.`val`().isNotBlank() }
                 .forEach { data.put(it.`val`().toInt(), it.text()) }
-        return ScheduleFilter(data)
+        return data
     }
 
     @Throws(NullPointerException::class, InvalidYearException::class)
@@ -116,7 +115,7 @@ class NetworkHelper @Inject constructor(private val currentDate: CurrentDate) {
                 .children()
 
         val hasValidYear = elements
-                .map { it.`val`() }
+                .eachAttr("value")
                 .filter { it.isNotBlank() }
                 .map { Integer.parseInt(it) }
                 .filter { it == currentDate.academicYear }

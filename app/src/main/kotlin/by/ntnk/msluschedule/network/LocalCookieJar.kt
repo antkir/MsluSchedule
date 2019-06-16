@@ -54,7 +54,7 @@ class LocalCookieJar : CookieJar {
         var cookies: MutableList<Cookie>? = null
         val cookieHandler = localThreadCookie.get()
         if (cookieHandler != null) {
-            if (!cookieHandler.isEmpty()) {
+            if (cookieHandler.isNotEmpty()) {
                 Timber.i("Getting cookie: %s", cookieHandler)
                 cookies = ArrayList()
                 cookies.addAll(decodeHeaderAsJavaNetCookies(url, cookieHandler))

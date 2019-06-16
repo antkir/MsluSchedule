@@ -63,7 +63,8 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
                     if (startTime.isNotEmpty()) {
                         val lesson = StudyGroupLesson(subject, teacher, classroom, startTime, endTime)
                         if (sharedPreferencesRepository.isPhysEdClassHidden()) {
-                            if (subject.contains("физ", true) && subject.contains("культура", true)) {
+                            if (subject.contains("физ", ignoreCase = true) &&
+                                    subject.contains("культура", ignoreCase = true)) {
                                 isPreviousLessonPhysEd = true
                             } else if (!(isPreviousLessonPhysEd && subject.isBlank())) {
                                 isPreviousLessonPhysEd = false
@@ -78,7 +79,7 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
             }
         }
 
-        // Cut empty lessons, if they are the last ones in the list
+        // Remove empty lessons, if they are the last ones in the list
         for (weekdayWithLessons in weekdaysWithLessons) {
             val size = weekdayWithLessons.lessons.size
             for (i in weekdayWithLessons.lessons.indices) {
