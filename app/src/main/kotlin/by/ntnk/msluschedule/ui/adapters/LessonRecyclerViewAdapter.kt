@@ -45,7 +45,6 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
                 hasNotesList.add(view.hasNotes)
             }
         }
-
         data.clear()
 
         var hasNotesListCounter = 0
@@ -59,13 +58,13 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
 
             if (day.lessons.isNotEmpty()) {
                 for (lesson in day.lessons) {
-                    val lessonLesson: LessonView =
+                    val lessonView: LessonView =
                             when (lesson) {
                                 is StudyGroupLesson -> StudyGroupLessonView(lesson)
                                 is TeacherLesson -> TeacherLessonView(lesson)
                                 else -> throw NullPointerException()
                             }
-                    data.add(lessonLesson)
+                    data.add(lessonView)
                 }
             } else {
                 data.add(BlankLessonView())

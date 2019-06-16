@@ -23,10 +23,7 @@ import by.ntnk.msluschedule.data.Note
 import by.ntnk.msluschedule.mvp.views.MvpActivity
 import by.ntnk.msluschedule.ui.adapters.NoteRecyclerViewAdapter
 import by.ntnk.msluschedule.ui.customviews.ItemSwipeCallback
-import by.ntnk.msluschedule.utils.INVALID_VALUE
-import by.ntnk.msluschedule.utils.SimpleAnimatorListener
-import by.ntnk.msluschedule.utils.dipToPixels
-import by.ntnk.msluschedule.utils.getWeekdayFromTag
+import by.ntnk.msluschedule.utils.*
 import com.google.android.material.snackbar.Snackbar
 import dagger.Lazy
 import dagger.android.AndroidInjection
@@ -74,7 +71,7 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
         weekdayId = intent?.getIntExtra(ARG_WEEKDAY_ID, INVALID_VALUE) ?: INVALID_VALUE
         layoutManagerSavedState = savedInstanceState?.getParcelable(ARG_LAYOUT_MANAGER_SAVED_STATE)
 
-        fab_weekday.setOnClickListener { onNoteChangeFabClick() }
+        fab_weekday.setOnClickListener { showNoteEditLayout() }
 
         button_save_note.setOnClickListener { onSaveNoteClick() }
 
@@ -91,7 +88,7 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
         initOnLongClickNoteListener()
     }
 
-    private fun onNoteChangeFabClick() {
+    private fun showNoteEditLayout() {
         (fab_weekday as View).visibility = View.INVISIBLE
 
         layout_edit_note.visibility = View.VISIBLE
@@ -140,7 +137,7 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
                 }
             }
 
-            hideEditNoteView()
+            hideEditNoteLayout()
             edittext_note.text?.clear()
         }
     }
@@ -148,6 +145,10 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
     private fun createSwipeHandler(): ItemSwipeCallback {
         return object : ItemSwipeCallback(recyclerView.context) {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                // Sometimes update layout for a note can be triggered by user after the note
+                // was removed which leads to crash if we don't set updatedNoteIndex to INVALID_VALUE.
+                updatedNoteIndex = INVALID_VALUE
+
                 val adapter = recyclerView.adapter as NoteRecyclerViewAdapter
                 val deletedNoteIndex = viewHolder.adapterPosition
                 val note: Note = adapter.getNote(deletedNoteIndex)
@@ -174,15 +175,15 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
         val adapter = recyclerView.adapter as NoteRecyclerViewAdapter
         disposables += adapter.onLongClickObservable.subscribeBy(
                 onNext = {
-                    edittext_note.setText(it.text, TextView.BufferType.EDITABLE)
-                    onNoteChangeFabClick()
                     updatedNoteIndex = adapter.findNotePosition(it.text)
+                    edittext_note.setText(it.text, TextView.BufferType.EDITABLE)
+                    showNoteEditLayout()
                 },
                 onError = { throwable -> Timber.e(throwable) }
         )
     }
 
-    private fun hideEditNoteView() {
+    private fun hideEditNoteLayout() {
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(edittext_note.windowToken, 0)
 
@@ -235,7 +236,7 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
             keyboardIsShown = true
         } else {
             if (keyboardIsShown) {
-                hideEditNoteView()
+                hideEditNoteLayout()
                 updatedNoteIndex = INVALID_VALUE
             }
             keyboardIsShown = false

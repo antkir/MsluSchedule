@@ -143,9 +143,7 @@ class AddGroupPresenter @Inject constructor(
     fun getStudyGroup(): StudyGroup? {
         val groupValue = groups!!.getValue(group)
         if (groupValue == EMPTY_STRING) {
-            val message = String.format("Group value must not be an empty string.\n%d\n%s", group, groups.toString())
-            val exception = IllegalStateException(message)
-            Timber.e(exception)
+            val exception = IllegalStateException("Group value wasn't found in the array.")
             view?.showError(exception)
             return null
         }

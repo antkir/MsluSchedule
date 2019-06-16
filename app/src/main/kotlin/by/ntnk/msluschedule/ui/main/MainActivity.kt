@@ -109,7 +109,7 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
 
         button_settings_main.setOnClickListener {
             SettingsActivity.startActivity(this)
-            Handler().postDelayed(ToastRunnable(drawer_layout), 500)
+            Handler().postDelayed(NavigationDrawerRunnable(drawer_layout), 500)
         }
 
         supportActionBar?.title = savedInstanceState?.getString(ARG_ACTIONBAR_TITLE)
@@ -118,7 +118,9 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
                 .filter { it }
                 .subscribe { recreate() }
 
-        if (!sharedPreferencesRepository.isFirstAppLaunch) return
+        if (!sharedPreferencesRepository.isFirstAppLaunch) {
+            return
+        }
 
         val point = Point()
         windowManager.defaultDisplay.getSize(point)
@@ -172,7 +174,7 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
         })
     }
 
-    private class ToastRunnable(context: DrawerLayout?) : Runnable {
+    private class NavigationDrawerRunnable(context: DrawerLayout?) : Runnable {
         private val drawerLayoutRef: WeakReference<DrawerLayout?> = WeakReference(context)
 
         override fun run() {
@@ -196,16 +198,6 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
         fam_layout_main.visibility = if (sharedPreferencesRepository.isMainFabShown()) View.VISIBLE else View.GONE
     }
 
-    override fun onStop() {
-        super.onStop()
-        presenter.clearDisposables()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        onThemeChangedDisposable.dispose()
-    }
-
     private fun isContainerListViewEmpty(): Boolean {
         var size = 0
         for (type in ScheduleType.values()) {
@@ -216,6 +208,16 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
             size += subMenuSize
         }
         return size == 0
+    }
+
+    override fun onStop() {
+        super.onStop()
+        presenter.clearDisposables()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        onThemeChangedDisposable.dispose()
     }
 
     override fun onBackPressed() {
@@ -283,14 +285,10 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
     @Suppress("UNUSED_PARAMETER")
     fun onBaseFabClick(view: View) {
         if (isNetworkAccessible(applicationContext)) {
-            toggleFloatingActionMenu(!isFamOpen)
+            if (!isFamOpen) expandFam() else collapseFam()
         } else {
             showSnackbarNetworkInaccessible(framelayout_main)
         }
-    }
-
-    private fun toggleFloatingActionMenu(enabled: Boolean) {
-        if (enabled) expandFam() else collapseFam()
     }
 
     private fun expandFam() {

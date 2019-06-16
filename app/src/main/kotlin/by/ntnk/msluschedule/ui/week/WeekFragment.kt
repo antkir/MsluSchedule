@@ -92,7 +92,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
             initAdapterOnClickListener()
         }
         smoothScroller = object : LinearSmoothScroller(context!!) {
-            override fun getVerticalSnapPreference() = LinearSmoothScroller.SNAP_TO_START
+            override fun getVerticalSnapPreference() = SNAP_TO_START
         }
     }
 
@@ -141,7 +141,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         adapterOnClickDisposable.dispose()
     }
 
-    fun showToday() {
+    fun highlightToday() {
         if (text_week_nolessons.visibility != View.VISIBLE) {
             val adapter = recyclerView.adapter as LessonRecyclerViewAdapter
             val index = adapter.getWeekdayViewIndex(presenter.getCurrentDayOfWeek())
@@ -162,21 +162,18 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     }
 
     override fun showSchedule(data: List<WeekdayWithLessons<Lesson>>) {
-        if (data.asSequence().map { it.lessons.size }.sum() == 0) {
+        if (data.map { it.lessons.size }.sum() == 0) {
             button_week_weekdays_visibility.visibility = View.VISIBLE
             if (!isEmptyScheduleDaysVisible) {
                 text_week_nolessons.visibility = View.VISIBLE
-                rv_week_days.setOnTouchListener { _, _ -> true }
             } else {
                 text_week_nolessons.visibility = View.GONE
-                rv_week_days.setOnTouchListener(null)
             }
             rv_week_days.addOnScrollListener(recyclerViewScrollListener)
             button_week_weekdays_visibility.setOnClickListener { onWeekdaysButtonClickListener() }
         } else {
             button_week_weekdays_visibility.visibility = View.GONE
             text_week_nolessons.visibility = View.GONE
-            rv_week_days.setOnTouchListener(null)
             rv_week_days.removeOnScrollListener(recyclerViewScrollListener)
         }
 
@@ -224,7 +221,6 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
             text_week_nolessons.visibility = View.GONE
 
             button_week_weekdays_visibility.text = context!!.getString(R.string.button_week_hide_weekdays)
-            rv_week_days.setOnTouchListener(null)
         } else {
             isEmptyScheduleDaysVisible = false
             text_week_nolessons.visibility = View.VISIBLE
@@ -234,7 +230,6 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
             rv_week_days.smoothScrollBy(0, -1)
 
             button_week_weekdays_visibility.text = context!!.getString(R.string.button_week_show_weekdays)
-            rv_week_days.setOnTouchListener { _, _ -> true }
         }
     }
 

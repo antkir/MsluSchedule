@@ -118,7 +118,7 @@ class WeeksContainerFragment :
             R.id.item_weekscontainer_today -> {
                 viewPager.currentItem = currentWeekItemIndex
                 val adapter = viewPager.adapter as WeekFragmentViewPagerAdapter?
-                adapter?.getFragment(currentWeekItemIndex)?.showToday()
+                adapter?.getFragment(currentWeekItemIndex)?.highlightToday()
                 return true
             }
             R.id.item_weekscontainer_delete -> {
