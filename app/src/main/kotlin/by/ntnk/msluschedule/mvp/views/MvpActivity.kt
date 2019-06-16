@@ -21,7 +21,7 @@ abstract class MvpActivity<out P : Presenter<V>, V : View> : AppCompatActivity()
     private lateinit var presenterManager: PresenterManager
 
     @Inject
-    fun setPresenter(presenterManager: PresenterManager) {
+    fun setPresenterManager(presenterManager: PresenterManager) {
         this.presenterManager = presenterManager
     }
 
@@ -30,7 +30,7 @@ abstract class MvpActivity<out P : Presenter<V>, V : View> : AppCompatActivity()
         get() =
             if (presenterId != null) {
                 @Suppress("UNCHECKED_CAST")
-                // The invalid presenter issue seems to be fixed, but let's have this check here just in case.
+                // Have a fail-safe path here, just in case.
                 presenterManager.getPresenter(presenterId!!) as? P ?: onCreatePresenter().also { presenterId = null }
             } else {
                 onCreatePresenter()
@@ -53,7 +53,8 @@ abstract class MvpActivity<out P : Presenter<V>, V : View> : AppCompatActivity()
             if (presenterId == null) {
                 val hashCode = toString().hashCode().absoluteValue
                 val id = (0 until Int.MAX_VALUE - hashCode).random() + hashCode
-                presenterId = presenterManager.addPresenter(id, presenter)
+                presenterId = id
+                presenterManager.addPresenter(id, presenter)
             }
         }
         presenter.bindView(view)
