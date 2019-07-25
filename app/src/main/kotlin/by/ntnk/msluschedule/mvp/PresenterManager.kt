@@ -12,8 +12,9 @@ class PresenterManager @Inject constructor() {
         return presenters[id]
     }
 
-    internal fun addPresenter(id: Int, presenter: Presenter<*>) {
+    internal fun addPresenter(id: Int, presenter: Presenter<*>): Int {
         presenters.put(id, presenter)
+        return id
     }
 
     internal fun removePresenter(id: Int) {

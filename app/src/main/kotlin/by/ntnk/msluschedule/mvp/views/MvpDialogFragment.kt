@@ -49,8 +49,7 @@ abstract class MvpDialogFragment<out P : Presenter<V>, V : View> : DialogFragmen
         if (presenterId == null) {
             val hashCode = toString().hashCode().absoluteValue
             val id = (0 until Int.MAX_VALUE - hashCode).random() + hashCode
-            presenterId = id
-            presenterManager.addPresenter(id, presenter)
+            presenterId = presenterManager.addPresenter(id, presenter)
         }
     }
 
