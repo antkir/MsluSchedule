@@ -17,6 +17,7 @@ import androidx.room.PrimaryKey
 )
 data class DbNote constructor(
         val text: String,
+        val subject: String,
         val weekdayId: Int,
         @PrimaryKey(autoGenerate = true) val id: Int = 0
 )

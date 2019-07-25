@@ -69,21 +69,20 @@ class WeekPresenter @Inject constructor(
         return databaseRepository.isWeekInitialized(weekId)
                 .flatMap { isInitialized ->
                     return@flatMap if (isInitialized) {
-                        getWeekdaysWithLessonsForWeek(container.type, weekId)
-                                .toList()
+                        getWeekdaysWithLessons(weekId, container.type).toList()
                     } else {
                         initSchedule(container, weekId)
                     }
                 }
     }
 
-    private fun getWeekdaysWithLessonsForWeek(type: ScheduleType, weekId: Int): Observable<WeekdayWithLessons<Lesson>> {
+    private fun getWeekdaysWithLessons(weekId: Int, type: ScheduleType): Observable<WeekdayWithLessons<Lesson>> {
         return when (type) {
             ScheduleType.STUDYGROUP -> {
-                databaseRepository.getWeekdayWithStudyGroupLessonsForWeek(weekId)
+                databaseRepository.getWeekdaysWithStudyGroupLessons(weekId)
             }
             ScheduleType.TEACHER -> {
-                databaseRepository.getWeekdayWithTeacherLessonsForWeek(weekId)
+                databaseRepository.getWeekdaysWithTeacherLessons(weekId)
             }
         }
     }
@@ -111,7 +110,7 @@ class WeekPresenter @Inject constructor(
                         .toList()
                         .flatMap { weekdaysWithLessons ->
                             return@flatMap if (isUpdate) {
-                                databaseRepository.deleteLessonsForWeek(weekId, container.type)
+                                databaseRepository.deleteLessons(weekId, container.type)
                                         .andThen(Single.just(weekdaysWithLessons))
                             } else {
                                 Single.just(weekdaysWithLessons)
@@ -130,7 +129,7 @@ class WeekPresenter @Inject constructor(
                         .toList()
                         .flatMap { weekdaysWithLessons ->
                             return@flatMap if (isUpdate) {
-                                databaseRepository.deleteLessonsForWeek(weekId, container.type)
+                                databaseRepository.deleteLessons(weekId, container.type)
                                         .andThen(Single.just(weekdaysWithLessons))
                             } else {
                                 Single.just(weekdaysWithLessons)
@@ -148,7 +147,7 @@ class WeekPresenter @Inject constructor(
         disposables += databaseRepository.getScheduleContainer(containerInfo.id)
                 .flatMap { scheduleContainer ->
                     downloadSchedule(isUpdate = true, container = scheduleContainer, weekId = weekId)
-                            .flatMap { getWeekdaysWithLessonsForWeek(containerInfo.type!!, weekId).toList() }
+                            .flatMap { getWeekdaysWithLessons(weekId, containerInfo.type!!).toList() }
                 }
                 .subscribeOn(schedulerProvider.cachedThreadPool())
                 .observeOn(schedulerProvider.ui())
@@ -157,7 +156,7 @@ class WeekPresenter @Inject constructor(
                 .doOnEvent { _, _ -> view?.hideUpdateProgressBar() }
                 .doOnSuccess { view?.showUpdateSuccessMessage() }
                 .subscribeBy(
-                        onSuccess = { weekDayEntities -> view?.showSchedule(weekDayEntities) },
+                        onSuccess = { weekdayEntities -> view?.showSchedule(weekdayEntities) },
                         onError = {
                             Timber.i(it)
                             view?.showError(it, shouldSetupViews = false)

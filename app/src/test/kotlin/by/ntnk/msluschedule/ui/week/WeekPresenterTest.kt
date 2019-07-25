@@ -25,7 +25,6 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 import org.mockito.MockitoAnnotations
 import timber.log.Timber
-import java.util.Collections
 import org.mockito.Mockito.`when` as whenever
 
 class WeekPresenterTest {
@@ -81,26 +80,26 @@ class WeekPresenterTest {
         whenever(databaseRepository.getWeekKey(anyInt()))
                 .thenReturn(Single.just(0)
                                     .doOnSubscribe { getWeekKeyTest.onSubscribe(it) })
-        whenever(databaseRepository.deleteLessonsForWeek(anyInt(), any()))
+        whenever(databaseRepository.deleteLessons(anyInt(), any()))
                 .thenReturn(Completable.complete()
                                     .doOnSubscribe { deleteLessonsForWeekTest.onSubscribe(it) })
-        whenever(databaseRepository.getWeekdayWithStudyGroupLessonsForWeek(anyInt()))
+        whenever(databaseRepository.getWeekdaysWithStudyGroupLessons(anyInt()))
                 .thenReturn(Observable.just(WeekdayWithStudyGroupLessons("") as WeekdayWithLessons<Lesson>)
                                     .doOnSubscribe { getWeekdayWithStudyGroupLessonsForWeekTest.onSubscribe(it) })
-        whenever(databaseRepository.getWeekdayWithTeacherLessonsForWeek(anyInt()))
+        whenever(databaseRepository.getWeekdaysWithTeacherLessons(anyInt()))
                 .thenReturn(Observable.just(WeekdayWithTeacherLessons("") as WeekdayWithLessons<Lesson>)
                                     .doOnSubscribe { getWeekdayWithTeacherLessonsForWeekTest.onSubscribe(it) })
         whenever(databaseRepository.insertStudyGroupSchedule(any(), anyInt()))
-                .thenReturn(Single.just(Collections.singletonList(WeekdayWithStudyGroupLessons("")))
+                .thenReturn(Single.just(listOf(WeekdayWithStudyGroupLessons("")))
                                     .doOnSubscribe { insertStudyGroupScheduleTest.onSubscribe(it) })
         whenever(databaseRepository.insertTeacherSchedule(any(), anyInt()))
-                .thenReturn(Single.just(Collections.singletonList(WeekdayWithTeacherLessons("")))
+                .thenReturn(Single.just(listOf(WeekdayWithTeacherLessons("")))
                                     .doOnSubscribe { insertTeacherScheduleTest.onSubscribe(it) })
         whenever(databaseRepository.insertWeekdays(anyInt()))
                 .thenReturn(Completable.complete()
                                     .doOnSubscribe { insertWeekdaysTest.onSubscribe(it) })
         whenever(databaseRepository.getNotesForWeekday(anyInt()))
-                .thenReturn(Observable.fromIterable(List(1) { return@List Note(0, "") })
+                .thenReturn(Observable.fromIterable(List(1) { return@List Note(0, "", "") })
                                     .doOnSubscribe { getNotesForWeekdayTest.onSubscribe(it) })
         whenever(networkRepository.getSchedule(any<StudyGroup>(), anyInt()))
                 .thenReturn(Observable.just(WeekdayWithStudyGroupLessons(""))

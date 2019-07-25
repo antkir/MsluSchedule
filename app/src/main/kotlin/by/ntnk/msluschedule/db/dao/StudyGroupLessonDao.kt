@@ -12,15 +12,19 @@ import io.reactivex.Single
 @Dao
 interface StudyGroupLessonDao : BaseDao<DbStudyGroupLesson> {
     @Query("DELETE FROM DbStudyGroupLesson WHERE weekdayId=:weekdayId")
-    fun deleteForWeekday(weekdayId: Int): Completable
+    fun delete(weekdayId: Int): Completable
 
     @Transaction
     @Query("SELECT * from Weekday WHERE weekId=:weekId")
-    fun getWeekdayWithStudyGroupLessonsForWeek(weekId: Int): Single<List<DbWeekdayWithStudyGroupLessons>>
+    fun getWeekdaysWithLessons(weekId: Int): Single<List<DbWeekdayWithStudyGroupLessons>>
+
+    @Transaction
+    @Query("SELECT * from Weekday WHERE id=:id")
+    fun getWeekdayWithLessons(id: Int): Single<DbWeekdayWithStudyGroupLessons>
 
     @Query("SELECT * FROM DbStudyGroupLesson WHERE id=:id")
     fun getLesson(id: Int): Maybe<DbStudyGroupLesson>
 
     @Query("SELECT * FROM DbStudyGroupLesson WHERE weekdayId=:weekdayId AND subject=:subject")
-    fun getLesson(weekdayId: Int, subject: String): Single<List<DbStudyGroupLesson>>
+    fun getLessons(weekdayId: Int, subject: String): Single<List<DbStudyGroupLesson>>
 }

@@ -5,7 +5,6 @@ import by.ntnk.msluschedule.db.data.*
 import by.ntnk.msluschedule.di.PerApp
 import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.utils.*
-import java.util.Arrays
 import javax.inject.Inject
 
 @PerApp
@@ -27,8 +26,8 @@ class DatabaseDataMapper @Inject constructor() {
         return weeks
     }
 
-    fun createWeekdaysList(weekId: Int): List<Weekday> =
-            Arrays.asList(MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY)
+    fun createWeekdayList(weekId: Int): List<Weekday> =
+            listOf(MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY)
                     .map { weekdayValue -> Weekday(weekdayValue, weekId) }
                     .toList()
 

@@ -8,7 +8,7 @@ import io.reactivex.Single
 
 @Dao
 interface NoteDao : BaseDao<DbNote> {
-    @Query("SELECT * FROM DbNote WHERE weekdayId=:weekdayId")
+    @Query("SELECT * FROM DbNote WHERE weekdayId=:weekdayId ORDER BY subject DESC")
     fun getNotesForWeekday(weekdayId: Int): Single<List<DbNote>>
 
     @Query("DELETE FROM DbNote WHERE id=:id")

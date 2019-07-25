@@ -8,7 +8,7 @@ import io.reactivex.Single
 @Dao
 interface WeekdayDao : BaseDao<Weekday> {
     @Query("SELECT * FROM Weekday WHERE weekId=:weekId")
-    fun getWeekdaysForWeek(weekId: Int): Single<List<Weekday>>
+    fun getWeekdays(weekId: Int): Single<List<Weekday>>
 
     @Query("SELECT * FROM Weekday WHERE id=:id")
     fun getWeekday(id: Int): Single<Weekday>
