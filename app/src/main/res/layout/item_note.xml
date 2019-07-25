@@ -5,7 +5,8 @@
     android:layout_height="wrap_content"
     android:background="@drawable/item_surface"
     android:foreground="?attr/selectableItemBackground"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    tools:ignore="UnusedAttribute">
 
     <View
         android:id="@+id/view_note_colorstripe"
@@ -22,9 +23,9 @@
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
         android:gravity="center_vertical"
-        android:minHeight="60dp"
+        android:minHeight="48dp"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:textColor="@color/tertiary_text"
+        android:textColor="@color/primary_text"
         android:textSize="16sp"
         tools:text="@tools:sample/lorem/random" />
 

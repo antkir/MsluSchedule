@@ -37,4 +37,11 @@ abstract class ItemSwipeCallback(context: Context) : ItemTouchHelper.SimpleCallb
 
         super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
     }
+
+    companion object {
+        /**
+         * No direction, used for swipe & drag control.
+         */
+        const val NO_DIRECION = 0
+    }
 }

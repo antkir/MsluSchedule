@@ -3,13 +3,13 @@ package by.ntnk.msluschedule.data
 import by.ntnk.msluschedule.utils.EMPTY_STRING
 
 data class TeacherLesson(
-        val subject: String,
+        override val subject: String,
         val faculty: String,
         val groups: String,
         val type: String,
-        val classroom: String,
-        val startTime: String,
-        val endTime: String,
+        override val classroom: String,
+        override val startTime: String,
+        override val endTime: String,
         var id: Int = 0
 ) : Lesson {
     constructor(startTime: String, endTime: String) : this(

@@ -13,6 +13,7 @@
     <color name="tertiary_text">#808080</color>
     <color name="weeks_tablayout_text">#AAFFFFFF</color>
     <color name="weeks_tablayout_selected_text">#FFFFFF</color>
+    <color name="chip_text">#000000</color>
 
     <color name="state_pressed">#E0E0E0</color>
     <color name="menuitem_highlight">#E0EBF9</color>
@@ -25,6 +26,7 @@
 
     <color name="ic_launcher_background">#005BCC</color>
     <color name="ic_save_note_tint">#006DDE</color>
+    <color name="ic_save_note_inactive_tint">#CCCCCC</color>
 
     <color name="text_pref_category">#006DDE</color>
     <color name="nav_statusbar">#44000000</color>

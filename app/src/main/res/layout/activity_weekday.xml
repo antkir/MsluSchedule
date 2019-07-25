@@ -14,29 +14,15 @@
         tools:context="by.ntnk.msluschedule.ui.weekday.WeekdayActivity">
 
         <TextView
-            android:id="@+id/textview_subhead_notes"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/textview_subhead_notes_height"
-            android:gravity="start|center_vertical"
-            android:paddingStart="@dimen/textview_subhead_notes_margin"
-            android:paddingLeft="@dimen/textview_subhead_notes_margin"
-            android:paddingEnd="@dimen/textview_subhead_notes_margin"
-            android:paddingRight="@dimen/textview_subhead_notes_margin"
-            android:text="@string/textview_notes_subhead"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
-            android:textColor="@color/primary_text"
-            android:textStyle="bold"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
             android:id="@+id/textview_zeronotes"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
             android:gravity="start|center_vertical"
-            android:paddingStart="@dimen/textview_zeronotes_margin"
-            android:paddingLeft="@dimen/textview_zeronotes_margin"
-            android:paddingEnd="@dimen/textview_zeronotes_margin"
-            android:paddingRight="@dimen/textview_zeronotes_margin"
+            android:paddingStart="@dimen/textview_zeronotes_padding"
+            android:paddingLeft="@dimen/textview_zeronotes_padding"
+            android:paddingEnd="@dimen/textview_zeronotes_padding"
+            android:paddingRight="@dimen/textview_zeronotes_padding"
             android:text="@string/textview_zeronotes"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
             android:textColor="@color/tertiary_text"
@@ -48,18 +34,49 @@
             android:id="@+id/recyclerview_weekday"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            android:clipToPadding="false"
+            android:paddingTop="8dp"
             android:saveEnabled="false"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textview_subhead_notes" />
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <FrameLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/layout_edit_note"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:orientation="vertical"
             android:visibility="invisible">
+
+            <HorizontalScrollView
+                android:id="@+id/scroll_view_chips"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/note_edit_surface"
+                android:clipToPadding="false"
+                android:elevation="8dp"
+                android:paddingStart="@dimen/chipsgroup_padding_horizontal"
+                android:paddingLeft="@dimen/chipsgroup_padding_horizontal"
+                android:paddingEnd="@dimen/chipsgroup_padding_horizontal"
+                android:paddingRight="@dimen/chipsgroup_padding_horizontal"
+                android:scrollbarStyle="outsideOverlay"
+                app:layout_constraintBottom_toTopOf="@+id/edittext_note"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                tools:ignore="UnusedAttribute">
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/chips_subjects"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="16dp"
+                    app:singleLine="true"
+                    app:singleSelection="true" />
+
+            </HorizontalScrollView>
 
             <androidx.appcompat.widget.AppCompatEditText
                 android:id="@+id/edittext_note"
@@ -73,13 +90,15 @@
                 android:inputType="textMultiLine"
                 android:maxLines="8"
                 android:minHeight="@dimen/edittext_note_minheight"
-                android:paddingStart="@dimen/edittext_note_marginstart"
-                android:paddingLeft="@dimen/edittext_note_marginstart"
-                android:paddingTop="@dimen/edittext_note_marginvertical"
-                android:paddingEnd="@dimen/edittext_note_marginend"
-                android:paddingRight="@dimen/edittext_note_marginend"
-                android:paddingBottom="@dimen/edittext_note_marginvertical"
-                android:scrollbarStyle="insideInset"
+                android:paddingStart="@dimen/edittext_note_padding_start"
+                android:paddingLeft="@dimen/edittext_note_padding_start"
+                android:paddingTop="@dimen/edittext_note_padding_vertical"
+                android:paddingEnd="@dimen/edittext_note_padding_end"
+                android:paddingRight="@dimen/edittext_note_padding_end"
+                android:paddingBottom="@dimen/edittext_note_padding_vertical"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
                 tools:ignore="UnusedAttribute" />
 
             <androidx.appcompat.widget.AppCompatImageButton
@@ -87,15 +106,19 @@
                 android:layout_width="@dimen/button_note_save_width"
                 android:layout_height="@dimen/button_note_save_height"
                 android:layout_gravity="bottom|end"
-                android:layout_marginEnd="@dimen/button_note_save_margin"
-                android:layout_marginRight="@dimen/button_note_save_margin"
+                android:layout_marginEnd="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginBottom="8dp"
                 android:background="@android:color/transparent"
                 android:elevation="8dp"
                 android:src="@drawable/ic_save_note"
                 android:tint="@color/ic_save_note_tint"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/edittext_note"
+                app:layout_constraintTop_toTopOf="@+id/edittext_note"
                 tools:ignore="UnusedAttribute" />
 
-        </FrameLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

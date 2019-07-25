@@ -20,11 +20,16 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.ntnk.msluschedule.R
+import by.ntnk.msluschedule.data.Lesson
 import by.ntnk.msluschedule.data.Note
+import by.ntnk.msluschedule.data.WeekdayWithLessons
 import by.ntnk.msluschedule.mvp.views.MvpActivity
 import by.ntnk.msluschedule.ui.adapters.NoteRecyclerViewAdapter
+import by.ntnk.msluschedule.ui.adapters.VIEWTYPE_NOTE
 import by.ntnk.msluschedule.ui.customviews.ItemSwipeCallback
 import by.ntnk.msluschedule.utils.*
+import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipDrawable
 import com.google.android.material.snackbar.Snackbar
 import dagger.Lazy
 import dagger.android.AndroidInjection
@@ -45,10 +50,16 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
         HasSupportFragmentInjector {
     private lateinit var recyclerView: RecyclerView
     private var weekdayId: Int = INVALID_VALUE
-    private var updatedNoteIndex: Int = INVALID_VALUE
     private var keyboardIsShown = false
     private var layoutManagerSavedState: Parcelable? = null
     private val disposables = CompositeDisposable()
+
+    private val adapter: NoteRecyclerViewAdapter
+        get() = if (recyclerView.adapter == null) {
+            NoteRecyclerViewAdapter()
+        } else {
+            recyclerView.adapter as NoteRecyclerViewAdapter
+        }
 
     override val view: WeekdayView
         get() = this
@@ -77,27 +88,36 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
         weekdayId = intent?.getIntExtra(ARG_WEEKDAY_ID, INVALID_VALUE) ?: INVALID_VALUE
         layoutManagerSavedState = savedInstanceState?.getParcelable(ARG_LAYOUT_MANAGER_SAVED_STATE)
 
-        fab_weekday.setOnClickListener { showNoteEditLayout() }
-
-        button_save_note.setOnClickListener { onSaveNoteClick() }
-
         recyclerView = findViewById(R.id.recyclerview_weekday)
         with(recyclerView) {
             layoutManager = LinearLayoutManager(this@WeekdayActivity)
             setHasFixedSize(true)
-            adapter = NoteRecyclerViewAdapter()
+            adapter = this@WeekdayActivity.adapter
             val swipeHandler = createSwipeHandler()
             val itemTouchHelper = ItemTouchHelper(swipeHandler)
             itemTouchHelper.attachToRecyclerView(recyclerView)
         }
 
+        fab_weekday.setOnClickListener { showNoteEditLayout() }
+        button_save_note.setOnClickListener { onSaveNoteClick() }
+        val buttonInactiveTint = ContextCompat.getColor(this@WeekdayActivity, R.color.ic_save_note_inactive_tint)
+        button_save_note.setColorFilter(buttonInactiveTint)
+        edittext_note.addTextChangedListener(object : SimpleTextWatcher {
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                val color = if (s.isBlank()) {
+                    ContextCompat.getColor(this@WeekdayActivity, R.color.ic_save_note_inactive_tint)
+                } else {
+                    ContextCompat.getColor(this@WeekdayActivity, R.color.ic_save_note_tint)
+                }
+                button_save_note.setColorFilter(color)
+            }
+        })
         initOnLongClickNoteListener()
     }
 
     private fun showNoteEditLayout() {
         (fab_weekday as View).visibility = View.INVISIBLE
 
-        layout_edit_note.visibility = View.VISIBLE
         layout_edit_note.translationY = edittext_note.height.toFloat()
         layout_edit_note.animate()
                 .translationY(0f)
@@ -111,6 +131,7 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
                     val backgroundColor = ContextCompat.getColor(applicationContext, R.color.unfocused_background)
 
                     override fun onAnimationStart(animation: Animator?) {
+                        layout_edit_note?.visibility = View.VISIBLE
                         layout_edit_note?.startAnimation(alphaAnimation)
                         layout_edit_note?.isFocusable = true
                         layout_edit_note?.isClickable = true
@@ -130,46 +151,69 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
 
     private fun onSaveNoteClick() {
         if (edittext_note.text?.isNotBlank() == true) {
-            val adapter = recyclerView.adapter as NoteRecyclerViewAdapter
-            if (updatedNoteIndex >= 0) {
-                val noteId = adapter.getNote(updatedNoteIndex).id
-                val updatedNote = Note(noteId, edittext_note.text.toString())
-                adapter.changeItem(updatedNoteIndex, updatedNote)
+            val selectedNoteId = adapter.getSelectedNoteId()
+            val subject = getCheckedChipText()
+            if (selectedNoteId != null) {
+                val updatedNote = Note(selectedNoteId, edittext_note.text.toString(), subject)
+                adapter.updateSelectedNote(updatedNote)
                 presenter.updateNote(updatedNote, weekdayId)
+                adapter.deselectNote()
             } else {
-                val isDuplicate = adapter.findNotePosition(edittext_note.text.toString()) != INVALID_VALUE
-                if (!isDuplicate) {
-                    presenter.insertNote(edittext_note.text.toString(), weekdayId)
-                }
+                presenter.insertNote(Note(0, edittext_note.text.toString(), subject), weekdayId)
             }
 
             hideEditNoteLayout()
             edittext_note.text?.clear()
+            chips_subjects.clearCheck()
+            scroll_view_chips.scrollTo(0, 0)
         }
+    }
+
+    private fun getCheckedChipText(): String {
+        var subject = EMPTY_STRING
+        for (i in 0 until chips_subjects.childCount) {
+            val chip = chips_subjects.getChildAt(i) as Chip
+            if (chip.id == chips_subjects.checkedChipId) {
+                subject = chip.text.toString()
+            }
+        }
+        return subject
     }
 
     private fun createSwipeHandler(): ItemSwipeCallback {
         return object : ItemSwipeCallback(recyclerView.context) {
+            override fun getSwipeDirs(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
+                return if (viewHolder.itemViewType == VIEWTYPE_NOTE && adapter.getSelectedNoteId() == null) {
+                    super.getSwipeDirs(recyclerView, viewHolder)
+                } else {
+                    NO_DIRECION
+                }
+            }
+
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                // Sometimes update layout for a note can be triggered by user after the note
-                // was removed which leads to crash if we don't set updatedNoteIndex to INVALID_VALUE.
-                updatedNoteIndex = INVALID_VALUE
-
-                val adapter = recyclerView.adapter as NoteRecyclerViewAdapter
-                val deletedNoteIndex = viewHolder.adapterPosition
-                val note: Note = adapter.getNote(deletedNoteIndex)
-                val color: Int = adapter.getColor(deletedNoteIndex)
-                val noteDeleted = resources.getString(R.string.snackbar_note_deleted)
-
-                adapter.removeAt(deletedNoteIndex)
+                val noteView = adapter.getNoteView(viewHolder.adapterPosition)
+                val noteMapIndex = adapter.getMapIndexOfNote(noteView)
+                adapter.removeNote(noteView)
                 if (adapter.itemCount == 0) {
+                    val alphaAnimation = AlphaAnimation(0f, 1f).apply {
+                        startOffset = 200
+                        duration = 100
+                    }
+                    textview_zeronotes.startAnimation(alphaAnimation)
                     textview_zeronotes.visibility = View.VISIBLE
                 }
-                presenter.deleteNote(note.id)
 
+                val noteDeleted = resources.getString(R.string.snackbar_note_deleted)
                 Snackbar.make(constraintlayout_weekday, noteDeleted, Snackbar.LENGTH_LONG)
+                        .addCallback(object : Snackbar.Callback() {
+                            override fun onDismissed(snackbar: Snackbar, event: Int) {
+                                if (event != DISMISS_EVENT_ACTION) {
+                                    presenter.deleteNote(noteView.note.id)
+                                }
+                            }
+                        })
                         .setAction(resources.getString(R.string.snackbar_action_undo)) {
-                            presenter.restoreNote(note.text, deletedNoteIndex, color, weekdayId)
+                            adapter.restoreNote(noteMapIndex, noteView)
                             textview_zeronotes.visibility = View.GONE
                         }
                         .show()
@@ -178,11 +222,15 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
     }
 
     private fun initOnLongClickNoteListener() {
-        val adapter = recyclerView.adapter as NoteRecyclerViewAdapter
         disposables += adapter.onLongClickObservable.subscribeBy(
-                onNext = {
-                    updatedNoteIndex = adapter.findNotePosition(it.text)
-                    edittext_note.setText(it.text, TextView.BufferType.EDITABLE)
+                onNext = { note ->
+                    for (i in 0 until chips_subjects.childCount) {
+                        val chip = chips_subjects.getChildAt(i) as Chip
+                        if (chip.text == note.subject) {
+                            chip.isChecked = true
+                        }
+                    }
+                    edittext_note.setText(note.text, TextView.BufferType.EDITABLE)
                     showNoteEditLayout()
                 },
                 onError = { throwable -> Timber.e(throwable) }
@@ -215,9 +263,8 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
             NavUtils.navigateUpFromSameTask(this)
             return
         }
-        presenter.getWeekday(weekdayId)
-        presenter.getNotes(weekdayId)
 
+        presenter.initWeekdayView(weekdayId)
         constraintlayout_weekday.viewTreeObserver.addOnGlobalLayoutListener(onKeyboardStateChangeListener)
     }
 
@@ -231,22 +278,28 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
         outState.putParcelable(ARG_LAYOUT_MANAGER_SAVED_STATE, recyclerView.layoutManager?.onSaveInstanceState())
     }
 
+    private val onKeyboardStateChangeListener = ViewTreeObserver.OnGlobalLayoutListener {
+        val heightDiff = constraintlayout_weekday.rootView.height - constraintlayout_weekday.height
+        keyboardIsShown =
+                if (heightDiff > applicationContext.dipToPixels(200f)) {
+                    true
+                } else {
+                    if (keyboardIsShown) {
+                        hideEditNoteLayout()
+                        if (adapter.getSelectedNoteId() != null) {
+                            adapter.deselectNote()
+                            edittext_note.text?.clear()
+                            chips_subjects.clearCheck()
+                            scroll_view_chips.scrollTo(0, 0)
+                        }
+                    }
+                    false
+                }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         disposables.clear()
-    }
-
-    private val onKeyboardStateChangeListener = ViewTreeObserver.OnGlobalLayoutListener {
-        val heightDiff = constraintlayout_weekday.rootView.height - constraintlayout_weekday.height
-        if (heightDiff > applicationContext.dipToPixels(200f)) {
-            keyboardIsShown = true
-        } else {
-            if (keyboardIsShown) {
-                hideEditNoteLayout()
-                updatedNoteIndex = INVALID_VALUE
-            }
-            keyboardIsShown = false
-        }
     }
 
     override fun onBackPressed() {
@@ -285,27 +338,36 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
         return super.onOptionsItemSelected(item)
     }
 
-    override fun setToolbar(weekday: String) {
-        supportActionBar?.title = getWeekdayFromTag(weekday, applicationContext)
-    }
+    override fun initView(weekdayWithLessons: WeekdayWithLessons<Lesson>, data: List<Note>) {
+        supportActionBar?.title = getWeekdayFromTag(weekdayWithLessons.weekday, applicationContext)
 
-    override fun showNotes(data: List<Note>) {
-        val adapter = recyclerView.adapter as NoteRecyclerViewAdapter
-        adapter.initData(data, resources)
+        adapter.initData(data, weekdayWithLessons.lessons, resources)
         if (adapter.itemCount > 0) {
             textview_zeronotes.visibility = View.GONE
         }
         recyclerView.layoutManager?.onRestoreInstanceState(layoutManagerSavedState)
+
+        if (chips_subjects.childCount == 0) {
+            val lessonSubjects = weekdayWithLessons.lessons.map { it.subject }.toSet()
+            if (lessonSubjects.isEmpty()) {
+                chips_subjects.visibility = View.GONE
+            }
+
+            for (lessonSubject in lessonSubjects) {
+                if (lessonSubject == EMPTY_STRING) continue
+
+                val chip = Chip(this)
+                val chipDrawable = ChipDrawable.createFromAttributes(this, null, 0, R.style.MsluTheme_Chip_Choice)
+                chip.setChipDrawable(chipDrawable)
+                chip.text = lessonSubject
+                chips_subjects.addView(chip)
+            }
+        }
     }
 
     override fun addNote(note: Note) {
-        val adapter = recyclerView.adapter as NoteRecyclerViewAdapter
-        adapter.addNote(note, resources)
-    }
-
-    override fun restoreNote(note: Note, position: Int, color: Int) {
-        val adapter = recyclerView.adapter as NoteRecyclerViewAdapter
-        adapter.restoreItem(position, note, color)
+        textview_zeronotes.visibility = View.GONE
+        adapter.addNote(note)
     }
 
     companion object {

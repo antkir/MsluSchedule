@@ -47,4 +47,15 @@
         <item name="android:windowExitAnimation">@anim/dialog_zoom_out</item>
     </style>
 
+    <style name="MsluTheme.Chip.Choice" parent="Widget.MaterialComponents.Chip.Choice">
+        <item name="android:checkable">true</item>
+        <item name="checkedIconVisible">true</item>
+        <item name="chipBackgroundColor">@color/colorAccent</item>
+        <item name="android:textAppearance">@style/MsluTheme.Chip.Text.Appearance</item>
+    </style>
+
+    <style name="MsluTheme.Chip.Text.Appearance" parent="TextAppearance.MaterialComponents.Chip">
+        <item name="android:textColor">@color/chip_text</item>
+    </style>
+
 </resources>

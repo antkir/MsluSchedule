@@ -10,6 +10,7 @@
     <color name="primary_text">#FFFFFF</color>
     <color name="primary_text_inverted">#000000</color>
     <color name="tertiary_text">#BEBEBE</color>
+    <color name="chip_text">#000000</color>
 
     <color name="state_pressed">#444444</color>
     <color name="menuitem_highlight">#444444</color>
@@ -20,5 +21,6 @@
     <color name="icon_tint">#C1C1C1</color>
 
     <color name="ic_save_note_tint">#FDD835</color>
+    <color name="ic_save_note_inactive_tint">#666666</color>
     <color name="text_pref_category">#FDD835</color>
 </resources>

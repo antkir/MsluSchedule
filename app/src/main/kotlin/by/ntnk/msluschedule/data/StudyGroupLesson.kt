@@ -1,10 +1,10 @@
 package by.ntnk.msluschedule.data
 
 data class StudyGroupLesson(
-        val subject: String,
+        override val subject: String,
         val teacher: String,
-        val classroom: String,
-        val startTime: String,
-        val endTime: String,
+        override val classroom: String,
+        override val startTime: String,
+        override val endTime: String,
         var id: Int = 0
 ) : Lesson

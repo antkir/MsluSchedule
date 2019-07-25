@@ -21,15 +21,15 @@ class WeeksContainerPresenter @Inject constructor(
     private val disposables: CompositeDisposable = CompositeDisposable()
 
     fun initWeeksAdapter() {
-        val info = sharedPreferencesRepository.getSelectedScheduleContainerInfo()
-        disposables += databaseRepository.getWeeksForContainer(info.id)
+        val containerInfo = sharedPreferencesRepository.getSelectedScheduleContainerInfo()
+        disposables += databaseRepository.getWeeks(containerInfo.id)
                 .toList()
                 .map { weeks ->
                     val index = when {
                         currentDate.academicWeek < 0 -> 0
                         else -> currentDate.academicWeek
                     }
-                    val weekIds = ArrayList<ImmutableEntry>()
+                    val weekIds = mutableListOf<ImmutableEntry>()
                     for (j in index - 2..index + 2) {
                         if (j in weeks.indices) {
                             weekIds.add(ImmutableEntry(weeks[j].id, weeks[j].value))
@@ -47,14 +47,14 @@ class WeeksContainerPresenter @Inject constructor(
     }
 
     fun deleteSelectedScheduleContainer() {
-        val info = sharedPreferencesRepository.getSelectedScheduleContainerInfo()
-        databaseRepository.deleteScheduleContainer(info.id)
+        val containerInfo = sharedPreferencesRepository.getSelectedScheduleContainerInfo()
+        databaseRepository.deleteScheduleContainer(containerInfo.id)
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
                 .subscribeBy(
                         onComplete = {
                             sharedPreferencesRepository.selectEmptyScheduleContainer()
-                            view?.removeScheduleContainerFromView(info)
+                            view?.removeScheduleContainerFromView(containerInfo)
                         },
                         onError = { throwable -> Timber.e(throwable) }
                 )

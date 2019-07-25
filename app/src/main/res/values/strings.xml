@@ -53,7 +53,7 @@
     <string name="button_week_hide_weekdays">Hide weekdays</string>
 
     <string name="edittext_weekday_note">Enter a note</string>
-    <string name="textview_notes_subhead">Notes</string>
+    <string name="textview_other_notes_header">Other notes</string>
     <string name="textview_zeronotes">No notes for this day</string>
     <string name="snackbar_note_deleted">The note was deleted</string>
     <string name="snackbar_action_undo">Undo</string>

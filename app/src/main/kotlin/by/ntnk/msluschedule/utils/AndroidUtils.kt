@@ -8,6 +8,7 @@ import android.text.TextWatcher
 import android.util.TypedValue
 import android.view.View
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.recyclerview.widget.RecyclerView
 import by.ntnk.msluschedule.R
 import com.google.android.material.snackbar.Snackbar
 import io.reactivex.subjects.PublishSubject
@@ -37,8 +38,8 @@ fun getErrorMessageResId(t: Throwable): Int {
     }
 }
 
-fun getWeekdayFromTag(weekDayTag: String, context: Context): String {
-    return when (weekDayTag) {
+fun getWeekdayFromTag(weekdayTag: String, context: Context): String {
+    return when (weekdayTag) {
         MONDAY -> context.resources.getString(R.string.monday)
         TUESDAY -> context.resources.getString(R.string.tuesday)
         WEDNESDAY -> context.resources.getString(R.string.wednesday)
@@ -79,4 +80,9 @@ interface SimpleDrawerListener : DrawerLayout.DrawerListener {
     override fun onDrawerOpened(drawerView: View) = Unit
     override fun onDrawerClosed(drawerView: View) = Unit
     override fun onDrawerStateChanged(newState: Int) = Unit
+}
+
+interface BaseRVItemView {
+    val viewType: Int
+    fun bindViewHolder(viewHolder: RecyclerView.ViewHolder)
 }

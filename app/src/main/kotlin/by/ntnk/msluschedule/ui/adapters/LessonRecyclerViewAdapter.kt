@@ -15,6 +15,7 @@ import by.ntnk.msluschedule.data.Lesson
 import by.ntnk.msluschedule.data.StudyGroupLesson
 import by.ntnk.msluschedule.data.TeacherLesson
 import by.ntnk.msluschedule.data.WeekdayWithLessons
+import by.ntnk.msluschedule.utils.BaseRVItemView
 import by.ntnk.msluschedule.utils.EMPTY_STRING
 import by.ntnk.msluschedule.utils.WEEKDAYS_NUMBER
 import by.ntnk.msluschedule.utils.getWeekdayFromTag
@@ -22,24 +23,24 @@ import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import java.util.ArrayList
 
-const val VIEWTYPE_STUDYGROUP = R.layout.item_studygrouplesson
-const val VIEWTYPE_TEACHER = R.layout.item_teacherlesson
-const val VIEWTYPE_WEEKDAY = R.layout.item_day
-private const val VIEWTYPE_BLANK = R.layout.item_blanklesson
-private const val VIEWTYPE_DAYEND = R.layout.item_dayend
+const val VIEWTYPE_STUDYGROUP = 101
+const val VIEWTYPE_TEACHER = 102
+const val VIEWTYPE_WEEKDAY = 103
+private const val VIEWTYPE_BLANK = 104
+private const val VIEWTYPE_DAYEND = 105
 
 class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    private val data = ArrayList<LessonView>()
-    private val onClickSubject = PublishSubject.create<LessonView>()
+    private val data = mutableListOf<BaseRVItemView>()
+    private val onClickSubject = PublishSubject.create<BaseRVItemView>()
 
-    val onClickObservable: Observable<LessonView>
+    val onClickObservable: Observable<BaseRVItemView>
         get() = onClickSubject
 
     @Throws(NullPointerException::class)
     fun initData(days: List<WeekdayWithLessons<Lesson>>) {
         val dataWasEmpty = data.isEmpty()
 
-        val hasNotesList = ArrayList<Boolean>()
+        val hasNotesList = ArrayList<Boolean>(7)
         for (view in data) {
             if (view is DayView) {
                 hasNotesList.add(view.hasNotes)
@@ -47,18 +48,18 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
         }
         data.clear()
 
-        var hasNotesListCounter = 0
+        var hasNotesIdx = 0
         for (day in days) {
             val dayView = DayView(day.weekdayId, day.weekday)
             if (hasNotesList.size == WEEKDAYS_NUMBER) {
-                dayView.hasNotes = hasNotesList[hasNotesListCounter]
-                hasNotesListCounter++
+                dayView.hasNotes = hasNotesList[hasNotesIdx]
+                hasNotesIdx++
             }
             data.add(dayView)
 
             if (day.lessons.isNotEmpty()) {
                 for (lesson in day.lessons) {
-                    val lessonView: LessonView =
+                    val lessonView: BaseRVItemView =
                             when (lesson) {
                                 is StudyGroupLesson -> StudyGroupLessonView(lesson)
                                 is TeacherLesson -> TeacherLessonView(lesson)
@@ -80,13 +81,13 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
     }
 
     fun getWeekdayViewIndex(weekdayNumber: Int): Int {
-        var dayIndex = 0
+        var dayIdx = 0
         for (i in 0 until data.size) {
-            if (data[i] is DayView) {
-                if (dayIndex == weekdayNumber - 1) {
+            if (data[i].viewType == VIEWTYPE_WEEKDAY) {
+                if (dayIdx == weekdayNumber - 1) {
                     return i
                 }
-                ++dayIndex
+                ++dayIdx
             }
         }
         return 0
@@ -167,26 +168,26 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
 
     override fun getItemViewType(position: Int): Int = data[position].viewType
 
-    private class BlankLessonView : LessonView {
+    private class BlankLessonView : BaseRVItemView {
         override val viewType: Int = VIEWTYPE_BLANK
 
         override fun bindViewHolder(viewHolder: RecyclerView.ViewHolder) = Unit
     }
 
-    private class DayEndView : LessonView {
+    private class DayEndView : BaseRVItemView {
         override val viewType: Int = VIEWTYPE_DAYEND
 
         override fun bindViewHolder(viewHolder: RecyclerView.ViewHolder) = Unit
     }
 
-    class DayView(val weekdayId: Int, private val weekdayTag: String) : LessonView {
+    class DayView(val weekdayId: Int, private val weekdayTag: String) : BaseRVItemView {
         internal var hasNotes: Boolean = false
 
         override val viewType: Int = VIEWTYPE_WEEKDAY
 
         override fun bindViewHolder(viewHolder: RecyclerView.ViewHolder) {
             with(viewHolder as DayViewHolder) {
-                weekDay.text = getWeekdayFromTag(weekdayTag, itemView.context)
+                weekday.text = getWeekdayFromTag(weekdayTag, itemView.context)
                 if (hasNotes) {
                     notesIconDrawable?.mutate()?.setColorFilter(accentColor, PorterDuff.Mode.SRC_IN)
                 } else {
@@ -197,7 +198,7 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
         }
     }
 
-    class StudyGroupLessonView(val lesson: StudyGroupLesson) : LessonView {
+    class StudyGroupLessonView(val lesson: StudyGroupLesson) : BaseRVItemView {
         override val viewType: Int = VIEWTYPE_STUDYGROUP
 
         override fun bindViewHolder(viewHolder: RecyclerView.ViewHolder) {
@@ -211,7 +212,7 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
         }
     }
 
-    class TeacherLessonView(val lesson: TeacherLesson) : LessonView {
+    class TeacherLessonView(val lesson: TeacherLesson) : BaseRVItemView {
         override val viewType: Int = VIEWTYPE_TEACHER
 
         override fun bindViewHolder(viewHolder: RecyclerView.ViewHolder) {
@@ -233,11 +234,6 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
         }
     }
 
-    interface LessonView {
-        val viewType: Int
-        fun bindViewHolder(viewHolder: RecyclerView.ViewHolder)
-    }
-
     private class StudyGroupLessonViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val lessonStartTime: TextView = view.findViewById(R.id.text_studygrouplesson_starttime)
         val lessonEndTime: TextView = view.findViewById(R.id.text_studygrouplesson_endtime)
@@ -257,7 +253,7 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
     }
 
     private class DayViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val weekDay: TextView = view.findViewById(R.id.text_day)
+        val weekday: TextView = view.findViewById(R.id.text_day)
         val notesIcon: ImageView = view.findViewById(R.id.imageview_notes_day)
         val notesIconDrawable: Drawable? = ContextCompat.getDrawable(view.context, R.drawable.ic_note_day)
         val accentColor = ContextCompat.getColor(view.context, R.color.colorAccent)

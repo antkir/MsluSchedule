@@ -40,7 +40,7 @@
     <string name="snackbar_action_undo">Скасаваць</string>
     <string name="snackbar_note_deleted">Нататка была выдаленая</string>
     <string name="textview_zeronotes">Няма нататкаў на гэты дзень</string>
-    <string name="textview_notes_subhead">Нататкі</string>
+    <string name="textview_other_notes_header">Іншыя нататкі</string>
     <string name="edittext_weekday_note">Увядзіце нататку</string>
     <string name="button_week_hide_weekdays">Схаваць дні</string>
     <string name="button_week_show_weekdays">Паказаць дні</string>

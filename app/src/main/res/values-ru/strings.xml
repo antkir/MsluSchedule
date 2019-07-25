@@ -40,7 +40,7 @@
     <string name="button_week_show_weekdays">Показать дни</string>
     <string name="button_week_hide_weekdays">Скрыть дни</string>
     <string name="edittext_weekday_note">Введите заметку</string>
-    <string name="textview_notes_subhead">Заметки</string>
+    <string name="textview_other_notes_header">Другие заметки</string>
     <string name="textview_zeronotes">Нет заметок на этот день</string>
     <string name="snackbar_note_deleted">Заметка была удалена</string>
     <string name="snackbar_action_undo">Отменить</string>
