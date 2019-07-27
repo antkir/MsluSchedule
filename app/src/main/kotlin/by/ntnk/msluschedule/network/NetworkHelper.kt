@@ -14,7 +14,6 @@ import by.ntnk.msluschedule.utils.toInt
 import io.reactivex.Single
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import java.util.Collections
 import javax.inject.Inject
 
 @PerApp
@@ -45,7 +44,7 @@ class NetworkHelper @Inject constructor(private val currentDate: CurrentDate) {
             createSubjectLengthRequestDataInstance(isFullSubjectName.toInt())
 
     fun getYearsFilterDataList(): List<RequestData> =
-            Collections.singletonList(createYearRequestDataInstance(currentDate.academicYear))
+            listOf(createYearRequestDataInstance(currentDate.academicYear))
 
     fun getStudyGroupsFilterDataList(faculty: Int, course: Int, year: Int = 0): List<RequestData> =
             listOf(

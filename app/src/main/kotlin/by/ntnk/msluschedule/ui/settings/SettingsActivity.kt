@@ -50,7 +50,7 @@ class SettingsActivity : AppCompatActivity(), HasSupportFragmentInjector {
         @Inject
         lateinit var sharedPreferencesRepository: SharedPreferencesRepository
 
-        override fun onAttach(context: Context?) {
+        override fun onAttach(context: Context) {
             AndroidSupportInjection.inject(this)
             super.onAttach(context)
         }

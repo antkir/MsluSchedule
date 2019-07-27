@@ -20,7 +20,7 @@ class WarningDialogFragment : DialogFragment() {
     private lateinit var disposable: Disposable
     private lateinit var listener: DialogListener
 
-    override fun onAttach(context: Context?) {
+    override fun onAttach(context: Context) {
         super.onAttach(context)
         try {
             listener = parentFragment as DialogListener

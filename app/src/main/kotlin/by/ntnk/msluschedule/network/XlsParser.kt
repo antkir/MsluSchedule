@@ -29,7 +29,7 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
     }
 
     private fun parseCellsToStudyGroupWeekdays(cells: List<Cell>): List<WeekdayWithStudyGroupLessons> {
-        val weekdaysWithLessons = ArrayList<WeekdayWithStudyGroupLessons>()
+        val weekdaysWithLessons = ArrayList<WeekdayWithStudyGroupLessons>(WEEKDAYS_NUMBER)
         lateinit var weekday: WeekdayWithStudyGroupLessons
         lateinit var startTime: String
         lateinit var endTime: String

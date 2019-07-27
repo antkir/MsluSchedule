@@ -39,13 +39,13 @@ class WeeksContainerFragment :
 
     override fun onCreatePresenter(): WeeksContainerPresenter = injectedPresenter.get()
 
-    override fun onAttach(context: Context?) {
+    override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
         try {
             listener = context as OnScheduleContainerDeletedListener
         } catch (e: ClassCastException) {
-            throw ClassCastException(context.toString() + " must implement OnScheduleContainerDeletedListener")
+            throw ClassCastException("$context must implement OnScheduleContainerDeletedListener")
         }
     }
 
@@ -108,13 +108,13 @@ class WeeksContainerFragment :
         outState.putInt(SELECTED_TAB_POSITION, tabLayout.selectedTabPosition)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
-        inflater?.inflate(R.menu.fragment_weekscontainer_menu, menu)
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.fragment_weekscontainer_menu, menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
         super.onOptionsItemSelected(item)
-        return when (item?.itemId) {
+        return when (item.itemId) {
             R.id.item_weekscontainer_today -> {
                 viewPager.currentItem = currentWeekItemIndex
                 val adapter = viewPager.adapter as WeekFragmentViewPagerAdapter?

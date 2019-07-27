@@ -7,7 +7,7 @@ data class WeekdayWithTeacherLessons(override val weekday: String) : WeekdayWith
     override var weekdayId: Int = INVALID_VALUE
         private set
 
-    override val lessons: MutableList<TeacherLesson> = ArrayList()
+    override val lessons = mutableListOf<TeacherLesson>()
 
     constructor(weekdayId: Int, weekday: String, lessons: List<TeacherLesson>) : this(weekday) {
         this.weekdayId = weekdayId

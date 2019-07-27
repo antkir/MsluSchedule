@@ -26,7 +26,6 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import androidx.viewpager.widget.PagerAdapter
 import timber.log.Timber
-import java.util.ArrayList
 
 /**
  * Implementation of [PagerAdapter] that uses a [Fragment] to manage each page.
@@ -54,7 +53,7 @@ import java.util.ArrayList
 abstract class FragmentStatePagerAdapter(private val mFragmentManager: FragmentManager) : PagerAdapter() {
     private var mCurTransaction: FragmentTransaction? = null
 
-    private val mFragments = ArrayList<Fragment?>()
+    private val mFragments = mutableListOf<Fragment?>()
     private var mCurrentPrimaryItem: Fragment? = null
 
     /**
@@ -64,7 +63,7 @@ abstract class FragmentStatePagerAdapter(private val mFragmentManager: FragmentM
 
     override fun startUpdate(container: ViewGroup) {
         if (container.id == View.NO_ID) {
-            throw IllegalStateException("ViewPager with adapter " + this + " requires a view id")
+            throw IllegalStateException("ViewPager with adapter ${this} requires a view id")
         }
     }
 

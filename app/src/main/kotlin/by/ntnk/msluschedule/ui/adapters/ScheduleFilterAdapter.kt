@@ -58,19 +58,19 @@ class ScheduleFilterAdapter(
     override fun getFilter(): Filter = if (isFilteringEnabled) filter else dummyFilter
 
     private inner class DummyFilter : Filter() {
-        override fun performFiltering(constraint: CharSequence?): Filter.FilterResults {
-            val filterResults = Filter.FilterResults()
+        override fun performFiltering(constraint: CharSequence?): FilterResults {
+            val filterResults = FilterResults()
             filterResults.values = unfilteredData
             filterResults.count = unfilteredData.size
             return filterResults
         }
 
-        override fun publishResults(constraint: CharSequence?, results: Filter.FilterResults) = Unit
+        override fun publishResults(constraint: CharSequence?, results: FilterResults) = Unit
     }
 
     private inner class DataFilter : Filter() {
-        override fun performFiltering(constraint: CharSequence?): Filter.FilterResults {
-            val filterResults = Filter.FilterResults()
+        override fun performFiltering(constraint: CharSequence?): FilterResults {
+            val filterResults = FilterResults()
             if (constraint == null || constraint.isEmpty()) {
                 filterResults.values = unfilteredData
                 filterResults.count = unfilteredData.size
@@ -97,7 +97,7 @@ class ScheduleFilterAdapter(
         }
 
         @Suppress("UNCHECKED_CAST")
-        override fun publishResults(constraint: CharSequence?, results: Filter.FilterResults) {
+        override fun publishResults(constraint: CharSequence?, results: FilterResults) {
             filteredData = results.values as ScheduleFilter
             if (results.count > 0) {
                 notifyDataSetChanged()

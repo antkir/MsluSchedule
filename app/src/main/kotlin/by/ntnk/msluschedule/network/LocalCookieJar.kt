@@ -23,10 +23,8 @@ import okhttp3.HttpUrl
 import okhttp3.internal.Util
 import timber.log.Timber
 import java.net.HttpCookie
-import java.util.ArrayList
-import java.util.Collections
 
-/* Simplified/Kotlinified JavaNetCookieJar from OkHttp package with local threads support */
+/* Simplified JavaNetCookieJar from OkHttp package with local threads support */
 class LocalCookieJar : CookieJar {
     private val localThreadCookie = object : ThreadLocal<String>() {
         @Synchronized
@@ -51,16 +49,15 @@ class LocalCookieJar : CookieJar {
 
     override fun loadForRequest(url: HttpUrl): List<Cookie> {
         Timber.d("Cookie thread: %s", Thread.currentThread().name)
-        var cookies: MutableList<Cookie>? = null
+        var cookies: List<Cookie>? = null
         val cookieHandler = localThreadCookie.get()
         if (cookieHandler != null) {
             if (cookieHandler.isNotEmpty()) {
                 Timber.i("Getting cookie: %s", cookieHandler)
-                cookies = ArrayList()
-                cookies.addAll(decodeHeaderAsJavaNetCookies(url, cookieHandler))
+                cookies = decodeHeaderAsJavaNetCookies(url, cookieHandler)
             }
         }
-        return if (cookies != null) Collections.unmodifiableList(cookies) else emptyList()
+        return cookies ?: emptyList()
     }
 
     /**
@@ -68,7 +65,7 @@ class LocalCookieJar : CookieJar {
      * multiple cookies in a single request header, which [Cookie.parse] doesn't support.
      */
     private fun decodeHeaderAsJavaNetCookies(url: HttpUrl, header: String): List<Cookie> {
-        val result = ArrayList<Cookie>()
+        val result = mutableListOf<Cookie>()
         var pos = 0
         val limit = header.length
         var pairEnd: Int

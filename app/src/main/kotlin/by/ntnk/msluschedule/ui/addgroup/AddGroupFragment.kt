@@ -33,13 +33,13 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
 
     override fun onCreatePresenter(): AddGroupPresenter = injectedPresenter.get()
 
-    override fun onAttach(context: Context?) {
+    override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
         try {
             listener = context as DialogListener
         } catch (e: ClassCastException) {
-            throw ClassCastException(context.toString() + " must implement DialogListener")
+            throw ClassCastException("$context must implement DialogListener")
         }
     }
 

@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.os.Parcelable
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import androidx.viewpager.widget.PagerAdapter
 import by.ntnk.msluschedule.ui.week.WeekFragment
 import by.ntnk.msluschedule.utils.ImmutableEntry
 
@@ -35,7 +34,7 @@ class WeekFragmentViewPagerAdapter(
         return WeekFragment.newInstance(weekId, isCurrentWeek = position == currentWeekIndex)
     }
 
-    override fun getItemPosition(any: Any) = PagerAdapter.POSITION_NONE
+    override fun getItemPosition(any: Any) = POSITION_NONE
 
     override fun getCount(): Int = fragmentsInfo.size
 

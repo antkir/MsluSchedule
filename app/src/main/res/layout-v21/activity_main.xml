@@ -56,7 +56,8 @@
             android:paddingEnd="@dimen/nav_view_footer_textview_padding_side"
             android:paddingRight="@dimen/nav_view_footer_textview_padding_side"
             android:text="@string/navigation_drawer_settings"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Button" />
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Button"
+            tools:ignore="UnusedAttribute" />
 
     </RelativeLayout>
 
