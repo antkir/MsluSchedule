@@ -6,6 +6,7 @@
     <color name="colorAccent">#FDD835</color>
 
     <color name="surface">#FFFFFF</color>
+    <color name="surface_dialog">#FFFFFF</color>
     <color name="lesson_type_circle">#FDD835</color>
 
     <color name="primary_text">#000000</color>
