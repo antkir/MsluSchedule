@@ -9,7 +9,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.NavUtils
-import androidx.fragment.app.Fragment
 import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.data.StudyGroupLesson
 import by.ntnk.msluschedule.data.TeacherLesson
@@ -19,14 +18,14 @@ import dagger.Lazy
 import dagger.android.AndroidInjection
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
-import dagger.android.support.HasSupportFragmentInjector
+import dagger.android.HasAndroidInjector
 import kotlinx.android.synthetic.main.activity_lessoninfo_studygroup.*
 import kotlinx.android.synthetic.main.activity_lessoninfo_teacher.*
 import javax.inject.Inject
 
 class LessonInfoActivity : MvpActivity<LessonInfoPresenter, LessonInfoView>(),
         LessonInfoView,
-        HasSupportFragmentInjector {
+        HasAndroidInjector {
     private var lessonId: Int = INVALID_VALUE
     private var weekId: Int = INVALID_VALUE
     private var scheduleType: ScheduleType? = null
@@ -35,7 +34,7 @@ class LessonInfoActivity : MvpActivity<LessonInfoPresenter, LessonInfoView>(),
         get() = this
 
     @Inject
-    lateinit var fragmentDispatchingAndroidInjector: DispatchingAndroidInjector<Fragment>
+    lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Any>
 
     @Inject
     lateinit var injectedPresenter: Lazy<LessonInfoPresenter>
@@ -43,7 +42,7 @@ class LessonInfoActivity : MvpActivity<LessonInfoPresenter, LessonInfoView>(),
     @Inject
     lateinit var sharedPreferencesRepository: SharedPreferencesRepository
 
-    override fun supportFragmentInjector(): AndroidInjector<Fragment> = fragmentDispatchingAndroidInjector
+    override fun androidInjector(): AndroidInjector<Any> = dispatchingAndroidInjector
 
     override fun onCreatePresenter(): LessonInfoPresenter = injectedPresenter.get()
 

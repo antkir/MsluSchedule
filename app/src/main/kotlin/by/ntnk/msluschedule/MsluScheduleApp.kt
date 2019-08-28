@@ -1,20 +1,19 @@
 package by.ntnk.msluschedule
 
-import android.app.Activity
 import androidx.multidex.MultiDexApplication
 import by.ntnk.msluschedule.di.DaggerAppComponent
 import com.crashlytics.android.Crashlytics
 import com.squareup.leakcanary.LeakCanary
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
-import dagger.android.HasActivityInjector
+import dagger.android.HasAndroidInjector
 import io.fabric.sdk.android.Fabric
 import timber.log.Timber
 import javax.inject.Inject
 
-class MsluScheduleApp : MultiDexApplication(), HasActivityInjector {
+class MsluScheduleApp : MultiDexApplication(), HasAndroidInjector {
     @Inject
-    lateinit var dispatchingAndroidActivityInjector: DispatchingAndroidInjector<Activity>
+    lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Any>
 
     override fun onCreate() {
         super.onCreate()
@@ -39,7 +38,5 @@ class MsluScheduleApp : MultiDexApplication(), HasActivityInjector {
                 .create(this)
     }
 
-    override fun activityInjector(): AndroidInjector<Activity> {
-        return dispatchingAndroidActivityInjector
-    }
+    override fun androidInjector(): AndroidInjector<Any> = dispatchingAndroidInjector
 }

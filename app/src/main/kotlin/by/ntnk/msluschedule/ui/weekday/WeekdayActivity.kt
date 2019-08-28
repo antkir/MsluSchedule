@@ -14,7 +14,6 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.NavUtils
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -35,7 +34,7 @@ import dagger.Lazy
 import dagger.android.AndroidInjection
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
-import dagger.android.support.HasSupportFragmentInjector
+import dagger.android.HasAndroidInjector
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
@@ -45,7 +44,7 @@ import javax.inject.Inject
 
 class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
         WeekdayView,
-        HasSupportFragmentInjector {
+        HasAndroidInjector {
     private lateinit var recyclerView: RecyclerView
     private var weekdayId: Int = INVALID_VALUE
     private var layoutManagerSavedState: Parcelable? = null
@@ -62,7 +61,7 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
         get() = this
 
     @Inject
-    lateinit var fragmentDispatchingAndroidInjector: DispatchingAndroidInjector<Fragment>
+    lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Any>
 
     @Inject
     lateinit var injectedPresenter: Lazy<WeekdayPresenter>
@@ -70,7 +69,7 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
     @Inject
     lateinit var sharedPreferencesRepository: SharedPreferencesRepository
 
-    override fun supportFragmentInjector(): AndroidInjector<Fragment> = fragmentDispatchingAndroidInjector
+    override fun androidInjector(): AndroidInjector<Any> = dispatchingAndroidInjector
 
     override fun onCreatePresenter(): WeekdayPresenter = injectedPresenter.get()
 

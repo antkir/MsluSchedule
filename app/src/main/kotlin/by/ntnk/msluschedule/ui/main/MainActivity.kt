@@ -15,7 +15,6 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.fragment.app.Fragment
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.viewpager.widget.ViewPager
 import by.ntnk.msluschedule.R
@@ -39,7 +38,7 @@ import dagger.Lazy
 import dagger.android.AndroidInjection
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
-import dagger.android.support.HasSupportFragmentInjector
+import dagger.android.HasAndroidInjector
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
@@ -55,7 +54,7 @@ private const val ARG_ACTIONBAR_TITLE = "ActionBarTitle"
 class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
         NavigationView.OnNavigationItemSelectedListener,
         SimpleDrawerListener,
-        HasSupportFragmentInjector,
+        HasAndroidInjector,
         AddGroupFragment.DialogListener,
         AddTeacherFragment.DialogListener,
         WeeksContainerFragment.OnScheduleContainerDeletedListener {
@@ -67,7 +66,7 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
         get() = this
 
     @Inject
-    lateinit var fragmentDispatchingAndroidInjector: DispatchingAndroidInjector<Fragment>
+    lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Any>
 
     @Inject
     lateinit var injectedPresenter: Lazy<MainPresenter>
@@ -75,7 +74,7 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
     @Inject
     lateinit var sharedPreferencesRepository: SharedPreferencesRepository
 
-    override fun supportFragmentInjector(): AndroidInjector<Fragment> = fragmentDispatchingAndroidInjector
+    override fun androidInjector(): AndroidInjector<Any> = dispatchingAndroidInjector
 
     override fun onCreatePresenter(): MainPresenter = injectedPresenter.get()
 
