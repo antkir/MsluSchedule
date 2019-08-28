@@ -41,7 +41,7 @@ class WeekdayPresenter @Inject constructor(
     }
 
     fun insertNote(note: Note, weekdayId: Int) {
-        databaseRepository.insertNote(note.text, weekdayId, note.subject)
+        databaseRepository.insertNote(note, weekdayId)
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
                 .subscribeBy(
@@ -64,6 +64,16 @@ class WeekdayPresenter @Inject constructor(
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
                 .subscribeBy(
+                        onError = { throwable -> Timber.e(throwable) }
+                )
+    }
+
+    fun restoreNote(note: Note, weekdayId: Int, color: Int, position: Int) {
+        databaseRepository.insertNote(note, weekdayId)
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.ui())
+                .subscribeBy(
+                        onSuccess = { id -> view?.restoreNote(Note(id, note.text, note.subject), color, position) },
                         onError = { throwable -> Timber.e(throwable) }
                 )
     }

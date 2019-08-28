@@ -8,4 +8,5 @@ import by.ntnk.msluschedule.mvp.View
 interface WeekdayView : View {
     fun initView(weekdayWithLessons: WeekdayWithLessons<Lesson>, data: List<Note>)
     fun addNote(note: Note)
+    fun restoreNote(note: Note, color: Int, position: Int)
 }

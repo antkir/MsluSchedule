@@ -198,16 +198,14 @@ class DatabaseRepository @Inject constructor(
                 .map { Note(it.id, it.text, it.subject) }
     }
 
-    fun insertNote(note: String, weekdayId: Int, subject: String): Single<Int> {
-        return Single.just(note)
-                .map { DbNote(it, subject, weekdayId) }
+    fun insertNote(note: Note, weekdayId: Int): Single<Int> {
+        return Single.just(DbNote(note.text, note.subject, weekdayId))
                 .flatMap { appDatabase.noteDao.insert(it) }
                 .map { it.toInt() }
     }
 
     fun updateNote(note: Note, weekdayId: Int): Completable {
-        return Single.just(note)
-                .map { DbNote(it.text, it.subject, weekdayId, it.id) }
+        return Single.just(DbNote(note.text, note.subject, weekdayId, note.id))
                 .flatMapCompletable { appDatabase.noteDao.update(it) }
     }
 

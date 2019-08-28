@@ -43,14 +43,11 @@ import kotlinx.android.synthetic.main.activity_weekday.*
 import timber.log.Timber
 import javax.inject.Inject
 
-private const val ARG_LAYOUT_MANAGER_SAVED_STATE = "argLayoutManagerSavedState"
-
 class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
         WeekdayView,
         HasSupportFragmentInjector {
     private lateinit var recyclerView: RecyclerView
     private var weekdayId: Int = INVALID_VALUE
-    private var keyboardIsShown = false
     private var layoutManagerSavedState: Parcelable? = null
     private val disposables = CompositeDisposable()
 
@@ -89,7 +86,7 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
         layoutManagerSavedState = savedInstanceState?.getParcelable(ARG_LAYOUT_MANAGER_SAVED_STATE)
 
         recyclerView = findViewById(R.id.recyclerview_weekday)
-        with(recyclerView) {
+        recyclerView.apply {
             layoutManager = LinearLayoutManager(this@WeekdayActivity)
             setHasFixedSize(true)
             adapter = this@WeekdayActivity.adapter
@@ -118,24 +115,28 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
     private fun showNoteEditLayout() {
         (fab_weekday as View).visibility = View.INVISIBLE
 
-        layout_edit_note.translationY = edittext_note.height.toFloat()
+        val editNotelayoutAnimDelay: Long = 50
+        val editNoteLayoutAnimDuration: Long = 100
+
+        val backgroundColor = ContextCompat.getColor(applicationContext, R.color.unfocused_background)
+        layout_edit_note.setBackgroundColor(backgroundColor)
+        layout_edit_note.visibility = View.VISIBLE
+        layout_edit_note.isFocusable = true
+        layout_edit_note.isClickable = true
+        layout_edit_note.translationY = layout_edit_note.height.toFloat()
         layout_edit_note.animate()
                 .translationY(0f)
-                .setStartDelay(50)
-                .setDuration(100)
+                .setStartDelay(editNotelayoutAnimDelay)
+                .setDuration(editNoteLayoutAnimDuration)
+                .setInterpolator(FastOutSlowInInterpolator())
                 .setListener(object : SimpleAnimatorListener {
                     val alphaAnimation = AlphaAnimation(0f, 1f).apply {
-                        startOffset = 50
-                        duration = 100
+                        startOffset = editNotelayoutAnimDelay
+                        duration = editNoteLayoutAnimDuration
                     }
-                    val backgroundColor = ContextCompat.getColor(applicationContext, R.color.unfocused_background)
 
                     override fun onAnimationStart(animation: Animator?) {
-                        layout_edit_note?.visibility = View.VISIBLE
                         layout_edit_note?.startAnimation(alphaAnimation)
-                        layout_edit_note?.isFocusable = true
-                        layout_edit_note?.isClickable = true
-                        layout_edit_note?.setBackgroundColor(backgroundColor)
                     }
 
                     override fun onAnimationEnd(animation: Animator?) {
@@ -144,7 +145,17 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
                 })
                 .start()
 
+        scroll_view_chips.translationY = scroll_view_chips.height.toFloat()
+        scroll_view_chips.visibility = View.VISIBLE
+        scroll_view_chips.animate()
+                .translationY(0f)
+                .setStartDelay(editNotelayoutAnimDelay + editNoteLayoutAnimDuration)
+                .setDuration(150)
+                .setInterpolator(FastOutSlowInInterpolator())
+                .start()
+
         edittext_note.requestFocus()
+
         val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager.showSoftInput(edittext_note, InputMethodManager.SHOW_IMPLICIT)
     }
@@ -157,27 +168,82 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
                 val updatedNote = Note(selectedNoteId, edittext_note.text.toString(), subject)
                 adapter.updateSelectedNote(updatedNote)
                 presenter.updateNote(updatedNote, weekdayId)
-                adapter.deselectNote()
             } else {
                 presenter.insertNote(Note(0, edittext_note.text.toString(), subject), weekdayId)
             }
 
-            hideEditNoteLayout()
-            edittext_note.text?.clear()
-            chips_subjects.clearCheck()
-            scroll_view_chips.scrollTo(0, 0)
+            hideEditNoteLayout(resetViews = true)
         }
     }
 
+    private fun hideEditNoteLayout(resetViews: Boolean, isEditNoteLayoutAnimEnabled: Boolean = false) {
+        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(edittext_note.windowToken, 0)
+
+        val editNoteLayoutAnimDuration: Long = 100
+
+        fab_weekday.scaleX = 0f
+        fab_weekday.scaleY = 0f
+        (fab_weekday as View).visibility = View.VISIBLE
+        fab_weekday.animate()
+                .setDuration(150)
+                .scaleY(1f)
+                .scaleX(1f)
+                .setStartDelay(editNoteLayoutAnimDuration)
+                .setInterpolator(FastOutSlowInInterpolator())
+                .start()
+
+        val backgroundColor = ContextCompat.getColor(applicationContext, R.color.transparent)
+        layout_edit_note.setBackgroundColor(backgroundColor)
+        layout_edit_note.isClickable = false
+        layout_edit_note.isFocusable = false
+
+        if (isEditNoteLayoutAnimEnabled) {
+            layout_edit_note.animate()
+                    .translationY(edittext_note.height.toFloat())
+                    .setDuration(editNoteLayoutAnimDuration)
+                    .setInterpolator(FastOutSlowInInterpolator())
+                    .setListener(object : SimpleAnimatorListener {
+                        override fun onAnimationEnd(animation: Animator?) {
+                            scroll_view_chips?.translationY = scroll_view_chips.height.toFloat()
+                            scroll_view_chips?.visibility = View.INVISIBLE
+
+                            layout_edit_note?.visibility = View.INVISIBLE
+                            layout_edit_note?.animate()?.setListener(null)
+
+                            if (resetViews || adapter.getSelectedNoteId() != null) {
+                                resetEditNoteLayoutViews()
+                            }
+                        }
+                    })
+                    .start()
+        } else {
+            scroll_view_chips.translationY = scroll_view_chips.height.toFloat()
+            scroll_view_chips.visibility = View.INVISIBLE
+
+            layout_edit_note.visibility = View.INVISIBLE
+
+            if (resetViews || adapter.getSelectedNoteId() != null) {
+                resetEditNoteLayoutViews()
+            }
+        }
+    }
+
+    private fun resetEditNoteLayoutViews() {
+        adapter.deselectNote()
+        edittext_note?.text?.clear()
+        chips_subjects?.clearCheck()
+        scroll_view_chips?.scrollTo(0, 0)
+    }
+
     private fun getCheckedChipText(): String {
-        var subject = EMPTY_STRING
         for (i in 0 until chips_subjects.childCount) {
             val chip = chips_subjects.getChildAt(i) as Chip
             if (chip.id == chips_subjects.checkedChipId) {
-                subject = chip.text.toString()
+                return chip.text.toString()
             }
         }
-        return subject
+        return EMPTY_STRING
     }
 
     private fun createSwipeHandler(): ItemSwipeCallback {
@@ -191,33 +257,28 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
             }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                val noteView = adapter.getNoteView(viewHolder.adapterPosition)
-                val noteMapIndex = adapter.getMapIndexOfNote(noteView)
-                adapter.removeNote(noteView)
-                if (adapter.itemCount == 0) {
-                    val alphaAnimation = AlphaAnimation(0f, 1f).apply {
-                        startOffset = 200
-                        duration = 100
-                    }
-                    textview_zeronotes.startAnimation(alphaAnimation)
-                    textview_zeronotes.visibility = View.VISIBLE
-                }
+                val (note, noteViewColor, noteSubgroupPosition) = adapter.removeNote(viewHolder.adapterPosition)
+                animateZeroNotesView()
+                presenter.deleteNote(note.id)
 
                 val noteDeleted = resources.getString(R.string.snackbar_note_deleted)
                 Snackbar.make(constraintlayout_weekday, noteDeleted, Snackbar.LENGTH_LONG)
-                        .addCallback(object : Snackbar.Callback() {
-                            override fun onDismissed(snackbar: Snackbar, event: Int) {
-                                if (event != DISMISS_EVENT_ACTION) {
-                                    presenter.deleteNote(noteView.note.id)
-                                }
-                            }
-                        })
                         .setAction(resources.getString(R.string.snackbar_action_undo)) {
-                            adapter.restoreNote(noteMapIndex, noteView)
-                            textview_zeronotes.visibility = View.GONE
+                            presenter.restoreNote(note, weekdayId, noteViewColor, noteSubgroupPosition)
                         }
                         .show()
             }
+        }
+    }
+
+    private fun animateZeroNotesView() {
+        if (adapter.itemCount == 0) {
+            val alphaAnimation = AlphaAnimation(0f, 1f).apply {
+                startOffset = 200
+                duration = 100
+            }
+            textview_zeronotes.startAnimation(alphaAnimation)
+            textview_zeronotes.visibility = View.VISIBLE
         }
     }
 
@@ -226,35 +287,13 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
                 onNext = { note ->
                     for (i in 0 until chips_subjects.childCount) {
                         val chip = chips_subjects.getChildAt(i) as Chip
-                        if (chip.text == note.subject) {
-                            chip.isChecked = true
-                        }
+                        chip.isChecked = chip.text == note.subject
                     }
                     edittext_note.setText(note.text, TextView.BufferType.EDITABLE)
                     showNoteEditLayout()
                 },
                 onError = { throwable -> Timber.e(throwable) }
         )
-    }
-
-    private fun hideEditNoteLayout() {
-        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.hideSoftInputFromWindow(edittext_note.windowToken, 0)
-
-        layout_edit_note.isClickable = false
-        layout_edit_note.isFocusable = false
-        layout_edit_note.setBackgroundColor(ContextCompat.getColor(applicationContext, R.color.transparent))
-        layout_edit_note.visibility = View.INVISIBLE
-
-        (fab_weekday as View).visibility = View.VISIBLE
-        fab_weekday.scaleX = 0f
-        fab_weekday.scaleY = 0f
-        fab_weekday.animate()
-                .setDuration(300)
-                .scaleY(1f)
-                .scaleX(1f)
-                .setInterpolator(FastOutSlowInInterpolator())
-                .start()
     }
 
     override fun onStart() {
@@ -264,37 +303,35 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
             return
         }
 
-        presenter.initWeekdayView(weekdayId)
         constraintlayout_weekday.viewTreeObserver.addOnGlobalLayoutListener(onKeyboardStateChangeListener)
+        presenter.initWeekdayView(weekdayId)
     }
 
     override fun onStop() {
         super.onStop()
+        if (adapter.getSelectedNoteId() != null) {
+            hideEditNoteLayout(resetViews = true)
+        }
         constraintlayout_weekday.viewTreeObserver.removeOnGlobalLayoutListener(onKeyboardStateChangeListener)
+    }
+
+    private val onKeyboardStateChangeListener = object : ViewTreeObserver.OnGlobalLayoutListener {
+        private var isKeyboardVisible = false
+
+        override fun onGlobalLayout() {
+            val heightDiff = constraintlayout_weekday.rootView.height - constraintlayout_weekday.height
+            val wasKeyboardVisible = isKeyboardVisible
+            val isKeyboardVisible = heightDiff > applicationContext.dipToPixels(200f)
+            if (!isKeyboardVisible && wasKeyboardVisible) {
+                hideEditNoteLayout(resetViews = false)
+            }
+            this.isKeyboardVisible = isKeyboardVisible
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putParcelable(ARG_LAYOUT_MANAGER_SAVED_STATE, recyclerView.layoutManager?.onSaveInstanceState())
-    }
-
-    private val onKeyboardStateChangeListener = ViewTreeObserver.OnGlobalLayoutListener {
-        val heightDiff = constraintlayout_weekday.rootView.height - constraintlayout_weekday.height
-        keyboardIsShown =
-                if (heightDiff > applicationContext.dipToPixels(200f)) {
-                    true
-                } else {
-                    if (keyboardIsShown) {
-                        hideEditNoteLayout()
-                        if (adapter.getSelectedNoteId() != null) {
-                            adapter.deselectNote()
-                            edittext_note.text?.clear()
-                            chips_subjects.clearCheck()
-                            scroll_view_chips.scrollTo(0, 0)
-                        }
-                    }
-                    false
-                }
     }
 
     override fun onDestroy() {
@@ -304,27 +341,7 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
 
     override fun onBackPressed() {
         if (layout_edit_note.visibility == View.VISIBLE) {
-            val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.hideSoftInputFromWindow(edittext_note.windowToken, 0)
-
-            layout_edit_note.isClickable = false
-            layout_edit_note.isFocusable = false
-            val backgroundColor = ContextCompat.getColor(applicationContext, R.color.transparent)
-            layout_edit_note.setBackgroundColor(backgroundColor)
-            layout_edit_note.animate()
-                    .translationY(edittext_note.height.toFloat())
-                    .setDuration(100)
-                    .setListener(object : SimpleAnimatorListener {
-                        override fun onAnimationEnd(animation: Animator?) {
-                            layout_edit_note?.animate()?.setListener(null)
-                            layout_edit_note?.visibility = View.INVISIBLE
-                            layout_edit_note?.translationY = 0f
-                            edittext_note?.text?.clear()
-
-                            (fab_weekday as View?)?.visibility = View.VISIBLE
-                        }
-                    })
-                    .start()
+            hideEditNoteLayout(resetViews = true, isEditNoteLayoutAnimEnabled = true)
         } else {
             super.onBackPressed()
         }
@@ -370,8 +387,14 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
         adapter.addNote(note)
     }
 
+    override fun restoreNote(note: Note, color: Int, position: Int) {
+        textview_zeronotes.visibility = View.GONE
+        adapter.restoreNote(note, color, position)
+    }
+
     companion object {
         private const val ARG_WEEKDAY_ID = "weekdayId"
+        private const val ARG_LAYOUT_MANAGER_SAVED_STATE = "argLayoutManagerSavedState"
 
         fun startActivity(context: Context, weekdayId: Int) {
             val intent = Intent(context, WeekdayActivity::class.java).apply {

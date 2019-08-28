@@ -45,12 +45,12 @@ class NoteRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() 
 
         for (lesson in lessons) {
             sortedLesssons.add(lesson)
-            sortedNotes[lesson.subject] = mutableListOf<NoteView>()
+            sortedNotes[lesson.subject] = mutableListOf()
         }
 
         for (note in notes) {
             if (sortedNotes[note.subject] == null) {
-                sortedNotes[note.subject] = mutableListOf<NoteView>()
+                sortedNotes[note.subject] = mutableListOf()
             }
             sortedNotes[note.subject]!!.add(NoteView(note, getViewColor()))
         }
@@ -71,14 +71,16 @@ class NoteRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() 
         val oldData: List<BaseRVItemView> = ArrayList(data)
         data.clear()
         for (entry in sortedNotes) {
-            if (entry.value.size > 0) {
+            if (entry.value.isNotEmpty()) {
                 val header = if (entry.key == EMPTY_STRING) otherNotesHeader else entry.key
                 val filteredLessons = sortedLesssons.filter { it.subject == header }
                 var time = EMPTY_STRING
                 for (lesson in filteredLessons) {
                     time = time.plus(lesson.startTime + " / ")
                 }
-                time = time.dropLast(3)
+                if (time.endsWith(" / ")) {
+                    time = time.dropLast(3)
+                }
                 data.add(NoteHeaderView(header, time))
                 data.addAll(entry.value)
             }
@@ -103,49 +105,51 @@ class NoteRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() 
 
     fun addNote(note: Note) {
         if (sortedNotes[note.subject] == null) {
-            sortedNotes[note.subject] = mutableListOf<NoteView>()
+            sortedNotes[note.subject] = mutableListOf()
         }
+
         sortedNotes[note.subject]!!.add(NoteView(note, getViewColor()))
 
         updateData()
     }
 
-    fun updateSelectedNote(note: Note) {
+    fun restoreNote(note: Note, color: Int, position: Int) {
         if (sortedNotes[note.subject] == null) {
-            sortedNotes[note.subject] = mutableListOf<NoteView>()
+            sortedNotes[note.subject] = mutableListOf()
+        }
+
+        sortedNotes[note.subject]!!.add(position, NoteView(note, color))
+
+        updateData()
+    }
+
+    fun updateSelectedNote(updatedNote: Note) {
+        if (sortedNotes[updatedNote.subject] == null) {
+            sortedNotes[updatedNote.subject] = mutableListOf()
         }
         val oldNoteIdx: Int = sortedNotes[selectedNote!!.note.subject]!!.indexOf(selectedNote!!)
-        if (selectedNote!!.note.subject == note.subject) {
-            val oldNoteView = sortedNotes[note.subject]!![oldNoteIdx]
-            sortedNotes[note.subject]!![oldNoteIdx] = NoteView(note, oldNoteView.color)
+        if (selectedNote!!.note.subject == updatedNote.subject) {
+            val oldNoteView = sortedNotes[updatedNote.subject]!![oldNoteIdx]
+            sortedNotes[updatedNote.subject]!![oldNoteIdx] = NoteView(updatedNote, oldNoteView.color)
         } else {
             sortedNotes[selectedNote!!.note.subject]!!.removeAt(oldNoteIdx)
-            sortedNotes[note.subject]!!.add(NoteView(note, getViewColor()))
+            sortedNotes[updatedNote.subject]!!.add(NoteView(updatedNote, getViewColor()))
         }
+
+        deselectNote()
 
         updateData()
     }
 
     fun getSelectedNoteId(): Int? = selectedNote?.note?.id
 
-    fun getMapIndexOfNote(note: NoteView): Int = sortedNotes[note.note.subject]!!.indexOf(note)
-
-    fun restoreNote(position: Int, note: NoteView) {
-        if (sortedNotes[note.note.subject] == null) {
-            sortedNotes[note.note.subject] = mutableListOf<NoteView>()
-        }
-        sortedNotes[note.note.subject]!!.add(position, note)
-
+    fun removeNote(position: Int): Triple<Note, Int, Int> {
+        val noteView = data[position] as NoteView
+        val noteViewIdx = sortedNotes[noteView.note.subject]!!.indexOf(noteView)
+        sortedNotes[noteView.note.subject]!!.remove(noteView)
         updateData()
+        return Triple(noteView.note, noteView.color, noteViewIdx)
     }
-
-    fun removeNote(note: NoteView) {
-        sortedNotes[note.note.subject]!!.remove(note)
-
-        updateData()
-    }
-
-    fun getNoteView(position: Int): NoteView = data[position] as NoteView
 
     fun deselectNote() {
         selectedNote = null
@@ -163,8 +167,9 @@ class NoteRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() 
                 NoteViewHolder(view).apply {
                     itemView.setOnLongClickListener {
                         if (adapterPosition != NO_POSITION) {
-                            selectedNote = data[adapterPosition] as NoteView
-                            onLongClickSubject.onNext((data[adapterPosition] as NoteView).note)
+                            val noteView = data[adapterPosition] as NoteView
+                            selectedNote = noteView
+                            onLongClickSubject.onNext(noteView.note)
                         }
                         return@setOnLongClickListener true
                     }
@@ -232,10 +237,11 @@ class NoteRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() 
         override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
             val oldItem = oldData[oldItemPosition]
             val newItem = newData[newItemPosition]
-            return oldItem is NoteView && newItem is NoteView &&
+            return (oldItem is NoteView && newItem is NoteView &&
                     oldItem.note.id == newItem.note.id &&
                     oldItem.note.text == newItem.note.text &&
-                    oldItem.note.subject == newItem.note.subject
+                    oldItem.note.subject == newItem.note.subject) ||
+                    (oldItem is NoteHeaderView && newItem is NoteHeaderView && oldItem.header == newItem.header)
         }
     }
 }

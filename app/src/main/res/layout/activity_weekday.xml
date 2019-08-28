@@ -58,6 +58,7 @@
                 android:clipToPadding="false"
                 android:elevation="8dp"
                 android:paddingStart="@dimen/chipsgroup_padding_horizontal"
+                android:visibility="invisible"
                 android:paddingLeft="@dimen/chipsgroup_padding_horizontal"
                 android:paddingEnd="@dimen/chipsgroup_padding_horizontal"
                 android:paddingRight="@dimen/chipsgroup_padding_horizontal"
@@ -108,14 +109,12 @@
                 android:layout_gravity="bottom|end"
                 android:layout_marginEnd="8dp"
                 android:layout_marginRight="8dp"
-                android:layout_marginBottom="8dp"
                 android:background="@android:color/transparent"
                 android:elevation="8dp"
                 android:src="@drawable/ic_save_note"
                 android:tint="@color/ic_save_note_tint"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="@+id/edittext_note"
-                app:layout_constraintTop_toTopOf="@+id/edittext_note"
                 tools:ignore="UnusedAttribute" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
