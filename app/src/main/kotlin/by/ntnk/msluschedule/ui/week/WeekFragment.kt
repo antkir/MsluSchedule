@@ -80,7 +80,12 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         val swipeRefreshLayout = rootView.findViewById<SwipeRefreshLayout>(R.id.swipe_refresh_layout_week)
         swipeRefreshLayout.setOnRefreshListener {
             swipeRefreshLayout.isRefreshing = false
-            presenter.updateSchedule(weekId)
+            if (isNetworkAccessible(context!!.applicationContext)) {
+                layoutManagerSavedState = recyclerView.layoutManager?.onSaveInstanceState()
+                presenter.updateSchedule(weekId)
+            } else {
+                showSnackbarNetworkInaccessible(getView()!!)
+            }
         }
 
         return rootView
@@ -181,9 +186,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         adapter.initData(data)
 
         val layoutManager = recyclerView.layoutManager as LinearLayoutManager
-        if (isRecentlyRecreated) {
-            layoutManager.onRestoreInstanceState(layoutManagerSavedState)
-        }
+        layoutManager.onRestoreInstanceState(layoutManagerSavedState)
         if (isCurrentWeek) {
             if (layoutManagerSavedState == null) {
                 val index = adapter.getWeekdayViewIndex(presenter.getCurrentDayOfWeek())
@@ -299,6 +302,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
                 .setAction(R.string.snackbar_week_init_retry) {
                     context ?: return@setAction
                     if (isNetworkAccessible(context!!.applicationContext)) {
+                        layoutManagerSavedState = recyclerView.layoutManager?.onSaveInstanceState()
                         presenter.updateSchedule(weekId)
                     } else {
                         showError(t, shouldSetupViews = false)
@@ -316,6 +320,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
             R.id.item_week_update -> {
                 if (isNetworkAccessible(context!!.applicationContext)) {
                     if (weekId == INVALID_VALUE) return true
+                    layoutManagerSavedState = recyclerView.layoutManager?.onSaveInstanceState()
                     presenter.updateSchedule(weekId)
                 } else {
                     showSnackbarNetworkInaccessible(getView()!!)
