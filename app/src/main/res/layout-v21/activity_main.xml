@@ -34,7 +34,7 @@
             android:layout_width="@dimen/nav_view_width"
             android:layout_height="@dimen/nav_view_footer_height"
             android:layout_alignParentBottom="true"
-            android:background="@color/surface"
+            android:background="@color/button_nav_drawer"
             android:clickable="true"
             android:drawableStart="@drawable/ic_menu_settings"
             android:drawablePadding="@dimen/nav_view_footer_image_padding_end"

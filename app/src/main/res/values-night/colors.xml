@@ -13,9 +13,10 @@
     <color name="tertiary_text">#A3A3A3</color>
     <color name="chip_text">#000000</color>
 
-    <color name="state_pressed">#313131</color>
-    <color name="menuitem_highlight">#444444</color>
-    <color name="item_separator">#4F4F4F</color>
+    <color name="state_pressed">#2C2C2C</color>
+    <color name="menuitem_highlight">#2C2C2C</color>
+    <color name="item_separator">#313131</color>
+    <color name="button_nav_drawer">#1D1D1D</color>
 
     <color name="button_secondary">#313131</color>
     <color name="note_edit_surface">#2E2E2E</color>
