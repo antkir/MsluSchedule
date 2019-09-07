@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="nav_bar">#FFFFFF</color>
+    <color name="nav_bar_launch_screen">#000000</color>
+    <color name="nav_bar_divider">#1F000000</color>
+</resources>

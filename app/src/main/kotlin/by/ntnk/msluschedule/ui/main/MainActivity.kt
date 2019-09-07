@@ -97,7 +97,15 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
 
         nav_view.setNavigationItemSelectedListener(this)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            val uiFlags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+            var uiFlags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+                val nightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+                if (nightMode == Configuration.UI_MODE_NIGHT_NO) {
+                    uiFlags = uiFlags or
+                            WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS or
+                            View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+                }
+            }
             window.decorView.systemUiVisibility = uiFlags
 
             drawer_layout.setOnApplyWindowInsetsListener { view, insets ->

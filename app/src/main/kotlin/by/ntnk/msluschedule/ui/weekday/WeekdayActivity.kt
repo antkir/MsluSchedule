@@ -3,11 +3,14 @@ package by.ntnk.msluschedule.ui.weekday
 import android.animation.Animator
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
+import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewTreeObserver
+import android.view.WindowManager
 import android.view.animation.AlphaAnimation
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
@@ -105,6 +108,15 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
             }
         })
         initOnLongClickNoteListener()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+            val nightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+            if (nightMode == Configuration.UI_MODE_NIGHT_NO) {
+                val uiFlags = WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS or
+                        View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+                window.decorView.systemUiVisibility = uiFlags
+            }
+        }
     }
 
     private fun showNoteEditLayout() {
