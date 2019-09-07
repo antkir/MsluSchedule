@@ -2,8 +2,11 @@ package by.ntnk.msluschedule.ui.weekscontainer
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.view.*
+import androidx.core.text.TextUtilsCompat
+import androidx.core.view.ViewCompat
 import androidx.viewpager.widget.ViewPager
 import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.data.ScheduleContainerInfo
@@ -15,6 +18,7 @@ import by.ntnk.msluschedule.utils.ImmutableEntry
 import com.google.android.material.tabs.TabLayout
 import dagger.Lazy
 import dagger.android.support.AndroidSupportInjection
+import java.util.Locale
 import javax.inject.Inject
 
 private const val SELECTED_TAB_POSITION = "tab_position"
@@ -64,12 +68,16 @@ class WeeksContainerFragment :
         tabLayout = rootView.findViewById(R.id.tabs_weekscontainer)
         tabLayout.setOnTouchListener { _, _ -> true }
         tabLayout.setupWithViewPager(viewPager)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            tabLayout.layoutDirection = View.LAYOUT_DIRECTION_LTR
+        }
         return rootView
     }
 
     override fun onStart() {
         super.onStart()
-        presenter.initWeeksAdapter()
+        val isRTL = TextUtilsCompat.getLayoutDirectionFromLocale(Locale.getDefault()) == ViewCompat.LAYOUT_DIRECTION_RTL
+        presenter.initWeeksAdapter(isRTL)
     }
 
     override fun onStop() {
@@ -101,7 +109,8 @@ class WeeksContainerFragment :
 
     fun swapTabs() {
         savedCurrentPosition = INVALID_VALUE
-        presenter.initWeeksAdapter()
+        val isRTL = TextUtilsCompat.getLayoutDirectionFromLocale(Locale.getDefault()) == ViewCompat.LAYOUT_DIRECTION_RTL
+        presenter.initWeeksAdapter(isRTL)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

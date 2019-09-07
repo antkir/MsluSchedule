@@ -20,7 +20,7 @@ class WeeksContainerPresenter @Inject constructor(
 ) : Presenter<WeeksContainerView>() {
     private val disposables: CompositeDisposable = CompositeDisposable()
 
-    fun initWeeksAdapter() {
+    fun initWeeksAdapter(isRTL: Boolean) {
         val containerInfo = sharedPreferencesRepository.getSelectedScheduleContainerInfo()
         disposables += databaseRepository.getWeeks(containerInfo.id)
                 .toList()
@@ -35,7 +35,9 @@ class WeeksContainerPresenter @Inject constructor(
                             weekIds.add(ImmutableEntry(weeks[j].id, weeks[j].value))
                         }
                     }
-                    val currentItemIndex = if (index < 2) index else 2
+                    if (isRTL) weekIds.reverse()
+                    var currentItemIndex = if (index < 2) index else 2
+                    if (isRTL) currentItemIndex = weekIds.size - 1 - currentItemIndex
                     return@map Pair(weekIds, currentItemIndex)
                 }
                 .subscribeOn(schedulerProvider.io())
