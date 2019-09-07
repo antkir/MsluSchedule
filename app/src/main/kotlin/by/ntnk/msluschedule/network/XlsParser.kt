@@ -146,8 +146,8 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
         var endTime = EMPTY_STRING
 
         for (rowIndex in hssfRows.indices) {
-            for (columnIndex in 0 until hssfRows[rowIndex].count()) {
-                val hssfCell = hssfRows[rowIndex].elementAt(columnIndex)
+            for (columnIndex in 0 until hssfRows[rowIndex].lastCellNum) {
+                val hssfCell = hssfRows[rowIndex].getCell(columnIndex)
                 if (hssfCell.columnIndex == 1 && hssfCell.stringCellValue.isNotEmpty()) {
                     val values = getLessonTimePair(hssfCell.stringCellValue)
                     startTime = values.first

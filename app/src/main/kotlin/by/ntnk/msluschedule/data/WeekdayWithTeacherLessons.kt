@@ -1,7 +1,6 @@
 package by.ntnk.msluschedule.data
 
 import by.ntnk.msluschedule.utils.INVALID_VALUE
-import java.util.Arrays
 
 data class WeekdayWithTeacherLessons(override val weekday: String) : WeekdayWithLessons<TeacherLesson> {
     override var weekdayId: Int = INVALID_VALUE
@@ -27,7 +26,7 @@ data class WeekdayWithTeacherLessons(override val weekday: String) : WeekdayWith
         return true
     }
 
-    override fun hashCode(): Int = Arrays.hashCode(arrayOf(lessons))
+    override fun hashCode(): Int = arrayOf(lessons).contentHashCode()
 
     override fun toString(): String {
         var ret = String.format("WeekdayWithTeacherLessons(weekday=%s)", weekday)

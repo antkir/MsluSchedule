@@ -28,8 +28,10 @@ class WeeksContainerFragment :
     private lateinit var tabLayout: TabLayout
     private var savedCurrentPosition = INVALID_VALUE
     private var currentWeekItemIndex = INVALID_VALUE
-
     private lateinit var listener: OnScheduleContainerDeletedListener
+
+    private val adapter: WeekFragmentViewPagerAdapter?
+        get() = viewPager.adapter as WeekFragmentViewPagerAdapter?
 
     override val view: WeeksContainerView
         get() = this
@@ -57,12 +59,12 @@ class WeeksContainerFragment :
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_weekscontainer, container, false)
-        viewPager = view.findViewById(R.id.viewpager_weekscontainer)
-        tabLayout = view.findViewById(R.id.tabs_weekscontainer)
+        val rootView = inflater.inflate(R.layout.fragment_weekscontainer, container, false)
+        viewPager = rootView.findViewById(R.id.viewpager_weekscontainer)
+        tabLayout = rootView.findViewById(R.id.tabs_weekscontainer)
         tabLayout.setOnTouchListener { _, _ -> true }
         tabLayout.setupWithViewPager(viewPager)
-        return view
+        return rootView
     }
 
     override fun onStart() {
@@ -82,8 +84,7 @@ class WeeksContainerFragment :
         with(viewPager) {
             offscreenPageLimit = weekIds.size - 1
             if (adapter == null) {
-                val viewPagerAdapter = WeekFragmentViewPagerAdapter(childFragmentManager, weekIds, currentWeekItemIndex)
-                adapter = viewPagerAdapter
+                adapter = WeekFragmentViewPagerAdapter(childFragmentManager, weekIds, currentWeekItemIndex)
                 if (savedCurrentPosition == INVALID_VALUE) {
                     savedCurrentPosition = currentWeekItemIndex
                 }
@@ -117,7 +118,6 @@ class WeeksContainerFragment :
         return when (item.itemId) {
             R.id.item_weekscontainer_today -> {
                 viewPager.currentItem = currentWeekItemIndex
-                val adapter = viewPager.adapter as WeekFragmentViewPagerAdapter?
                 adapter?.getFragment(currentWeekItemIndex)?.highlightToday()
                 return true
             }

@@ -2,7 +2,6 @@ package by.ntnk.msluschedule.network.data
 
 import android.util.SparseArray
 import by.ntnk.msluschedule.utils.EMPTY_STRING
-import java.util.Arrays
 
 data class ScheduleFilter(private val data: SparseArray<String>) {
     val size: Int
@@ -39,7 +38,7 @@ data class ScheduleFilter(private val data: SparseArray<String>) {
         return true
     }
 
-    override fun hashCode(): Int = Arrays.hashCode(arrayOf(data))
+    override fun hashCode(): Int = arrayOf(data).contentHashCode()
 
     override fun toString(): String = data.toString()
 }

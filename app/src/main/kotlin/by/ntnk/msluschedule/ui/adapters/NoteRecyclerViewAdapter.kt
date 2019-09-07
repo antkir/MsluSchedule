@@ -70,9 +70,9 @@ class NoteRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() 
     private fun updateData() {
         val oldData: List<BaseRVItemView> = ArrayList(data)
         data.clear()
-        for (entry in sortedNotes) {
-            if (entry.value.isNotEmpty()) {
-                val header = if (entry.key == EMPTY_STRING) otherNotesHeader else entry.key
+        for ((subject, notes) in sortedNotes) {
+            if (notes.isNotEmpty()) {
+                val header = if (subject == EMPTY_STRING) otherNotesHeader else subject
                 val filteredLessons = sortedLesssons.filter { it.subject == header }
                 var time = EMPTY_STRING
                 for (lesson in filteredLessons) {
@@ -82,7 +82,7 @@ class NoteRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() 
                     time = time.dropLast(3)
                 }
                 data.add(NoteHeaderView(header, time))
-                data.addAll(entry.value)
+                data.addAll(notes)
             }
         }
 

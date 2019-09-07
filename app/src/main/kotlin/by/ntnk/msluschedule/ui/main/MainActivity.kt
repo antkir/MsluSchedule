@@ -117,16 +117,26 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
                 .filter { it }
                 .subscribe { recreate() }
 
-        if (!sharedPreferencesRepository.isFirstAppLaunch) {
-            return
+        if (sharedPreferencesRepository.isFirstAppLaunch) {
+            showTutorial()
         }
+    }
 
-        val point = Point()
-        windowManager.defaultDisplay.getSize(point)
+    private class NavigationDrawerRunnable(context: DrawerLayout?) : Runnable {
+        private val drawerLayoutRef: WeakReference<DrawerLayout?> = WeakReference(context)
 
+        override fun run() {
+            drawerLayoutRef.get()?.closeDrawer(GravityCompat.START)
+        }
+    }
+
+    private fun showTutorial() {
         drawer_layout.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
                 drawer_layout?.viewTreeObserver?.removeOnGlobalLayoutListener(this)
+
+                val point = Point()
+                windowManager.defaultDisplay.getSize(point)
 
                 val welcomeTarget = SimpleTarget.Builder(this@MainActivity)
                         .setPoint(image_main_smileyface)
@@ -171,14 +181,6 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
                         .start()
             }
         })
-    }
-
-    private class NavigationDrawerRunnable(context: DrawerLayout?) : Runnable {
-        private val drawerLayoutRef: WeakReference<DrawerLayout?> = WeakReference(context)
-
-        override fun run() {
-            drawerLayoutRef.get()?.closeDrawer(GravityCompat.START)
-        }
     }
 
     override fun onStart() {

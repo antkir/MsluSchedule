@@ -62,8 +62,8 @@ abstract class FragmentStatePagerAdapter(private val mFragmentManager: FragmentM
     abstract fun getItem(position: Int): Fragment
 
     override fun startUpdate(container: ViewGroup) {
-        if (container.id == View.NO_ID) {
-            throw IllegalStateException("ViewPager with adapter ${this} requires a view id")
+        check(container.id != View.NO_ID) {
+            "ViewPager with adapter ${this} requires a view id"
         }
     }
 

@@ -49,6 +49,9 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     private var layoutManagerSavedState: Parcelable? = null
     private lateinit var adapterOnClickDisposable: Disposable
 
+    private val adapter: LessonRecyclerViewAdapter
+        get() = recyclerView.adapter as LessonRecyclerViewAdapter? ?: LessonRecyclerViewAdapter()
+
     override val view: WeekView
         get() = this
 
@@ -88,7 +91,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         recyclerView.apply {
             layoutManager = LinearLayoutManager(activity)
             setHasFixedSize(true)
-            adapter = LessonRecyclerViewAdapter()
+            adapter = this@WeekFragment.adapter
             initAdapterOnClickListener()
         }
         smoothScroller = object : LinearSmoothScroller(context!!) {
@@ -97,7 +100,6 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     }
 
     private fun initAdapterOnClickListener() {
-        val adapter = recyclerView.adapter as LessonRecyclerViewAdapter
         adapterOnClickDisposable = adapter.onClickObservable.subscribeBy(
                 onNext = {
                     when (it.viewType) {
@@ -121,7 +123,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
 
     override fun onStart() {
         super.onStart()
-        val shouldUpdateAdapter = recyclerView.adapter?.itemCount == 0
+        val shouldUpdateAdapter = adapter.itemCount == 0
         presenter.getSchedule(weekId, shouldUpdateAdapter)
     }
 
@@ -143,7 +145,6 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
 
     fun highlightToday() {
         if (text_week_nolessons.visibility != View.VISIBLE) {
-            val adapter = recyclerView.adapter as LessonRecyclerViewAdapter
             val index = adapter.getWeekdayViewIndex(presenter.getCurrentDayOfWeek())
             smoothScroller.targetPosition = index
             recyclerView.layoutManager?.startSmoothScroll(smoothScroller)
@@ -177,7 +178,6 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
             rv_week_days.removeOnScrollListener(recyclerViewScrollListener)
         }
 
-        val adapter = recyclerView.adapter as LessonRecyclerViewAdapter
         adapter.initData(data)
 
         val layoutManager = recyclerView.layoutManager as LinearLayoutManager
@@ -327,7 +327,6 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     }
 
     override fun updateNotesStatus(weekdayId: Int, hasNotes: Boolean) {
-        val adapter = recyclerView.adapter as LessonRecyclerViewAdapter
         adapter.updateWeekdayNotesStatus(weekdayId, hasNotes)
     }
 

@@ -51,11 +51,7 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
     private val disposables = CompositeDisposable()
 
     private val adapter: NoteRecyclerViewAdapter
-        get() = if (recyclerView.adapter == null) {
-            NoteRecyclerViewAdapter()
-        } else {
-            recyclerView.adapter as NoteRecyclerViewAdapter
-        }
+        get() = recyclerView.adapter as NoteRecyclerViewAdapter? ?: NoteRecyclerViewAdapter()
 
     override val view: WeekdayView
         get() = this
