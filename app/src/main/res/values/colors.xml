@@ -19,6 +19,7 @@
     <color name="state_pressed">#E0E0E0</color>
     <color name="menuitem_highlight">#E0EBF9</color>
     <color name="item_separator">#E5E5E5</color>
+    <color name="statusbar_nav_drawer">#40000000</color>
 
     <color name="warning">#B00020</color>
     <color name="button_secondary">#E0EBF9</color>
@@ -30,7 +31,6 @@
     <color name="ic_save_note_inactive_tint">#CCCCCC</color>
 
     <color name="text_pref_category">#006DDE</color>
-    <color name="nav_statusbar">#44000000</color>
     <color name="unfocused_background">#44000000</color>
     <color name="transparent">#00000000</color>
 </resources>

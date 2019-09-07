@@ -17,7 +17,7 @@
         <item name="android:selectable">false</item>
     </style>
 
-    <style name="MsluTheme.NoActionBar">
+    <style name="MsluTheme.NoActionBar" parent="MsluTheme">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
@@ -26,7 +26,7 @@
         <item name="android:windowBackground">@color/surface</item>
     </style>
 
-    <style name="MsluTheme.LaunchScreen" parent="MsluTheme.NoActionBarTransparentStatusBar">
+    <style name="MsluTheme.LaunchScreen" parent="MsluTheme.NoActionBar">
         <item name="android:windowBackground">@drawable/launch_screen</item>
     </style>
 

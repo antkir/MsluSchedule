@@ -1,17 +1,17 @@
 package by.ntnk.msluschedule.ui.main
 
 import android.animation.Animator
+import android.content.res.Configuration
+import android.graphics.Color
 import android.graphics.Point
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewTreeObserver
+import android.view.*
 import android.view.animation.OvershootInterpolator
-import android.widget.RelativeLayout
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -85,10 +85,10 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
         setTheme(R.style.MsluTheme_NoActionBarTransparentStatusBar)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        setSupportActionBar(toolbar)
+        setSupportActionBar(toolbar_main)
 
         val toggle = ActionBarDrawerToggle(
-                this, drawer_layout, toolbar, R.string.navigation_drawer_open,
+                this, drawer_layout, toolbar_main, R.string.navigation_drawer_open,
                 R.string.navigation_drawer_close
         )
         drawer_layout.addDrawerListener(toggle)
@@ -96,12 +96,42 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
         drawer_layout.addDrawerListener(this)
 
         nav_view.setNavigationItemSelectedListener(this)
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            nav_layout_main.setOnApplyWindowInsetsListener { _, insets ->
-                if (nav_statusbar_main.width > 0) {
-                    nav_statusbar_main?.layoutParams =
-                            RelativeLayout.LayoutParams(nav_statusbar_main.width, insets.systemWindowInsetTop)
-                }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            val uiFlags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+            window.decorView.systemUiVisibility = uiFlags
+
+            drawer_layout.setOnApplyWindowInsetsListener { view, insets ->
+                val layoutParams = view.layoutParams as ViewGroup.MarginLayoutParams
+                layoutParams.bottomMargin = insets.systemWindowInsetBottom
+                layoutParams.leftMargin = insets.systemWindowInsetLeft
+                layoutParams.rightMargin = insets.systemWindowInsetRight
+                return@setOnApplyWindowInsetsListener insets
+            }
+
+            nav_layout_main.setOnApplyWindowInsetsListener { view, insets ->
+                view.setPadding(
+                        view.paddingStart,
+                        insets.systemWindowInsetTop,
+                        view.paddingEnd,
+                        view.paddingBottom
+                )
+                return@setOnApplyWindowInsetsListener insets
+            }
+
+            appbar_main.setOnApplyWindowInsetsListener { view, insets ->
+                view.setPadding(
+                        view.paddingStart,
+                        insets.systemWindowInsetTop,
+                        view.paddingEnd,
+                        view.paddingBottom
+                )
+                return@setOnApplyWindowInsetsListener insets
+            }
+
+            framelayout_main.setOnApplyWindowInsetsListener { view, insets ->
+                val layoutParams = view.layoutParams as ViewGroup.MarginLayoutParams
+                val toolbarHeight = resources.getDimension(R.dimen.toolbar_height).toInt()
+                layoutParams.topMargin = toolbarHeight + insets.systemWindowInsetTop
                 return@setOnApplyWindowInsetsListener insets
             }
         }
@@ -151,14 +181,14 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
                         .setDescription(getString(R.string.tutorial_add_schedule_description))
                         .build()
                 val navigationViewTarget = SimpleTarget.Builder(this@MainActivity)
-                        .setPoint(0f, toolbar.y)
+                        .setPoint(0f, toolbar_main.y)
                         .setShape(Circle(dipToPixels(120f).toFloat()))
                         .setTitle(getString(R.string.tutorial_navigation_view_title))
                         .setDescription(getString(R.string.tutorial_navigation_view_description))
                         .build()
                 val actionMenuTarget = SimpleTarget.Builder(this@MainActivity)
-                        .setPoint(point.x.toFloat(), toolbar.y)
-                        .setShape(ActionMenuCircle(dipToPixels(120f).toFloat(), this@MainActivity, toolbar))
+                        .setPoint(point.x.toFloat(), toolbar_main.y)
+                        .setShape(ActionMenuCircle(dipToPixels(120f).toFloat(), this@MainActivity, toolbar_main))
                         .setTitle(getString(R.string.tutorial_action_menu_title))
                         .setDescription(getString(R.string.tutorial_action_menu_description))
                         .build()
@@ -245,7 +275,26 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
         return true
     }
 
+    override fun onDrawerOpened(drawerView: View) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            val nightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+            if (nightMode == Configuration.UI_MODE_NIGHT_NO) {
+                window.statusBarColor = ContextCompat.getColor(this, R.color.statusbar_nav_drawer)
+            }
+        }
+    }
+
     override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            val nightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+            if (nightMode == Configuration.UI_MODE_NIGHT_NO) {
+                val color = ContextCompat.getColor(this, R.color.statusbar_nav_drawer)
+                window.statusBarColor = Color.argb(
+                        (slideOffset * Color.alpha(color)).toInt(),
+                        Color.red(color), Color.green(color), Color.blue(color))
+            }
+        }
+
         if (isUpdatingWeeksContainer) {
             var viewPagerWeeksContainer: ViewPager? = null
             val weeksContainerFragment = supportFragmentManager.findFragmentById(R.id.framelayout_main)
@@ -398,7 +447,9 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
     }
 
     override fun onError(t: Throwable) {
-        Snackbar.make(framelayout_main, getErrorMessageResId(t), Snackbar.LENGTH_LONG).show()
+        val snackbar = Snackbar.make(framelayout_main, getErrorMessageResId(t), Snackbar.LENGTH_LONG)
+        ViewCompat.setOnApplyWindowInsetsListener(snackbar.view) { _, insets -> insets }
+        snackbar.show()
     }
 
     override fun initMainContent() {
@@ -462,7 +513,9 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
         image_main_smileyface.visibility = View.VISIBLE
         text_main_advice.visibility = View.VISIBLE
 
-        Snackbar.make(framelayout_main, R.string.error_general, Snackbar.LENGTH_LONG).show()
+        val snackbar = Snackbar.make(framelayout_main, R.string.error_general, Snackbar.LENGTH_LONG)
+        ViewCompat.setOnApplyWindowInsetsListener(snackbar.view) { _, insets -> insets }
+        snackbar.show()
     }
 
     override fun onScheduleContainerDeleted(info: ScheduleContainerInfo) {

@@ -3,10 +3,12 @@ package by.ntnk.msluschedule.utils
 import android.animation.Animator
 import android.content.Context
 import android.net.ConnectivityManager
+import android.os.Build
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.TypedValue
 import android.view.View
+import androidx.core.view.ViewCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.RecyclerView
 import by.ntnk.msluschedule.R
@@ -25,8 +27,11 @@ fun isNetworkAccessible(context: Context): Boolean {
     return connectivityManager.activeNetworkInfo != null && connectivityManager.activeNetworkInfo.isConnected
 }
 
-fun showSnackbarNetworkInaccessible(view: View) =
-        Snackbar.make(view, R.string.snackbar_internet_unavailable, Snackbar.LENGTH_LONG).show()
+fun showSnackbarNetworkInaccessible(view: View) {
+    val snackbar = Snackbar.make(view, R.string.snackbar_internet_unavailable, Snackbar.LENGTH_LONG)
+    ViewCompat.setOnApplyWindowInsetsListener(snackbar.view) { _, insets -> insets }
+    snackbar.show()
+}
 
 fun getErrorMessageResId(t: Throwable): Int {
     return when (t) {
@@ -55,7 +60,7 @@ fun Context.dipToPixels(dipValue: Float) =
         TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dipValue, resources.displayMetrics).toInt()
 
 fun IntRange.random(): Int {
-    return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
         ThreadLocalRandom.current().nextInt((endInclusive + 1) - start) + start
     } else {
         Random().nextInt((endInclusive + 1) - start) + start

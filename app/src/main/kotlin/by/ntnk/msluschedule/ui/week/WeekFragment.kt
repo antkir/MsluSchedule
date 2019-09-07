@@ -12,6 +12,7 @@ import android.view.animation.AnimationUtils
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
@@ -298,7 +299,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         if (shouldSetupViews) {
             presenter.getSchedule(weekId, shouldUpdateAdapter = true)
         }
-        Snackbar.make(getView()!!, getErrorMessageResId(t), 5000)
+        val snackbar = Snackbar.make(getView()!!, getErrorMessageResId(t), 5000)
                 .setAction(R.string.snackbar_week_init_retry) {
                     context ?: return@setAction
                     if (isNetworkAccessible(context!!.applicationContext)) {
@@ -308,7 +309,8 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
                         showError(t, shouldSetupViews = false)
                     }
                 }
-                .show()
+        ViewCompat.setOnApplyWindowInsetsListener(snackbar.view) { _, insets -> insets }
+        snackbar.show()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

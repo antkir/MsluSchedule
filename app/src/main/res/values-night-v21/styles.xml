@@ -1,0 +1,10 @@
+<resources>
+    <style name="MsluTheme" parent="Theme.MaterialComponents">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="actionBarTheme">@style/MsluTheme.AppBarOverlay</item>
+        <item name="preferenceTheme">@style/MsluTheme.PreferenceThemeOverlay</item>
+        <item name="android:statusBarColor">?attr/colorPrimary</item>
+    </style>
+</resources>

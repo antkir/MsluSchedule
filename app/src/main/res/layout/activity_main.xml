@@ -5,7 +5,6 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
     tools:openDrawer="start">
 
     <include
@@ -17,25 +16,17 @@
         android:id="@+id/nav_layout_main"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_gravity="start"
-        android:fitsSystemWindows="true">
+        android:layout_gravity="start">
 
         <com.google.android.material.navigation.NavigationView
             android:id="@+id/nav_view"
             android:layout_width="@dimen/nav_view_width"
             android:layout_height="match_parent"
             android:layout_marginBottom="@dimen/nav_view_footer_height"
-            android:background="@color/surface"
             app:headerLayout="@layout/nav_header_main"
             app:itemBackground="@drawable/nav_view_item_background"
             app:itemTextColor="@drawable/nav_view_item_textcolor"
             app:menu="@menu/activity_main_drawer" />
-
-        <View
-            android:id="@+id/nav_statusbar_main"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_alignParentTop="true" />
 
         <View
             android:layout_width="@dimen/nav_view_width"
@@ -43,7 +34,6 @@
             android:layout_alignParentBottom="true"
             android:layout_marginBottom="@dimen/nav_view_footer_height"
             android:background="@color/item_separator" />
-
 
         <TextView
             android:id="@+id/button_settings_main"
