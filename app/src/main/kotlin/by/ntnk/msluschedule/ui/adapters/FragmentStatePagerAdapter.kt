@@ -16,16 +16,37 @@
 
 package by.ntnk.msluschedule.ui.adapters
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.IntDef
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
+import androidx.lifecycle.Lifecycle
 import androidx.viewpager.widget.PagerAdapter
 import timber.log.Timber
+
+/**
+ * Indicates that [Fragment.setUserVisibleHint] will be called when the current
+ * fragment changes.
+ *
+ * @see [FragmentStatePagerAdapter]
+ */
+@Deprecated("This behavior relies on the deprecated\n" +
+                    "      {@link Fragment#setUserVisibleHint(boolean)} API. Use {@link #BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT}\n" +
+                    "      to switch to its replacement, {@link FragmentTransaction#setMaxLifecycle}.\n" +
+                    "      ")
+const val BEHAVIOR_SET_USER_VISIBLE_HINT = 0
+
+/**
+ * Indicates that only the current fragment will be in the [Lifecycle.State.RESUMED]
+ * state. All other Fragments are capped at [Lifecycle.State.STARTED].
+ *
+ * @see [FragmentStatePagerAdapter]
+ */
+const val BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT = 1
 
 /**
  * Implementation of [PagerAdapter] that uses a [Fragment] to manage each page.
@@ -50,7 +71,14 @@ import timber.log.Timber
  *
  * Subclasses only need to implement [getItem] and [getCount] to have a working adapter.
  */
-abstract class FragmentStatePagerAdapter(private val mFragmentManager: FragmentManager) : PagerAdapter() {
+@Suppress("DEPRECATION")
+abstract class FragmentStatePagerAdapter(
+        private val mFragmentManager: FragmentManager,
+        @Behavior private val mBehavior: Int = BEHAVIOR_SET_USER_VISIBLE_HINT) : PagerAdapter() {
+    @Retention(AnnotationRetention.SOURCE)
+    @IntDef(value = [BEHAVIOR_SET_USER_VISIBLE_HINT, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT])
+    private annotation class Behavior
+
     private var mCurTransaction: FragmentTransaction? = null
 
     private val mFragments = mutableListOf<Fragment?>()
@@ -78,7 +106,6 @@ abstract class FragmentStatePagerAdapter(private val mFragmentManager: FragmentM
         return null
     }
 
-    @SuppressLint("CommitTransaction")
     override fun instantiateItem(container: ViewGroup, position: Int): Any {
         // If we already have this item instantiated, there is nothing
         // to do.  This can happen when we are restoring the entire pager
@@ -101,14 +128,20 @@ abstract class FragmentStatePagerAdapter(private val mFragmentManager: FragmentM
             mFragments.add(null)
         }
         fragment.setMenuVisibility(false)
-        fragment.userVisibleHint = false
+        if (mBehavior == BEHAVIOR_SET_USER_VISIBLE_HINT) {
+            fragment.userVisibleHint = false
+        }
+
         mFragments[position] = fragment
         mCurTransaction!!.add(container.id, fragment)
+
+        if (mBehavior == BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+            mCurTransaction!!.setMaxLifecycle(fragment, Lifecycle.State.STARTED)
+        }
 
         return fragment
     }
 
-    @SuppressLint("CommitTransaction")
     override fun destroyItem(container: ViewGroup, position: Int, any: Any) {
         val fragment = any as Fragment
 
@@ -118,19 +151,37 @@ abstract class FragmentStatePagerAdapter(private val mFragmentManager: FragmentM
         Timber.v("Removing item #$position: fragment=$fragment, view=${fragment.view}")
         mFragments[position] = null
         mCurTransaction!!.remove(fragment)
+        if (fragment == mCurrentPrimaryItem) {
+            mCurrentPrimaryItem = null
+        }
     }
 
     override fun setPrimaryItem(container: ViewGroup, position: Int, any: Any) {
-        val fragment = any as Fragment?
-        if (fragment !== mCurrentPrimaryItem) {
+        val fragment = any as Fragment
+        if (fragment != mCurrentPrimaryItem) {
             if (mCurrentPrimaryItem != null) {
                 mCurrentPrimaryItem!!.setMenuVisibility(false)
-                mCurrentPrimaryItem!!.userVisibleHint = false
+                if (mBehavior == BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+                    if (mCurTransaction == null) {
+                        mCurTransaction = mFragmentManager.beginTransaction()
+                    }
+                    mCurTransaction!!.setMaxLifecycle(mCurrentPrimaryItem!!,
+                                                      Lifecycle.State.STARTED)
+                } else {
+                    mCurrentPrimaryItem!!.userVisibleHint = false
+                }
             }
-            if (fragment != null) {
-                fragment.setMenuVisibility(true)
+
+            fragment.setMenuVisibility(true)
+            if (mBehavior == BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+                if (mCurTransaction == null) {
+                    mCurTransaction = mFragmentManager.beginTransaction()
+                }
+                mCurTransaction!!.setMaxLifecycle(fragment, Lifecycle.State.RESUMED)
+            } else {
                 fragment.userVisibleHint = true
             }
+
             mCurrentPrimaryItem = fragment
         }
     }
@@ -161,7 +212,6 @@ abstract class FragmentStatePagerAdapter(private val mFragmentManager: FragmentM
         return state
     }
 
-    @SuppressLint("CommitTransaction")
     override fun restoreState(state: Parcelable?, loader: ClassLoader?) {
         if (state != null) {
             state as Bundle?
