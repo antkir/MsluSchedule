@@ -3,6 +3,7 @@ package by.ntnk.msluschedule.utils
 import android.animation.Animator
 import android.content.Context
 import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.Build
 import android.text.Editable
 import android.text.TextWatcher
@@ -23,8 +24,18 @@ import java.util.concurrent.ThreadLocalRandom
 val onThemeChanged = PublishSubject.create<Boolean>()
 
 fun isNetworkAccessible(context: Context): Boolean {
-    val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-    return connectivityManager.activeNetworkInfo != null && connectivityManager.activeNetworkInfo.isConnected
+    val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        val activeNetwork = connectivityManager?.activeNetwork
+        val networkCapabilities = connectivityManager?.getNetworkCapabilities(activeNetwork) ?: return false
+        return networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
+                networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
+                networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)
+    } else {
+        @Suppress("DEPRECATION")
+        return connectivityManager?.activeNetworkInfo != null &&
+                connectivityManager.activeNetworkInfo?.isConnected == true
+    }
 }
 
 fun showSnackbarNetworkInaccessible(view: View) {

@@ -14,9 +14,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.NavUtils
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.ListFragment
-import androidx.preference.ListPreference
-import androidx.preference.Preference
-import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.*
 import by.ntnk.msluschedule.BuildConfig
 import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
@@ -75,12 +73,11 @@ class SettingsActivity : AppCompatActivity(), HasAndroidInjector {
             super.onCreate(savedInstanceState)
             setHasOptionsMenu(true)
 
-            val themePreference = findPreference(getString(R.string.key_theme))
-            themePreference as ListPreference
+            val themePreference = findPreference<ListPreference>(getString(R.string.key_theme))
             val values = arrayOf(AppCompatDelegate.MODE_NIGHT_NO.toString(),
                                  AppCompatDelegate.MODE_NIGHT_YES.toString(),
-                                 AppCompatDelegate.MODE_NIGHT_AUTO.toString())
-            themePreference.entryValues = values
+                                 AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM.toString())
+            themePreference!!.entryValues = values
             themePreference.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { preference, value ->
                 preference as ListPreference
                 value as String
@@ -97,13 +94,15 @@ class SettingsActivity : AppCompatActivity(), HasAndroidInjector {
             }
             // Trigger the listener immediately with the preference's current value.
             val value = sharedPreferencesRepository.getThemeMode()
-            themePreference.onPreferenceChangeListener.onPreferenceChange(themePreference, value)
+            themePreference.onPreferenceChangeListener!!.onPreferenceChange(themePreference, value)
 
-            findPreference(getString(R.string.key_show_add_schedule)).isSingleLineTitle = false
-            findPreference(getString(R.string.key_hide_pe_classes)).isSingleLineTitle = false
+            val keyShowAddSchedule = getString(R.string.key_show_add_schedule)
+            findPreference<SwitchPreferenceCompat>(keyShowAddSchedule)!!.isSingleLineTitle = false
+            val keyHidePEClasses = getString(R.string.key_hide_pe_classes)
+            findPreference<CheckBoxPreference>(keyHidePEClasses)!!.isSingleLineTitle = false
 
-            val sendFeedback = findPreference(getString(R.string.key_send_feedback))
-            sendFeedback.setOnPreferenceClickListener {
+            val sendFeedback = findPreference<Preference>(getString(R.string.key_send_feedback))
+            sendFeedback!!.setOnPreferenceClickListener {
                 try {
                     val uri = Uri.parse("market://details?id=${context!!.packageName}")
                     val playStoreIntent = Intent(Intent.ACTION_VIEW, uri)
@@ -121,8 +120,8 @@ class SettingsActivity : AppCompatActivity(), HasAndroidInjector {
                 return@setOnPreferenceClickListener true
             }
 
-            val libraries = findPreference(getString(R.string.key_libraries))
-            libraries.setOnPreferenceClickListener {
+            val libraries = findPreference<Preference>(getString(R.string.key_libraries))
+            libraries!!.setOnPreferenceClickListener {
                 activity?.supportFragmentManager?.beginTransaction()
                         ?.setCustomAnimations(R.anim.dialog_zoom_in, 0, 0, R.anim.dialog_zoom_out)
                         ?.replace(android.R.id.content, SettingsLibrariesFragment())
@@ -131,8 +130,8 @@ class SettingsActivity : AppCompatActivity(), HasAndroidInjector {
                 return@setOnPreferenceClickListener true
             }
 
-            val aboutPreference = findPreference(getString(R.string.key_about))
-            aboutPreference.summary = BuildConfig.VERSION_NAME
+            val aboutPreference = findPreference<Preference>(getString(R.string.key_about))
+            aboutPreference!!.summary = BuildConfig.VERSION_NAME
         }
 
         override fun onOptionsItemSelected(item: MenuItem): Boolean {
