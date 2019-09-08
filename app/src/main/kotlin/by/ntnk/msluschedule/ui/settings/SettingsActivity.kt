@@ -104,12 +104,20 @@ class SettingsActivity : AppCompatActivity(), HasAndroidInjector {
 
             val sendFeedback = findPreference(getString(R.string.key_send_feedback))
             sendFeedback.setOnPreferenceClickListener {
-                val emailIntent = Intent(Intent.ACTION_SENDTO, Uri.parse(getString(R.string.send_feedback_uri)))
-                val text = String.format("App Version: %s\nDevice and Android Version: %s - %s\n\n",
-                                         BuildConfig.VERSION_NAME, Build.MODEL, Build.VERSION.RELEASE)
-                emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Feedback")
-                emailIntent.putExtra(Intent.EXTRA_TEXT, text)
-                startActivity(Intent.createChooser(emailIntent, getString(R.string.pref_send_feedback_title)))
+                try {
+                    val uri = Uri.parse("market://details?id=${context!!.packageName}")
+                    val playStoreIntent = Intent(Intent.ACTION_VIEW, uri)
+                    playStoreIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY or
+                                                     Intent.FLAG_ACTIVITY_MULTIPLE_TASK)
+                    startActivity(playStoreIntent)
+                } catch (e: Exception) {
+                    val emailIntent = Intent(Intent.ACTION_SENDTO, Uri.parse(getString(R.string.send_feedback_uri)))
+                    val text = "App Version: ${BuildConfig.VERSION_NAME}\n" +
+                            "Device and Android Version: ${Build.MODEL} - ${Build.VERSION.RELEASE}\n\n"
+                    emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Feedback")
+                    emailIntent.putExtra(Intent.EXTRA_TEXT, text)
+                    startActivity(Intent.createChooser(emailIntent, getString(R.string.pref_send_feedback_title)))
+                }
                 return@setOnPreferenceClickListener true
             }
 
