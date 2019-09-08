@@ -13,7 +13,6 @@ import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 import timber.log.Timber
-import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 class WarningDialogFragment : DialogFragment() {
@@ -25,7 +24,7 @@ class WarningDialogFragment : DialogFragment() {
         try {
             listener = parentFragment as DialogListener
         } catch (e: ClassCastException) {
-            throw ClassCastException(parentFragment.toString() + " must implement DialogListener")
+            throw ClassCastException("$parentFragment must implement DialogListener")
         }
     }
 
@@ -59,7 +58,7 @@ class WarningDialogFragment : DialogFragment() {
         disposable = Observable
                 .intervalRange(1, timeout, 0, 1, TimeUnit.SECONDS)
                 .map { timePassed -> timeout - timePassed }
-                .map { timeLeft -> String.format(Locale.getDefault(), "%s (%d)", buttonDeleteString, timeLeft) }
+                .map { timeLeft -> "$buttonDeleteString ($timeLeft)" }
                 .observeOn(SchedulerProvider.ui())
                 .subscribeBy(
                         onNext = { button.text = it },

@@ -29,9 +29,9 @@ data class WeekdayWithStudyGroupLessons(override val weekday: String) : WeekdayW
     override fun hashCode(): Int = arrayOf(lessons).contentHashCode()
 
     override fun toString(): String {
-        var ret = String.format("WeekdayWithStudyGroupLessons(weekday=%s)", weekday)
+        var ret = "WeekdayWithStudyGroupLessons(weekday=$weekday)"
         for (lesson in lessons) {
-            ret += "\n" + lesson.toString()
+            ret += "\n$lesson"
         }
         return ret
     }

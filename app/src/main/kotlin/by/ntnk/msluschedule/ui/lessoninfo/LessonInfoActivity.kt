@@ -94,12 +94,12 @@ class LessonInfoActivity : MvpActivity<LessonInfoPresenter, LessonInfoView>(),
         setFieldText(lesson.classroom,
                      textview_classroom_lessoninfo_studygroup,
                      imageview_classroom_lessoninfo_studygroup)
-        setFieldText(String.format("%s - %s", lesson.startTime, lesson.endTime),
+        setFieldText("${lesson.startTime} - ${lesson.endTime}",
                      textview_time_lessoninfo_studygroup, imageview_time_lessoninfo_studygroup)
 
         var weekdays: String = EMPTY_STRING
         for (weekday in weekdaysWithLesson) {
-            weekdays += String.format(", %s", getWeekdayFromTag(weekday, applicationContext))
+            weekdays += ", ${getWeekdayFromTag(weekday, applicationContext)}"
         }
         weekdays = weekdays.drop(2)
         textview_weekdays_lessoninfo_studygroup.text = weekdays
@@ -108,7 +108,7 @@ class LessonInfoActivity : MvpActivity<LessonInfoPresenter, LessonInfoView>(),
     override fun showInfo(lesson: TeacherLesson, weekdaysWithLesson: List<String>) {
         setFieldText(lesson.subject, textview_subject_lessoninfo_teacher, imageview_subject_lessoninfo_teacher)
         setFieldText(lesson.classroom, textview_classroom_lessoninfo_teacher, imageview_classroom_lessoninfo_teacher)
-        setFieldText(String.format("%s - %s", lesson.startTime, lesson.endTime),
+        setFieldText("${lesson.startTime} - ${lesson.endTime}",
                      textview_time_lessoninfo_teacher, imageview_time_lessoninfo_teacher)
         setFieldText(lesson.type, textview_type_lessoninfo_teacher, imageView = null)
         val faculties = lesson.faculty.replace(", ", "\n")
@@ -122,7 +122,7 @@ class LessonInfoActivity : MvpActivity<LessonInfoPresenter, LessonInfoView>(),
 
         var weekdays: String = EMPTY_STRING
         for (weekday in weekdaysWithLesson) {
-            weekdays += String.format(", %s", getWeekdayFromTag(weekday, applicationContext))
+            weekdays += ", ${getWeekdayFromTag(weekday, applicationContext)}"
         }
         weekdays = weekdays.drop(2)
         textview_weekdays_lessoninfo_teacher.text = weekdays

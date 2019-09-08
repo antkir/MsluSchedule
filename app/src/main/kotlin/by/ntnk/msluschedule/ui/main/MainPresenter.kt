@@ -92,7 +92,7 @@ class MainPresenter @Inject constructor(
                 .subscribeBy(
                         onNext = { scheduleContainer ->
                             val name = if (scheduleContainer.year != currentDate.academicYear) {
-                                String.format("(%d) ", scheduleContainer.year) + scheduleContainer.name
+                                "(${scheduleContainer.year}) ${scheduleContainer.name}"
                             } else {
                                 scheduleContainer.name
                             }
