@@ -2,6 +2,10 @@ package by.ntnk.msluschedule.utils
 
 import android.animation.Animator
 import android.content.Context
+import android.graphics.BlendMode
+import android.graphics.BlendModeColorFilter
+import android.graphics.PorterDuff
+import android.graphics.drawable.Drawable
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
@@ -22,50 +26,6 @@ import java.util.Random
 import java.util.concurrent.ThreadLocalRandom
 
 val onThemeChanged = PublishSubject.create<Boolean>()
-
-fun isNetworkAccessible(context: Context): Boolean {
-    val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-        val activeNetwork = connectivityManager?.activeNetwork
-        val networkCapabilities = connectivityManager?.getNetworkCapabilities(activeNetwork) ?: return false
-        return networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
-                networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
-                networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)
-    } else {
-        @Suppress("DEPRECATION")
-        return connectivityManager?.activeNetworkInfo != null &&
-                connectivityManager.activeNetworkInfo?.isConnected == true
-    }
-}
-
-fun showSnackbarNetworkInaccessible(view: View) {
-    val snackbar = Snackbar.make(view, R.string.snackbar_internet_unavailable, Snackbar.LENGTH_LONG)
-    ViewCompat.setOnApplyWindowInsetsListener(snackbar.view) { _, insets -> insets }
-    snackbar.show()
-}
-
-fun getErrorMessageResId(t: Throwable): Int {
-    return when (t) {
-        is ConnectException -> R.string.error_website_unavailable
-        is HttpStatusException -> R.string.error_website_unavailable
-        is SocketTimeoutException -> R.string.error_website_unavailable
-        is UnknownHostException -> R.string.error_website_unavailable
-        else -> R.string.error_general
-    }
-}
-
-fun getWeekdayFromTag(weekdayTag: String, context: Context): String {
-    return when (weekdayTag) {
-        MONDAY -> context.resources.getString(R.string.monday)
-        TUESDAY -> context.resources.getString(R.string.tuesday)
-        WEDNESDAY -> context.resources.getString(R.string.wednesday)
-        THURSDAY -> context.resources.getString(R.string.thursday)
-        FRIDAY -> context.resources.getString(R.string.friday)
-        SATURDAY -> context.resources.getString(R.string.saturday)
-        SUNDAY -> context.resources.getString(R.string.sunday)
-        else -> EMPTY_STRING
-    }
-}
 
 fun Context.dipToPixels(dipValue: Float) =
         TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dipValue, resources.displayMetrics).toInt()
@@ -101,4 +61,64 @@ interface SimpleDrawerListener : DrawerLayout.DrawerListener {
 interface BaseRVItemView {
     val viewType: Int
     fun bindViewHolder(viewHolder: RecyclerView.ViewHolder)
+}
+
+object AndroidUtils {
+    fun isNetworkAccessible(context: Context): Boolean {
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val activeNetwork = connectivityManager?.activeNetwork
+            val networkCapabilities = connectivityManager?.getNetworkCapabilities(activeNetwork) ?: return false
+            return networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
+                    networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
+                    networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)
+        } else {
+            @Suppress("DEPRECATION")
+            return connectivityManager?.activeNetworkInfo != null &&
+                    connectivityManager.activeNetworkInfo?.isConnected == true
+        }
+    }
+
+    fun showSnackbarNetworkInaccessible(view: View) {
+        val snackbar = Snackbar.make(view, R.string.snackbar_internet_unavailable, Snackbar.LENGTH_LONG)
+        ViewCompat.setOnApplyWindowInsetsListener(snackbar.view) { _, insets -> insets }
+        snackbar.show()
+    }
+
+    fun getErrorMessageResId(t: Throwable): Int {
+        return when (t) {
+            is ConnectException -> R.string.error_website_unavailable
+            is HttpStatusException -> R.string.error_website_unavailable
+            is SocketTimeoutException -> R.string.error_website_unavailable
+            is UnknownHostException -> R.string.error_website_unavailable
+            else -> R.string.error_general
+        }
+    }
+
+    fun getWeekdayFromTag(weekdayTag: String, context: Context): String {
+        return when (weekdayTag) {
+            MONDAY -> context.resources.getString(R.string.monday)
+            TUESDAY -> context.resources.getString(R.string.tuesday)
+            WEDNESDAY -> context.resources.getString(R.string.wednesday)
+            THURSDAY -> context.resources.getString(R.string.thursday)
+            FRIDAY -> context.resources.getString(R.string.friday)
+            SATURDAY -> context.resources.getString(R.string.saturday)
+            SUNDAY -> context.resources.getString(R.string.sunday)
+            else -> EMPTY_STRING
+        }
+    }
+
+    fun setColorFilter(drawable: Drawable?, color: Int, mode: PorterDuff.Mode) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val blendMode = when (mode) {
+                PorterDuff.Mode.SRC_IN -> BlendMode.SRC_IN
+                PorterDuff.Mode.DST_IN -> BlendMode.DST_IN
+                else -> throw NotImplementedError()
+            }
+            drawable?.colorFilter = BlendModeColorFilter(color, blendMode)
+        } else {
+            @Suppress("DEPRECATION")
+            drawable?.setColorFilter(color, mode)
+        }
+    }
 }

@@ -15,10 +15,10 @@ import by.ntnk.msluschedule.data.Lesson
 import by.ntnk.msluschedule.data.StudyGroupLesson
 import by.ntnk.msluschedule.data.TeacherLesson
 import by.ntnk.msluschedule.data.WeekdayWithLessons
+import by.ntnk.msluschedule.utils.AndroidUtils
 import by.ntnk.msluschedule.utils.BaseRVItemView
 import by.ntnk.msluschedule.utils.EMPTY_STRING
 import by.ntnk.msluschedule.utils.WEEKDAYS_NUMBER
-import by.ntnk.msluschedule.utils.getWeekdayFromTag
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import java.util.ArrayList
@@ -187,11 +187,11 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
 
         override fun bindViewHolder(viewHolder: RecyclerView.ViewHolder) {
             with(viewHolder as DayViewHolder) {
-                weekday.text = getWeekdayFromTag(weekdayTag, itemView.context)
+                weekday.text = AndroidUtils.getWeekdayFromTag(weekdayTag, itemView.context)
                 if (hasNotes) {
-                    notesIconDrawable?.mutate()?.setColorFilter(accentColor, PorterDuff.Mode.SRC_IN)
+                    AndroidUtils.setColorFilter(notesIconDrawable?.mutate(), accentColor, PorterDuff.Mode.SRC_IN)
                 } else {
-                    notesIconDrawable?.mutate()?.setColorFilter(accentColor, PorterDuff.Mode.DST_IN)
+                    AndroidUtils.setColorFilter(notesIconDrawable?.mutate(), accentColor, PorterDuff.Mode.DST_IN)
                 }
                 notesIcon.setImageDrawable(notesIconDrawable)
             }

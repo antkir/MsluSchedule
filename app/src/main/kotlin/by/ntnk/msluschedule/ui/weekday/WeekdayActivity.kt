@@ -363,7 +363,7 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
     }
 
     override fun initView(weekdayWithLessons: WeekdayWithLessons<Lesson>, data: List<Note>) {
-        supportActionBar?.title = getWeekdayFromTag(weekdayWithLessons.weekday, applicationContext)
+        supportActionBar?.title = AndroidUtils.getWeekdayFromTag(weekdayWithLessons.weekday, applicationContext)
 
         adapter.initData(data, weekdayWithLessons.lessons, resources)
         if (adapter.itemCount > 0) {

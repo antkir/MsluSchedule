@@ -342,10 +342,10 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
 
     @Suppress("UNUSED_PARAMETER")
     fun onBaseFabClick(view: View) {
-        if (isNetworkAccessible(applicationContext)) {
+        if (AndroidUtils.isNetworkAccessible(applicationContext)) {
             if (!isFamOpen) expandFam() else collapseFam()
         } else {
-            showSnackbarNetworkInaccessible(framelayout_main)
+            AndroidUtils.showSnackbarNetworkInaccessible(framelayout_main)
         }
     }
 
@@ -455,7 +455,7 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
     }
 
     override fun onError(t: Throwable) {
-        val snackbar = Snackbar.make(framelayout_main, getErrorMessageResId(t), Snackbar.LENGTH_LONG)
+        val snackbar = Snackbar.make(framelayout_main, AndroidUtils.getErrorMessageResId(t), Snackbar.LENGTH_LONG)
         ViewCompat.setOnApplyWindowInsetsListener(snackbar.view) { _, insets -> insets }
         snackbar.show()
     }

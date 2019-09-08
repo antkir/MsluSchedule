@@ -28,7 +28,10 @@ import by.ntnk.msluschedule.ui.adapters.VIEWTYPE_TEACHER
 import by.ntnk.msluschedule.ui.adapters.VIEWTYPE_WEEKDAY
 import by.ntnk.msluschedule.ui.lessoninfo.LessonInfoActivity
 import by.ntnk.msluschedule.ui.weekday.WeekdayActivity
-import by.ntnk.msluschedule.utils.*
+import by.ntnk.msluschedule.utils.AndroidUtils
+import by.ntnk.msluschedule.utils.INVALID_VALUE
+import by.ntnk.msluschedule.utils.ScheduleType
+import by.ntnk.msluschedule.utils.SimpleAnimatorListener
 import com.google.android.material.snackbar.Snackbar
 import dagger.Lazy
 import dagger.android.support.AndroidSupportInjection
@@ -81,11 +84,11 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         val swipeRefreshLayout = rootView.findViewById<SwipeRefreshLayout>(R.id.swipe_refresh_layout_week)
         swipeRefreshLayout.setOnRefreshListener {
             swipeRefreshLayout.isRefreshing = false
-            if (isNetworkAccessible(context!!.applicationContext)) {
+            if (AndroidUtils.isNetworkAccessible(context!!.applicationContext)) {
                 layoutManagerSavedState = recyclerView.layoutManager?.onSaveInstanceState()
                 presenter.updateSchedule(weekId)
             } else {
-                showSnackbarNetworkInaccessible(getView()!!)
+                AndroidUtils.showSnackbarNetworkInaccessible(getView()!!)
             }
         }
 
@@ -299,10 +302,10 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         if (shouldSetupViews) {
             presenter.getSchedule(weekId, shouldUpdateAdapter = true)
         }
-        val snackbar = Snackbar.make(getView()!!, getErrorMessageResId(t), 5000)
+        val snackbar = Snackbar.make(getView()!!, AndroidUtils.getErrorMessageResId(t), 5000)
                 .setAction(R.string.snackbar_week_init_retry) {
                     context ?: return@setAction
-                    if (isNetworkAccessible(context!!.applicationContext)) {
+                    if (AndroidUtils.isNetworkAccessible(context!!.applicationContext)) {
                         layoutManagerSavedState = recyclerView.layoutManager?.onSaveInstanceState()
                         presenter.updateSchedule(weekId)
                     } else {
@@ -320,12 +323,12 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.item_week_update -> {
-                if (isNetworkAccessible(context!!.applicationContext)) {
+                if (AndroidUtils.isNetworkAccessible(context!!.applicationContext)) {
                     if (weekId == INVALID_VALUE) return true
                     layoutManagerSavedState = recyclerView.layoutManager?.onSaveInstanceState()
                     presenter.updateSchedule(weekId)
                 } else {
-                    showSnackbarNetworkInaccessible(getView()!!)
+                    AndroidUtils.showSnackbarNetworkInaccessible(getView()!!)
                 }
                 return true
             }

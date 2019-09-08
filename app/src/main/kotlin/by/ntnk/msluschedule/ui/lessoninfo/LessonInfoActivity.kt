@@ -99,7 +99,7 @@ class LessonInfoActivity : MvpActivity<LessonInfoPresenter, LessonInfoView>(),
 
         var weekdays: String = EMPTY_STRING
         for (weekday in weekdaysWithLesson) {
-            weekdays += ", ${getWeekdayFromTag(weekday, applicationContext)}"
+            weekdays += ", ${AndroidUtils.getWeekdayFromTag(weekday, applicationContext)}"
         }
         weekdays = weekdays.drop(2)
         textview_weekdays_lessoninfo_studygroup.text = weekdays
@@ -122,7 +122,7 @@ class LessonInfoActivity : MvpActivity<LessonInfoPresenter, LessonInfoView>(),
 
         var weekdays: String = EMPTY_STRING
         for (weekday in weekdaysWithLesson) {
-            weekdays += ", ${getWeekdayFromTag(weekday, applicationContext)}"
+            weekdays += ", ${AndroidUtils.getWeekdayFromTag(weekday, applicationContext)}"
         }
         weekdays = weekdays.drop(2)
         textview_weekdays_lessoninfo_teacher.text = weekdays
