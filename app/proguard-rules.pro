@@ -1,5 +1,6 @@
 # Project specific ProGuard rules
 -repackageclasses
+-printmapping release/mapping.txt
 -keep class by.ntnk.msluschedule.network.data.** { *; }
 
 # Kotlin
@@ -12,33 +13,16 @@
 -dontnote org.apache.http.**
 
 # Apache POI
--dontwarn org.apache.**
--dontnote org.apache.**
--keep public class org.apache.poi.poifs.filesystem.** { *; }
--keep public class org.apache.poi.ss.usermodel.** { *; }
--keep public class org.apache.poi.hssf.** { *; }
+-keepclassmembers public class org.apache.poi.** { *; }
 
 # Dagger
 -dontwarn com.google.errorprone.annotations.*
-
-# Retrofit
--keepattributes Signature, Exceptions, InnerClasses, EnclosingMethod
--keepclassmembers,allowshrinking,allowobfuscation interface * {
-    @retrofit2.http.* <methods>;
-}
--optimizations !method/removal/parameter
--dontwarn org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
--dontwarn kotlin.Unit
--dontwarn retrofit2.-KotlinExtensions
--if interface * { @retrofit2.http.* <methods>; }
--keep,allowobfuscation interface <1>
 
 # Okhttp
 -dontwarn javax.annotation.**
 -keepnames class okhttp3.internal.publicsuffix.PublicSuffixDatabase
 -dontwarn org.codehaus.mojo.animal_sniffer.*
--dontwarn okhttp3.internal.platform.*
--dontnote okhttp3.internal.platform.*
+-dontwarn okhttp3.internal.platform.ConscryptPlatform
 
 # Moshi
 -dontwarn okio.**
@@ -83,18 +67,10 @@
     <fields>;
 }
 
-# Material Components
--keep class com.google.android.material.** { *; }
-
 # Firebase
 -keepattributes *Annotation*
 # For stack traces
--keepattributes SourceFile, LineNumberTable
+-keepattributes SourceFile, LineNumberTable, Exceptions, Signature, InnerClasses, EnclosingMethod
 -keep public class * extends java.lang.Exception
 -keep class com.crashlytics.** { *; }
 -dontwarn com.crashlytics.**
-
--dontwarn org.xmlpull.v1.**
--dontnote org.xmlpull.v1.**
--keep class org.xmlpull.** { *; }
--keepclassmembers class org.xmlpull.** { *; }
