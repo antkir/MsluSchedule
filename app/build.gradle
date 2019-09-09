@@ -7,9 +7,9 @@ apply plugin: 'io.fabric'
 
 android {
     def versionMajor = 1
-    def versionMinor = 0
-    def versionPatch = 4
-    def versionBuild = 0
+    def versionMinor = 1
+    def versionPatch = 0
+    def versionBuild = 1
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
