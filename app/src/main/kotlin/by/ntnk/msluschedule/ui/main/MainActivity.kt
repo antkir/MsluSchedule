@@ -10,7 +10,6 @@ import android.os.Handler
 import android.view.*
 import android.view.animation.OvershootInterpolator
 import androidx.appcompat.app.ActionBarDrawerToggle
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
@@ -80,8 +79,6 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
-        val themeMode = sharedPreferencesRepository.getThemeMode().toInt()
-        AppCompatDelegate.setDefaultNightMode(themeMode)
         setTheme(R.style.MsluTheme_NoActionBarTransparentStatusBar)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)

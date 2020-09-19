@@ -10,7 +10,6 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.NavUtils
 import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.data.StudyGroupLesson
@@ -42,17 +41,12 @@ class LessonInfoActivity : MvpActivity<LessonInfoPresenter, LessonInfoView>(),
     @Inject
     lateinit var injectedPresenter: Lazy<LessonInfoPresenter>
 
-    @Inject
-    lateinit var sharedPreferencesRepository: SharedPreferencesRepository
-
     override fun androidInjector(): AndroidInjector<Any> = dispatchingAndroidInjector
 
     override fun onCreatePresenter(): LessonInfoPresenter = injectedPresenter.get()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
-        val themeMode = sharedPreferencesRepository.getThemeMode().toInt()
-        AppCompatDelegate.setDefaultNightMode(themeMode)
         super.onCreate(savedInstanceState)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 

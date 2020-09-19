@@ -14,7 +14,6 @@ import android.view.WindowManager
 import android.view.animation.AlphaAnimation
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.NavUtils
 import androidx.core.content.ContextCompat
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
@@ -65,17 +64,12 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
     @Inject
     lateinit var injectedPresenter: Lazy<WeekdayPresenter>
 
-    @Inject
-    lateinit var sharedPreferencesRepository: SharedPreferencesRepository
-
     override fun androidInjector(): AndroidInjector<Any> = dispatchingAndroidInjector
 
     override fun onCreatePresenter(): WeekdayPresenter = injectedPresenter.get()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
-        val themeMode = sharedPreferencesRepository.getThemeMode().toInt()
-        AppCompatDelegate.setDefaultNightMode(themeMode)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_weekday)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
