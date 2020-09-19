@@ -15,31 +15,31 @@ import dagger.android.ContributesAndroidInjector
 @Module
 @Suppress("UNUSED")
 @SuppressLint
-abstract class BuildersModule {
+abstract class ContributorsModule {
     @ContributesAndroidInjector
-    abstract fun bindMainActivity(): MainActivity
+    abstract fun contributeMainActivity(): MainActivity
 
     @ContributesAndroidInjector
-    abstract fun bindAddGroupFragment(): AddGroupFragment
+    abstract fun contributeAddGroupFragment(): AddGroupFragment
 
     @ContributesAndroidInjector
-    abstract fun bindAddTeacherFragment(): AddTeacherFragment
+    abstract fun contributeAddTeacherFragment(): AddTeacherFragment
 
     @ContributesAndroidInjector
-    abstract fun bindWeeksContainerFragment(): WeeksContainerFragment
+    abstract fun contributeWeeksContainerFragment(): WeeksContainerFragment
 
     @ContributesAndroidInjector
-    abstract fun bindWeekFragment(): WeekFragment
+    abstract fun contributeWeekFragment(): WeekFragment
 
     @ContributesAndroidInjector
-    abstract fun bindWeekdayActivity(): WeekdayActivity
+    abstract fun contributeWeekdayActivity(): WeekdayActivity
 
     @ContributesAndroidInjector
-    abstract fun bindLessonInfoActivity(): LessonInfoActivity
+    abstract fun contributeLessonInfoActivity(): LessonInfoActivity
 
     @ContributesAndroidInjector
-    abstract fun bindSettingsActivity(): SettingsActivity
+    abstract fun contributeSettingsActivity(): SettingsActivity
 
     @ContributesAndroidInjector
-    abstract fun bindSettingsFragment(): SettingsActivity.SettingsFragment
+    abstract fun contributeSettingsFragment(): SettingsActivity.SettingsFragment
 }

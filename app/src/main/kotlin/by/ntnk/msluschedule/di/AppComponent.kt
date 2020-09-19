@@ -3,14 +3,14 @@ package by.ntnk.msluschedule.di
 import by.ntnk.msluschedule.MsluScheduleApp
 import by.ntnk.msluschedule.di.modules.*
 import dagger.Component
+import dagger.android.AndroidInjectionModule
 import dagger.android.AndroidInjector
-import dagger.android.support.AndroidSupportInjectionModule
 
 @PerApp
 @Component(modules = [
-    AndroidSupportInjectionModule::class,
+    AndroidInjectionModule::class,
     ContextModule::class,
-    BuildersModule::class,
+    ContributorsModule::class,
     DatabaseModule::class,
     NetworkModule::class,
     UtilsModule::class

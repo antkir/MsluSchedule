@@ -72,5 +72,5 @@
 # For stack traces
 -keepattributes SourceFile, LineNumberTable, Exceptions, Signature, InnerClasses, EnclosingMethod
 -keep public class * extends java.lang.Exception
--keep class com.crashlytics.** { *; }
--dontwarn com.crashlytics.**
+-keep class com.google.firebase.crashlytics.** { *; }
+-dontwarn com.google.firebase.crashlytics.**

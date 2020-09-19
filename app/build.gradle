@@ -3,7 +3,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'com.google.gms.google-services'
-apply plugin: 'io.fabric'
+apply plugin: 'com.google.firebase.crashlytics'
 
 android {
     def versionMajor = 1
@@ -32,18 +32,19 @@ android {
         exclude 'META-INF/README.md'
         exclude 'org/apache/**'
     }
-    compileSdkVersion 29
-    buildToolsVersion "29.0.2"
+    compileSdkVersion 30
+    buildToolsVersion "30.0.2"
     defaultConfig {
         applicationId "by.ntnk.msluschedule"
         minSdkVersion 16
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode versionMajor * 1000000 + versionMinor * 10000 + versionPatch * 100 + versionBuild
         versionName "${versionMajor}.${versionMinor}.${versionPatch}"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         kapt {
             arguments {
                 arg("room.schemaLocation", "$projectDir/schemas".toString())
+                arg("room.incremental", "true")
             }
         }
     }
@@ -62,33 +63,35 @@ android {
 }
 
 ext {
-    androidxVersion = '1.1.0'
-    constraintlayoutVersion = '1.1.3'
-    daggerVersion = '2.24'
-    jsoupVersion = '1.12.1'
-    junitVersion = '4.12'
-    leakcanaryVersion = '2.0-beta-3'
-    materialVersion = '1.0.0'
-    mockitoVersion = '2.23.0'
+    androidxVersion = '1.2.0'
+    androidxPreferenceVersion = '1.1.1'
+    constraintlayoutVersion = '2.0.1'
+    daggerVersion = '2.29.1'
+    jsoupVersion = '1.13.1'
+    junitVersion = '4.13'
+    leakcanaryVersion = '2.4'
+    materialVersion = '1.2.1'
+    mockitoVersion = '3.3.3'
     multidexVersion = '2.0.1'
     // OkHttp 3.13.0 release bumps minimum requirements to Java 8+ or Android 5+.
     // 3.12.x branch will receive critical fixes through December 31, 2020.
-    okhttpVersion = '3.12.5'
+    okhttpVersion = '3.12.12'
     // POI 4.0.0 release bumps minimum requirements to Java 8+ or Android 5+.
     poiVersion = '3.17'
     // Retrofit 2.7.0 release bumps minimum requirements to Java 8+ or Android 5+.
-    retrofitVersion = '2.6.1'
-    roomVersion = '2.1.0'
+    retrofitVersion = '2.6.4'
+    roomVersion = '2.2.5'
     rxandroidVersion = '2.1.1'
-    rxjavaVersion = '2.2.12'
+    rxjavaVersion = '2.2.19'
     rxkotlinVersion = '2.4.0'
     // Spotlight 1.8.0 is broken.
     spotlightVersion = '1.7.0'
-    threetenbpVersion = '1.4.0'
+    swipeRefreshLayoutVersion = '1.1.0'
+    threetenbpVersion = '1.4.4'
     timberVersion = '4.7.1'
 
-    crashlyticsVersion = '2.10.1'
-    firebaseVersion = '17.2.0'
+    crashlyticsVersion = '17.2.1'
+    firebaseVersion = '17.5.0'
 }
 
 dependencies {
@@ -97,9 +100,10 @@ dependencies {
     // Support libraries
     implementation "androidx.appcompat:appcompat:$androidxVersion"
     implementation "androidx.constraintlayout:constraintlayout:$constraintlayoutVersion"
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:$swipeRefreshLayoutVersion"
     implementation "com.google.android.material:material:$materialVersion"
     implementation "androidx.multidex:multidex:$multidexVersion"
-    implementation "androidx.preference:preference:$androidxVersion"
+    implementation "androidx.preference:preference:$androidxPreferenceVersion"
     // Dagger
     implementation "com.google.dagger:dagger:$daggerVersion"
     implementation "com.google.dagger:dagger-android-support:$daggerVersion"
@@ -140,5 +144,5 @@ dependencies {
     // Firebase Core
     implementation "com.google.firebase:firebase-core:$firebaseVersion"
     // Crashlytics
-    implementation "com.crashlytics.sdk.android:crashlytics:$crashlyticsVersion"
+    implementation "com.google.firebase:firebase-crashlytics:$crashlyticsVersion"
 }
