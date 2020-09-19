@@ -383,6 +383,7 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
                 val chip = Chip(this)
                 val chipDrawable = ChipDrawable.createFromAttributes(this, null, 0, R.style.MsluTheme_Chip_Choice)
                 chip.setChipDrawable(chipDrawable)
+                chip.setTextAppearanceResource(R.style.MsluTheme_Chip_Text_Appearance);
                 chip.text = lessonSubject
                 chips_subjects.addView(chip)
             }

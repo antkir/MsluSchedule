@@ -21,7 +21,7 @@
         <by.ntnk.msluschedule.ui.customviews.LoadingAutoCompleteTextView
             android:id="@+id/actv_dialog_faculty"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:layout_weight="1"
             android:completionThreshold="1"
             android:hint="@string/faculty"
@@ -62,7 +62,7 @@
         <by.ntnk.msluschedule.ui.customviews.LoadingAutoCompleteTextView
             android:id="@+id/actv_dialog_course"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:layout_weight="1"
             android:completionThreshold="1"
             android:hint="@string/course"
@@ -89,7 +89,7 @@
         <by.ntnk.msluschedule.ui.customviews.LoadingAutoCompleteTextView
             android:id="@+id/actv_dialog_group"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:completionThreshold="1"
             android:hint="@string/group"
             android:imeOptions="actionDone|flagNoExtractUi"

@@ -1,16 +1,22 @@
 <resources>
     <style name="MsluTheme" parent="Theme.MaterialComponents">
+        <item name="colorAccent">@color/colorAccent</item>
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorSecondary">@color/colorAccent</item>
         <item name="actionBarTheme">@style/MsluTheme.AppBarOverlay</item>
+        <item name="alertDialogTheme">@style/MsluTheme.Dialog.Alert</item>
         <item name="preferenceTheme">@style/MsluTheme.PreferenceThemeOverlay</item>
+        <item name="snackbarStyle">@style/MsluTheme.Snackbar</item>
+        <item name="snackbarTextViewStyle">@style/MsluTheme.Snackbar.TextView</item>
+        <item name="snackbarButtonStyle">@style/MsluTheme.Snackbar.Button</item>
     </style>
 
     <style name="MsluTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Dark" />
 
     <style name="MsluTheme.Dialog.Alert" parent="Theme.MaterialComponents.Dialog.Alert">
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorPrimary">@color/colorAccent</item>
         <item name="android:windowBackground">@drawable/rounded_corners_rect</item>
         <item name="materialButtonStyle">@style/MsluTheme.ActionModeButton</item>
     </style>

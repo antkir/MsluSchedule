@@ -1,10 +1,15 @@
 <resources>
     <style name="MsluTheme" parent="Theme.MaterialComponents.Light">
+        <item name="colorAccent">@color/colorAccent</item>
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorSecondary">@color/colorAccent</item>
         <item name="actionBarTheme">@style/MsluTheme.AppBarOverlay</item>
+        <item name="alertDialogTheme">@style/MsluTheme.Dialog.Alert</item>
         <item name="preferenceTheme">@style/MsluTheme.PreferenceThemeOverlay</item>
+        <item name="snackbarStyle">@style/MsluTheme.Snackbar</item>
+        <item name="snackbarTextViewStyle">@style/MsluTheme.Snackbar.TextView</item>
+        <item name="snackbarButtonStyle">@style/MsluTheme.Snackbar.Button</item>
     </style>
 
     <style name="MsluTheme.PreferenceThemeOverlay" parent="@style/PreferenceThemeOverlay.v14.Material">
@@ -30,14 +35,19 @@
         <item name="android:windowBackground">@drawable/launch_screen</item>
     </style>
 
-    <style name="MsluTheme.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar" />
+    <style name="MsluTheme.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar" >
+        <item name="android:background">@color/colorPrimary</item>
+    </style>
+
+    <style name="MsluTheme.AppBarOverlay.NoActionBar" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar" />
 
     <style name="MsluTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Light" />
 
     <style name="MsluTheme.ActionModeButton" parent="Widget.AppCompat.Button.Borderless" />
 
     <style name="MsluTheme.Dialog.Alert" parent="Theme.MaterialComponents.Light.Dialog.Alert">
-        <item name="colorAccent">@color/colorPrimaryLight</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorPrimary">@color/colorPrimaryLight</item>
         <item name="android:windowBackground">@drawable/rounded_corners_rect</item>
         <item name="materialButtonStyle">@style/MsluTheme.ActionModeButton</item>
     </style>
@@ -56,6 +66,19 @@
 
     <style name="MsluTheme.Chip.Text.Appearance" parent="TextAppearance.MaterialComponents.Chip">
         <item name="android:textColor">@color/chip_text</item>
+    </style>
+
+    <style name="MsluTheme.Snackbar" parent="Widget.MaterialComponents.Snackbar">
+        <item name="android:background">@color/snackbar_surface</item>
+        <item name="actionTextColorAlpha">1.0</item>
+    </style>
+
+    <style name="MsluTheme.Snackbar.TextView" parent="Widget.MaterialComponents.Snackbar.TextView">
+        <item name="android:textColor">@color/snackbar_text</item>
+    </style>
+
+    <style name="MsluTheme.Snackbar.Button" parent="Widget.MaterialComponents.Button.TextButton.Snackbar">
+        <item name="android:textColor">@color/colorAccent</item>
     </style>
 
 </resources>

@@ -20,7 +20,7 @@
         <by.ntnk.msluschedule.ui.customviews.LoadingAutoCompleteTextView
             android:id="@+id/actv_dialog_teacher"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:hint="@string/teacher"
             android:imeOptions="actionDone|flagNoExtractUi"
             android:inputType="textAutoComplete"
