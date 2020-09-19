@@ -92,7 +92,7 @@ class DatabaseRepository @Inject constructor(
                 .flatMapObservable { Observable.fromIterable(it) }
                 .flatMapSingle { weekday ->
                     val weekdayWithLessons = weekdays.firstOrNull { it.weekday == weekday.value }
-                    val lessons = weekdayWithLessons?.lessons ?: emptyList<StudyGroupLesson>()
+                    val lessons = weekdayWithLessons?.lessons ?: emptyList()
                     return@flatMapSingle insertStudyGroupLessons(lessons, weekday.id)
                             .flatMap { Single.just(WeekdayWithStudyGroupLessons(weekday.id, weekday.value, it)) }
                 }
@@ -122,7 +122,7 @@ class DatabaseRepository @Inject constructor(
                 .flatMapObservable { Observable.fromIterable(it) }
                 .flatMapSingle { weekday ->
                     val weekdayWithLessons = weekdays.firstOrNull { it.weekday == weekday.value }
-                    val lessons = weekdayWithLessons?.lessons ?: emptyList<TeacherLesson>()
+                    val lessons = weekdayWithLessons?.lessons ?: emptyList()
                     return@flatMapSingle insertTeacherLessons(lessons, weekday.id)
                             .flatMap { Single.just(WeekdayWithTeacherLessons(weekday.id, weekday.value, it)) }
                 }

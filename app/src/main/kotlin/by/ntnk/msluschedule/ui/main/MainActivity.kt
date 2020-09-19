@@ -3,10 +3,10 @@ package by.ntnk.msluschedule.ui.main
 import android.animation.Animator
 import android.content.res.Configuration
 import android.graphics.Color
-import android.graphics.Point
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.view.*
 import android.view.animation.OvershootInterpolator
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -143,7 +143,7 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
 
         button_settings_main.setOnClickListener {
             SettingsActivity.startActivity(this)
-            Handler().postDelayed(NavigationDrawerRunnable(drawer_layout), 500)
+            Handler(Looper.getMainLooper()).postDelayed(NavigationDrawerRunnable(drawer_layout), 500)
         }
 
         supportActionBar?.title = savedInstanceState?.getString(ARG_ACTIONBAR_TITLE)
@@ -170,8 +170,7 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
             override fun onGlobalLayout() {
                 drawer_layout?.viewTreeObserver?.removeOnGlobalLayoutListener(this)
 
-                val point = Point()
-                windowManager.defaultDisplay.getSize(point)
+                val bounds = windowManager.currentWindowMetrics.bounds
 
                 val welcomeTarget = SimpleTarget.Builder(this@MainActivity)
                         .setPoint(image_main_smileyface)
@@ -192,7 +191,7 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
                         .setDescription(getString(R.string.tutorial_navigation_view_description))
                         .build()
                 val actionMenuTarget = SimpleTarget.Builder(this@MainActivity)
-                        .setPoint(point.x.toFloat(), toolbar_main.y)
+                        .setPoint(bounds.width().toFloat(), toolbar_main.y)
                         .setShape(ActionMenuCircle(dipToPixels(120f).toFloat(), this@MainActivity, toolbar_main))
                         .setTitle(getString(R.string.tutorial_action_menu_title))
                         .setDescription(getString(R.string.tutorial_action_menu_description))

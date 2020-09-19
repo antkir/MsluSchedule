@@ -6,6 +6,7 @@ import android.animation.ValueAnimator
 import android.content.Context
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.os.Parcelable
 import android.view.*
 import android.view.animation.AnimationUtils
@@ -281,7 +282,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     }
 
     override fun showUpdateSuccessMessage() {
-        Handler().postDelayed(ToastRunnable(context), 250)
+        Handler(Looper.getMainLooper()).postDelayed(ToastRunnable(context), 250)
     }
 
     private class ToastRunnable(context: Context?) : Runnable {
