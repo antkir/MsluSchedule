@@ -85,10 +85,10 @@
             android:layout_marginLeft="@dimen/imageview_lessoninfo_margin_start"
             android:contentDescription="@string/imageview_subject_description"
             android:src="@drawable/ic_subject_info"
-            android:tint="@color/icon_tint"
             app:layout_constraintBottom_toBottomOf="@id/textview_subject_lessoninfo_teacher"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/textview_subject_lessoninfo_teacher" />
+            app:layout_constraintTop_toTopOf="@id/textview_subject_lessoninfo_teacher"
+            app:tint="@color/icon_tint" />
 
         <ImageView
             android:id="@+id/imageview_time_lessoninfo_teacher"
@@ -98,10 +98,10 @@
             android:layout_marginLeft="@dimen/imageview_lessoninfo_margin_start"
             android:contentDescription="@string/imageview_time_description"
             android:src="@drawable/ic_time_info"
-            android:tint="@color/icon_tint"
             app:layout_constraintBottom_toBottomOf="@id/textview_time_lessoninfo_teacher"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/textview_time_lessoninfo_teacher" />
+            app:layout_constraintTop_toTopOf="@id/textview_time_lessoninfo_teacher"
+            app:tint="@color/icon_tint" />
 
         <ImageView
             android:id="@+id/imageview_groups_lessoninfo_teacher"
@@ -111,10 +111,10 @@
             android:layout_marginLeft="@dimen/imageview_lessoninfo_margin_start"
             android:contentDescription="@string/imageview_groups_description"
             android:src="@drawable/ic_studygroup"
-            android:tint="@color/icon_tint"
             app:layout_constraintBottom_toBottomOf="@id/textview_groups_lessoninfo_teacher"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/textview_type_lessoninfo_teacher" />
+            app:layout_constraintTop_toTopOf="@id/textview_type_lessoninfo_teacher"
+            app:tint="@color/icon_tint" />
 
         <TextView
             android:id="@+id/textview_groups_lessoninfo_teacher"
@@ -147,10 +147,10 @@
             android:layout_marginLeft="@dimen/imageview_lessoninfo_margin_start"
             android:contentDescription="@string/imageview_classroom_description"
             android:src="@drawable/ic_place_info"
-            android:tint="@color/icon_tint"
             app:layout_constraintBottom_toBottomOf="@id/textview_classroom_lessoninfo_teacher"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/textview_classroom_lessoninfo_teacher" />
+            app:layout_constraintTop_toTopOf="@id/textview_classroom_lessoninfo_teacher"
+            app:tint="@color/icon_tint" />
 
         <TextView
             android:id="@+id/textview_classroom_lessoninfo_teacher"
@@ -181,10 +181,10 @@
             android:layout_marginLeft="@dimen/imageview_lessoninfo_margin_start"
             android:contentDescription="@string/imageview_weekdays_description"
             android:src="@drawable/ic_today"
-            android:tint="@color/icon_tint"
             app:layout_constraintBottom_toBottomOf="@id/textview_weekdays_lessoninfo_teacher"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/textview_weekdays_lessoninfo_teacher" />
+            app:layout_constraintTop_toTopOf="@id/textview_weekdays_lessoninfo_teacher"
+            app:tint="@color/icon_tint" />
 
         <TextView
             android:id="@+id/textview_weekdays_lessoninfo_teacher"

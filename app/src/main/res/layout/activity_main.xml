@@ -43,8 +43,6 @@
             android:layout_alignParentBottom="true"
             android:background="@drawable/item_surface"
             android:clickable="true"
-            android:drawableStart="@drawable/ic_menu_settings"
-            android:drawableLeft="@drawable/ic_menu_settings"
             android:drawablePadding="@dimen/nav_view_footer_image_padding_end"
             android:focusable="true"
             android:gravity="start|center_vertical"
@@ -53,7 +51,9 @@
             android:paddingEnd="@dimen/nav_view_footer_textview_padding_side"
             android:paddingRight="@dimen/nav_view_footer_textview_padding_side"
             android:text="@string/navigation_drawer_settings"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Button" />
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Button"
+            app:drawableLeftCompat="@drawable/ic_menu_settings"
+            app:drawableStartCompat="@drawable/ic_menu_settings" />
 
     </RelativeLayout>
 

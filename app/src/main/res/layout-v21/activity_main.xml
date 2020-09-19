@@ -14,10 +14,10 @@
 
     <RelativeLayout
         android:id="@+id/nav_layout_main"
-        android:background="@color/surface"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_gravity="start">
+        android:layout_gravity="start"
+        android:background="@color/surface">
 
         <com.google.android.material.navigation.NavigationView
             android:id="@+id/nav_view"
@@ -37,7 +37,6 @@
             android:layout_alignParentBottom="true"
             android:background="@color/button_nav_drawer"
             android:clickable="true"
-            android:drawableStart="@drawable/ic_menu_settings"
             android:drawablePadding="@dimen/nav_view_footer_image_padding_end"
             android:elevation="18dp"
             android:focusable="true"
@@ -49,6 +48,7 @@
             android:paddingRight="@dimen/nav_view_footer_textview_padding_side"
             android:text="@string/navigation_drawer_settings"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Button"
+            app:drawableStartCompat="@drawable/ic_menu_settings"
             tools:ignore="UnusedAttribute" />
 
     </RelativeLayout>
