@@ -85,7 +85,9 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         swipeRefreshLayout.setOnRefreshListener {
             swipeRefreshLayout.isRefreshing = false
             if (AndroidUtils.isNetworkAccessible(requireContext().applicationContext)) {
-                layoutManagerSavedState = recyclerView.layoutManager?.onSaveInstanceState()
+                if (!isEmptyScheduleDaysVisible) {
+                    layoutManagerSavedState = recyclerView.layoutManager?.onSaveInstanceState()
+                }
                 presenter.updateSchedule(weekId)
             } else {
                 AndroidUtils.showSnackbarNetworkInaccessible(requireView())
