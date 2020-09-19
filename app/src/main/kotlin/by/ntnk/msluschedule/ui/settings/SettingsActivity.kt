@@ -107,7 +107,7 @@ class SettingsActivity : AppCompatActivity(), HasAndroidInjector {
             val sendFeedback = findPreference<Preference>(getString(R.string.key_send_feedback))
             sendFeedback!!.setOnPreferenceClickListener {
                 try {
-                    val uri = Uri.parse("market://details?id=${context!!.packageName}")
+                    val uri = Uri.parse("market://details?id=${requireContext().packageName}")
                     val playStoreIntent = Intent(Intent.ACTION_VIEW, uri)
                     playStoreIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY or
                                                      Intent.FLAG_ACTIVITY_MULTIPLE_TASK)
@@ -139,7 +139,7 @@ class SettingsActivity : AppCompatActivity(), HasAndroidInjector {
 
         override fun onOptionsItemSelected(item: MenuItem): Boolean {
             if (item.itemId == android.R.id.home) {
-                NavUtils.navigateUpFromSameTask(activity!!)
+                NavUtils.navigateUpFromSameTask(requireActivity())
                 return true
             }
             return super.onOptionsItemSelected(item)
@@ -157,7 +157,7 @@ class SettingsActivity : AppCompatActivity(), HasAndroidInjector {
                 super.onActivityCreated(savedInstanceState)
                 libraryUrls = resources.getStringArray(R.array.library_urls)
                 val adapter = ArrayAdapter.createFromResource(
-                        activity!!, R.array.library_list, android.R.layout.simple_list_item_1)
+                        requireActivity(), R.array.library_list, android.R.layout.simple_list_item_1)
                 listAdapter = adapter
                 listView.onItemClickListener = this
             }

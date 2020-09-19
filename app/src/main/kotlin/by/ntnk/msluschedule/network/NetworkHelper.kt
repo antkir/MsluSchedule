@@ -96,7 +96,7 @@ class NetworkHelper @Inject constructor(private val currentDate: CurrentDate) {
 
     private fun parseResponse(document: Document, requestInfo: RequestInfo): ScheduleFilter {
         val elements = document
-                .select("select[id^=" + requestInfo.requestName + "]")
+                .select("select[id^=${requestInfo.requestName}]")
                 .first()
                 .children()
         val data = ScheduleFilter()
@@ -109,7 +109,7 @@ class NetworkHelper @Inject constructor(private val currentDate: CurrentDate) {
     @Throws(NullPointerException::class, InvalidYearException::class)
     private fun checkYearValid(htmlBody: Document) {
         val elements = htmlBody
-                .select("select[id^=" + yearRequestInfo.requestName + "]")
+                .select("select[id^=${yearRequestInfo.requestName}]")
                 .first()
                 .children()
 

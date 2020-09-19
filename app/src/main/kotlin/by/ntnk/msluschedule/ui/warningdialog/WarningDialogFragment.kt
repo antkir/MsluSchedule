@@ -39,7 +39,7 @@ class WarningDialogFragment : DialogFragment() {
     }
 
     private fun initMaterialDialog(): AlertDialog {
-        return AlertDialog.Builder(activity!!, R.style.MsluTheme_Dialog_Alert)
+        return AlertDialog.Builder(requireActivity(), R.style.MsluTheme_Dialog_Alert)
                 .setTitle(R.string.dialog_delete_container_title)
                 .setMessage(R.string.dialog_delete_container_message)
                 .setPositiveButton(R.string.button_delete) { _, _ ->
@@ -53,7 +53,7 @@ class WarningDialogFragment : DialogFragment() {
         context ?: return
         button.isEnabled = false
         val buttonDeleteString = resources.getString(R.string.button_delete)
-        val buttonDeleteColor = ContextCompat.getColor(context!!, R.color.warning)
+        val buttonDeleteColor = ContextCompat.getColor(requireContext(), R.color.warning)
         val timeout = 5L
         disposable = Observable
                 .intervalRange(1, timeout, 0, 1, TimeUnit.SECONDS)

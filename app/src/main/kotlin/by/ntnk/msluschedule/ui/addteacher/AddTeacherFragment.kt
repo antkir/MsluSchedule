@@ -72,7 +72,7 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
     }
 
     private fun initMaterialDialog(layout: View): Dialog {
-        return AlertDialog.Builder(activity!!, R.style.MsluTheme_Dialog_Alert)
+        return AlertDialog.Builder(requireActivity(), R.style.MsluTheme_Dialog_Alert)
                 .setTitle((R.string.add_teacher_title))
                 .setView(layout)
                 .setPositiveButton(R.string.button_add) { _, _ ->
@@ -106,7 +106,7 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
 
     private fun initAdapter(data: ScheduleFilter): ScheduleFilterAdapter {
         return ScheduleFilterAdapter(
-                activity!!,
+                requireActivity(),
                 android.R.layout.simple_spinner_dropdown_item,
                 data
         )

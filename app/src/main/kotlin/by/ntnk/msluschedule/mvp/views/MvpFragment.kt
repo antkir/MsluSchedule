@@ -78,7 +78,7 @@ abstract class MvpFragment<out P : Presenter<V>, V : View> : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-        if (retainPresenter && presenterId != null && !activity!!.isChangingConfigurations) {
+        if (retainPresenter && presenterId != null && !requireActivity().isChangingConfigurations) {
             presenterManager.removePresenter(presenterId!!)
         }
     }

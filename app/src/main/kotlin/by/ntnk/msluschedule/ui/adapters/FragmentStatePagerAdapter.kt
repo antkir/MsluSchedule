@@ -91,7 +91,7 @@ abstract class FragmentStatePagerAdapter(
 
     override fun startUpdate(container: ViewGroup) {
         check(container.id != View.NO_ID) {
-            "ViewPager with adapter ${this} requires a view id"
+            "ViewPager with adapter $this requires a view id"
         }
     }
 

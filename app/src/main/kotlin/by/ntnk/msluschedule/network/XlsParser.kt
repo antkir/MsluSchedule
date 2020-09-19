@@ -190,7 +190,7 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
             if (i == subjectLessontype.size - 1) {
                 lessonType = subjectLessontype[i]
             } else {
-                subject += (subjectLessontype[i] + " ")
+                subject += "${subjectLessontype[i]} "
             }
         }
         subject = subject.dropLastWhile { it.isWhitespace() }

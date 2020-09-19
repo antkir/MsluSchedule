@@ -84,11 +84,11 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         val swipeRefreshLayout = rootView.findViewById<SwipeRefreshLayout>(R.id.swipe_refresh_layout_week)
         swipeRefreshLayout.setOnRefreshListener {
             swipeRefreshLayout.isRefreshing = false
-            if (AndroidUtils.isNetworkAccessible(context!!.applicationContext)) {
+            if (AndroidUtils.isNetworkAccessible(requireContext().applicationContext)) {
                 layoutManagerSavedState = recyclerView.layoutManager?.onSaveInstanceState()
                 presenter.updateSchedule(weekId)
             } else {
-                AndroidUtils.showSnackbarNetworkInaccessible(getView()!!)
+                AndroidUtils.showSnackbarNetworkInaccessible(requireView())
             }
         }
 
@@ -103,7 +103,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
             adapter = this@WeekFragment.adapter
             initAdapterOnClickListener()
         }
-        smoothScroller = object : LinearSmoothScroller(context!!) {
+        smoothScroller = object : LinearSmoothScroller(requireContext()) {
             override fun getVerticalSnapPreference() = SNAP_TO_START
         }
     }
@@ -114,15 +114,15 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
                     when (it.viewType) {
                         VIEWTYPE_WEEKDAY -> {
                             val weekdayId = (it as LessonRecyclerViewAdapter.DayView).weekdayId
-                            WeekdayActivity.startActivity(context!!, weekdayId)
+                            WeekdayActivity.startActivity(requireContext(), weekdayId)
                         }
                         VIEWTYPE_STUDYGROUP -> {
                             val lessonId = (it as LessonRecyclerViewAdapter.StudyGroupLessonView).lesson.id
-                            LessonInfoActivity.startActivity(context!!, lessonId, ScheduleType.STUDYGROUP, weekId)
+                            LessonInfoActivity.startActivity(requireContext(), lessonId, ScheduleType.STUDYGROUP, weekId)
                         }
                         VIEWTYPE_TEACHER -> {
                             val lessonId = (it as LessonRecyclerViewAdapter.TeacherLessonView).lesson.id
-                            LessonInfoActivity.startActivity(context!!, lessonId, ScheduleType.TEACHER, weekId)
+                            LessonInfoActivity.startActivity(requireContext(), lessonId, ScheduleType.TEACHER, weekId)
                         }
                     }
                 },
@@ -157,8 +157,8 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
             val index = adapter.getWeekdayViewIndex(presenter.getCurrentDayOfWeek())
             smoothScroller.targetPosition = index
             recyclerView.layoutManager?.startSmoothScroll(smoothScroller)
-            val fromColor = ContextCompat.getColor(context!!, R.color.surface)
-            val toColor = ContextCompat.getColor(context!!, R.color.menuitem_highlight)
+            val fromColor = ContextCompat.getColor(requireContext(), R.color.surface)
+            val toColor = ContextCompat.getColor(requireContext(), R.color.menuitem_highlight)
             val highlightAnimation = ValueAnimator.ofObject(ArgbEvaluator(), fromColor, toColor)
             highlightAnimation.duration = 500
             highlightAnimation.addUpdateListener { animator ->
@@ -227,7 +227,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
             isEmptyScheduleDaysVisible = true
             text_week_nolessons.visibility = View.GONE
 
-            button_week_weekdays_visibility.text = context!!.getString(R.string.button_week_hide_weekdays)
+            button_week_weekdays_visibility.text = requireContext().getString(R.string.button_week_hide_weekdays)
         } else {
             isEmptyScheduleDaysVisible = false
             text_week_nolessons.visibility = View.VISIBLE
@@ -236,7 +236,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
             // the hiding animation and won't show again
             rv_week_days.smoothScrollBy(0, -1)
 
-            button_week_weekdays_visibility.text = context!!.getString(R.string.button_week_show_weekdays)
+            button_week_weekdays_visibility.text = requireContext().getString(R.string.button_week_show_weekdays)
         }
     }
 
@@ -302,10 +302,10 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         if (shouldSetupViews) {
             presenter.getSchedule(weekId, shouldUpdateAdapter = true)
         }
-        val snackbar = Snackbar.make(getView()!!, AndroidUtils.getErrorMessageResId(t), 5000)
+        val snackbar = Snackbar.make(requireView(), AndroidUtils.getErrorMessageResId(t), 5000)
                 .setAction(R.string.snackbar_week_init_retry) {
                     context ?: return@setAction
-                    if (AndroidUtils.isNetworkAccessible(context!!.applicationContext)) {
+                    if (AndroidUtils.isNetworkAccessible(requireContext().applicationContext)) {
                         layoutManagerSavedState = recyclerView.layoutManager?.onSaveInstanceState()
                         presenter.updateSchedule(weekId)
                     } else {
@@ -323,12 +323,12 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.item_week_update -> {
-                if (AndroidUtils.isNetworkAccessible(context!!.applicationContext)) {
+                if (AndroidUtils.isNetworkAccessible(requireContext().applicationContext)) {
                     if (weekId == INVALID_VALUE) return true
                     layoutManagerSavedState = recyclerView.layoutManager?.onSaveInstanceState()
                     presenter.updateSchedule(weekId)
                 } else {
-                    AndroidUtils.showSnackbarNetworkInaccessible(getView()!!)
+                    AndroidUtils.showSnackbarNetworkInaccessible(requireView())
                 }
                 return true
             }

@@ -39,7 +39,7 @@ class ScheduleFilterAdapter(
             text = view as TextView
         } catch (exception: ClassCastException) {
             throw IllegalStateException(
-                    this.javaClass.simpleName + " requires the resource ID to be a TextView",
+                    "${this.javaClass.simpleName} requires the resource ID to be a TextView",
                     exception
             )
         }

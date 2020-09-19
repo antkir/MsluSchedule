@@ -72,7 +72,7 @@ abstract class MvpDialogFragment<out P : Presenter<V>, V : View> : DialogFragmen
 
     override fun onDestroy() {
         super.onDestroy()
-        if (presenterId != null && !activity!!.isChangingConfigurations) {
+        if (presenterId != null && !requireActivity().isChangingConfigurations) {
             presenterManager.removePresenter(presenterId!!)
         }
     }
