@@ -20,11 +20,18 @@ class DatabaseModule {
         }
     }
 
+    private val migration9to10: Migration = object : Migration(9, 10) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("ALTER TABLE DbStudyGroupLesson ADD COLUMN type VARCHAR DEFAULT '' NOT NULL")
+        }
+    }
+
     @PerApp
     @Provides
     fun provideAppDatabase(app: MsluScheduleApp): AppDatabase {
         return Room.databaseBuilder(app, AppDatabase::class.java, DATABASE_NAME)
                 .addMigrations(migration8to9)
+                .addMigrations(migration9to10)
                 .build()
     }
 }
