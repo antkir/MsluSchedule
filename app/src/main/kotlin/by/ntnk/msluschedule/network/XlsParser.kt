@@ -6,6 +6,8 @@ import by.ntnk.msluschedule.data.WeekdayWithStudyGroupLessons
 import by.ntnk.msluschedule.data.WeekdayWithTeacherLessons
 import by.ntnk.msluschedule.utils.*
 import io.reactivex.Observable
+import org.apache.poi.hssf.usermodel.HSSFFont
+import org.apache.poi.hssf.usermodel.HSSFRichTextString
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.poifs.filesystem.POIFSFileSystem
 import org.apache.poi.ss.usermodel.Cell
@@ -24,16 +26,19 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
                 .flatMap { Observable.fromIterable(it) }
                 .toList()
                 .flatMapObservable { cells ->
-                    Observable.fromIterable(parseCellsToStudyGroupWeekdays(cells))
+                    Observable.fromIterable(parseCellsToStudyGroupWeekdays(cells, hssfWorkbook::getFontAt))
                 }
     }
 
-    private fun parseCellsToStudyGroupWeekdays(cells: List<Cell>): List<WeekdayWithStudyGroupLessons> {
+    private fun parseCellsToStudyGroupWeekdays(cells: List<Cell>,
+                                               getWorkbookFontAt: (Short) -> HSSFFont
+                                              ): List<WeekdayWithStudyGroupLessons> {
         val weekdaysWithLessons = ArrayList<WeekdayWithStudyGroupLessons>(WEEKDAYS_NUMBER)
         lateinit var weekday: WeekdayWithStudyGroupLessons
         lateinit var startTime: String
         lateinit var endTime: String
         lateinit var subject: String
+        lateinit var type: String
         lateinit var teacher: String
         lateinit var classroom: String
         var isPreviousLessonPhysEd = false
@@ -53,15 +58,42 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
                     endTime = pair.second
                 }
                 2 -> {
-                    val pair = getSubjectTeacherPair(cell.stringCellValue)
-                    subject = pair.first
-                    teacher = pair.second
+                    subject = EMPTY_STRING
+                    type = EMPTY_STRING
+                    teacher = EMPTY_STRING
+
+                    val richTextString = cell.richStringCellValue as HSSFRichTextString
+                    val valueString = richTextString.string
+                    val substringLengths = getRichTextSubstringLengths(richTextString)
+
+                    if (richTextString.numFormattingRuns() == 0) {
+                        subject = valueString.trim()
+                        type = EMPTY_STRING
+                        teacher = EMPTY_STRING
+                    }
+
+                    for (i in 0 until richTextString.numFormattingRuns()) {
+                        val startIdx = richTextString.getIndexOfFormattingRun(i)
+                        val fontIdx = richTextString.getFontAtIndex(startIdx)
+                        val font: HSSFFont = getWorkbookFontAt(fontIdx)
+
+                        if (font.bold) {
+                            val nextStartIdx = substringLengths[i]
+                            val typeTeacherString = valueString.substring(nextStartIdx, richTextString.length()).trim()
+                            val hasNewline = valueString.contains("\n")
+                            val (lessonType, lessonTeacher) = getTypeTeacherPair(typeTeacherString, hasNewline)
+
+                            subject = valueString.substring(0, nextStartIdx).trim()
+                            type = lessonType
+                            teacher = lessonTeacher
+                        }
+                    }
                 }
                 3 -> {
                     classroom = cell.stringCellValue.replace(" ", EMPTY_STRING)
 
                     if (startTime.isNotEmpty()) {
-                        val lesson = StudyGroupLesson(subject, teacher, classroom, startTime, endTime)
+                        val lesson = StudyGroupLesson(subject, type, teacher, classroom, startTime, endTime)
                         if (sharedPreferencesRepository.isPhysEdClassHidden()) {
                             if (subject.contains("физ", ignoreCase = true) &&
                                     subject.contains("культура", ignoreCase = true)) {
@@ -108,12 +140,18 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
         }
     }
 
-    private fun getSubjectTeacherPair(value: String): Pair<String, String> {
+    private fun getTypeTeacherPair(value: String, hasNewline: Boolean): Pair<String, String> {
         return if (value.isNotEmpty()) {
-            val values = value.split("\n".toRegex())
-            var teacher = if (values.size > 1) values[1] else EMPTY_STRING
-            teacher = teacher.dropLastWhile { it.isWhitespace() }
-            Pair(values[0], teacher)
+            if (hasNewline) {
+                if (value.contains("\n")) {
+                    val values = value.split("\n".toRegex())
+                    Pair(values[0].substringAfter(',').trim(), values[1].trim())
+                } else {
+                    Pair(EMPTY_STRING, value.trim())
+                }
+            } else {
+                Pair(value.substringAfter(',').trim(), EMPTY_STRING)
+            }
         } else {
             Pair(EMPTY_STRING, EMPTY_STRING)
         }
@@ -128,11 +166,12 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
                 .filter { row -> row.rowNum > 2 }
                 .toList()
                 .flatMapObservable { cells ->
-                    Observable.fromIterable(parseCellsToTeacherWeekdays(cells))
+                    Observable.fromIterable(parseCellsToTeacherWeekdays(cells, hssfWorkbook::getFontAt))
                 }
     }
 
-    private fun parseCellsToTeacherWeekdays(hssfRows: List<Row>): List<WeekdayWithTeacherLessons> {
+    private fun parseCellsToTeacherWeekdays(hssfRows: List<Row>,
+                                            getWorkbookFontAt: (Short) -> HSSFFont): List<WeekdayWithTeacherLessons> {
         val weekdaysWithLessons: List<WeekdayWithTeacherLessons> = listOf(
                 WeekdayWithTeacherLessons(MONDAY),
                 WeekdayWithTeacherLessons(TUESDAY),
@@ -155,7 +194,7 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
                 } else if (hssfCell.columnIndex in 2..7) {
                     val weekdayWithLessons = weekdaysWithLessons[hssfCell.columnIndex - 2].lessons
                     if (hssfCell.stringCellValue.isNotEmpty()) {
-                        val lessonEntity = parseCellToTeacherLesson(hssfCell, startTime, endTime)
+                        val lessonEntity = parseCellToTeacherLesson(hssfCell, startTime, endTime, getWorkbookFontAt)
                         weekdayWithLessons.add(lessonEntity)
                     } else if (weekdayWithLessons.isNotEmpty() &&
                             dayHasMoreLessons(hssfRows, rowIndex, columnIndex)) {
@@ -169,33 +208,54 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
         return weekdaysWithLessons
     }
 
-    private fun parseCellToTeacherLesson(cell: Cell, startTime: String, endTime: String): TeacherLesson {
-        val fullString = cell.stringCellValue.split("\\(".toRegex(), 2)
+    private fun parseCellToTeacherLesson(cell: Cell, startTime: String, endTime: String,
+                                         getWorkbookFontAt: (Short) -> HSSFFont): TeacherLesson {
+        val richTextString = cell.richStringCellValue as HSSFRichTextString
+        val valueString = richTextString.string
+        val substringLengths = getRichTextSubstringLengths(richTextString)
 
-        val groups = fullString[0].dropLastWhile { it.isWhitespace() }
+        if (richTextString.numFormattingRuns() == 0) {
+            return TeacherLesson(valueString.trim(), EMPTY_STRING, EMPTY_STRING,
+                                 EMPTY_STRING, EMPTY_STRING, startTime, endTime)
+        }
 
-        val facultiesClassroomSubjectLessontype = fullString[1].split(" {2}".toRegex())
+        for (i in 0 until richTextString.numFormattingRuns()) {
+            val startIdx = richTextString.getIndexOfFormattingRun(i)
+            val fontIdx = richTextString.getFontAtIndex(startIdx)
+            val font: HSSFFont = getWorkbookFontAt(fontIdx)
 
-        val faculties = facultiesClassroomSubjectLessontype[0].substringBeforeLast(")")
+            if (font.bold) {
+                val nextStartIdx = startIdx + substringLengths[i]
+                val subject = valueString.substring(startIdx, nextStartIdx).trim()
+                val lessonType = valueString.substring(nextStartIdx, richTextString.length()).trim()
 
-        val classroom = facultiesClassroomSubjectLessontype[0]
-                .substringAfterLast(")")
-                .replace(" ", EMPTY_STRING)
+                val groupsFacultiesClassroom = valueString.substring(0, startIdx)
+                val groupsFacultiesClassroomList = groupsFacultiesClassroom.split("\\(".toRegex(), 2)
+                val facultiesClassroom = groupsFacultiesClassroomList[1]
 
-        val subjectLessontype = facultiesClassroomSubjectLessontype[1].split(" ".toRegex())
+                val groups = groupsFacultiesClassroomList[0].trim()
+                val faculties = facultiesClassroom.substringBeforeLast(")")
+                val classroom = facultiesClassroom
+                        .substringAfterLast(")")
+                        .replace(" ", EMPTY_STRING)
 
-        var subject = EMPTY_STRING
-        var lessonType = EMPTY_STRING
-        for (i in subjectLessontype.indices) {
-            if (i == subjectLessontype.size - 1) {
-                lessonType = subjectLessontype[i]
-            } else {
-                subject += "${subjectLessontype[i]} "
+                return TeacherLesson(subject, faculties, groups, lessonType, classroom, startTime, endTime)
             }
         }
-        subject = subject.dropLastWhile { it.isWhitespace() }
 
-        return TeacherLesson(subject, faculties, groups, lessonType, classroom, startTime, endTime)
+        return TeacherLesson(startTime, endTime)
+    }
+
+    private fun getRichTextSubstringLengths(richTextString: HSSFRichTextString): List<Int> {
+        val substringLengths = mutableListOf<Int>()
+        var prev = 0
+        for (i in 1 until richTextString.numFormattingRuns()) {
+            val startIdx = richTextString.getIndexOfFormattingRun(i)
+            substringLengths.add(startIdx - prev)
+            prev = startIdx
+        }
+        substringLengths.add(richTextString.length() - prev)
+        return substringLengths
     }
 
     private fun dayHasMoreLessons(hssfRows: List<Row>, rowIndex: Int, columnIndex: Int) =

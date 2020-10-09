@@ -31,6 +31,7 @@ class XlsParserTest {
         val weekdayWithStudyGroupLessons = WeekdayWithStudyGroupLessons(SATURDAY)
         val lesson1 = StudyGroupLesson(
                 subject = "СОРО",
+                type = "",
                 teacher = "пр. Якушева  Н. В.",
                 classroom = "",
                 startTime = "8:15",
@@ -38,6 +39,7 @@ class XlsParserTest {
         )
         val lesson2 = StudyGroupLesson(
                 subject = "Практ. фон. (2)",
+                type = "",
                 teacher = "пр. Евдокимова В. В.",
                 classroom = "В507",
                 startTime = "9:45",
@@ -45,6 +47,7 @@ class XlsParserTest {
         )
         val lesson3 = StudyGroupLesson(
                 subject = "Спецмодуль: Логика / Этика",
+                type = "",
                 teacher = "",
                 classroom = "",
                 startTime = "11:15",
@@ -115,5 +118,85 @@ class XlsParserTest {
         observable.test().assertNoErrors()
         observable.test().assertValueCount(weekdays)
         observable.test().assertValueAt(weekdays - 2, weekdayWithTeacherLessons)
+    }
+
+    @Test
+    fun `Check if lessons with incomplete data for a studygroup schedule for 2020 are parsed correctly`() {
+        // given
+        val fridayWithStudyGroupLessons = WeekdayWithStudyGroupLessons(SATURDAY)
+        val fridayLesson1 = StudyGroupLesson(
+                subject = "Физ. культура, ЛК\nпреп. Пронский А.",
+                type = "",
+                teacher = "",
+                classroom = "",
+                startTime = "11:15",
+                endTime = "12:35"
+        )
+        val fridayLesson2 = StudyGroupLesson(
+                subject = "Безоп. жизнедеят. чел-ка",
+                type = "ЛК",
+                teacher = "",
+                classroom = "",
+                startTime = "14:30",
+                endTime = "15:50"
+        )
+        val fridayLesson3 = StudyGroupLesson(
+                subject = "Практ. фонетика (1 ин. яз.)",
+                type = "",
+                teacher = "ст.пр. Абламейко  В. С.",
+                classroom = "А300",
+                startTime = "16:00",
+                endTime = "17:20"
+        )
+        val fridayLesson4 = StudyGroupLesson(
+                subject = "История: Ист. Беларуси",
+                type = "",
+                teacher = "доц. Цымбал  А. Г.",
+                classroom = "А320",
+                startTime = "17:30",
+                endTime = "18:50"
+        )
+        fridayWithStudyGroupLessons.lessons.add(fridayLesson1)
+        fridayWithStudyGroupLessons.lessons.add(fridayLesson2)
+        fridayWithStudyGroupLessons.lessons.add(fridayLesson3)
+        fridayWithStudyGroupLessons.lessons.add(fridayLesson4)
+
+        val saturdayWithStudyGroupLessons = WeekdayWithStudyGroupLessons(SATURDAY)
+        val saturdayLesson1 = StudyGroupLesson(
+                subject = "Практ. фонетика (1 ин. яз.)",
+                type = "ПЗ",
+                teacher = "ст.пр. Абламейко  В. С.",
+                classroom = "",
+                startTime = "13:00",
+                endTime = "14:20"
+        )
+        val saturdayLesson2 = StudyGroupLesson(
+                subject = "История: Ист. Беларуси",
+                type = "",
+                teacher = "доц. Цымбал  А. Г.",
+                classroom = "А417",
+                startTime = "14:30",
+                endTime = "15:50"
+        )
+        val saturdayLesson3 = StudyGroupLesson(
+                subject = "Практ. фонетика (1 ин. яз.)",
+                type = "",
+                teacher = "",
+                classroom = "",
+                startTime = "16:00",
+                endTime = "17:20"
+        )
+        saturdayWithStudyGroupLessons.lessons.add(saturdayLesson1)
+        saturdayWithStudyGroupLessons.lessons.add(saturdayLesson2)
+        saturdayWithStudyGroupLessons.lessons.add(saturdayLesson3)
+        val weekdays = 7
+        val xlsBody = javaClass.getResource("/sample_studygroup_schedule_2020.xls")!!.openStream()
+        // when
+        val observable = xlsParser.parseStudyGroupXls(xlsBody)
+        // then
+        observable.test().assertNoErrors()
+        observable.test().assertValueCount(weekdays)
+        observable.test().assertValueAt(weekdays - 3, fridayWithStudyGroupLessons)
+        observable.test().assertValueAt(weekdays - 2, saturdayWithStudyGroupLessons)
     }
 }

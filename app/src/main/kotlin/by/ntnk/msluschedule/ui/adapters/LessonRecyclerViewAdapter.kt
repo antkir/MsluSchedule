@@ -208,6 +208,13 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
                 lessonSubject.text = lesson.subject
                 lessonTeacher.text = lesson.teacher
                 lessonClassroom.text = lesson.classroom
+                lessonType.text = lesson.type
+
+                if (lessonType.text.isBlank()) {
+                    lessonType.visibility = View.GONE
+                } else {
+                    lessonType.visibility = View.VISIBLE
+                }
             }
         }
     }
@@ -225,10 +232,10 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
                 lessonType.text = lesson.type
                 lessonFaculty.text = lesson.faculty
 
-                if (lesson.subject.isBlank()) {
-                    lessonType.setBackgroundColor(ContextCompat.getColor(itemView.context, R.color.surface))
+                if (lessonType.text.isBlank()) {
+                    lessonType.visibility = View.GONE
                 } else {
-                    lessonType.background = ContextCompat.getDrawable(itemView.context, R.drawable.classtype_circle)
+                    lessonType.visibility = View.VISIBLE
                 }
             }
         }
@@ -239,6 +246,7 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
         val lessonEndTime: TextView = view.findViewById(R.id.text_studygrouplesson_endtime)
         val lessonSubject: TextView = view.findViewById(R.id.text_studygrouplesson_subject)
         val lessonTeacher: TextView = view.findViewById(R.id.text_studygrouplesson_teacher)
+        val lessonType: TextView = view.findViewById(R.id.text_studygrouplesson_type)
         val lessonClassroom: TextView = view.findViewById(R.id.text_studygrouplesson_classroom)
     }
 

@@ -6,7 +6,7 @@ data class TeacherLesson(
         override val subject: String,
         val faculty: String,
         val groups: String,
-        val type: String,
+        override val type: String,
         override val classroom: String,
         override val startTime: String,
         override val endTime: String,

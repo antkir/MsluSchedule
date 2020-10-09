@@ -56,6 +56,7 @@ class DatabaseDataMapper @Inject constructor() {
             lessons.add(
                     StudyGroupLesson(
                             lesson.subject,
+                            lesson.type,
                             lesson.teacher,
                             lesson.classroom,
                             lesson.startTime,
