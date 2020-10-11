@@ -65,13 +65,13 @@ android {
 ext {
     androidxVersion = '1.2.0'
     androidxPreferenceVersion = '1.1.1'
-    constraintlayoutVersion = '2.0.1'
+    constraintlayoutVersion = '2.0.2'
     daggerVersion = '2.29.1'
     jsoupVersion = '1.13.1'
     junitVersion = '4.13'
-    leakcanaryVersion = '2.4'
+    leakcanaryVersion = '2.5'
     materialVersion = '1.2.1'
-    mockitoVersion = '3.3.3'
+    mockitoVersion = '3.5.11'
     multidexVersion = '2.0.1'
     // OkHttp 3.13.0 release bumps minimum requirements to Java 8+ or Android 5+.
     // 3.12.x branch will receive critical fixes through December 31, 2020.
@@ -82,16 +82,15 @@ ext {
     retrofitVersion = '2.6.4'
     roomVersion = '2.2.5'
     rxandroidVersion = '2.1.1'
-    rxjavaVersion = '2.2.19'
+    rxjavaVersion = '2.2.20'
     rxkotlinVersion = '2.4.0'
-    // Spotlight 1.8.0 is broken.
     spotlightVersion = '1.7.0'
     swipeRefreshLayoutVersion = '1.1.0'
-    threetenbpVersion = '1.4.4'
+    threetenbpVersion = '1.4.5'
     timberVersion = '4.7.1'
 
-    crashlyticsVersion = '17.2.1'
-    firebaseVersion = '17.5.0'
+    crashlyticsVersion = '17.2.2'
+    firebaseVersion = '17.5.1'
 }
 
 dependencies {
