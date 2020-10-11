@@ -71,7 +71,7 @@ class SettingsActivity : AppCompatActivity(), HasAndroidInjector {
 
         override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
             val view = super.onCreateView(inflater, container, savedInstanceState)
-            view!!.setBackgroundColor(ContextCompat.getColor(container!!.context, R.color.surface))
+            view?.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.surface))
             return view
         }
 
@@ -83,11 +83,11 @@ class SettingsActivity : AppCompatActivity(), HasAndroidInjector {
             super.onCreate(savedInstanceState)
             setHasOptionsMenu(true)
 
-            val themePreference = findPreference<ListPreference>(getString(R.string.key_theme))
+            val themePreference = findPreference<ListPreference>(getString(R.string.key_theme))!!
             val values = arrayOf(AppCompatDelegate.MODE_NIGHT_NO.toString(),
                                  AppCompatDelegate.MODE_NIGHT_YES.toString(),
                                  AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM.toString())
-            themePreference!!.entryValues = values
+            themePreference.entryValues = values
             themePreference.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { preference, value ->
                 preference as ListPreference
                 value as String
@@ -104,7 +104,7 @@ class SettingsActivity : AppCompatActivity(), HasAndroidInjector {
             }
             // Trigger the listener immediately with the preference's current value.
             val value = sharedPreferencesRepository.getThemeMode()
-            themePreference.onPreferenceChangeListener!!.onPreferenceChange(themePreference, value)
+            themePreference.onPreferenceChangeListener?.onPreferenceChange(themePreference, value)
 
             val keyShowAddSchedule = getString(R.string.key_show_add_schedule)
             findPreference<SwitchPreferenceCompat>(keyShowAddSchedule)!!.isSingleLineTitle = false
@@ -114,8 +114,8 @@ class SettingsActivity : AppCompatActivity(), HasAndroidInjector {
             val keyHidePEClasses = getString(R.string.key_hide_pe_classes)
             findPreference<CheckBoxPreference>(keyHidePEClasses)!!.isSingleLineTitle = false
 
-            val sendFeedback = findPreference<Preference>(getString(R.string.key_send_feedback))
-            sendFeedback!!.setOnPreferenceClickListener {
+            val sendFeedback = findPreference<Preference>(getString(R.string.key_send_feedback))!!
+            sendFeedback.setOnPreferenceClickListener {
                 try {
                     val uri = Uri.parse("market://details?id=${requireContext().packageName}")
                     val playStoreIntent = Intent(Intent.ACTION_VIEW, uri)
@@ -133,8 +133,8 @@ class SettingsActivity : AppCompatActivity(), HasAndroidInjector {
                 return@setOnPreferenceClickListener true
             }
 
-            val libraries = findPreference<Preference>(getString(R.string.key_libraries))
-            libraries!!.setOnPreferenceClickListener {
+            val libraries = findPreference<Preference>(getString(R.string.key_libraries))!!
+            libraries.setOnPreferenceClickListener {
                 activity?.supportFragmentManager?.beginTransaction()
                         ?.setCustomAnimations(R.anim.dialog_zoom_in, 0, 0, R.anim.dialog_zoom_out)
                         ?.replace(android.R.id.content, SettingsLibrariesFragment())
@@ -143,8 +143,8 @@ class SettingsActivity : AppCompatActivity(), HasAndroidInjector {
                 return@setOnPreferenceClickListener true
             }
 
-            val aboutPreference = findPreference<Preference>(getString(R.string.key_about))
-            aboutPreference!!.summary = BuildConfig.VERSION_NAME
+            val aboutPreference = findPreference<Preference>(getString(R.string.key_about))!!
+            aboutPreference.summary = BuildConfig.VERSION_NAME
         }
 
         override fun onOptionsItemSelected(item: MenuItem): Boolean {
