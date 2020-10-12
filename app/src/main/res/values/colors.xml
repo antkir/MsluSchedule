@@ -7,10 +7,8 @@
 
     <color name="surface">#FFFFFF</color>
     <color name="surface_dialog">#FFFFFF</color>
-    <color name="lesson_type_circle">#FDD835</color>
 
     <color name="primary_text">#000000</color>
-    <color name="primary_text_inverted">#FFFFFF</color>
     <color name="tertiary_text">#808080</color>
     <color name="weeks_tablayout_text">#AAFFFFFF</color>
     <color name="weeks_tablayout_selected_text">#FFFFFF</color>
