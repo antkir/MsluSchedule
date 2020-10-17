@@ -45,7 +45,8 @@ class NoteRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() 
 
         for (lesson in lessons) {
             sortedLesssons.add(lesson)
-            sortedNotes[lesson.subject] = mutableListOf()
+            val subjectKey = if (lesson.type != EMPTY_STRING) "${lesson.subject}, ${lesson.type}" else lesson.subject
+            sortedNotes[subjectKey] = mutableListOf()
         }
 
         for (note in notes) {
@@ -73,7 +74,11 @@ class NoteRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() 
         for ((subject, notes) in sortedNotes) {
             if (notes.isNotEmpty()) {
                 val header = if (subject == EMPTY_STRING) otherNotesHeader else subject
-                val filteredLessons = sortedLesssons.filter { it.subject == header }
+                val filteredLessons = sortedLesssons
+                        .filter {
+                            val subjectKey = if (it.type != EMPTY_STRING) "${it.subject}, ${it.type}" else it.subject
+                            return@filter subjectKey == header
+                        }
                 var time = EMPTY_STRING
                 for (lesson in filteredLessons) {
                     time = time.plus(lesson.startTime + " / ")

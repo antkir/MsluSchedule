@@ -366,7 +366,9 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
         recyclerView.layoutManager?.onRestoreInstanceState(layoutManagerSavedState)
 
         if (chips_subjects.childCount == 0) {
-            val lessonSubjects = weekdayWithLessons.lessons.map { it.subject }.toSet()
+            val lessonSubjects = weekdayWithLessons.lessons
+                    .map { if (it.type != EMPTY_STRING) "${it.subject}, ${it.type}" else it.subject }
+                    .toSet()
             if (lessonSubjects.isEmpty()) {
                 chips_subjects.visibility = View.GONE
             }
