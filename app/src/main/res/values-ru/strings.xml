@@ -83,4 +83,7 @@
     <string name="tutorial_finish_description">Спасибо!</string>
     <string name="tutorial_navigation_view_description">Здесь можно проверить добавленные расписания или поменять настройки.</string>
     <string name="fab_add_schedule_main_description">Добавить расписание</string>
+    <string name="fab_add_schedule_studygroup_description">Добавить расписание группы</string>
+    <string name="fab_add_schedule_teacher_description">Добавить расписание преподавателя</string>
+    <string name="fab_edit_note">Редактировать заметку</string>
 </resources>

@@ -83,4 +83,7 @@
     <string name="tutorial_action_menu_title">Меню раскладу</string>
     <string name="tutorial_action_menu_description">Абнаўляйце расклад на тыдзень адсюль ці пацягніце экран уніз, каб абнавіць яго.</string>
     <string name="fab_add_schedule_main_description">Дадаць расклад</string>
+    <string name="fab_add_schedule_studygroup_description">Дадаць расклад групы</string>
+    <string name="fab_add_schedule_teacher_description">Дадаць расклад выкладчыка</string>
+    <string name="fab_edit_note">Рэдагаваць нататку</string>
 </resources>

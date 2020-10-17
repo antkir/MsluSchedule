@@ -1,13 +1,16 @@
 <resources>
     <string name="app_name">MSLU Schedule</string>
 
-    <string name="add_group_title">Add a Group</string>
+    <string name="add_group_title">Add a group</string>
     <string name="group_already_added">The group is already added.</string>
-    <string name="add_teacher_title">Add a Teacher</string>
+    <string name="add_teacher_title">Add a teacher</string>
     <string name="teacher_already_added">The teacher is already added.</string>
     <string name="button_add">Add</string>
     <string name="button_cancel">Cancel</string>
     <string name="fab_add_schedule_main_description">Add a schedule</string>
+    <string name="fab_add_schedule_studygroup_description">Add a group schedule</string>
+    <string name="fab_add_schedule_teacher_description">Add a teacher schedule</string>
+    <string name="fab_edit_note">Edit a note</string>
 
     <string name="faculty">Faculty</string>
     <string name="course">Course</string>
