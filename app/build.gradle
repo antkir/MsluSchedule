@@ -68,10 +68,10 @@ ext {
     constraintlayoutVersion = '2.0.2'
     daggerVersion = '2.29.1'
     jsoupVersion = '1.13.1'
-    junitVersion = '4.13'
+    junitVersion = '4.13.1'
     leakcanaryVersion = '2.5'
     materialVersion = '1.2.1'
-    mockitoVersion = '3.5.11'
+    mockitoVersion = '3.5.13'
     multidexVersion = '2.0.1'
     // OkHttp 3.13.0 release bumps minimum requirements to Java 8+ or Android 5+.
     // 3.12.x branch will receive critical fixes through December 31, 2020.
@@ -102,7 +102,7 @@ dependencies {
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:$swipeRefreshLayoutVersion"
     implementation "com.google.android.material:material:$materialVersion"
     implementation "androidx.multidex:multidex:$multidexVersion"
-    implementation "androidx.preference:preference:$androidxPreferenceVersion"
+    implementation "androidx.preference:preference-ktx:$androidxPreferenceVersion"
     // Dagger
     implementation "com.google.dagger:dagger:$daggerVersion"
     implementation "com.google.dagger:dagger-android-support:$daggerVersion"
