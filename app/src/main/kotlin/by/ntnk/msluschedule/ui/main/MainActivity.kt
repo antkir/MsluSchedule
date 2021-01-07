@@ -356,7 +356,7 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
                 .setInterpolator(OvershootInterpolator(2f))
                 .start()
 
-        with(groupfab_main as View) {
+        with(groupfab_main) {
             visibility = View.VISIBLE
             scaleX = 0f
             scaleY = 0f
@@ -370,7 +370,7 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
                     .setInterpolator(FastOutSlowInInterpolator())
                     .start()
         }
-        with(teacherfab_main as View) {
+        with(teacherfab_main) {
             visibility = View.VISIBLE
             scaleX = 0f
             scaleY = 0f
@@ -401,7 +401,7 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
                 .setInterpolator(FastOutSlowInInterpolator())
                 .setListener(object : SimpleAnimatorListener {
                     override fun onAnimationEnd(animation: Animator?) {
-                        (groupfab_main as View?)?.visibility = View.INVISIBLE
+                        groupfab_main?.visibility = View.INVISIBLE
                         groupfab_main?.animate()?.setListener(null)
                     }
                 })
@@ -415,7 +415,7 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
                 .setInterpolator(FastOutSlowInInterpolator())
                 .setListener(object : SimpleAnimatorListener {
                     override fun onAnimationEnd(animation: Animator?) {
-                        (teacherfab_main as View?)?.visibility = View.INVISIBLE
+                        teacherfab_main?.visibility = View.INVISIBLE
                         teacherfab_main?.animate()?.setListener(null)
                     }
                 })

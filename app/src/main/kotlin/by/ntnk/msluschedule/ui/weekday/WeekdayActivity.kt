@@ -114,7 +114,7 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
     }
 
     private fun showNoteEditLayout() {
-        (fab_weekday as View).visibility = View.INVISIBLE
+        fab_weekday.visibility = View.INVISIBLE
 
         val editNotelayoutAnimDelay: Long = 50
         val editNoteLayoutAnimDuration: Long = 100
@@ -185,7 +185,7 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
 
         fab_weekday.scaleX = 0f
         fab_weekday.scaleY = 0f
-        (fab_weekday as View).visibility = View.VISIBLE
+        fab_weekday.visibility = View.VISIBLE
         fab_weekday.animate()
                 .setDuration(150)
                 .scaleY(1f)
