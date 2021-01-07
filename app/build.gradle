@@ -33,7 +33,7 @@ android {
         exclude 'org/apache/**'
     }
     compileSdkVersion 30
-    buildToolsVersion "30.0.2"
+    buildToolsVersion "30.0.3"
     defaultConfig {
         applicationId "by.ntnk.msluschedule"
         minSdkVersion 16
@@ -65,13 +65,13 @@ android {
 ext {
     androidxVersion = '1.2.0'
     androidxPreferenceVersion = '1.1.1'
-    constraintlayoutVersion = '2.0.2'
-    daggerVersion = '2.29.1'
+    constraintlayoutVersion = '2.0.4'
+    daggerVersion = '2.30.1'
     jsoupVersion = '1.13.1'
     junitVersion = '4.13.1'
-    leakcanaryVersion = '2.5'
+    leakcanaryVersion = '2.6'
     materialVersion = '1.2.1'
-    mockitoVersion = '3.5.13'
+    mockitoVersion = '3.7.0'
     multidexVersion = '2.0.1'
     // OkHttp 3.13.0 release bumps minimum requirements to Java 8+ or Android 5+.
     // 3.12.x branch will receive critical fixes through December 31, 2020.
@@ -80,7 +80,7 @@ ext {
     poiVersion = '3.17'
     // Retrofit 2.7.0 release bumps minimum requirements to Java 8+ or Android 5+.
     retrofitVersion = '2.6.4'
-    roomVersion = '2.2.5'
+    roomVersion = '2.2.6'
     rxandroidVersion = '2.1.1'
     rxjavaVersion = '2.2.20'
     rxkotlinVersion = '2.4.0'
@@ -89,8 +89,8 @@ ext {
     threetenbpVersion = '1.4.5'
     timberVersion = '4.7.1'
 
-    crashlyticsVersion = '17.2.2'
-    firebaseVersion = '17.5.1'
+    crashlyticsVersion = '17.3.0'
+    firebaseAnalyticsVersion = '18.0.0'
 }
 
 dependencies {
@@ -139,9 +139,7 @@ dependencies {
     // Testing
     testImplementation "org.mockito:mockito-core:$mockitoVersion"
     testImplementation "junit:junit:$junitVersion"
-
-    // Firebase Core
-    implementation "com.google.firebase:firebase-core:$firebaseVersion"
-    // Crashlytics
-    implementation "com.google.firebase:firebase-crashlytics:$crashlyticsVersion"
+    // Firebase
+    implementation "com.google.firebase:firebase-analytics-ktx:$firebaseAnalyticsVersion"
+    implementation "com.google.firebase:firebase-crashlytics-ktx:$crashlyticsVersion"
 }
