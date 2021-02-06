@@ -33,15 +33,17 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
-    <ProgressBar
+    <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/progressbar_dialog_teacher"
         android:layout_width="@dimen/actv_progressbar_size"
         android:layout_height="@dimen/actv_progressbar_size"
-        android:layout_marginEnd="@dimen/actv_progressbar_margin_end"
-        android:layout_marginRight="@dimen/actv_progressbar_margin_end"
-        android:layout_marginBottom="@dimen/actv_progressbar_margin"
+        android:indeterminate="true"
         android:visibility="gone"
+        app:indicatorColor="@color/colorAccent"
+        app:indicatorInset="@dimen/actv_progressbar_inset"
+        app:indicatorSize="@dimen/actv_progressbar_size"
         app:layout_constraintBottom_toBottomOf="@id/textinputlayout_teacher"
-        app:layout_constraintEnd_toEndOf="@id/textinputlayout_teacher" />
+        app:layout_constraintEnd_toEndOf="@id/textinputlayout_teacher"
+        app:trackThickness="@dimen/actv_progressbar_thickness" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

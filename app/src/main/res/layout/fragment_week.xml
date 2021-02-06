@@ -32,21 +32,21 @@
                 android:textAlignment="center"
                 android:visibility="gone" />
 
-            <ProgressBar
+            <com.google.android.material.progressindicator.LinearProgressIndicator
                 android:id="@+id/progressbar_week"
-                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="top|center_horizontal"
                 android:background="@color/colorPrimaryLight"
                 android:elevation="2dp"
                 android:indeterminate="true"
-                android:paddingTop="16dp"
-                android:paddingBottom="16dp"
+                android:paddingTop="24dp"
+                android:paddingBottom="24dp"
                 android:visibility="invisible"
+                app:indicatorColor="@color/colorAccent"
                 tools:ignore="UnusedAttribute" />
 
-            <ProgressBar
+            <com.google.android.material.progressindicator.CircularProgressIndicator
                 android:id="@+id/progressbar_week_init"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -54,6 +54,7 @@
                 android:elevation="2dp"
                 android:indeterminate="true"
                 android:visibility="gone"
+                app:indicatorColor="@color/colorAccent"
                 tools:ignore="UnusedAttribute" />
 
             <com.google.android.material.button.MaterialButton

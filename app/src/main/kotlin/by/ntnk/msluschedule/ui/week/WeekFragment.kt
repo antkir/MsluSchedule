@@ -10,7 +10,6 @@ import android.os.Looper
 import android.os.Parcelable
 import android.view.*
 import android.view.animation.AnimationUtils
-import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
@@ -33,6 +32,7 @@ import by.ntnk.msluschedule.utils.AndroidUtils
 import by.ntnk.msluschedule.utils.INVALID_VALUE
 import by.ntnk.msluschedule.utils.ScheduleType
 import by.ntnk.msluschedule.utils.SimpleAnimatorListener
+import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.google.android.material.snackbar.Snackbar
 import dagger.Lazy
 import dagger.android.support.AndroidSupportInjection
@@ -199,7 +199,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
                 val index = adapter.getWeekdayViewIndex(presenter.getCurrentDayOfWeek())
                 layoutManager.scrollToPosition(index)
             }
-            activity?.findViewById<ProgressBar>(R.id.progressbar_main)?.visibility = View.GONE
+            activity?.findViewById<CircularProgressIndicator>(R.id.progressbar_main)?.visibility = View.GONE
             parentFragment?.view?.findViewById<ViewPager>(R.id.viewpager_weekscontainer)?.visibility = View.VISIBLE
         }
     }

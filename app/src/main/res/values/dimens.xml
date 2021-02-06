@@ -5,9 +5,9 @@
     <dimen name="nav_view_footer_image_padding_end">32dp</dimen>
     <dimen name="nav_view_width">512dp</dimen>
 
-    <dimen name="actv_progressbar_margin">10dp</dimen>
-    <dimen name="actv_progressbar_margin_end">16dp</dimen>
+    <dimen name="actv_progressbar_inset">12dp</dimen>
     <dimen name="actv_progressbar_size">24dp</dimen>
+    <dimen name="actv_progressbar_thickness">3dp</dimen>
     <dimen name="actv_padding_side">8dp</dimen>
 
     <dimen name="dialog_margin">24dp</dimen>
