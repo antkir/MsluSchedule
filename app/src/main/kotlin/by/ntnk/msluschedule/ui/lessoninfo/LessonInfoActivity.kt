@@ -82,6 +82,9 @@ class LessonInfoActivity : MvpActivity<LessonInfoPresenter, LessonInfoView>(),
         setFieldText(lesson.subject,
                      textview_subject_lessoninfo_studygroup,
                      imageview_subject_lessoninfo_studygroup)
+        setFieldText(lesson.type,
+                     textview_type_lessoninfo_studygroup,
+                     imageview_type_lessoninfo_studygroup)
         setFieldText(lesson.teacher,
                      textview_teacher_lessoninfo_studygroup,
                      imageview_teacher_lessoninfo_studygroup)

@@ -34,6 +34,29 @@
             tools:text="Осн. метод. науч. иссл-я" />
 
         <TextView
+            android:id="@+id/textview_type_lessoninfo_studygroup"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/textview_lessoninfo_margin_start"
+            android:layout_marginLeft="@dimen/textview_lessoninfo_margin_start"
+            android:layout_marginTop="@dimen/textview_lessoninfo_margin"
+            android:layout_marginEnd="@dimen/textview_lessoninfo_margin"
+            android:layout_marginRight="@dimen/textview_lessoninfo_margin"
+            android:layout_marginBottom="@dimen/textview_lessoninfo_margin"
+            android:gravity="center_vertical"
+            android:lineSpacingMultiplier="@dimen/textview_lessoninfo_line_space_multiplier"
+            android:minHeight="@dimen/item_lessoninfo_minheight"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textColor="@color/primary_text"
+            android:textIsSelectable="true"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toTopOf="@id/textview_teacher_lessoninfo_studygroup"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/imageview_type_lessoninfo_studygroup"
+            app:layout_constraintTop_toBottomOf="@id/textview_time_lessoninfo_studygroup"
+            tools:text="ЛК" />
+
+        <TextView
             android:id="@+id/textview_time_lessoninfo_studygroup"
             android:layout_width="0dp"
             android:layout_height="@dimen/item_lessoninfo_minheight"
@@ -48,7 +71,7 @@
             android:textColor="@color/primary_text"
             android:textIsSelectable="true"
             android:textSize="16sp"
-            app:layout_constraintBottom_toTopOf="@id/textview_teacher_lessoninfo_studygroup"
+            app:layout_constraintBottom_toTopOf="@id/textview_type_lessoninfo_studygroup"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/imageview_time_lessoninfo_studygroup"
             app:layout_constraintTop_toBottomOf="@id/textview_subject_lessoninfo_studygroup"
@@ -73,7 +96,7 @@
             app:layout_constraintBottom_toTopOf="@id/textview_classroom_lessoninfo_studygroup"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/imageview_teacher_lessoninfo_studygroup"
-            app:layout_constraintTop_toBottomOf="@id/textview_time_lessoninfo_studygroup"
+            app:layout_constraintTop_toBottomOf="@id/textview_type_lessoninfo_studygroup"
             tools:text="доц. Дроздов  М. В." />
 
         <ImageView
@@ -100,6 +123,19 @@
             app:layout_constraintBottom_toBottomOf="@id/textview_time_lessoninfo_studygroup"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/textview_time_lessoninfo_studygroup"
+            app:tint="@color/icon_tint" />
+
+        <ImageView
+            android:id="@+id/imageview_type_lessoninfo_studygroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/imageview_lessoninfo_margin_start"
+            android:layout_marginLeft="@dimen/imageview_lessoninfo_margin_start"
+            android:contentDescription="@string/imageview_groups_description"
+            android:src="@drawable/ic_studygroup"
+            app:layout_constraintBottom_toBottomOf="@id/textview_type_lessoninfo_studygroup"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/textview_type_lessoninfo_studygroup"
             app:tint="@color/icon_tint" />
 
         <ImageView
