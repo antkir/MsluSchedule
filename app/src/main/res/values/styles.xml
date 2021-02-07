@@ -1,4 +1,5 @@
 <resources>
+
     <style name="MsluTheme" parent="Theme.MaterialComponents.Light">
         <item name="colorAccent">@color/colorAccent</item>
         <item name="colorPrimary">@color/colorPrimary</item>
@@ -35,7 +36,7 @@
         <item name="android:windowBackground">@drawable/launch_screen</item>
     </style>
 
-    <style name="MsluTheme.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar" >
+    <style name="MsluTheme.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar">
         <item name="android:background">@color/colorPrimary</item>
     </style>
 
@@ -50,6 +51,8 @@
         <item name="colorPrimary">@color/colorPrimaryLight</item>
         <item name="android:windowBackground">@drawable/rounded_corners_rect</item>
         <item name="materialButtonStyle">@style/MsluTheme.ActionModeButton</item>
+        <item name="backgroundInsetStart">0dp</item>
+        <item name="backgroundInsetEnd">0dp</item>
     </style>
 
     <style name="DialogAnimation">

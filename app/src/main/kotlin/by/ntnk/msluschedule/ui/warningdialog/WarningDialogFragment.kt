@@ -9,6 +9,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.utils.SchedulerProvider
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
@@ -39,7 +40,8 @@ class WarningDialogFragment : DialogFragment() {
     }
 
     private fun initMaterialDialog(): AlertDialog {
-        return AlertDialog.Builder(requireActivity(), R.style.MsluTheme_Dialog_Alert)
+        return MaterialAlertDialogBuilder(requireActivity(), R.style.MsluTheme_Dialog_Alert)
+                .setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.rounded_corners_rect))
                 .setTitle(R.string.dialog_delete_container_title)
                 .setMessage(R.string.dialog_delete_container_message)
                 .setPositiveButton(R.string.button_delete) { _, _ ->

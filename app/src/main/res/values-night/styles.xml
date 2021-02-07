@@ -1,4 +1,5 @@
 <resources>
+
     <style name="MsluTheme" parent="Theme.MaterialComponents">
         <item name="colorAccent">@color/colorAccent</item>
         <item name="colorPrimary">@color/colorPrimary</item>
@@ -19,6 +20,8 @@
         <item name="colorPrimary">@color/colorAccent</item>
         <item name="android:windowBackground">@drawable/rounded_corners_rect</item>
         <item name="materialButtonStyle">@style/MsluTheme.ActionModeButton</item>
+        <item name="backgroundInsetStart">0dp</item>
+        <item name="backgroundInsetEnd">0dp</item>
     </style>
 
 </resources>

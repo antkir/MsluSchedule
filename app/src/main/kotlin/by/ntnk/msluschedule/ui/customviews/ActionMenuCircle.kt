@@ -5,14 +5,14 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.PointF
 import android.graphics.drawable.Drawable
-import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.utils.dipToPixels
+import com.google.android.material.appbar.MaterialToolbar
 import com.takusemba.spotlight.shape.Circle
 import kotlin.math.roundToInt
 
-class ActionMenuCircle(radius: Float, context: Context, private val toolbar: Toolbar) : Circle(radius) {
+class ActionMenuCircle(radius: Float, context: Context, private val toolbar: MaterialToolbar) : Circle(radius) {
     private val moreIcon = ContextCompat.getDrawable(context, R.drawable.ic_more) as Drawable
     private val actionMenuEndMargin = context.dipToPixels(10f)
 

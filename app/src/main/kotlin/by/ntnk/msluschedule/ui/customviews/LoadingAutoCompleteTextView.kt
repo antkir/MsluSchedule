@@ -4,10 +4,10 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.KeyEvent
 import android.view.inputmethod.InputMethodManager
-import androidx.appcompat.widget.AppCompatAutoCompleteTextView
 import com.google.android.material.progressindicator.CircularProgressIndicator
+import com.google.android.material.textfield.MaterialAutoCompleteTextView
 
-class LoadingAutoCompleteTextView : AppCompatAutoCompleteTextView {
+class LoadingAutoCompleteTextView : MaterialAutoCompleteTextView {
     var progressBar: CircularProgressIndicator? = null
     var progressBarVisibility: Int
         get() = progressBar?.visibility!!

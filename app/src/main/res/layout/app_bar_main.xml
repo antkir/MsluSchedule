@@ -14,7 +14,7 @@
         android:theme="@style/MsluTheme.AppBarOverlay.NoActionBar"
         app:elevation="0dp">
 
-        <androidx.appcompat.widget.Toolbar
+        <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar_main"
             android:layout_width="match_parent"
             android:layout_height="@dimen/toolbar_height"

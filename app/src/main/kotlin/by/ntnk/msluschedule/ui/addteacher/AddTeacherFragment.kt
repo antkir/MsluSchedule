@@ -5,6 +5,7 @@ import android.content.Context
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.data.Teacher
 import by.ntnk.msluschedule.mvp.views.MvpDialogFragment
@@ -13,6 +14,7 @@ import by.ntnk.msluschedule.ui.adapters.ScheduleFilterAdapter
 import by.ntnk.msluschedule.ui.customviews.LoadingAutoCompleteTextView
 import by.ntnk.msluschedule.utils.EMPTY_STRING
 import by.ntnk.msluschedule.utils.SimpleTextWatcher
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputLayout
 import dagger.Lazy
 import dagger.android.support.AndroidSupportInjection
@@ -72,7 +74,8 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
     }
 
     private fun initMaterialDialog(layout: View): Dialog {
-        return AlertDialog.Builder(requireActivity(), R.style.MsluTheme_Dialog_Alert)
+        return MaterialAlertDialogBuilder(requireActivity(), R.style.MsluTheme_Dialog_Alert)
+                .setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.rounded_corners_rect))
                 .setTitle((R.string.add_teacher_title))
                 .setView(layout)
                 .setPositiveButton(R.string.button_add) { _, _ ->
