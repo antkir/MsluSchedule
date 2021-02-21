@@ -1,6 +1,6 @@
 # MSLU Schedule for Android
 
-[![Build Status](https://travis-ci.org/antkir/MsluSchedule.svg?branch=master)](https://travis-ci.org/antkir/MsluSchedule)
+[![Build Status](https://travis-ci.com/antkir/MsluSchedule.svg?branch=master)](https://travis-ci.com/antkir/MsluSchedule)
 
 
 Just a simple Android application to view schedules of the classes at Minsk State Linguistic University.

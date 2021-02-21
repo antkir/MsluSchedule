@@ -25,9 +25,9 @@ before_install:
 
 install:
   - mkdir -p ${TOOLS}
-  - travis_retry wget https://dl.google.com/android/repository/commandlinetools-linux-6825553_latest.zip -O ${TOOLS}/tools.zip
+  - travis_retry wget https://dl.google.com/android/repository/commandlinetools-linux-6858069_latest.zip -O ${TOOLS}/tools.zip
   - unzip ${TOOLS}/tools.zip -d ${TOOLS}
-  - yes | travis_retry sdkmanager "build-tools;30.0.2" > /dev/null
+  - yes | travis_retry sdkmanager "build-tools;30.0.3" > /dev/null
   - yes | travis_retry sdkmanager "platforms;android-30" > /dev/null
 
 script:
