@@ -69,7 +69,7 @@ class WeekPresenterTest {
     @Before
     fun setUp() {
         Timber.plant(TestTree())
-        MockitoAnnotations.initMocks(this)
+        MockitoAnnotations.openMocks(this)
 
         whenever(networkRepositoryLazy.get()).thenReturn(mock(NetworkRepository::class.java))
         whenever(sharedPreferencesRepository.getSelectedScheduleContainerInfo())

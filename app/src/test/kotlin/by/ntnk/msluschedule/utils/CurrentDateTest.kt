@@ -46,7 +46,7 @@ class CurrentDateTest {
     }
 
     @Test
-    fun `"academicWeek" for September the 1st must return 0 or -1 for Sundays`() {
+    fun `academicWeek for September the 1st must return 0 or -1 for Sundays`() {
         // given
         val year = 1970
         val month = 9
@@ -66,7 +66,7 @@ class CurrentDateTest {
     }
 
     @Test
-    fun `When September the 1st is Sunday, "academicWeek" for September the 2nd must return 0`() {
+    fun `When September the 1st is Sunday, academicWeek for September the 2nd must return 0`() {
         // given
         val year = 2019
         val month = 9
@@ -79,7 +79,7 @@ class CurrentDateTest {
     }
 
     @Test
-    fun `If it is the last week of August, and the week is shared with September, "academicWeek" must return 0`() {
+    fun `If it is the last week of August, and the week is shared with September, academicWeek must return 0`() {
         // given
         val year = 2018
         val month = 8
@@ -92,7 +92,7 @@ class CurrentDateTest {
     }
 
     @Test
-    fun `If the current month is August, "academicWeek" must return a negative number`() {
+    fun `If the current month is August, academicWeek must return a negative number`() {
         // given
         val year = 1970
         val month = 8

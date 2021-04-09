@@ -20,7 +20,7 @@ class XlsParserTest {
 
     @Before
     fun setUp() {
-        MockitoAnnotations.initMocks(this)
+        MockitoAnnotations.openMocks(this)
         xlsParser = XlsParser(sharedPreferencesRepository)
         Timber.plant(TestTree())
     }
@@ -198,5 +198,32 @@ class XlsParserTest {
         observable.test().assertValueCount(weekdays)
         observable.test().assertValueAt(weekdays - 3, fridayWithStudyGroupLessons)
         observable.test().assertValueAt(weekdays - 2, saturdayWithStudyGroupLessons)
+    }
+
+    @Test
+    fun `Check if lesson with multiple parentheses for a teacher schedule is parsed correctly`() {
+        // given
+        val wednesdayWithTeacherLessons = WeekdayWithTeacherLessons(SATURDAY)
+
+        val wednesdayLesson1 = TeacherLesson(
+                subject = "Психология",
+                faculty = "ФРЯ (фр.)",
+                groups = "104/1 (фр.), 104/2 (фр.), 104/3 (фр.)",
+                type = "СМ",
+                classroom = "А417",
+                startTime = "8:15",
+                endTime = "9:35"
+        )
+
+        wednesdayWithTeacherLessons.lessons.add(wednesdayLesson1)
+
+        val weekdays = 7
+        val xlsBody = javaClass.getResource("/sample_teacher_schedule.xls")!!.openStream()
+        // when
+        val observable = xlsParser.parseTeacherXls(xlsBody)
+        // then
+        observable.test().assertNoErrors()
+        observable.test().assertValueCount(weekdays)
+        observable.map { it.lessons[0] }.test().assertValueAt(weekdays - 5, wednesdayWithTeacherLessons.lessons[0])
     }
 }

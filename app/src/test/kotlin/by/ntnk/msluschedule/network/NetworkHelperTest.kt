@@ -21,7 +21,7 @@ class NetworkHelperTest {
 
     @Before
     fun setUp() {
-        MockitoAnnotations.initMocks(this)
+        MockitoAnnotations.openMocks(this)
         networkHelper = NetworkHelper(currentDate)
         Timber.plant(TestTree())
     }
