@@ -229,21 +229,52 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
                 val subject = valueString.substring(startIdx, nextStartIdx).trim()
                 val lessonType = valueString.substring(nextStartIdx, richTextString.length()).trim()
 
-                val groupsFacultiesClassroom = valueString.substring(0, startIdx)
-                val groupsFacultiesClassroomList = groupsFacultiesClassroom.split("\\(".toRegex(), 2)
-                val facultiesClassroom = groupsFacultiesClassroomList[1]
+                val groupsFacultiesClassroom = valueString.substring(0, startIdx).trim()
 
-                val groups = groupsFacultiesClassroomList[0].trim()
-                val faculties = facultiesClassroom.substringBeforeLast(")")
-                val classroom = facultiesClassroom
-                        .substringAfterLast(")")
-                        .replace(" ", EMPTY_STRING)
+                val groupsFaculties = with(groupsFacultiesClassroom.substringBeforeLast(')')) {
+                    return@with if (groupsFacultiesClassroom.contains(')')) "$this)" else EMPTY_STRING
+                }
+
+                val splitIdx = findOpeningParenthesisIndex(groupsFaculties)
+
+                val groups = groupsFaculties.substring(0, splitIdx).trim()
+
+                val faculties = if (splitIdx != groupsFaculties.length) {
+                    groupsFaculties.substring(splitIdx, groupsFaculties.length)
+                            .drop(1)
+                            .dropLast(1)
+                            .trim()
+                } else {
+                    EMPTY_STRING
+                }
+
+                val classroom = groupsFacultiesClassroom
+                        .substringAfterLast(')')
+                        .filter { it != ' ' }
 
                 return TeacherLesson(subject, faculties, groups, lessonType, classroom, startTime, endTime)
             }
         }
 
         return TeacherLesson(startTime, endTime)
+    }
+
+    private fun findOpeningParenthesisIndex(str: String): Int {
+        if (str != EMPTY_STRING) {
+            var closingParenthesisCnt = 0
+            var openingParenthesisCnt = 0
+            for (chIdx in str.indices) {
+                val idx = str.lastIndex - chIdx
+                if (str[idx] == ')') closingParenthesisCnt++
+                if (str[idx] == '(') openingParenthesisCnt++
+
+                if (closingParenthesisCnt != 0 && closingParenthesisCnt == openingParenthesisCnt) {
+                    return idx
+                }
+            }
+        }
+
+        return str.length
     }
 
     private fun getRichTextSubstringLengths(richTextString: HSSFRichTextString): List<Int> {
