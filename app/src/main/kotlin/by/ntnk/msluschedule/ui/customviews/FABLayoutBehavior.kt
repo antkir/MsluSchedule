@@ -29,16 +29,17 @@ class FABLayoutBehavior(
         params.dodgeInsetEdges = Gravity.BOTTOM
     }
 
-    override fun onNestedScroll(
-            coordinatorLayout: CoordinatorLayout, child: RelativeLayout, target: View,
-            dxConsumed: Int, dyConsumed: Int, dxUnconsumed: Int, dyUnconsumed: Int, type: Int
-    ) {
-        if (child.visibility == View.VISIBLE && (dyConsumed > 0 || dyUnconsumed > 0)) {
-            child.visibility = View.INVISIBLE
-            child.startAnimation(famSlideDownAnim)
-        } else if (child.visibility != View.VISIBLE && dyConsumed < 0) {
-            child.visibility = View.VISIBLE
-            child.startAnimation(famSlideUpAnim)
+    override fun onNestedScroll(coordinatorLayout: CoordinatorLayout, child: RelativeLayout, target: View,
+                                dxConsumed: Int, dyConsumed: Int, dxUnconsumed: Int, dyUnconsumed: Int,
+                                type: Int, consumed: IntArray) {
+        if (type == ViewCompat.TYPE_TOUCH) {
+            if (child.visibility == View.VISIBLE && (dyConsumed > 0 || dyUnconsumed > 0)) {
+                child.visibility = View.INVISIBLE
+                child.startAnimation(famSlideDownAnim)
+            } else if (child.visibility != View.VISIBLE && dyConsumed < 0) {
+                child.visibility = View.VISIBLE
+                child.startAnimation(famSlideUpAnim)
+            }
         }
     }
 }
