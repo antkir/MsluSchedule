@@ -37,6 +37,7 @@
     <string name="imageview_time_description">Час</string>
     <string name="imageview_subject_description">Прадмет</string>
     <string name="imageview_dayitem_description">Нататкі</string>
+    <string name="class_same_time_description">Гэты занятак пачынаецца адначасова з заняткам вышэй у спісе</string>
     <string name="snackbar_action_undo">Скасаваць</string>
     <string name="snackbar_note_deleted">Нататка была выдаленая</string>
     <string name="textview_zeronotes">Няма нататкаў на гэты дзень</string>
@@ -72,7 +73,8 @@
         <item>Цёмная</item>
         <item>Аўтаматычна</item>
     </string-array>
-    <string name="tutorial_welcome_title">Сардэчна запрашаем у `Расклад МДЛУ`</string>
+
+    <string name="tutorial_welcome_title">Вітаем у `Расклад МДЛУ`</string>
     <string name="tutorial_welcome_description">Націсніце, каб працягнуць.</string>
     <string name="tutorial_navigation_view_title">Бакавое меню</string>
     <string name="tutorial_navigation_view_description">Тут можна праверыць дададзеныя расклады або змяніць налады.</string>

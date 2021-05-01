@@ -68,6 +68,8 @@
     <string name="imageview_classroom_description">Classroom</string>
     <string name="imageview_weekdays_description">Weekdays</string>
 
+    <string name="class_same_time_description">This class starts at the same time as the class higher in the list</string>
+
     <string name="activity_lesson_info_title">Details</string>
 
     <!-- Settings -->

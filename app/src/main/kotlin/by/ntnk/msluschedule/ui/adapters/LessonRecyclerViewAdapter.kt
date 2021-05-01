@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.NO_POSITION
@@ -58,14 +59,21 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
             data.add(dayView)
 
             if (day.lessons.isNotEmpty()) {
+                var prevStartTime: String = EMPTY_STRING
+
                 for (lesson in day.lessons) {
                     val lessonView: BaseRVItemView =
                             when (lesson) {
-                                is StudyGroupLesson -> StudyGroupLessonView(lesson)
+                                is StudyGroupLesson -> {
+                                    val isClassAlternative: Boolean = prevStartTime == lesson.startTime
+                                    StudyGroupLessonView(lesson, isClassAlternative)
+                                }
                                 is TeacherLesson -> TeacherLessonView(lesson)
                                 else -> throw NullPointerException()
                             }
                     data.add(lessonView)
+
+                    prevStartTime = lesson.startTime
                 }
             } else {
                 data.add(BlankLessonView())
@@ -117,6 +125,20 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
                                 (data[adapterPosition] as StudyGroupLessonView).lesson.subject != EMPTY_STRING) {
                             onClickSubject.onNext(data[adapterPosition])
                         }
+                    }
+
+                    itemView.setOnLongClickListener {
+                        if (adapterPosition != NO_POSITION &&
+                                (data[adapterPosition] as StudyGroupLessonView).isClassAlternative) {
+                            if (itemView.context != null) {
+                                Toast.makeText(
+                                        itemView.context,
+                                        itemView.context.resources.getString(R.string.class_same_time_description),
+                                        Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                        return@setOnLongClickListener true
                     }
                 }
             }
@@ -198,17 +220,23 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
         }
     }
 
-    class StudyGroupLessonView(val lesson: StudyGroupLesson) : BaseRVItemView {
+    class StudyGroupLessonView(val lesson: StudyGroupLesson, val isClassAlternative: Boolean) : BaseRVItemView {
         override val viewType: Int = VIEWTYPE_STUDYGROUP
 
         override fun bindViewHolder(viewHolder: RecyclerView.ViewHolder) {
             with(viewHolder as StudyGroupLessonViewHolder) {
-                lessonStartTime.text = lesson.startTime
-                lessonEndTime.text = lesson.endTime
+                lessonStartTime.text = if (isClassAlternative) EMPTY_STRING else lesson.startTime
+                lessonEndTime.text = if (isClassAlternative) EMPTY_STRING else lesson.endTime
                 lessonSubject.text = lesson.subject
                 lessonTeacher.text = lesson.teacher
                 lessonClassroom.text = lesson.classroom
                 lessonType.text = lesson.type
+
+                if (isClassAlternative) {
+                    lessonImgTime.visibility = View.VISIBLE
+                } else {
+                    lessonImgTime.visibility = View.GONE
+                }
 
                 if (lessonType.text.isBlank()) {
                     lessonType.visibility = View.GONE
@@ -242,6 +270,7 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
     }
 
     private class StudyGroupLessonViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val lessonImgTime: ImageView = view.findViewById(R.id.img_studygrouplesson_same_time)
         val lessonStartTime: TextView = view.findViewById(R.id.text_studygrouplesson_starttime)
         val lessonEndTime: TextView = view.findViewById(R.id.text_studygrouplesson_endtime)
         val lessonSubject: TextView = view.findViewById(R.id.text_studygrouplesson_subject)

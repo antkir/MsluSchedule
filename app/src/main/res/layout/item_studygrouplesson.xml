@@ -8,6 +8,20 @@
     android:foreground="?attr/selectableItemBackground"
     tools:ignore="UnusedAttribute">
 
+    <ImageView
+        android:id="@+id/img_studygrouplesson_same_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="21dp"
+        android:layout_marginRight="21dp"
+        android:clickable="false"
+        android:contentDescription="@string/class_same_time_description"
+        android:src="@drawable/ic_list_arrow_up"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/text_studygrouplesson_subject"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
         android:id="@+id/text_studygrouplesson_starttime"
         android:layout_width="wrap_content"
