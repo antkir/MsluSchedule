@@ -163,8 +163,8 @@ class SettingsActivity : AppCompatActivity(), HasAndroidInjector {
                 return inflater.inflate(R.layout.fragment_libraries, container, false)
             }
 
-            override fun onActivityCreated(savedInstanceState: Bundle?) {
-                super.onActivityCreated(savedInstanceState)
+            override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+                super.onViewCreated(view, savedInstanceState)
                 libraryUrls = resources.getStringArray(R.array.library_urls)
                 val adapter = ArrayAdapter.createFromResource(
                         requireActivity(), R.array.library_list, android.R.layout.simple_list_item_1)
