@@ -41,6 +41,8 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
         lateinit var type: String
         lateinit var teacher: String
         lateinit var classroom: String
+
+        var prevTime: Pair<String, String> = Pair(EMPTY_STRING, EMPTY_STRING)
         var isPreviousLessonPhysEd = false
 
         for (cell in cells) {
@@ -54,8 +56,10 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
                 }
                 1 -> {
                     val pair = getLessonTimePair(cell.stringCellValue)
-                    startTime = pair.first
-                    endTime = pair.second
+                    startTime = if (pair.first != EMPTY_STRING) pair.first else prevTime.first
+                    endTime = if (pair.second != EMPTY_STRING) pair.second else prevTime.second
+
+                    prevTime = Pair(startTime, endTime)
                 }
                 2 -> {
                     subject = EMPTY_STRING
@@ -92,7 +96,7 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
                 3 -> {
                     classroom = cell.stringCellValue.replace(" ", EMPTY_STRING)
 
-                    if (startTime.isNotEmpty()) {
+                    if (startTime.isNotEmpty() || subject.isNotEmpty()) {
                         val lesson = StudyGroupLesson(subject, type, teacher, classroom, startTime, endTime)
                         if (sharedPreferencesRepository.isPhysEdClassHidden()) {
                             if (subject.contains("физ", ignoreCase = true) &&
@@ -134,7 +138,7 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
     private fun getLessonTimePair(value: String): Pair<String, String> {
         return if (value.isNotEmpty()) {
             val values = value.split("-".toRegex())
-            Pair(values[0], values[1])
+            Pair(values[0].trim(), values[1].trim())
         } else {
             Pair(EMPTY_STRING, EMPTY_STRING)
         }
