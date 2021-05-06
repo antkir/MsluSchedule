@@ -3,21 +3,21 @@
 [![Build Status](https://travis-ci.com/antkir/MsluSchedule.svg?branch=master)](https://travis-ci.com/antkir/MsluSchedule)
 
 
-Just a simple Android application to view schedules of the classes at Minsk State Linguistic University.
+An Android application to view the schedule of classes at Minsk State Linguistic University.
 
-<a href="https://play.google.com/store/apps/details?id=by.ntnk.msluschedule" target="_blank"><img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png" alt="Get it on Google Play" height="60"/></a>
+<a href="https://play.google.com/store/apps/details?id=by.ntnk.msluschedule"><img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" height="80"/></a>
 
 
 ## Build Instructions
 
 
-1. Clone or Download the repository:
+1. Download or clone the repository:
 
   ```shell
   git clone https://github.com/antkir/MsluSchedule
   ```
 
-2. Import the project into Android Studio **or** build on the command line:
+2. Import the project into Android Studio or build on the command line:
 
   ```shell
   ./gradlew clean app:assembleRelease
@@ -26,7 +26,7 @@ Just a simple Android application to view schedules of the classes at Minsk Stat
 ## License
 
 
-    Copyright 2018 Kirill Antonik
+    Copyright 2018 Kiryl Antonik
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
