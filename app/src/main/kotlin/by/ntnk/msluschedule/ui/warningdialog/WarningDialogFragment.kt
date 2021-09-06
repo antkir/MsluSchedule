@@ -56,7 +56,7 @@ class WarningDialogFragment : DialogFragment() {
         button.isEnabled = false
         val buttonDeleteString = resources.getString(R.string.button_delete)
         val buttonDeleteColor = ContextCompat.getColor(requireContext(), R.color.warning)
-        val timeout = 5L
+        val timeout = 3L
         disposable = Observable
                 .intervalRange(1, timeout, 0, 1, TimeUnit.SECONDS)
                 .map { timePassed -> timeout - timePassed }
