@@ -3,7 +3,6 @@ package by.ntnk.msluschedule.ui.main
 import android.animation.Animator
 import android.content.res.Configuration
 import android.graphics.Color
-import android.graphics.Point
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -12,6 +11,7 @@ import android.view.*
 import android.view.animation.OvershootInterpolator
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.content.ContextCompat
+import androidx.core.text.TextUtilsCompat
 import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -46,6 +46,10 @@ import kotlinx.android.synthetic.main.content_main.*
 import kotlinx.android.synthetic.main.fam_main.*
 import java.lang.ref.WeakReference
 import javax.inject.Inject
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.WindowCompat
+import java.util.Locale
 
 private const val ADD_GROUP_FRAGMENT_TAG = "AddGroupFragment"
 private const val ADD_TEACHER_FRAGMENT_TAG = "AddTeacherFragment"
@@ -95,49 +99,52 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
 
         nav_view.setNavigationItemSelectedListener(this)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            var uiFlags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+            WindowCompat.setDecorFitsSystemWindows(window, false)
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
                 val nightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
                 if (nightMode == Configuration.UI_MODE_NIGHT_NO) {
-                    uiFlags = uiFlags or
-                            WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS or
-                            View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+                    val insetsController = WindowInsetsControllerCompat(window, window.decorView)
+                    insetsController.isAppearanceLightNavigationBars = true
                 }
             }
-            window.decorView.systemUiVisibility = uiFlags
 
-            drawer_layout.setOnApplyWindowInsetsListener { view, insets ->
+            ViewCompat.setOnApplyWindowInsetsListener(drawer_layout) { view, insets ->
                 val layoutParams = view.layoutParams as ViewGroup.MarginLayoutParams
-                layoutParams.bottomMargin = insets.systemWindowInsetBottom
-                layoutParams.leftMargin = insets.systemWindowInsetLeft
-                layoutParams.rightMargin = insets.systemWindowInsetRight
+                val insetsSystemBars = WindowInsetsCompat.Type.systemBars()
+                layoutParams.bottomMargin = insets.getInsetsIgnoringVisibility(insetsSystemBars).bottom
+                layoutParams.leftMargin = insets.getInsetsIgnoringVisibility(insetsSystemBars).left
+                layoutParams.rightMargin = insets.getInsetsIgnoringVisibility(insetsSystemBars).right
                 return@setOnApplyWindowInsetsListener insets
             }
 
-            nav_layout_main.setOnApplyWindowInsetsListener { view, insets ->
+            ViewCompat.setOnApplyWindowInsetsListener(nav_layout_main) { view, insets ->
+                val insetsSystemBars = WindowInsetsCompat.Type.systemBars()
                 view.setPadding(
                         view.paddingStart,
-                        insets.systemWindowInsetTop,
+                        insets.getInsetsIgnoringVisibility(insetsSystemBars).top,
                         view.paddingEnd,
                         view.paddingBottom
                 )
                 return@setOnApplyWindowInsetsListener insets
             }
 
-            appbar_main.setOnApplyWindowInsetsListener { view, insets ->
+            ViewCompat.setOnApplyWindowInsetsListener(appbar_main) { view, insets ->
+                val insetsSystemBars = WindowInsetsCompat.Type.systemBars()
                 view.setPadding(
                         view.paddingStart,
-                        insets.systemWindowInsetTop,
+                        insets.getInsetsIgnoringVisibility(insetsSystemBars).top,
                         view.paddingEnd,
                         view.paddingBottom
                 )
                 return@setOnApplyWindowInsetsListener insets
             }
 
-            framelayout_main.setOnApplyWindowInsetsListener { view, insets ->
+            ViewCompat.setOnApplyWindowInsetsListener(framelayout_main) { view, insets ->
                 val layoutParams = view.layoutParams as ViewGroup.MarginLayoutParams
                 val toolbarHeight = resources.getDimension(R.dimen.toolbar_height).toInt()
-                layoutParams.topMargin = toolbarHeight + insets.systemWindowInsetTop
+                val insetsSystemBars = WindowInsetsCompat.Type.systemBars()
+                layoutParams.topMargin = toolbarHeight + insets.getInsetsIgnoringVisibility(insetsSystemBars).top
                 return@setOnApplyWindowInsetsListener insets
             }
         }
@@ -145,6 +152,29 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
         button_settings_main.setOnClickListener {
             SettingsActivity.startActivity(this)
             Handler(Looper.getMainLooper()).postDelayed(NavigationDrawerRunnable(drawer_layout), 500)
+        }
+
+        button_settings_main.setOnClickListener {
+            SettingsActivity.startActivity(this)
+            Handler(Looper.getMainLooper()).postDelayed(NavigationDrawerRunnable(drawer_layout), 500)
+        }
+
+        basefab_main.setOnClickListener {
+            if (AndroidUtils.isNetworkAccessible(applicationContext)) {
+                if (!isFamOpen) expandFam() else collapseFam()
+            } else {
+                AndroidUtils.showSnackbarNetworkInaccessible(framelayout_main)
+            }
+        }
+
+        groupfab_main.setOnClickListener {
+            AddGroupFragment().show(supportFragmentManager, ADD_GROUP_FRAGMENT_TAG)
+            if (isFamOpen) collapseFam()
+        }
+
+        teacherfab_main.setOnClickListener {
+            AddTeacherFragment().show(supportFragmentManager, ADD_TEACHER_FRAGMENT_TAG)
+            if (isFamOpen) collapseFam()
         }
 
         supportActionBar?.title = savedInstanceState?.getString(ARG_ACTIONBAR_TITLE)
@@ -171,8 +201,18 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
             override fun onGlobalLayout() {
                 drawer_layout?.viewTreeObserver?.removeOnGlobalLayoutListener(this)
 
-                val point = Point()
-                windowManager.defaultDisplay.getSize(point)
+                val layoutDirection = TextUtilsCompat.getLayoutDirectionFromLocale(Locale.getDefault())
+                val isRTL = layoutDirection == ViewCompat.LAYOUT_DIRECTION_RTL
+                val insetsSystemBars = WindowInsetsCompat.Type.systemBars()
+                val insetsTop = ViewCompat.getRootWindowInsets(window.decorView)?.getInsets(insetsSystemBars)?.top ?: 0
+
+                val navIconOffsetX = dipToPixels(28f).toFloat()
+                val navigationViewTargetX = if (isRTL) toolbar_main.right.toFloat() - navIconOffsetX else navIconOffsetX
+                val navigationViewTargetY = insetsTop.toFloat() + toolbar_main.height / 2
+
+                val actIconOffsetX = dipToPixels(22f).toFloat()
+                val actionMenuTargetX = if (isRTL) actIconOffsetX else toolbar_main.right.toFloat() - actIconOffsetX
+                val actionMenuTargetY = insetsTop.toFloat() + toolbar_main.height / 2
 
                 val welcomeTarget = SimpleTarget.Builder(this@MainActivity)
                         .setPoint(image_main_smileyface)
@@ -187,13 +227,13 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
                         .setDescription(getString(R.string.tutorial_add_schedule_description))
                         .build()
                 val navigationViewTarget = SimpleTarget.Builder(this@MainActivity)
-                        .setPoint(0f, toolbar_main.y)
+                        .setPoint(navigationViewTargetX, navigationViewTargetY)
                         .setShape(Circle(dipToPixels(120f).toFloat()))
                         .setTitle(getString(R.string.tutorial_navigation_view_title))
                         .setDescription(getString(R.string.tutorial_navigation_view_description))
                         .build()
                 val actionMenuTarget = SimpleTarget.Builder(this@MainActivity)
-                        .setPoint(point.x.toFloat(), toolbar_main.y)
+                        .setPoint(actionMenuTargetX, actionMenuTargetY)
                         .setShape(ActionMenuCircle(dipToPixels(120f).toFloat(), this@MainActivity, toolbar_main))
                         .setTitle(getString(R.string.tutorial_action_menu_title))
                         .setDescription(getString(R.string.tutorial_action_menu_description))
@@ -338,15 +378,6 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
         outState.putString(ARG_ACTIONBAR_TITLE, supportActionBar?.title.toString())
     }
 
-    @Suppress("UNUSED_PARAMETER")
-    fun onBaseFabClick(view: View) {
-        if (AndroidUtils.isNetworkAccessible(applicationContext)) {
-            if (!isFamOpen) expandFam() else collapseFam()
-        } else {
-            AndroidUtils.showSnackbarNetworkInaccessible(framelayout_main)
-        }
-    }
-
     private fun expandFam() {
         isFamOpen = true
 
@@ -430,18 +461,6 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
         fam_layout_main.setOnClickListener(null)
         fam_layout_main.isClickable = false
         fam_layout_main.isFocusable = false
-    }
-
-    @Suppress("UNUSED_PARAMETER")
-    fun onGroupFabClick(view: View) {
-        AddGroupFragment().show(supportFragmentManager, ADD_GROUP_FRAGMENT_TAG)
-        if (isFamOpen) collapseFam()
-    }
-
-    @Suppress("UNUSED_PARAMETER")
-    fun onTeacherFabClick(view: View) {
-        AddTeacherFragment().show(supportFragmentManager, ADD_TEACHER_FRAGMENT_TAG)
-        if (isFamOpen) collapseFam()
     }
 
     override fun onNewStudyGroup(studyGroup: StudyGroup) {

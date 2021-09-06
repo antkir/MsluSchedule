@@ -84,6 +84,7 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
         if (dataWasEmpty) {
             notifyItemRangeInserted(0, data.size)
         } else {
+            @Suppress("NotifyDataSetChanged")
             notifyDataSetChanged()
         }
     }

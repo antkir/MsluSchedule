@@ -16,7 +16,6 @@
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         android:contentDescription="@string/fab_add_schedule_studygroup_description"
-        android:onClick="onGroupFabClick"
         android:src="@drawable/ic_studygroup"
         android:visibility="invisible"
         app:fabSize="mini"
@@ -32,7 +31,6 @@
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         android:contentDescription="@string/fab_add_schedule_teacher_description"
-        android:onClick="onTeacherFabClick"
         android:src="@drawable/ic_teacher"
         android:visibility="invisible"
         app:fabSize="mini"
@@ -46,7 +44,6 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
         android:contentDescription="@string/fab_add_schedule_main_description"
-        android:onClick="onBaseFabClick"
         android:src="@drawable/ic_fab_add"
         app:fabSize="normal"
         app:useCompatPadding="true" />

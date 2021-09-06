@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.NavUtils
 import androidx.core.content.ContextCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.ListFragment
 import androidx.preference.*
 import by.ntnk.msluschedule.BuildConfig
@@ -43,9 +44,8 @@ class SettingsActivity : AppCompatActivity(), HasAndroidInjector {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
             val nightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
             if (nightMode == Configuration.UI_MODE_NIGHT_NO) {
-                val uiFlags = WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS or
-                        View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-                window.decorView.systemUiVisibility = uiFlags
+                val insetsController = WindowInsetsControllerCompat(window, window.decorView)
+                insetsController.isAppearanceLightNavigationBars = true
             }
         }
     }

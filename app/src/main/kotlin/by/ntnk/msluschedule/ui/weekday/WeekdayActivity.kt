@@ -10,12 +10,12 @@ import android.os.Parcelable
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewTreeObserver
-import android.view.WindowManager
 import android.view.animation.AlphaAnimation
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import androidx.core.app.NavUtils
 import androidx.core.content.ContextCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -106,9 +106,8 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
             val nightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
             if (nightMode == Configuration.UI_MODE_NIGHT_NO) {
-                val uiFlags = WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS or
-                        View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-                window.decorView.systemUiVisibility = uiFlags
+                val insetsController = WindowInsetsControllerCompat(window, window.decorView)
+                insetsController.isAppearanceLightNavigationBars = true
             }
         }
     }
