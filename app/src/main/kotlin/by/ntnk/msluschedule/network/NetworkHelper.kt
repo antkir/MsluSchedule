@@ -98,29 +98,29 @@ class NetworkHelper @Inject constructor(private val currentDate: CurrentDate) {
         val elements = document
                 .select("select[id^=${requestInfo.requestName}]")
                 .first()
-                .children()
+                ?.children()
         val data = ScheduleFilter()
         elements
-                .filter { it.`val`().isNotBlank() }
-                .forEach { data.put(it.`val`().toInt(), it.text()) }
+                ?.filter { it.`val`().isNotBlank() }
+                ?.forEach { data.put(it.`val`().toInt(), it.text()) }
         return data
     }
 
-    @Throws(NullPointerException::class, InvalidYearException::class)
+    @Throws(InvalidYearException::class)
     private fun checkYearValid(htmlBody: Document) {
         val elements = htmlBody
                 .select("select[id^=${yearRequestInfo.requestName}]")
                 .first()
-                .children()
+                ?.children()
 
         val hasValidYear = elements
-                .eachAttr("value")
-                .filter { it.isNotBlank() }
-                .map { Integer.parseInt(it) }
-                .filter { it == currentDate.academicYear }
-                .any()
+                ?.eachAttr("value")
+                ?.filter { it.isNotBlank() }
+                ?.map { Integer.parseInt(it) }
+                ?.filter { it == currentDate.academicYear }
+                ?.any()
 
-        if (!hasValidYear) throw InvalidYearException()
+        if (hasValidYear == false) throw InvalidYearException()
     }
 
     fun getFormIdPair(scheduleType: String, requestData: RequestData): Pair<String, String> {

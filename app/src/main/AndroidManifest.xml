@@ -18,6 +18,7 @@
         <activity
             android:name="by.ntnk.msluschedule.ui.main.MainActivity"
             android:configChanges="uiMode"
+            android:exported="true"
             android:label="@string/app_name"
             android:launchMode="singleTop"
             android:theme="@style/MsluTheme.LaunchScreen">
