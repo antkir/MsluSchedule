@@ -163,7 +163,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
             smoothScroller.targetPosition = index
             recyclerView.layoutManager?.startSmoothScroll(smoothScroller)
             val fromColor = ContextCompat.getColor(requireContext(), R.color.surface)
-            val toColor = ContextCompat.getColor(requireContext(), R.color.menuitem_highlight)
+            val toColor = ContextCompat.getColor(requireContext(), R.color.item_highlight)
             val highlightAnimation = ValueAnimator.ofObject(ArgbEvaluator(), fromColor, toColor)
             highlightAnimation.duration = 500
             highlightAnimation.addUpdateListener { animator ->
