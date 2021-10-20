@@ -25,7 +25,7 @@
     <dimen name="chipsgroup_padding_horizontal">8dp</dimen>
     <dimen name="button_note_save_height">60dp</dimen>
     <dimen name="button_note_save_width">24dp</dimen>
-    <dimen name="fab_weekday_margin">16dp</dimen>
+    <dimen name="fab_weekday_margin">18dp</dimen>
 
     <dimen name="item_lessoninfo_minheight">56dp</dimen>
     <dimen name="textview_lessoninfo_margin_start">32dp</dimen>
