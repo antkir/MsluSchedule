@@ -15,6 +15,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import androidx.core.app.NavUtils
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -262,11 +263,13 @@ class WeekdayActivity : MvpActivity<WeekdayPresenter, WeekdayView>(),
                 presenter.deleteNote(note.id)
 
                 val noteDeleted = resources.getString(R.string.snackbar_note_deleted)
-                Snackbar.make(constraintlayout_weekday, noteDeleted, Snackbar.LENGTH_LONG)
-                        .setAction(resources.getString(R.string.snackbar_action_undo)) {
-                            presenter.restoreNote(note, weekdayId, noteViewColor, noteSubgroupPosition)
-                        }
-                        .show()
+                val snackbar = Snackbar.make(constraintlayout_weekday, noteDeleted, Snackbar.LENGTH_LONG)
+                    .setAnchorView(fab_weekday)
+                    .setAction(resources.getString(R.string.snackbar_action_undo)) {
+                        presenter.restoreNote(note, weekdayId, noteViewColor, noteSubgroupPosition)
+                    }
+                ViewCompat.setOnApplyWindowInsetsListener(snackbar.view) { _, insets -> insets }
+                snackbar.show()
             }
         }
     }

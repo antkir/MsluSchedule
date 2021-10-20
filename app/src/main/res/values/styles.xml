@@ -72,8 +72,8 @@
     </style>
 
     <style name="MsluTheme.Snackbar" parent="Widget.MaterialComponents.Snackbar">
-        <item name="android:background">@color/snackbar_surface</item>
         <item name="actionTextColorAlpha">1.0</item>
+        <item name="backgroundTint">@color/snackbar_surface</item>
     </style>
 
     <style name="MsluTheme.Snackbar.TextView" parent="Widget.MaterialComponents.Snackbar.TextView">

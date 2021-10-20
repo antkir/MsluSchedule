@@ -32,6 +32,7 @@ import by.ntnk.msluschedule.utils.AndroidUtils
 import by.ntnk.msluschedule.utils.INVALID_VALUE
 import by.ntnk.msluschedule.utils.ScheduleType
 import by.ntnk.msluschedule.utils.SimpleAnimatorListener
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.google.android.material.snackbar.Snackbar
 import dagger.Lazy
@@ -91,7 +92,8 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
                 }
                 presenter.updateSchedule(weekId)
             } else {
-                AndroidUtils.showSnackbarNetworkInaccessible(requireView())
+                val baseFABMain = requireActivity().findViewById<FloatingActionButton>(R.id.basefab_main)
+                AndroidUtils.showSnackbarNetworkInaccessible(baseFABMain)
             }
         }
 
@@ -305,16 +307,18 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         if (shouldSetupViews) {
             presenter.getSchedule(weekId, shouldUpdateAdapter = true)
         }
+        val baseFABMain = requireActivity().findViewById<FloatingActionButton>(R.id.basefab_main)
         val snackbar = Snackbar.make(requireView(), AndroidUtils.getErrorMessageResId(t), 5000)
-                .setAction(R.string.snackbar_week_init_retry) {
-                    context ?: return@setAction
-                    if (AndroidUtils.isNetworkAccessible(requireContext().applicationContext)) {
-                        layoutManagerSavedState = recyclerView.layoutManager?.onSaveInstanceState()
-                        presenter.updateSchedule(weekId)
-                    } else {
-                        showError(t, shouldSetupViews = false)
-                    }
+            .setAnchorView(baseFABMain)
+            .setAction(R.string.snackbar_week_init_retry) {
+                context ?: return@setAction
+                if (AndroidUtils.isNetworkAccessible(requireContext().applicationContext)) {
+                    layoutManagerSavedState = recyclerView.layoutManager?.onSaveInstanceState()
+                    presenter.updateSchedule(weekId)
+                } else {
+                    showError(t, shouldSetupViews = false)
                 }
+            }
         ViewCompat.setOnApplyWindowInsetsListener(snackbar.view) { _, insets -> insets }
         snackbar.show()
     }
@@ -331,7 +335,8 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
                     layoutManagerSavedState = recyclerView.layoutManager?.onSaveInstanceState()
                     presenter.updateSchedule(weekId)
                 } else {
-                    AndroidUtils.showSnackbarNetworkInaccessible(requireView())
+                    val baseFABMain = requireActivity().findViewById<FloatingActionButton>(R.id.basefab_main)
+                    AndroidUtils.showSnackbarNetworkInaccessible(baseFABMain)
                 }
                 return true
             }

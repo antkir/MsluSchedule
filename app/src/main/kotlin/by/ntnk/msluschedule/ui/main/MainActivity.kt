@@ -163,7 +163,7 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
             if (AndroidUtils.isNetworkAccessible(applicationContext)) {
                 if (!isFamOpen) expandFam() else collapseFam()
             } else {
-                AndroidUtils.showSnackbarNetworkInaccessible(framelayout_main)
+                AndroidUtils.showSnackbarNetworkInaccessible(it)
             }
         }
 
@@ -473,6 +473,7 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
 
     override fun onError(t: Throwable) {
         val snackbar = Snackbar.make(framelayout_main, AndroidUtils.getErrorMessageResId(t), Snackbar.LENGTH_LONG)
+        snackbar.anchorView = basefab_main
         ViewCompat.setOnApplyWindowInsetsListener(snackbar.view) { _, insets -> insets }
         snackbar.show()
     }
@@ -539,6 +540,7 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
         text_main_advice.visibility = View.VISIBLE
 
         val snackbar = Snackbar.make(framelayout_main, R.string.error_general, Snackbar.LENGTH_LONG)
+        snackbar.anchorView = basefab_main
         ViewCompat.setOnApplyWindowInsetsListener(snackbar.view) { _, insets -> insets }
         snackbar.show()
     }

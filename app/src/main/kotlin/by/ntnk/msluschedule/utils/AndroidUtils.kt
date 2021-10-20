@@ -81,6 +81,7 @@ object AndroidUtils {
 
     fun showSnackbarNetworkInaccessible(view: View) {
         val snackbar = Snackbar.make(view, R.string.snackbar_internet_unavailable, Snackbar.LENGTH_LONG)
+        snackbar.anchorView = view
         ViewCompat.setOnApplyWindowInsetsListener(snackbar.view) { _, insets -> insets }
         snackbar.show()
     }
