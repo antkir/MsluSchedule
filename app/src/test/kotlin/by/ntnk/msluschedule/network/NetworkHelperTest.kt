@@ -27,7 +27,7 @@ class NetworkHelperTest {
     }
 
     @Test
-    fun `Throws NullPointerException() when main html page doesn't contain requested elements`() {
+    fun `Throws InvalidYearException() when main html page doesn't contain requested elements`() {
         // given
         val requestInfo = networkHelper.facultyRequestInfo
         val mediaType = MediaType.parse(EMPTY_STRING)
@@ -35,7 +35,7 @@ class NetworkHelperTest {
         // when
         val testObserver = networkHelper.parseDataFromHtmlBody(requestInfo, responseBody).test()
         // then
-        testObserver.assertError(NullPointerException::class.java)
+        testObserver.assertError(InvalidYearException::class.java)
     }
 
     @Test

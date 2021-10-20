@@ -120,7 +120,7 @@ class NetworkHelper @Inject constructor(private val currentDate: CurrentDate) {
                 ?.filter { it == currentDate.academicYear }
                 ?.any()
 
-        if (hasValidYear == false) throw InvalidYearException()
+        if (hasValidYear != true) throw InvalidYearException()
     }
 
     fun getFormIdPair(scheduleType: String, requestData: RequestData): Pair<String, String> {
