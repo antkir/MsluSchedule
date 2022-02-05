@@ -69,9 +69,9 @@ class SettingsActivity : AppCompatActivity(), HasAndroidInjector {
             super.onAttach(context)
         }
 
-        override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
             val view = super.onCreateView(inflater, container, savedInstanceState)
-            view?.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.surface))
+            view.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.surface))
             return view
         }
 

@@ -57,6 +57,7 @@ class LessonInfoActivity : MvpActivity<LessonInfoPresenter, LessonInfoView>(),
         when (scheduleType) {
             ScheduleType.STUDYGROUP -> setContentView(R.layout.activity_lessoninfo_studygroup)
             ScheduleType.TEACHER -> setContentView(R.layout.activity_lessoninfo_teacher)
+            else -> {}
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {

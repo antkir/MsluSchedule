@@ -177,7 +177,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     }
 
     override fun showSchedule(data: List<WeekdayWithLessons<Lesson>>) {
-        if (data.map { it.lessons.size }.sum() == 0) {
+        if (data.sumOf { it.lessons.size } == 0) {
             button_week_weekdays_visibility.visibility = View.VISIBLE
             if (!isEmptyScheduleDaysVisible) {
                 text_week_nolessons.visibility = View.VISIBLE
