@@ -16,7 +16,8 @@
         android:id="@+id/nav_layout_main"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_gravity="start">
+        android:layout_gravity="start"
+        android:background="@color/surface">
 
         <com.google.android.material.navigation.NavigationView
             android:id="@+id/nav_view"
@@ -34,17 +35,22 @@
             android:layout_height="1dp"
             android:layout_alignParentBottom="true"
             android:layout_marginBottom="@dimen/nav_view_footer_height"
-            android:background="@color/item_separator" />
+            android:background="@color/item_separator"
+            android:elevation="16dp"
+            tools:ignore="UnusedAttribute" />
 
         <TextView
             android:id="@+id/button_settings_main"
             android:layout_width="@dimen/nav_view_width"
             android:layout_height="@dimen/nav_view_footer_height"
             android:layout_alignParentBottom="true"
+            android:layout_marginBottom="0dp"
             android:background="@drawable/item_surface"
             android:clickable="true"
             android:drawablePadding="@dimen/nav_view_footer_image_padding_end"
+            android:elevation="16dp"
             android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
             android:gravity="start|center_vertical"
             android:paddingStart="@dimen/nav_view_footer_textview_padding_side"
             android:paddingLeft="@dimen/nav_view_footer_textview_padding_side"
@@ -53,7 +59,8 @@
             android:text="@string/navigation_drawer_settings"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Button"
             app:drawableLeftCompat="@drawable/ic_menu_settings"
-            app:drawableStartCompat="@drawable/ic_menu_settings" />
+            app:drawableStartCompat="@drawable/ic_menu_settings"
+            tools:ignore="UnusedAttribute" />
 
     </RelativeLayout>
 
