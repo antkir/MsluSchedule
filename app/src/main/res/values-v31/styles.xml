@@ -1,0 +1,7 @@
+<resources>
+    <style name="MsluTheme.LaunchScreen" parent="MsluTheme.NoActionBar">
+        <item name="android:windowSplashScreenBackground">@color/colorPrimary</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_splash_anim</item>
+        <item name="android:windowSplashScreenAnimationDuration">500</item>
+    </style>
+</resources>
