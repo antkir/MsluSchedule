@@ -67,7 +67,9 @@ class WarningDialogFragment : DialogFragment() {
                         onComplete = {
                             button.setTextColor(buttonDeleteColor)
                             button.isEnabled = true
+                            val width = button.width
                             button.text = buttonDeleteString
+                            button.width = width
                         },
                         onError = { throwable -> Timber.e(throwable) }
                 )
