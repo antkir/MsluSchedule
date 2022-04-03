@@ -25,18 +25,25 @@
             android:layout_height="match_parent"
             android:layout_marginBottom="@dimen/nav_view_footer_height"
             android:background="@color/surface"
+            app:dividerInsetEnd="@dimen/nav_view_item_padding_horizontal"
+            app:dividerInsetStart="@dimen/nav_view_item_padding_horizontal"
             app:headerLayout="@layout/nav_header_main"
             app:itemBackground="@drawable/nav_view_item_background"
+            app:itemHorizontalPadding="@dimen/nav_view_item_padding_horizontal"
             app:itemTextColor="@drawable/nav_view_item_textcolor"
-            app:menu="@menu/activity_main_drawer" />
+            app:menu="@menu/activity_main_drawer"
+            app:subheaderColor="@color/tertiary_text"
+            app:subheaderInsetEnd="@dimen/nav_view_item_padding_horizontal"
+            app:subheaderInsetStart="@dimen/nav_view_item_padding_horizontal"
+            app:subheaderTextAppearance="@style/TextAppearance.MaterialComponents.Overline" />
 
-        <View
+        <com.google.android.material.divider.MaterialDivider
             android:layout_width="@dimen/nav_view_width"
-            android:layout_height="1dp"
+            android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_marginBottom="@dimen/nav_view_footer_height"
-            android:background="@color/item_separator"
             android:elevation="16dp"
+            app:dividerColor="@color/item_separator"
             tools:ignore="UnusedAttribute" />
 
         <TextView
@@ -47,15 +54,15 @@
             android:layout_marginBottom="0dp"
             android:background="@drawable/item_surface"
             android:clickable="true"
-            android:drawablePadding="@dimen/nav_view_footer_image_padding_end"
+            android:drawablePadding="@dimen/nav_view_footer_icon_padding_end"
             android:elevation="16dp"
             android:focusable="true"
             android:foreground="?attr/selectableItemBackground"
             android:gravity="start|center_vertical"
-            android:paddingStart="@dimen/nav_view_footer_textview_padding_side"
-            android:paddingLeft="@dimen/nav_view_footer_textview_padding_side"
-            android:paddingEnd="@dimen/nav_view_footer_textview_padding_side"
-            android:paddingRight="@dimen/nav_view_footer_textview_padding_side"
+            android:paddingStart="@dimen/nav_view_item_padding_horizontal"
+            android:paddingLeft="@dimen/nav_view_item_padding_horizontal"
+            android:paddingEnd="@dimen/nav_view_item_padding_horizontal"
+            android:paddingRight="@dimen/nav_view_item_padding_horizontal"
             android:text="@string/navigation_drawer_settings"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Button"
             app:drawableLeftCompat="@drawable/ic_menu_settings"

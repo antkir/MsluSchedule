@@ -13,12 +13,14 @@
         android:layout_above="@id/teacherfab_main"
         android:layout_alignParentEnd="true"
         android:layout_marginTop="14dp"
-        android:layout_marginBottom="14dp"
         android:layout_marginEnd="22dp"
+        android:layout_marginBottom="14dp"
         android:contentDescription="@string/fab_add_schedule_studygroup_description"
         android:src="@drawable/ic_studygroup"
         android:visibility="invisible"
-        app:fabSize="mini" />
+        app:backgroundTint="@color/colorAccent"
+        app:fabSize="mini"
+        app:tint="@color/fab_icon" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/teacherfab_main"
@@ -27,24 +29,28 @@
         android:layout_above="@id/basefab_main"
         android:layout_alignParentEnd="true"
         android:layout_marginTop="14dp"
-        android:layout_marginBottom="14dp"
         android:layout_marginEnd="22dp"
+        android:layout_marginBottom="14dp"
         android:contentDescription="@string/fab_add_schedule_teacher_description"
         android:src="@drawable/ic_teacher"
         android:visibility="invisible"
-        app:fabSize="mini" />
+        app:backgroundTint="@color/colorAccent"
+        app:fabSize="mini"
+        app:tint="@color/fab_icon" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/basefab_main"
-        android:layout_marginTop="18dp"
-        android:layout_marginBottom="18dp"
-        android:layout_marginEnd="18dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
+        android:layout_marginTop="18dp"
+        android:layout_marginEnd="18dp"
+        android:layout_marginBottom="18dp"
         android:contentDescription="@string/fab_add_schedule_main_description"
         android:src="@drawable/ic_fab_add"
-        app:fabSize="normal" />
+        app:backgroundTint="@color/colorAccent"
+        app:fabSize="normal"
+        app:tint="@color/fab_icon" />
 
 </RelativeLayout>

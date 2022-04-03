@@ -13,6 +13,7 @@
     <color name="weeks_tablayout_text">#AAFFFFFF</color>
     <color name="weeks_tablayout_selected_text">#FFFFFF</color>
     <color name="chip_text">#000000</color>
+    <color name="app_bar_text">#FFFFFF</color>
 
     <color name="state_pressed">#E0E0E0</color>
     <color name="item_highlight">#E0EBF9</color>
@@ -36,4 +37,6 @@
     <color name="text_pref_category">#006DDE</color>
     <color name="unfocused_background">#44000000</color>
     <color name="transparent">#00000000</color>
+
+    <color name="fab_icon">#000000</color>
 </resources>

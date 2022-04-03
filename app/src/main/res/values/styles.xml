@@ -37,14 +37,19 @@
     </style>
 
     <style name="MsluTheme.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar">
-        <item name="android:background">@color/colorPrimary</item>
+        <item name="colorSurface">@color/colorPrimary</item>
+        <item name="colorOnSurface">@color/app_bar_text</item>
     </style>
 
-    <style name="MsluTheme.AppBarOverlay.NoActionBar" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar" />
+    <style name="MsluTheme.AppBarOverlay.NoActionBar" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar" >
+        <item name="colorPrimary">@color/surface</item>
+    </style>
 
-    <style name="MsluTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Light" />
+    <style name="MsluTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Light" >
+        <item name="colorSurface">@color/surface</item>
+    </style>
 
-    <style name="MsluTheme.ActionModeButton" parent="Widget.AppCompat.Button.Borderless" />
+    <style name="MsluTheme.ActionModeButton" parent="Widget.MaterialComponents.Button" />
 
     <style name="MsluTheme.Dialog.Alert" parent="Theme.MaterialComponents.Light.Dialog.Alert">
         <item name="colorAccent">@color/colorAccent</item>
@@ -60,7 +65,7 @@
         <item name="android:windowExitAnimation">@anim/dialog_zoom_out</item>
     </style>
 
-    <style name="MsluTheme.Chip.Choice" parent="Widget.MaterialComponents.Chip.Choice">
+    <style name="MsluTheme.Chip.Filter" parent="Widget.MaterialComponents.Chip.Choice">
         <item name="android:checkable">true</item>
         <item name="checkedIconVisible">true</item>
         <item name="chipBackgroundColor">@color/colorAccent</item>

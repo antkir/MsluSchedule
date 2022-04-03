@@ -18,7 +18,9 @@
         android:contentDescription="@string/fab_add_schedule_studygroup_description"
         android:src="@drawable/ic_studygroup"
         android:visibility="invisible"
+        app:backgroundTint="@color/colorAccent"
         app:fabSize="mini"
+        app:tint="@color/fab_icon"
         app:useCompatPadding="true" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -33,7 +35,9 @@
         android:contentDescription="@string/fab_add_schedule_teacher_description"
         android:src="@drawable/ic_teacher"
         android:visibility="invisible"
+        app:backgroundTint="@color/colorAccent"
         app:fabSize="mini"
+        app:tint="@color/fab_icon"
         app:useCompatPadding="true" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -45,7 +49,9 @@
         android:layout_alignParentBottom="true"
         android:contentDescription="@string/fab_add_schedule_main_description"
         android:src="@drawable/ic_fab_add"
+        app:backgroundTint="@color/colorAccent"
         app:fabSize="normal"
+        app:tint="@color/fab_icon"
         app:useCompatPadding="true" />
 
 </RelativeLayout>

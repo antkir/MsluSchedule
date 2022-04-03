@@ -1,8 +1,8 @@
 <resources>
     <dimen name="nav_header_height">0dp</dimen>
     <dimen name="nav_view_footer_height">64dp</dimen>
-    <dimen name="nav_view_footer_textview_padding_side">16dp</dimen>
-    <dimen name="nav_view_footer_image_padding_end">32dp</dimen>
+    <dimen name="nav_view_item_padding_horizontal">24dp</dimen>
+    <dimen name="nav_view_footer_icon_padding_end">12dp</dimen>
     <dimen name="nav_view_width">512dp</dimen>
 
     <dimen name="actv_progressbar_inset">12dp</dimen>

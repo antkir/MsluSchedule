@@ -13,7 +13,9 @@
         <item name="snackbarButtonStyle">@style/MsluTheme.Snackbar.Button</item>
     </style>
 
-    <style name="MsluTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Dark" />
+    <style name="MsluTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Dark" >
+        <item name="colorSurface">@color/surface</item>
+    </style>
 
     <style name="MsluTheme.Dialog.Alert" parent="Theme.MaterialComponents.Dialog.Alert">
         <item name="colorAccent">@color/colorAccent</item>

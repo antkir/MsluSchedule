@@ -130,7 +130,9 @@
         android:layout_marginBottom="@dimen/fab_weekday_margin"
         android:contentDescription="@string/fab_edit_note"
         android:src="@drawable/ic_edit_note"
+        app:backgroundTint="@color/colorAccent"
         app:fabSize="normal"
+        app:tint="@color/fab_icon"
         app:useCompatPadding="true" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

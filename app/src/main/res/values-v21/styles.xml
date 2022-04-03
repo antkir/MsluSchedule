@@ -1,4 +1,5 @@
 <resources>
+
     <style name="MsluTheme" parent="Theme.MaterialComponents.Light">
         <item name="colorAccent">@color/colorAccent</item>
         <item name="colorPrimary">@color/colorPrimary</item>
@@ -23,7 +24,7 @@
         <item name="android:windowBackground">@drawable/launch_screen</item>
     </style>
 
-    <style name="MsluTheme.ActionModeButton" parent="Widget.AppCompat.Button.Borderless">
+    <style name="MsluTheme.ActionModeButton" parent="Widget.MaterialComponents.Button">
         <item name="android:backgroundTint">@color/transparent</item>
     </style>
 </resources>
