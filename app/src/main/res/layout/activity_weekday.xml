@@ -25,10 +25,10 @@
             android:text="@string/textview_zeronotes"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
             android:textColor="@color/tertiary_text"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerview_notes"
@@ -128,11 +128,13 @@
         android:layout_marginEnd="@dimen/fab_weekday_margin"
         android:layout_marginRight="@dimen/fab_weekday_margin"
         android:layout_marginBottom="@dimen/fab_weekday_margin"
+        android:clipToOutline="true"
         android:contentDescription="@string/fab_edit_note"
         android:src="@drawable/ic_edit_note"
         app:backgroundTint="@color/colorAccent"
         app:fabSize="normal"
         app:tint="@color/fab_icon"
-        app:useCompatPadding="true" />
+        app:useCompatPadding="true"
+        tools:ignore="UnusedAttribute" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

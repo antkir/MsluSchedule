@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/relative_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -15,13 +16,15 @@
         android:layout_alignParentRight="true"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
+        android:clipToOutline="true"
         android:contentDescription="@string/fab_add_schedule_studygroup_description"
         android:src="@drawable/ic_studygroup"
         android:visibility="invisible"
         app:backgroundTint="@color/colorAccent"
         app:fabSize="mini"
         app:tint="@color/fab_icon"
-        app:useCompatPadding="true" />
+        app:useCompatPadding="true"
+        tools:ignore="UnusedAttribute" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_teacher"
@@ -32,13 +35,15 @@
         android:layout_alignParentRight="true"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
+        android:clipToOutline="true"
         android:contentDescription="@string/fab_add_schedule_teacher_description"
         android:src="@drawable/ic_teacher"
         android:visibility="invisible"
         app:backgroundTint="@color/colorAccent"
         app:fabSize="mini"
         app:tint="@color/fab_icon"
-        app:useCompatPadding="true" />
+        app:useCompatPadding="true"
+        tools:ignore="UnusedAttribute" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_base"
@@ -47,11 +52,13 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
+        android:clipToOutline="true"
         android:contentDescription="@string/fab_add_schedule_main_description"
         android:src="@drawable/ic_fab_add"
         app:backgroundTint="@color/colorAccent"
         app:fabSize="normal"
         app:tint="@color/fab_icon"
-        app:useCompatPadding="true" />
+        app:useCompatPadding="true"
+        tools:ignore="UnusedAttribute" />
 
 </RelativeLayout>
