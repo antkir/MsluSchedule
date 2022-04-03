@@ -7,13 +7,41 @@
     android:layout_height="match_parent"
     tools:openDrawer="start">
 
-    <include
-        layout="@layout/app_bar_main"
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent">
+
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/appbar"
+            android:background="@color/colorPrimary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:theme="@style/MsluTheme.AppBarOverlay.NoActionBar"
+            app:elevation="0dp">
+
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/toolbar_height"
+                app:popupTheme="@style/MsluTheme.PopupOverlay" />
+
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <include
+            android:id="@+id/content"
+            layout="@layout/content_main"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="@dimen/toolbar_height" />
+
+        <include
+            android:id="@+id/fam"
+            layout="@layout/fam_main" />
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <RelativeLayout
-        android:id="@+id/nav_layout_main"
+        android:id="@+id/nav_drawer_layout"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
@@ -47,7 +75,7 @@
             tools:ignore="UnusedAttribute" />
 
         <TextView
-            android:id="@+id/button_settings_main"
+            android:id="@+id/button_settings"
             android:layout_width="@dimen/nav_view_width"
             android:layout_height="@dimen/nav_view_footer_height"
             android:layout_alignParentBottom="true"

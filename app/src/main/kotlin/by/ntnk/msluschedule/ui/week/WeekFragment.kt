@@ -92,7 +92,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
                 }
                 presenter.updateSchedule(weekId)
             } else {
-                val baseFABMain = requireActivity().findViewById<FloatingActionButton>(R.id.basefab_main)
+                val baseFABMain = requireActivity().findViewById<FloatingActionButton>(R.id.fab_base)
                 AndroidUtils.showSnackbarNetworkInaccessible(baseFABMain)
             }
         }
@@ -201,7 +201,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
                 val index = adapter.getWeekdayViewIndex(presenter.getCurrentDayOfWeek())
                 layoutManager.scrollToPosition(index)
             }
-            activity?.findViewById<CircularProgressIndicator>(R.id.progressbar_main)?.visibility = View.GONE
+            activity?.findViewById<CircularProgressIndicator>(R.id.progressbar)?.visibility = View.GONE
             parentFragment?.view?.findViewById<ViewPager>(R.id.viewpager_weekscontainer)?.visibility = View.VISIBLE
         }
     }
@@ -307,7 +307,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         if (shouldSetupViews) {
             presenter.getSchedule(weekId, shouldUpdateAdapter = true)
         }
-        val baseFABMain = requireActivity().findViewById<FloatingActionButton>(R.id.basefab_main)
+        val baseFABMain = requireActivity().findViewById<FloatingActionButton>(R.id.fab_base)
         val snackbar = Snackbar.make(requireView(), AndroidUtils.getErrorMessageResId(t), 5000)
             .setAnchorView(baseFABMain)
             .setAction(R.string.snackbar_week_init_retry) {
@@ -335,7 +335,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
                     layoutManagerSavedState = recyclerView.layoutManager?.onSaveInstanceState()
                     presenter.updateSchedule(weekId)
                 } else {
-                    val baseFABMain = requireActivity().findViewById<FloatingActionButton>(R.id.basefab_main)
+                    val baseFABMain = requireActivity().findViewById<FloatingActionButton>(R.id.fab_base)
                     AndroidUtils.showSnackbarNetworkInaccessible(baseFABMain)
                 }
                 return true
