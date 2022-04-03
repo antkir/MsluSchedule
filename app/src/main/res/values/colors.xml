@@ -24,7 +24,7 @@
     <color name="snackbar_surface">#303030</color>
     <color name="snackbar_text">#FFFFFF</color>
 
-    <color name="warning">#B00020</color>
+    <color name="destructive_action">#B3261E</color>
     <color name="button_secondary">#EBF3FF</color>
     <color name="note_edit_surface">#FFFFFF</color>
     <color name="icon_tint">#757575</color>
