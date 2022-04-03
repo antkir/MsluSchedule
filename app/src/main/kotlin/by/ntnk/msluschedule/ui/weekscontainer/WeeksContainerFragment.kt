@@ -7,15 +7,14 @@ import android.os.Bundle
 import android.view.*
 import androidx.core.text.TextUtilsCompat
 import androidx.core.view.ViewCompat
-import androidx.viewpager.widget.ViewPager
 import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.data.ScheduleContainerInfo
+import by.ntnk.msluschedule.databinding.FragmentWeekscontainerBinding
 import by.ntnk.msluschedule.mvp.views.MvpFragment
 import by.ntnk.msluschedule.ui.adapters.WeekFragmentViewPagerAdapter
 import by.ntnk.msluschedule.ui.warningdialog.WarningDialogFragment
 import by.ntnk.msluschedule.utils.INVALID_VALUE
 import by.ntnk.msluschedule.utils.ImmutableEntry
-import com.google.android.material.tabs.TabLayout
 import dagger.Lazy
 import dagger.android.support.AndroidSupportInjection
 import java.util.Locale
@@ -28,14 +27,14 @@ class WeeksContainerFragment :
         MvpFragment<WeeksContainerPresenter, WeeksContainerView>(),
         WeeksContainerView,
         WarningDialogFragment.DialogListener {
-    private lateinit var viewPager: ViewPager
-    private lateinit var tabLayout: TabLayout
     private var savedCurrentPosition = INVALID_VALUE
     private var currentWeekItemIndex = INVALID_VALUE
     private lateinit var listener: OnScheduleContainerDeletedListener
 
+    private lateinit var binding: FragmentWeekscontainerBinding
+
     private val adapter: WeekFragmentViewPagerAdapter?
-        get() = viewPager.adapter as WeekFragmentViewPagerAdapter?
+        get() = binding.viewpagerWeeks.adapter as WeekFragmentViewPagerAdapter?
 
     override val view: WeeksContainerView
         get() = this
@@ -62,16 +61,14 @@ class WeeksContainerFragment :
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView = inflater.inflate(R.layout.fragment_weekscontainer, container, false)
-        viewPager = rootView.findViewById(R.id.viewpager_weekscontainer)
-        tabLayout = rootView.findViewById(R.id.tabs_weekscontainer)
-        tabLayout.setOnTouchListener { _, _ -> true }
-        tabLayout.setupWithViewPager(viewPager)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        binding = FragmentWeekscontainerBinding.inflate(inflater, container, false)
+        binding.tabLayoutWeeks.setOnTouchListener { _, _ -> true }
+        binding.tabLayoutWeeks.setupWithViewPager(binding.viewpagerWeeks)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            tabLayout.layoutDirection = View.LAYOUT_DIRECTION_LTR
+            binding.tabLayoutWeeks.layoutDirection = View.LAYOUT_DIRECTION_LTR
         }
-        return rootView
+        return binding.root
     }
 
     override fun onStart() {
@@ -83,13 +80,13 @@ class WeeksContainerFragment :
     override fun onStop() {
         super.onStop()
         presenter.clearDisposables()
-        savedCurrentPosition = tabLayout.selectedTabPosition
+        savedCurrentPosition = binding.tabLayoutWeeks.selectedTabPosition
     }
 
     override fun initWeeksAdapter(weekIds: List<ImmutableEntry>, currentWeekItemIndex: Int) {
         this.currentWeekItemIndex = currentWeekItemIndex
 
-        with(viewPager) {
+        with(binding.viewpagerWeeks) {
             offscreenPageLimit = weekIds.size - 1
             if (adapter == null) {
                 adapter = WeekFragmentViewPagerAdapter(childFragmentManager, weekIds, currentWeekItemIndex)
@@ -115,7 +112,7 @@ class WeeksContainerFragment :
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putInt(SELECTED_TAB_POSITION, tabLayout.selectedTabPosition)
+        outState.putInt(SELECTED_TAB_POSITION, binding.tabLayoutWeeks.selectedTabPosition)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -126,7 +123,7 @@ class WeeksContainerFragment :
         super.onOptionsItemSelected(item)
         return when (item.itemId) {
             R.id.item_weekscontainer_today -> {
-                viewPager.currentItem = currentWeekItemIndex
+                binding.viewpagerWeeks.currentItem = currentWeekItemIndex
                 adapter?.getFragment(currentWeekItemIndex)?.highlightToday()
                 return true
             }

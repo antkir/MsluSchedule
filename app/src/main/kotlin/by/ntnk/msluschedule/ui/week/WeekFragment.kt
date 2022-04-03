@@ -202,7 +202,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
                 layoutManager.scrollToPosition(index)
             }
             activity?.findViewById<CircularProgressIndicator>(R.id.progressbar)?.visibility = View.GONE
-            parentFragment?.view?.findViewById<ViewPager>(R.id.viewpager_weekscontainer)?.visibility = View.VISIBLE
+            parentFragment?.view?.findViewById<ViewPager>(R.id.viewpager_weeks)?.visibility = View.VISIBLE
         }
     }
 

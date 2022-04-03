@@ -6,7 +6,7 @@
     android:layout_height="match_parent">
 
     <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tabs_weekscontainer"
+        android:id="@+id/tab_layout_weeks"
         style="@style/Widget.Design.TabLayout"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
@@ -20,7 +20,7 @@
         tools:ignore="UnusedAttribute" />
 
     <androidx.viewpager.widget.ViewPager
-        android:id="@+id/viewpager_weekscontainer"
+        android:id="@+id/viewpager_weeks"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="?attr/actionBarSize" />
@@ -28,7 +28,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="@dimen/shadow_toolbar_height"
-        android:layout_alignTop="@id/viewpager_weekscontainer"
+        android:layout_alignTop="@id/viewpager_weeks"
         android:background="@drawable/toolbar_shadow" />
 
 </RelativeLayout>

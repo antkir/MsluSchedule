@@ -345,7 +345,7 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
             var viewPagerWeeksContainer: ViewPager? = null
             val weeksContainerFragment = supportFragmentManager.findFragmentById(R.id.content)
             if (weeksContainerFragment != null) {
-                viewPagerWeeksContainer = weeksContainerFragment.view?.findViewById(R.id.viewpager_weekscontainer)
+                viewPagerWeeksContainer = weeksContainerFragment.view?.findViewById(R.id.viewpager_weeks)
             }
             viewPagerWeeksContainer?.alpha = slideOffset
             binding.content.progressbar.visibility = View.VISIBLE
