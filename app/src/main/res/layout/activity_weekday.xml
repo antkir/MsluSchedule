@@ -2,7 +2,7 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/constraintlayout_weekday"
+    android:id="@+id/coordinator_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -14,11 +14,10 @@
         tools:context="by.ntnk.msluschedule.ui.weekday.WeekdayActivity">
 
         <TextView
-            android:id="@+id/textview_zeronotes"
+            android:id="@+id/text_zero_notes"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
-            android:gravity="start|center_vertical"
             android:paddingStart="@dimen/textview_zeronotes_padding"
             android:paddingLeft="@dimen/textview_zeronotes_padding"
             android:paddingEnd="@dimen/textview_zeronotes_padding"
@@ -28,10 +27,11 @@
             android:textColor="@color/tertiary_text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/recyclerview_weekday" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerview_weekday"
+            android:id="@+id/recyclerview_notes"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:paddingTop="8dp"
@@ -121,7 +121,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_weekday"
+        android:id="@+id/fab_add_note"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
