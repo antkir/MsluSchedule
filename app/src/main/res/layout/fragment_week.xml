@@ -6,7 +6,7 @@
     android:layout_height="match_parent">
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/swipe_refresh_layout_week"
+        android:id="@+id/swipe_refresh_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -15,13 +15,13 @@
             android:layout_height="match_parent">
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_week_days"
+                android:id="@+id/recycler_view_days"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:saveEnabled="false" />
 
             <TextView
-                android:id="@+id/text_week_nolessons"
+                android:id="@+id/text_no_lessons"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@color/surface"
@@ -33,7 +33,7 @@
                 android:visibility="gone" />
 
             <com.google.android.material.progressindicator.LinearProgressIndicator
-                android:id="@+id/progressbar_week"
+                android:id="@+id/progressbar_update"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="top|center_horizontal"
@@ -47,7 +47,7 @@
                 tools:ignore="UnusedAttribute" />
 
             <com.google.android.material.progressindicator.CircularProgressIndicator
-                android:id="@+id/progressbar_week_init"
+                android:id="@+id/progressbar_init"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -58,7 +58,7 @@
                 tools:ignore="UnusedAttribute" />
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/button_week_weekdays_visibility"
+                android:id="@+id/button_days_visibility"
                 style="@style/Widget.MaterialComponents.Button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

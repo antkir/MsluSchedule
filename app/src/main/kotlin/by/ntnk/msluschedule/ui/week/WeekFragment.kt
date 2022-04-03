@@ -16,11 +16,11 @@ import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.viewpager.widget.ViewPager
 import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.data.Lesson
 import by.ntnk.msluschedule.data.WeekdayWithLessons
+import by.ntnk.msluschedule.databinding.FragmentWeekBinding
 import by.ntnk.msluschedule.mvp.views.MvpFragment
 import by.ntnk.msluschedule.ui.adapters.LessonRecyclerViewAdapter
 import by.ntnk.msluschedule.ui.adapters.VIEWTYPE_STUDYGROUP
@@ -39,7 +39,6 @@ import dagger.Lazy
 import dagger.android.support.AndroidSupportInjection
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
-import kotlinx.android.synthetic.main.fragment_week.*
 import timber.log.Timber
 import java.lang.ref.WeakReference
 import javax.inject.Inject
@@ -47,7 +46,6 @@ import javax.inject.Inject
 private const val ARG_LAYOUT_MANAGER_SAVED_STATE = "argLayoutManagerSavedState"
 
 class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
-    private lateinit var recyclerView: RecyclerView
     private lateinit var smoothScroller: RecyclerView.SmoothScroller
     private var isEmptyScheduleDaysVisible: Boolean = false
     private var weekId: Int = INVALID_VALUE
@@ -55,8 +53,10 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     private var layoutManagerSavedState: Parcelable? = null
     private lateinit var adapterOnClickDisposable: Disposable
 
+    private lateinit var binding: FragmentWeekBinding
+
     private val adapter: LessonRecyclerViewAdapter
-        get() = recyclerView.adapter as LessonRecyclerViewAdapter? ?: LessonRecyclerViewAdapter()
+        get() = binding.recyclerViewDays.adapter as LessonRecyclerViewAdapter? ?: LessonRecyclerViewAdapter()
 
     override val view: WeekView
         get() = this
@@ -79,16 +79,15 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         layoutManagerSavedState = savedInstanceState?.getParcelable(ARG_LAYOUT_MANAGER_SAVED_STATE)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView = inflater.inflate(R.layout.fragment_week, container, false)
-        initRecyclerView(rootView)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        binding = FragmentWeekBinding.inflate(inflater, container, false)
+        initRecyclerView()
 
-        val swipeRefreshLayout = rootView.findViewById<SwipeRefreshLayout>(R.id.swipe_refresh_layout_week)
-        swipeRefreshLayout.setOnRefreshListener {
-            swipeRefreshLayout.isRefreshing = false
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            binding.swipeRefreshLayout.isRefreshing = false
             if (AndroidUtils.isNetworkAccessible(requireContext().applicationContext)) {
                 if (!isEmptyScheduleDaysVisible) {
-                    layoutManagerSavedState = recyclerView.layoutManager?.onSaveInstanceState()
+                    layoutManagerSavedState = binding.recyclerViewDays.layoutManager?.onSaveInstanceState()
                 }
                 presenter.updateSchedule(weekId)
             } else {
@@ -97,12 +96,11 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
             }
         }
 
-        return rootView
+        return binding.root
     }
 
-    private fun initRecyclerView(rootView: View) {
-        recyclerView = rootView.findViewById(R.id.rv_week_days)
-        recyclerView.apply {
+    private fun initRecyclerView() {
+        binding.recyclerViewDays.apply {
             layoutManager = LinearLayoutManager(activity)
             setHasFixedSize(true)
             adapter = this@WeekFragment.adapter
@@ -148,7 +146,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        layoutManagerSavedState = recyclerView.layoutManager?.onSaveInstanceState()
+        layoutManagerSavedState = binding.recyclerViewDays.layoutManager?.onSaveInstanceState()
         outState.putParcelable(ARG_LAYOUT_MANAGER_SAVED_STATE, layoutManagerSavedState)
     }
 
@@ -158,16 +156,16 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     }
 
     fun highlightToday() {
-        if (text_week_nolessons.visibility != View.VISIBLE) {
+        if (binding.textNoLessons.visibility != View.VISIBLE) {
             val index = adapter.getWeekdayViewIndex(presenter.getCurrentDayOfWeek())
             smoothScroller.targetPosition = index
-            recyclerView.layoutManager?.startSmoothScroll(smoothScroller)
+            binding.recyclerViewDays.layoutManager?.startSmoothScroll(smoothScroller)
             val fromColor = ContextCompat.getColor(requireContext(), R.color.surface)
             val toColor = ContextCompat.getColor(requireContext(), R.color.item_highlight)
             val highlightAnimation = ValueAnimator.ofObject(ArgbEvaluator(), fromColor, toColor)
             highlightAnimation.duration = 500
             highlightAnimation.addUpdateListener { animator ->
-                val view: View? = recyclerView.layoutManager?.findViewByPosition(index)
+                val view: View? = binding.recyclerViewDays.layoutManager?.findViewByPosition(index)
                 view?.setBackgroundColor(animator.animatedValue as Int)
             }
             highlightAnimation.repeatMode = ValueAnimator.REVERSE
@@ -178,23 +176,23 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
 
     override fun showSchedule(data: List<WeekdayWithLessons<Lesson>>) {
         if (data.sumOf { it.lessons.size } == 0) {
-            button_week_weekdays_visibility.visibility = View.VISIBLE
+            binding.buttonDaysVisibility.visibility = View.VISIBLE
             if (!isEmptyScheduleDaysVisible) {
-                text_week_nolessons.visibility = View.VISIBLE
+                binding.textNoLessons.visibility = View.VISIBLE
             } else {
-                text_week_nolessons.visibility = View.GONE
+                binding.textNoLessons.visibility = View.GONE
             }
-            rv_week_days.addOnScrollListener(recyclerViewScrollListener)
-            button_week_weekdays_visibility.setOnClickListener { onWeekdaysButtonClickListener() }
+            binding.recyclerViewDays.addOnScrollListener(recyclerViewScrollListener)
+            binding.buttonDaysVisibility.setOnClickListener { onWeekdaysButtonClickListener() }
         } else {
-            button_week_weekdays_visibility.visibility = View.GONE
-            text_week_nolessons.visibility = View.GONE
-            rv_week_days.removeOnScrollListener(recyclerViewScrollListener)
+            binding.buttonDaysVisibility.visibility = View.GONE
+            binding.textNoLessons.visibility = View.GONE
+            binding.recyclerViewDays.removeOnScrollListener(recyclerViewScrollListener)
         }
 
         adapter.initData(data)
 
-        val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+        val layoutManager = binding.recyclerViewDays.layoutManager as LinearLayoutManager
         layoutManager.onRestoreInstanceState(layoutManagerSavedState)
         if (isCurrentWeek) {
             if (layoutManagerSavedState == null) {
@@ -209,20 +207,20 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     private val recyclerViewScrollListener: RecyclerView.OnScrollListener =
             object : RecyclerView.OnScrollListener() {
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                    if (button_week_weekdays_visibility.visibility == View.VISIBLE && dy > 0) {
-                        button_week_weekdays_visibility.visibility = View.GONE
+                    if (binding.buttonDaysVisibility.visibility == View.VISIBLE && dy > 0) {
+                        binding.buttonDaysVisibility.visibility = View.GONE
                         val anim = AnimationUtils.loadAnimation(
-                                button_week_weekdays_visibility.context,
+                                binding.buttonDaysVisibility.context,
                                 R.anim.button_week_slide_down
                         )
-                        button_week_weekdays_visibility.startAnimation(anim)
-                    } else if (button_week_weekdays_visibility.visibility != View.VISIBLE && dy < 0) {
-                        button_week_weekdays_visibility.visibility = View.VISIBLE
+                        binding.buttonDaysVisibility.startAnimation(anim)
+                    } else if (binding.buttonDaysVisibility.visibility != View.VISIBLE && dy < 0) {
+                        binding.buttonDaysVisibility.visibility = View.VISIBLE
                         val anim = AnimationUtils.loadAnimation(
-                                button_week_weekdays_visibility.context,
+                                binding.buttonDaysVisibility.context,
                                 R.anim.button_week_slide_up
                         )
-                        button_week_weekdays_visibility.startAnimation(anim)
+                        binding.buttonDaysVisibility.startAnimation(anim)
                     }
                 }
             }
@@ -230,57 +228,57 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     private fun onWeekdaysButtonClickListener() {
         if (!isEmptyScheduleDaysVisible) {
             isEmptyScheduleDaysVisible = true
-            text_week_nolessons.visibility = View.GONE
+            binding.textNoLessons.visibility = View.GONE
 
-            button_week_weekdays_visibility.text = requireContext().getString(R.string.button_week_hide_weekdays)
+            binding.buttonDaysVisibility.text = requireContext().getString(R.string.button_week_hide_weekdays)
         } else {
             isEmptyScheduleDaysVisible = false
-            text_week_nolessons.visibility = View.VISIBLE
+            binding.textNoLessons.visibility = View.VISIBLE
 
             // workaround the edge case, when the button is pressed during
             // the hiding animation and won't show again
-            rv_week_days.smoothScrollBy(0, -1)
+            binding.recyclerViewDays.smoothScrollBy(0, -1)
 
-            button_week_weekdays_visibility.text = requireContext().getString(R.string.button_week_show_weekdays)
+            binding.buttonDaysVisibility.text = requireContext().getString(R.string.button_week_show_weekdays)
         }
     }
 
     override fun hideUpdateProgressBar() {
-        rv_week_days.animate()
+        binding.recyclerViewDays.animate()
                 .translationY(0f)
                 .setDuration(200)
                 .start()
-        progressbar_week.animate()
-                .translationY(-progressbar_week.height.toFloat())
+        binding.progressbarUpdate.animate()
+                .translationY(-binding.progressbarUpdate.height.toFloat())
                 .setDuration(200)
                 .setListener(object : SimpleAnimatorListener {
                     override fun onAnimationEnd(animation: Animator?) {
-                        progressbar_week?.animate()?.setListener(null)
-                        progressbar_week?.visibility = View.INVISIBLE
+                        binding.progressbarUpdate.animate()?.setListener(null)
+                        binding.progressbarUpdate.visibility = View.INVISIBLE
                     }
                 })
                 .start()
     }
 
     override fun showUpdateProgressBar() {
-        progressbar_week.visibility = View.VISIBLE
-        rv_week_days.animate()
-                .translationY(progressbar_week.height.toFloat())
+        binding.progressbarUpdate.visibility = View.VISIBLE
+        binding.recyclerViewDays.animate()
+                .translationY(binding.progressbarUpdate.height.toFloat())
                 .setDuration(200)
                 .start()
-        progressbar_week.y = -progressbar_week.height.toFloat()
-        progressbar_week.animate()
+        binding.progressbarUpdate.y = -binding.progressbarUpdate.height.toFloat()
+        binding.progressbarUpdate.animate()
                 .translationY(0f)
                 .setDuration(200)
                 .start()
     }
 
     override fun hideInitProgressBar() {
-        progressbar_week_init.visibility = View.GONE
+        binding.progressbarInit.visibility = View.GONE
     }
 
     override fun showInitProgressBar() {
-        progressbar_week_init.visibility = View.VISIBLE
+        binding.progressbarInit.visibility = View.VISIBLE
     }
 
     override fun showUpdateSuccessMessage() {
@@ -313,7 +311,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
             .setAction(R.string.snackbar_week_init_retry) {
                 context ?: return@setAction
                 if (AndroidUtils.isNetworkAccessible(requireContext().applicationContext)) {
-                    layoutManagerSavedState = recyclerView.layoutManager?.onSaveInstanceState()
+                    layoutManagerSavedState = binding.recyclerViewDays.layoutManager?.onSaveInstanceState()
                     presenter.updateSchedule(weekId)
                 } else {
                     showError(t, shouldSetupViews = false)
@@ -332,7 +330,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
             R.id.item_week_update -> {
                 if (AndroidUtils.isNetworkAccessible(requireContext().applicationContext)) {
                     if (weekId == INVALID_VALUE) return true
-                    layoutManagerSavedState = recyclerView.layoutManager?.onSaveInstanceState()
+                    layoutManagerSavedState = binding.recyclerViewDays.layoutManager?.onSaveInstanceState()
                     presenter.updateSchedule(weekId)
                 } else {
                     val baseFABMain = requireActivity().findViewById<FloatingActionButton>(R.id.fab_base)
