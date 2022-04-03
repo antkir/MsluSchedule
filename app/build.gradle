@@ -9,6 +9,10 @@ android {
     def versionMinor = 2
     def versionPatch = 1
     def versionBuild = 3
+
+    compileSdkVersion 32
+    buildToolsVersion "32.0.0"
+
     buildFeatures {
         viewBinding true
     }
@@ -34,8 +38,6 @@ android {
             excludes += ['META-INF/CHANGES', 'META-INF/README.md', 'org/apache/**']
         }
     }
-    compileSdkVersion 32
-    buildToolsVersion "32.0.0"
     defaultConfig {
         applicationId "by.ntnk.msluschedule"
         minSdkVersion 16

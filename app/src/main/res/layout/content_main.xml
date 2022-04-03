@@ -33,7 +33,7 @@
         android:contentDescription="@string/view_main_image_description"
         android:src="@drawable/ic_emoji_smile"
         android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/text_main_advice"
+        app:layout_constraintBottom_toTopOf="@+id/text_hint"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -43,7 +43,7 @@
         android:id="@+id/text_hint"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/image_main_smileyface"
+        android:layout_below="@+id/image_smile"
         android:layout_centerHorizontal="true"
         android:layout_marginStart="32dp"
         android:layout_marginLeft="32dp"
@@ -58,6 +58,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/image_main_smileyface" />
+        app:layout_constraintTop_toBottomOf="@+id/image_smile" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
