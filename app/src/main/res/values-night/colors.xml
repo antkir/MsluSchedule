@@ -17,7 +17,6 @@
     <color name="item_highlight">#2C2C2C</color>
     <color name="nav_view_item_highlight">#1F1F1F</color>
     <color name="item_separator">#313131</color>
-    <color name="button_nav_drawer">#252525</color>
 
     <color name="button_secondary">#252525</color>
     <color name="note_edit_surface">#2E2E2E</color>
