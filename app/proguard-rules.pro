@@ -14,6 +14,10 @@
 
 # Apache POI
 -keepclassmembers public class org.apache.poi.** { *; }
+-dontwarn java.awt.**
+-dontwarn javax.imageio.**
+-dontwarn javax.swing.JLabel
+-dontwarn javax.xml.bind.**
 
 # Dagger
 -dontwarn com.google.errorprone.annotations.*
