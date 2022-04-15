@@ -3,6 +3,7 @@ package by.ntnk.msluschedule.ui.addgroup
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
+import android.text.InputType
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
@@ -97,6 +98,13 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
                     (dialog as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = isEnabled
                 }
             })
+
+            setOnClickListener {
+                if (presenter.isCourseSet()) {
+                    it as LoadingAutoCompleteTextView
+                    it.showDropDown()
+                }
+            }
         }
 
         with(courseView) {
@@ -189,7 +197,17 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
         val adapter = initAdapter(data)
         val isStartsWithFilterActive = !presenter.isCourseSet()
         adapter.isStartsWithFilterActive = isStartsWithFilterActive
+        adapter.isIgnoreCaseFilterActive = presenter.isCourseSet()
         with(groupView) {
+            inputType = if (presenter.isCourseSet()) {
+                InputType.TYPE_CLASS_TEXT or
+                        InputType.TYPE_TEXT_VARIATION_PASSWORD or
+                        InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+            } else {
+                InputType.TYPE_CLASS_NUMBER or
+                        InputType.TYPE_NUMBER_VARIATION_NORMAL or
+                        InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+            }
             progressBarVisibility = View.GONE
             setEnabledFocusable(true)
             setAdapter(adapter)

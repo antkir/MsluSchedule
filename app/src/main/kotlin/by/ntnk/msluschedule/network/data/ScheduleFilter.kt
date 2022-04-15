@@ -1,11 +1,15 @@
 package by.ntnk.msluschedule.network.data
 
 import android.util.SparseArray
+import androidx.core.util.valueIterator
 import by.ntnk.msluschedule.utils.EMPTY_STRING
 
 data class ScheduleFilter(private val data: SparseArray<String>) {
     val size: Int
         get() = data.size()
+
+    val canDetectCourse: Boolean
+        get() = data.valueIterator().asSequence().none { it.isNotEmpty() && !it.first().isDigit() }
 
     constructor() : this(SparseArray<String>())
 

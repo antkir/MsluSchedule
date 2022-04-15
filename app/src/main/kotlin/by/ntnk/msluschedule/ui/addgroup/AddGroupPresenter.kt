@@ -108,10 +108,7 @@ class AddGroupPresenter @Inject constructor(
                 .observeOn(schedulerProvider.ui())
                 .subscribeBy(
                         onSuccess = { scheduleFilter ->
-                            if (scheduleFilter.size > 0
-                                    && course == 0
-                                    && !scheduleFilter.valueAt(0).first().isDigit()
-                                    && !scheduleFilter.valueAt(1).first().isDigit()) {
+                            if (scheduleFilter.size > 0 && course == 0 && !scheduleFilter.canDetectCourse) {
                                 getCourseScheduleFilter()
                             } else {
                                 groups = scheduleFilter
@@ -136,6 +133,7 @@ class AddGroupPresenter @Inject constructor(
     fun isGroupStored(name: String): Boolean {
         return scheduleContaners
                 ?.filter { scheduleContainer -> scheduleContainer.year == currentDate.academicYear }
+                ?.filter { scheduleContainer -> scheduleContainer.faculty == faculty }
                 ?.map { scheduleContainer -> scheduleContainer.name }
                 ?.any { it == name } == true
     }
