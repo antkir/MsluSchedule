@@ -1,121 +1,127 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="@dimen/dialog_margin"
     android:theme="@style/MsluTheme.Dialog.Alert">
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/textinputlayout_faculty"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/textinputlayout_course"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:orientation="vertical"
+        android:padding="@dimen/dialog_margin">
 
-        <by.ntnk.msluschedule.ui.customviews.LoadingAutoCompleteTextView
-            android:id="@+id/actv_dialog_faculty"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textinputlayout_faculty"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_weight="1"
-            android:completionThreshold="1"
-            android:hint="@string/faculty"
-            android:imeOptions="actionDone|flagNoFullscreen|flagNoExtractUi"
-            android:inputType="textNoSuggestions"
-            android:longClickable="false"
-            android:paddingStart="@dimen/actv_padding_side"
-            android:paddingLeft="@dimen/actv_padding_side"
-            android:paddingEnd="@dimen/actv_padding_side"
-            android:paddingRight="@dimen/actv_padding_side" />
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/textinputlayout_course"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-    </com.google.android.material.textfield.TextInputLayout>
+            <by.ntnk.msluschedule.ui.customviews.LoadingAutoCompleteTextView
+                android:id="@+id/actv_dialog_faculty"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:completionThreshold="1"
+                android:hint="@string/faculty"
+                android:imeOptions="actionDone|flagNoFullscreen|flagNoExtractUi"
+                android:inputType="textNoSuggestions"
+                android:longClickable="false"
+                android:paddingStart="@dimen/actv_padding_side"
+                android:paddingLeft="@dimen/actv_padding_side"
+                android:paddingEnd="@dimen/actv_padding_side"
+                android:paddingRight="@dimen/actv_padding_side" />
 
-    <com.google.android.material.progressindicator.CircularProgressIndicator
-        android:id="@+id/progressbar_dialog_faculty"
-        android:layout_width="@dimen/actv_progressbar_size"
-        android:layout_height="@dimen/actv_progressbar_size"
-        android:indeterminate="true"
-        android:visibility="gone"
-        app:indicatorColor="@color/colorAccent"
-        app:indicatorInset="@dimen/actv_progressbar_inset"
-        app:indicatorSize="@dimen/actv_progressbar_size"
-        app:layout_constraintBottom_toBottomOf="@id/textinputlayout_faculty"
-        app:layout_constraintEnd_toEndOf="@id/textinputlayout_faculty"
-        app:trackThickness="@dimen/actv_progressbar_thickness" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/textinputlayout_course"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/textinputlayout_group"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textinputlayout_faculty">
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/progressbar_dialog_faculty"
+            android:layout_width="@dimen/actv_progressbar_size"
+            android:layout_height="@dimen/actv_progressbar_size"
+            android:indeterminate="true"
+            android:visibility="gone"
+            app:indicatorColor="@color/colorAccent"
+            app:indicatorInset="@dimen/actv_progressbar_inset"
+            app:indicatorSize="@dimen/actv_progressbar_size"
+            app:layout_constraintBottom_toBottomOf="@id/textinputlayout_faculty"
+            app:layout_constraintEnd_toEndOf="@id/textinputlayout_faculty"
+            app:trackThickness="@dimen/actv_progressbar_thickness" />
 
-        <by.ntnk.msluschedule.ui.customviews.LoadingAutoCompleteTextView
-            android:id="@+id/actv_dialog_course"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textinputlayout_course"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_weight="1"
-            android:completionThreshold="1"
-            android:hint="@string/course"
-            android:imeOptions="actionDone|flagNoFullscreen|flagNoExtractUi"
-            android:inputType="textNoSuggestions"
-            android:longClickable="false"
-            android:paddingStart="@dimen/actv_padding_side"
-            android:paddingLeft="@dimen/actv_padding_side"
-            android:paddingEnd="@dimen/actv_padding_side"
-            android:paddingRight="@dimen/actv_padding_side" />
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toTopOf="@+id/textinputlayout_group"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textinputlayout_faculty">
 
-    </com.google.android.material.textfield.TextInputLayout>
+            <by.ntnk.msluschedule.ui.customviews.LoadingAutoCompleteTextView
+                android:id="@+id/actv_dialog_course"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:completionThreshold="1"
+                android:hint="@string/course"
+                android:imeOptions="actionDone|flagNoFullscreen|flagNoExtractUi"
+                android:inputType="textNoSuggestions"
+                android:longClickable="false"
+                android:paddingStart="@dimen/actv_padding_side"
+                android:paddingLeft="@dimen/actv_padding_side"
+                android:paddingEnd="@dimen/actv_padding_side"
+                android:paddingRight="@dimen/actv_padding_side" />
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/textinputlayout_group"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textinputlayout_course">
+        </com.google.android.material.textfield.TextInputLayout>
 
-        <by.ntnk.msluschedule.ui.customviews.LoadingAutoCompleteTextView
-            android:id="@+id/actv_dialog_group"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textinputlayout_group"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:completionThreshold="1"
-            android:hint="@string/group"
-            android:imeOptions="actionDone|flagNoExtractUi"
-            android:importantForAutofill="no"
-            android:inputType="textNoSuggestions|textVisiblePassword"
-            android:paddingStart="@dimen/actv_padding_side"
-            android:paddingLeft="@dimen/actv_padding_side"
-            android:paddingEnd="@dimen/actv_padding_side"
-            android:paddingRight="@dimen/actv_padding_side"
-            android:textCursorDrawable="@drawable/cursor_dialog" />
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textinputlayout_course">
 
-    </com.google.android.material.textfield.TextInputLayout>
+            <by.ntnk.msluschedule.ui.customviews.LoadingAutoCompleteTextView
+                android:id="@+id/actv_dialog_group"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:completionThreshold="1"
+                android:hint="@string/group"
+                android:imeOptions="actionDone|flagNoExtractUi"
+                android:importantForAutofill="no"
+                android:inputType="textNoSuggestions"
+                android:paddingStart="@dimen/actv_padding_side"
+                android:paddingLeft="@dimen/actv_padding_side"
+                android:paddingEnd="@dimen/actv_padding_side"
+                android:paddingRight="@dimen/actv_padding_side"
+                android:textCursorDrawable="@drawable/cursor_dialog" />
 
-    <com.google.android.material.progressindicator.CircularProgressIndicator
-        android:id="@+id/progressbar_dialog_group"
-        android:layout_width="@dimen/actv_progressbar_size"
-        android:layout_height="@dimen/actv_progressbar_size"
-        android:indeterminate="true"
-        android:visibility="gone"
-        app:indicatorColor="@color/colorAccent"
-        app:indicatorInset="@dimen/actv_progressbar_inset"
-        app:indicatorSize="@dimen/actv_progressbar_size"
-        app:layout_constraintBottom_toBottomOf="@id/textinputlayout_group"
-        app:layout_constraintEnd_toEndOf="@id/textinputlayout_group"
-        app:trackThickness="@dimen/actv_progressbar_thickness" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/progressbar_dialog_group"
+            android:layout_width="@dimen/actv_progressbar_size"
+            android:layout_height="@dimen/actv_progressbar_size"
+            android:indeterminate="true"
+            android:visibility="gone"
+            app:indicatorColor="@color/colorAccent"
+            app:indicatorInset="@dimen/actv_progressbar_inset"
+            app:indicatorSize="@dimen/actv_progressbar_size"
+            app:layout_constraintBottom_toBottomOf="@id/textinputlayout_group"
+            app:layout_constraintEnd_toEndOf="@id/textinputlayout_group"
+            app:trackThickness="@dimen/actv_progressbar_thickness" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>
