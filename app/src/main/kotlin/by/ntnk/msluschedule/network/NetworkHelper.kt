@@ -41,34 +41,34 @@ class NetworkHelper @Inject constructor(private val currentDate: CurrentDate) {
     private fun createSubjectLengthRequestDataInstance(value: Int) = RequestData(subjectLengthRequestInfo, value)
 
     fun getSubjectLengthFilterData(isFullSubjectName: Boolean): RequestData =
-            createSubjectLengthRequestDataInstance(isFullSubjectName.toInt())
+        createSubjectLengthRequestDataInstance(isFullSubjectName.toInt())
 
     fun getYearsFilterDataList(): List<RequestData> =
-            listOf(createYearRequestDataInstance(currentDate.academicYear))
+        listOf(createYearRequestDataInstance(currentDate.academicYear))
 
     fun getStudyGroupsFilterDataList(faculty: Int, course: Int, year: Int = 0): List<RequestData> =
-            listOf(
-                    createFacultyRequestDataInstance(faculty),
-                    createCourseRequestDataInstance(course),
-                    // When passing 0, groups for all courses are returned
-                    createYearRequestDataInstance(year)
-            )
+        listOf(
+            createFacultyRequestDataInstance(faculty),
+            createCourseRequestDataInstance(course),
+            // When passing 0, groups for all courses are returned
+            createYearRequestDataInstance(year)
+        )
 
     fun getStudyGroupRequestDataList(studyGroup: StudyGroup, weekKey: Int): List<RequestData> =
-            listOf(
-                    createYearRequestDataInstance(studyGroup.year),
-                    createWeekRequestDataInstance(weekKey),
-                    createFacultyRequestDataInstance(studyGroup.faculty),
-                    createCourseRequestDataInstance(studyGroup.course),
-                    createStudyGroupRequestDataInstance(studyGroup.key)
-            )
+        listOf(
+            createYearRequestDataInstance(studyGroup.year),
+            createWeekRequestDataInstance(weekKey),
+            createFacultyRequestDataInstance(studyGroup.faculty),
+            createCourseRequestDataInstance(studyGroup.course),
+            createStudyGroupRequestDataInstance(studyGroup.key)
+        )
 
     fun getTeacherRequestDataList(teacher: Teacher, weekKey: Int): List<RequestData> =
-            listOf(
-                    createYearRequestDataInstance(teacher.year),
-                    createWeekRequestDataInstance(weekKey),
-                    createTeacherRequestDataInstance(teacher.key)
-            )
+        listOf(
+            createYearRequestDataInstance(teacher.year),
+            createWeekRequestDataInstance(weekKey),
+            createTeacherRequestDataInstance(teacher.key)
+        )
 
     fun parseDataFromHtmlBody(requestInfo: RequestInfo, response: String): Single<ScheduleFilter> {
         return try {
@@ -96,29 +96,28 @@ class NetworkHelper @Inject constructor(private val currentDate: CurrentDate) {
 
     private fun parseResponse(document: Document, requestInfo: RequestInfo): ScheduleFilter {
         val elements = document
-                .select("select[id^=${requestInfo.requestName}]")
-                .first()
-                ?.children()
+            .select("select[id^=${requestInfo.requestName}]")
+            .first()
+            ?.children()
         val data = ScheduleFilter()
         elements
-                ?.filter { it.`val`().isNotBlank() }
-                ?.forEach { data.put(it.`val`().toInt(), it.text()) }
+            ?.filter { element -> element.`val`().isNotBlank() }
+            ?.forEach { data.put(it.`val`().toInt(), it.text()) }
         return data
     }
 
     @Throws(InvalidYearException::class)
     private fun checkYearValid(htmlBody: Document) {
         val elements = htmlBody
-                .select("select[id^=${yearRequestInfo.requestName}]")
-                .first()
-                ?.children()
+            .select("select[id^=${yearRequestInfo.requestName}]")
+            .first()
+            ?.children()
 
         val hasValidYear = elements
-                ?.eachAttr("value")
-                ?.filter { it.isNotBlank() }
-                ?.map { Integer.parseInt(it) }
-                ?.filter { it == currentDate.academicYear }
-                ?.any()
+            ?.eachAttr("value")
+            ?.filter { it.isNotBlank() }
+            ?.map { Integer.parseInt(it) }
+            ?.any { it == currentDate.academicYear }
 
         if (hasValidYear != true) throw InvalidYearException()
     }
