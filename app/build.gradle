@@ -64,13 +64,14 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    namespace 'by.ntnk.msluschedule'
 }
 
 ext {
-    appcompatVersion = '1.5.0'
+    appcompatVersion = '1.5.1'
     constraintlayoutVersion = '2.1.4'
-    daggerVersion = '2.43.2'
-    fragmentVersion = '1.5.2'
+    daggerVersion = '2.44'
+    fragmentVersion = '1.5.3'
     jsoupVersion = '1.15.3'
     junitVersion = '4.13.2'
     leakcanaryVersion = '2.9.1'
@@ -91,7 +92,7 @@ ext {
     rxkotlinVersion = '2.4.0'
     spotlightVersion = '1.7.0'
     swipeRefreshLayoutVersion = '1.1.0'
-    threetenbpVersion = '1.6.1'
+    threetenbpVersion = '1.6.2'
     timberVersion = '5.0.1'
 
     crashlyticsVersion = '18.2.13'
