@@ -279,7 +279,7 @@ class MainActivity : MvpActivity<MainPresenter, MainView>(), MainView,
         var size = 0
         for (type in ScheduleType.values()) {
             val subMenuSize = binding.navView.menu
-                    .findItem(getContainerMenuViewId(ScheduleType.STUDYGROUP))
+                    .findItem(getContainerMenuViewId(type))
                     .subMenu
                     .size()
             size += subMenuSize
