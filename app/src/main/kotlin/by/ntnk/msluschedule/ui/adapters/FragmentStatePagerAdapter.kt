@@ -20,33 +20,12 @@ import android.os.Bundle
 import android.os.Parcelable
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.IntDef
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.Lifecycle
 import androidx.viewpager.widget.PagerAdapter
 import timber.log.Timber
-
-/**
- * Indicates that [Fragment.setUserVisibleHint] will be called when the current
- * fragment changes.
- *
- * @see [FragmentStatePagerAdapter]
- */
-@Deprecated("This behavior relies on the deprecated\n" +
-                    "      {@link Fragment#setUserVisibleHint(boolean)} API. Use {@link #BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT}\n" +
-                    "      to switch to its replacement, {@link FragmentTransaction#setMaxLifecycle}.\n" +
-                    "      ")
-const val BEHAVIOR_SET_USER_VISIBLE_HINT = 0
-
-/**
- * Indicates that only the current fragment will be in the [Lifecycle.State.RESUMED]
- * state. All other Fragments are capped at [Lifecycle.State.STARTED].
- *
- * @see [FragmentStatePagerAdapter]
- */
-const val BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT = 1
 
 /**
  * Implementation of [PagerAdapter] that uses a [Fragment] to manage each page.
@@ -71,14 +50,8 @@ const val BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT = 1
  *
  * Subclasses only need to implement [getItem] and [getCount] to have a working adapter.
  */
-@Suppress("DEPRECATION")
 abstract class FragmentStatePagerAdapter(
-        private val mFragmentManager: FragmentManager,
-        @Behavior private val mBehavior: Int = BEHAVIOR_SET_USER_VISIBLE_HINT) : PagerAdapter() {
-    @Retention(AnnotationRetention.SOURCE)
-    @IntDef(value = [BEHAVIOR_SET_USER_VISIBLE_HINT, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT])
-    private annotation class Behavior
-
+        private val mFragmentManager: FragmentManager) : PagerAdapter() {
     private var mCurTransaction: FragmentTransaction? = null
 
     private val mFragments = mutableListOf<Fragment?>()
@@ -129,16 +102,10 @@ abstract class FragmentStatePagerAdapter(
             mFragments.add(null)
         }
         fragment.setMenuVisibility(false)
-        if (mBehavior == BEHAVIOR_SET_USER_VISIBLE_HINT) {
-            fragment.userVisibleHint = false
-        }
 
         mFragments[position] = fragment
         mCurTransaction!!.add(container.id, fragment)
-
-        if (mBehavior == BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
-            mCurTransaction!!.setMaxLifecycle(fragment, Lifecycle.State.STARTED)
-        }
+        mCurTransaction!!.setMaxLifecycle(fragment, Lifecycle.State.STARTED)
 
         return fragment
     }
@@ -162,26 +129,19 @@ abstract class FragmentStatePagerAdapter(
         if (fragment != mCurrentPrimaryItem) {
             if (mCurrentPrimaryItem != null) {
                 mCurrentPrimaryItem!!.setMenuVisibility(false)
-                if (mBehavior == BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
-                    if (mCurTransaction == null) {
-                        mCurTransaction = mFragmentManager.beginTransaction()
-                    }
-                    mCurTransaction!!.setMaxLifecycle(mCurrentPrimaryItem!!,
-                                                      Lifecycle.State.STARTED)
-                } else {
-                    mCurrentPrimaryItem!!.userVisibleHint = false
-                }
-            }
 
-            fragment.setMenuVisibility(true)
-            if (mBehavior == BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
                 if (mCurTransaction == null) {
                     mCurTransaction = mFragmentManager.beginTransaction()
                 }
-                mCurTransaction!!.setMaxLifecycle(fragment, Lifecycle.State.RESUMED)
-            } else {
-                fragment.userVisibleHint = true
+                mCurTransaction!!.setMaxLifecycle(mCurrentPrimaryItem!!, Lifecycle.State.STARTED)
             }
+
+            fragment.setMenuVisibility(true)
+
+            if (mCurTransaction == null) {
+                mCurTransaction = mFragmentManager.beginTransaction()
+            }
+            mCurTransaction!!.setMaxLifecycle(fragment, Lifecycle.State.RESUMED)
 
             mCurrentPrimaryItem = fragment
         }
