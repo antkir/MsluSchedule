@@ -2,10 +2,6 @@ package by.ntnk.msluschedule.utils
 
 import android.animation.Animator
 import android.content.Context
-import android.graphics.BlendMode
-import android.graphics.BlendModeColorFilter
-import android.graphics.PorterDuff
-import android.graphics.drawable.Drawable
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
@@ -25,7 +21,7 @@ import java.net.UnknownHostException
 import java.util.Random
 import java.util.concurrent.ThreadLocalRandom
 
-val onThemeChanged = PublishSubject.create<Boolean>()
+val onThemeChanged : PublishSubject<Boolean> = PublishSubject.create()
 
 fun Context.dipToPixels(dipValue: Float) =
         TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dipValue, resources.displayMetrics).toInt()
@@ -106,20 +102,6 @@ object AndroidUtils {
             SATURDAY -> context.resources.getString(R.string.saturday)
             SUNDAY -> context.resources.getString(R.string.sunday)
             else -> EMPTY_STRING
-        }
-    }
-
-    fun setColorFilter(drawable: Drawable?, color: Int, mode: PorterDuff.Mode) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            val blendMode = when (mode) {
-                PorterDuff.Mode.SRC_IN -> BlendMode.SRC_IN
-                PorterDuff.Mode.DST_IN -> BlendMode.DST_IN
-                else -> throw NotImplementedError()
-            }
-            drawable?.colorFilter = BlendModeColorFilter(color, blendMode)
-        } else {
-            @Suppress("DEPRECATION")
-            drawable?.setColorFilter(color, mode)
         }
     }
 }

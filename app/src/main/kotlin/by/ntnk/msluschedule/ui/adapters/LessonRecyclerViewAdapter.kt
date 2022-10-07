@@ -1,6 +1,5 @@
 package by.ntnk.msluschedule.ui.adapters
 
-import android.graphics.PorterDuff
 import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +8,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.BlendModeColorFilterCompat
+import androidx.core.graphics.BlendModeCompat
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.NO_POSITION
 import by.ntnk.msluschedule.R
@@ -211,11 +212,11 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
         override fun bindViewHolder(viewHolder: RecyclerView.ViewHolder) {
             with(viewHolder as DayViewHolder) {
                 weekday.text = AndroidUtils.getWeekdayFromTag(weekdayTag, itemView.context)
-                if (hasNotes) {
-                    AndroidUtils.setColorFilter(notesIconDrawable?.mutate(), accentColor, PorterDuff.Mode.SRC_IN)
-                } else {
-                    AndroidUtils.setColorFilter(notesIconDrawable?.mutate(), accentColor, PorterDuff.Mode.DST_IN)
-                }
+                val blendMode = if (hasNotes) BlendModeCompat.SRC_IN else BlendModeCompat.DST_IN
+                notesIconDrawable?.mutate()?.colorFilter =
+                    BlendModeColorFilterCompat.createBlendModeColorFilterCompat(
+                        accentColor, blendMode
+                    )
                 notesIcon.setImageDrawable(notesIconDrawable)
             }
         }
