@@ -115,7 +115,8 @@ class SettingsActivity : AppCompatActivity(), HasAndroidInjector {
             val sendFeedback = findPreference<Preference>(getString(R.string.key_send_feedback))!!
             sendFeedback.setOnPreferenceClickListener {
                 try {
-                    val uri = Uri.parse("market://details?id=${requireContext().packageName}")
+                    val packageName = requireContext().packageName.removeSuffix(".debug")
+                    val uri = Uri.parse("market://details?id=${packageName}")
                     val playStoreIntent = Intent(Intent.ACTION_VIEW, uri)
                     playStoreIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY or
                                                      Intent.FLAG_ACTIVITY_MULTIPLE_TASK)
