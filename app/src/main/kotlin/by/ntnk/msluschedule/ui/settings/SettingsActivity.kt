@@ -11,7 +11,6 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.app.NavUtils
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.ListFragment
@@ -50,14 +49,14 @@ class SettingsActivity : AppCompatActivity(), HasAndroidInjector {
         }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
+    override fun onOptionsItemSelected(menuItem: MenuItem): Boolean {
+        when (menuItem.itemId) {
             android.R.id.home -> {
                 onBackPressed()
-                true
+                return true
             }
-            else -> super.onOptionsItemSelected(item)
         }
+        return super.onOptionsItemSelected(menuItem)
     }
 
     class SettingsFragment : PreferenceFragmentCompat() {
@@ -81,7 +80,6 @@ class SettingsActivity : AppCompatActivity(), HasAndroidInjector {
 
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
-            setHasOptionsMenu(true)
 
             val themePreference = findPreference<ListPreference>(getString(R.string.key_theme))!!
             val values = arrayOf(AppCompatDelegate.MODE_NIGHT_NO.toString(),
@@ -145,14 +143,6 @@ class SettingsActivity : AppCompatActivity(), HasAndroidInjector {
 
             val aboutPreference = findPreference<Preference>(getString(R.string.key_about))!!
             aboutPreference.summary = BuildConfig.VERSION_NAME
-        }
-
-        override fun onOptionsItemSelected(item: MenuItem): Boolean {
-            if (item.itemId == android.R.id.home) {
-                NavUtils.navigateUpFromSameTask(requireActivity())
-                return true
-            }
-            return super.onOptionsItemSelected(item)
         }
 
         class SettingsLibrariesFragment : ListFragment(), AdapterView.OnItemClickListener {

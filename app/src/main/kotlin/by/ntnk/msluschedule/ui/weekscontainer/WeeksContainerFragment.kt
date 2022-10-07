@@ -6,7 +6,9 @@ import android.os.Build
 import android.os.Bundle
 import android.view.*
 import androidx.core.text.TextUtilsCompat
+import androidx.core.view.MenuProvider
 import androidx.core.view.ViewCompat
+import androidx.lifecycle.Lifecycle
 import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.data.ScheduleContainerInfo
 import by.ntnk.msluschedule.databinding.FragmentWeekscontainerBinding
@@ -56,19 +58,43 @@ class WeeksContainerFragment :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
         savedCurrentPosition = savedInstanceState?.getInt(SELECTED_TAB_POSITION) ?: INVALID_VALUE
     }
 
-    @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentWeekscontainerBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.tabLayoutWeeks.setOnTouchListener { _, _ -> true }
         binding.tabLayoutWeeks.setupWithViewPager(binding.viewpagerWeeks)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
             binding.tabLayoutWeeks.layoutDirection = View.LAYOUT_DIRECTION_LTR
         }
-        return binding.root
+
+        requireActivity().addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.fragment_weekscontainer_menu, menu)
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                when (menuItem.itemId) {
+                    R.id.item_weekscontainer_today -> {
+                        binding.viewpagerWeeks.currentItem = currentWeekItemIndex
+                        adapter?.getFragment(currentWeekItemIndex)?.highlightToday()
+                        return true
+                    }
+                    R.id.item_weekscontainer_delete -> {
+                        val warningFragment = WarningDialogFragment()
+                        warningFragment.show(childFragmentManager, WARNING_DIALOG_FRAGMENT)
+                        return true
+                    }
+                }
+                return false
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
     override fun onStart() {
@@ -113,27 +139,6 @@ class WeeksContainerFragment :
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putInt(SELECTED_TAB_POSITION, binding.tabLayoutWeeks.selectedTabPosition)
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.fragment_weekscontainer_menu, menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        super.onOptionsItemSelected(item)
-        return when (item.itemId) {
-            R.id.item_weekscontainer_today -> {
-                binding.viewpagerWeeks.currentItem = currentWeekItemIndex
-                adapter?.getFragment(currentWeekItemIndex)?.highlightToday()
-                return true
-            }
-            R.id.item_weekscontainer_delete -> {
-                val warningFragment = WarningDialogFragment()
-                warningFragment.show(childFragmentManager, WARNING_DIALOG_FRAGMENT)
-                return true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
     }
 
     override fun onDeleteScheduleContainerClick() = presenter.deleteSelectedScheduleContainer()

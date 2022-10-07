@@ -12,7 +12,9 @@ import android.view.*
 import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.core.view.MenuProvider
 import androidx.core.view.ViewCompat
+import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
@@ -73,7 +75,6 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
         weekId = arguments?.getInt(ARG_WEEK_ID) ?: INVALID_VALUE
         isCurrentWeek = arguments?.getBoolean(ARG_IS_CURRENT_WEEK) == true
         layoutManagerSavedState = savedInstanceState?.getParcelable(ARG_LAYOUT_MANAGER_SAVED_STATE)
@@ -81,6 +82,10 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentWeekBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         initRecyclerView()
 
         binding.swipeRefreshLayout.setOnRefreshListener {
@@ -96,7 +101,29 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
             }
         }
 
-        return binding.root
+        requireActivity().addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.fragment_week_menu, menu)
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                when (menuItem.itemId) {
+                    R.id.item_week_update -> {
+                        if (AndroidUtils.isNetworkAccessible(requireContext().applicationContext)) {
+                            if (weekId != INVALID_VALUE) {
+                                layoutManagerSavedState = binding.recyclerViewDays.layoutManager?.onSaveInstanceState()
+                                presenter.updateSchedule(weekId)
+                            }
+                        } else {
+                            val baseFABMain = requireActivity().findViewById<FloatingActionButton>(R.id.fab_base)
+                            AndroidUtils.showSnackbarNetworkInaccessible(baseFABMain)
+                        }
+                        return true
+                    }
+                }
+                return false
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
     private fun initRecyclerView() {
@@ -319,27 +346,6 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
             }
         ViewCompat.setOnApplyWindowInsetsListener(snackbar.view) { _, insets -> insets }
         snackbar.show()
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.fragment_week_menu, menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.item_week_update -> {
-                if (AndroidUtils.isNetworkAccessible(requireContext().applicationContext)) {
-                    if (weekId == INVALID_VALUE) return true
-                    layoutManagerSavedState = binding.recyclerViewDays.layoutManager?.onSaveInstanceState()
-                    presenter.updateSchedule(weekId)
-                } else {
-                    val baseFABMain = requireActivity().findViewById<FloatingActionButton>(R.id.fab_base)
-                    AndroidUtils.showSnackbarNetworkInaccessible(baseFABMain)
-                }
-                return true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
     }
 
     override fun updateNotesStatus(weekdayId: Int, hasNotes: Boolean) {

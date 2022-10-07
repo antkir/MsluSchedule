@@ -13,7 +13,7 @@ class WeekFragmentViewPagerAdapter(
         fragmentManager: FragmentManager,
         private var fragmentsInfo: List<ImmutableEntry>,
         private var currentWeekIndex: Int
-) : FragmentStatePagerAdapter(fragmentManager) {
+) : FragmentStatePagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
     fun swapData(fragmentsInfo: List<ImmutableEntry>, currentWeekIndex: Int): Boolean {
         if (this.fragmentsInfo != fragmentsInfo) {
