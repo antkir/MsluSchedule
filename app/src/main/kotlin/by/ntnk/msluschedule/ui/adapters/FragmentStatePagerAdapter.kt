@@ -83,6 +83,7 @@ abstract class FragmentStatePagerAdapter(
 
     private val mFragments = mutableListOf<Fragment?>()
     private var mCurrentPrimaryItem: Fragment? = null
+    private var mExecutingFinishUpdate = false
 
     /**
      * Return the Fragment associated with a specified position.
@@ -188,7 +189,19 @@ abstract class FragmentStatePagerAdapter(
 
     override fun finishUpdate(container: ViewGroup) {
         if (mCurTransaction != null) {
-            mCurTransaction!!.commitNowAllowingStateLoss()
+            // We drop any transactions that attempt to be committed
+            // from a re-entrant call to finishUpdate(). We need to
+            // do this as a workaround for Robolectric running measure/layout
+            // calls inline rather than allowing them to be posted
+            // as they would on a real device.
+            if (!mExecutingFinishUpdate) {
+                try {
+                    mExecutingFinishUpdate = true
+                    mCurTransaction!!.commitNowAllowingStateLoss()
+                } finally {
+                    mExecutingFinishUpdate = false
+                }
+            }
             mCurTransaction = null
         }
     }
