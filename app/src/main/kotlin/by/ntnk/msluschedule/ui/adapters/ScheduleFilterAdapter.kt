@@ -4,26 +4,33 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.BaseAdapter
+import android.widget.Filter
+import android.widget.Filterable
+import android.widget.TextView
 import androidx.annotation.LayoutRes
 import by.ntnk.msluschedule.network.data.ScheduleFilter
 
 class ScheduleFilterAdapter(
-        context: Context,
-        @param:LayoutRes private val resource: Int,
-        private val unfilteredData: ScheduleFilter
+    context: Context,
+    @param:LayoutRes private val resource: Int,
+    private val unfilteredData: ScheduleFilter
 ) : BaseAdapter(), Filterable {
+
     private var filteredData: ScheduleFilter = unfilteredData
     private val filter: DataFilter by lazy { DataFilter() }
     private val dummyFilter: DummyFilter by lazy { DummyFilter() }
     private val layoutInflater: LayoutInflater = LayoutInflater.from(context)
+
     /**
      * Indicates if filtering checks if the string starts with the specified prefix.
      * By default, filtering checks if the string contains the specified sequence of characters as a substring.
      */
     var isStartsWithFilterActive = false
+
     /** Indicates if filtering ignores character case when comparing strings. */
     var isIgnoreCaseFilterActive = false
+
     /** Indicates if filtering is enabled. */
     var isFilteringEnabled = true
 
@@ -31,16 +38,21 @@ class ScheduleFilterAdapter(
         return createViewFromResource(layoutInflater, position, convertView, parent, resource)
     }
 
-    private fun createViewFromResource(inflater: LayoutInflater, position: Int,
-                                       convertView: View?, parent: ViewGroup, resource: Int): View {
+    private fun createViewFromResource(
+        inflater: LayoutInflater,
+        position: Int,
+        convertView: View?,
+        parent: ViewGroup,
+        resource: Int
+    ): View {
         val text: TextView
         val view: View = convertView ?: inflater.inflate(resource, parent, false)
         try {
             text = view as TextView
         } catch (exception: ClassCastException) {
             throw IllegalStateException(
-                    "${this.javaClass.simpleName} requires the resource ID to be a TextView",
-                    exception
+                "${this.javaClass.simpleName} requires the resource ID to be a TextView",
+                exception
             )
         }
 

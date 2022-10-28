@@ -16,7 +16,11 @@ import by.ntnk.msluschedule.data.TeacherLesson
 import by.ntnk.msluschedule.databinding.ActivityLessoninfoStudygroupBinding
 import by.ntnk.msluschedule.databinding.ActivityLessoninfoTeacherBinding
 import by.ntnk.msluschedule.mvp.views.MvpActivity
-import by.ntnk.msluschedule.utils.*
+import by.ntnk.msluschedule.utils.AndroidUtils
+import by.ntnk.msluschedule.utils.EMPTY_STRING
+import by.ntnk.msluschedule.utils.INVALID_VALUE
+import by.ntnk.msluschedule.utils.ScheduleType
+import by.ntnk.msluschedule.utils.ScheduleTypeConverter
 import dagger.Lazy
 import dagger.android.AndroidInjection
 import dagger.android.AndroidInjector
@@ -24,9 +28,11 @@ import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasAndroidInjector
 import javax.inject.Inject
 
-class LessonInfoActivity : MvpActivity<LessonInfoPresenter, LessonInfoView>(),
-        LessonInfoView,
-        HasAndroidInjector {
+class LessonInfoActivity :
+    MvpActivity<LessonInfoPresenter, LessonInfoView>(),
+    LessonInfoView,
+    HasAndroidInjector {
+
     private var lessonId: Int = INVALID_VALUE
     private var weekId: Int = INVALID_VALUE
     private var scheduleType: ScheduleType? = null
@@ -87,8 +93,11 @@ class LessonInfoActivity : MvpActivity<LessonInfoPresenter, LessonInfoView>(),
         setFieldText(lesson.type, bindingStudyGroup.textviewClassType, bindingStudyGroup.imageviewClassType)
         setFieldText(lesson.teacher, bindingStudyGroup.textviewTeacher, bindingStudyGroup.imageviewTeacher)
         setFieldText(lesson.classroom, bindingStudyGroup.textviewClassroom, bindingStudyGroup.imageviewClassroom)
-        setFieldText("${lesson.startTime} - ${lesson.endTime}",
-            bindingStudyGroup.textviewTime, bindingStudyGroup.imageviewTime)
+        setFieldText(
+            "${lesson.startTime} - ${lesson.endTime}",
+            bindingStudyGroup.textviewTime,
+            bindingStudyGroup.imageviewTime
+        )
 
         var weekdays: String = EMPTY_STRING
         for (weekday in weekdaysWithLesson) {
@@ -101,8 +110,11 @@ class LessonInfoActivity : MvpActivity<LessonInfoPresenter, LessonInfoView>(),
     override fun showInfo(lesson: TeacherLesson, weekdaysWithLesson: List<String>) {
         setFieldText(lesson.subject, bindingTeacher.textviewSubject, bindingTeacher.imageviewSubject)
         setFieldText(lesson.classroom, bindingTeacher.textviewClassroom, bindingTeacher.imageviewClassroom)
-        setFieldText("${lesson.startTime} - ${lesson.endTime}",
-            bindingTeacher.textviewTime, bindingTeacher.imageviewTime)
+        setFieldText(
+            "${lesson.startTime} - ${lesson.endTime}",
+            bindingTeacher.textviewTime,
+            bindingTeacher.imageviewTime
+        )
         setFieldText(lesson.type, bindingTeacher.textviewClassType, imageView = null)
         val faculties = lesson.faculty.replace(", ", "\n")
         setFieldText(faculties, bindingTeacher.textviewFaculties, imageView = null)

@@ -17,6 +17,7 @@ import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 class WarningDialogFragment : DialogFragment() {
+
     private lateinit var disposable: Disposable
     private lateinit var listener: DialogListener
 
@@ -41,14 +42,14 @@ class WarningDialogFragment : DialogFragment() {
 
     private fun initMaterialDialog(): AlertDialog {
         return MaterialAlertDialogBuilder(requireActivity(), R.style.MsluTheme_Dialog_Alert)
-                .setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.rounded_corners_rect))
-                .setTitle(R.string.dialog_delete_container_title)
-                .setMessage(R.string.dialog_delete_container_message)
-                .setPositiveButton(R.string.button_delete) { _, _ ->
-                    listener.onDeleteScheduleContainerClick()
-                }
-                .setNegativeButton(R.string.button_cancel) { _, _ -> dismiss() }
-                .create()
+            .setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.rounded_corners_rect))
+            .setTitle(R.string.dialog_delete_container_title)
+            .setMessage(R.string.dialog_delete_container_message)
+            .setPositiveButton(R.string.button_delete) { _, _ ->
+                listener.onDeleteScheduleContainerClick()
+            }
+            .setNegativeButton(R.string.button_cancel) { _, _ -> dismiss() }
+            .create()
     }
 
     private fun initPositiveButtonCountdown(button: Button) {
@@ -58,21 +59,21 @@ class WarningDialogFragment : DialogFragment() {
         val buttonDeleteColor = ContextCompat.getColor(requireContext(), R.color.destructive_action)
         val timeout = 3L
         disposable = Observable
-                .intervalRange(1, timeout, 0, 1, TimeUnit.SECONDS)
-                .map { timePassed -> timeout - timePassed }
-                .map { timeLeft -> "$buttonDeleteString ($timeLeft)" }
-                .observeOn(SchedulerProvider.ui())
-                .subscribeBy(
-                        onNext = { button.text = it },
-                        onComplete = {
-                            button.setTextColor(buttonDeleteColor)
-                            button.isEnabled = true
-                            val width = button.width
-                            button.text = buttonDeleteString
-                            button.width = width
-                        },
-                        onError = { throwable -> Timber.e(throwable) }
-                )
+            .intervalRange(1, timeout, 0, 1, TimeUnit.SECONDS)
+            .map { timePassed -> timeout - timePassed }
+            .map { timeLeft -> "$buttonDeleteString ($timeLeft)" }
+            .observeOn(SchedulerProvider.ui())
+            .subscribeBy(
+                onNext = { button.text = it },
+                onComplete = {
+                    button.setTextColor(buttonDeleteColor)
+                    button.isEnabled = true
+                    val width = button.width
+                    button.text = buttonDeleteString
+                    button.width = width
+                },
+                onError = { throwable -> Timber.e(throwable) }
+            )
     }
 
     override fun dismiss() {

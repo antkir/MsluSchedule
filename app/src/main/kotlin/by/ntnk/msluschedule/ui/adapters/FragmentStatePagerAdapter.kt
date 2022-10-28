@@ -50,8 +50,8 @@ import timber.log.Timber
  *
  * Subclasses only need to implement [getItem] and [getCount] to have a working adapter.
  */
-abstract class FragmentStatePagerAdapter(
-        private val mFragmentManager: FragmentManager) : PagerAdapter() {
+abstract class FragmentStatePagerAdapter(private val mFragmentManager: FragmentManager) : PagerAdapter() {
+
     private var mCurTransaction: FragmentTransaction? = null
 
     private val mFragments = mutableListOf<Fragment?>()

@@ -14,10 +14,11 @@ import timber.log.Timber
 import javax.inject.Inject
 
 class WeekdayPresenter @Inject constructor(
-        private val databaseRepository: DatabaseRepository,
-        private val sharedPreferencesRepository: SharedPreferencesRepository,
-        private val schedulerProvider: SchedulerProvider
+    private val databaseRepository: DatabaseRepository,
+    private val sharedPreferencesRepository: SharedPreferencesRepository,
+    private val schedulerProvider: SchedulerProvider
 ) : Presenter<WeekdayView>() {
+
     fun initWeekdayView(weekdayId: Int) {
         val weekdayWithLessons = when (sharedPreferencesRepository.getSelectedScheduleContainerInfo().type) {
             ScheduleType.STUDYGROUP -> databaseRepository.getWeekdayWithStudyGroupLessons(weekdayId)
@@ -30,51 +31,51 @@ class WeekdayPresenter @Inject constructor(
         }
 
         databaseRepository.getNotesForWeekday(weekdayId)
-                .toList()
-                .zipWith(weekdayWithLessons, zipFun)
-                .subscribeOn(schedulerProvider.io())
-                .observeOn(schedulerProvider.ui())
-                .subscribeBy(
-                        onSuccess = { view?.initView(it.first, it.second) },
-                        onError = { throwable -> Timber.e(throwable) }
-                )
+            .toList()
+            .zipWith(weekdayWithLessons, zipFun)
+            .subscribeOn(schedulerProvider.io())
+            .observeOn(schedulerProvider.ui())
+            .subscribeBy(
+                onSuccess = { view?.initView(it.first, it.second) },
+                onError = { throwable -> Timber.e(throwable) }
+            )
     }
 
     fun insertNote(note: Note, weekdayId: Int) {
         databaseRepository.insertNote(note, weekdayId)
-                .subscribeOn(schedulerProvider.io())
-                .observeOn(schedulerProvider.ui())
-                .subscribeBy(
-                        onSuccess = { id -> view?.addNote(Note(id, note.text, note.subject)) },
-                        onError = { throwable -> Timber.e(throwable) }
-                )
+            .subscribeOn(schedulerProvider.io())
+            .observeOn(schedulerProvider.ui())
+            .subscribeBy(
+                onSuccess = { id -> view?.addNote(Note(id, note.text, note.subject)) },
+                onError = { throwable -> Timber.e(throwable) }
+            )
     }
 
     fun deleteNote(id: Int) {
         databaseRepository.deleteNote(id)
-                .subscribeOn(schedulerProvider.io())
-                .observeOn(schedulerProvider.ui())
-                .subscribeBy(
-                        onError = { throwable -> Timber.e(throwable) }
-                )
+            .subscribeOn(schedulerProvider.io())
+            .observeOn(schedulerProvider.ui())
+            .subscribeBy(
+                onError = { throwable -> Timber.e(throwable) }
+            )
     }
 
     fun updateNote(note: Note, weekdayId: Int) {
         databaseRepository.updateNote(note, weekdayId)
-                .subscribeOn(schedulerProvider.io())
-                .observeOn(schedulerProvider.ui())
-                .subscribeBy(
-                        onError = { throwable -> Timber.e(throwable) }
-                )
+            .subscribeOn(schedulerProvider.io())
+            .observeOn(schedulerProvider.ui())
+            .subscribeBy(
+                onError = { throwable -> Timber.e(throwable) }
+            )
     }
 
     fun restoreNote(note: Note, weekdayId: Int, color: Int, position: Int) {
         databaseRepository.insertNote(note, weekdayId)
-                .subscribeOn(schedulerProvider.io())
-                .observeOn(schedulerProvider.ui())
-                .subscribeBy(
-                        onSuccess = { id -> view?.restoreNote(Note(id, note.text, note.subject), color, position) },
-                        onError = { throwable -> Timber.e(throwable) }
-                )
+            .subscribeOn(schedulerProvider.io())
+            .observeOn(schedulerProvider.ui())
+            .subscribeBy(
+                onSuccess = { id -> view?.restoreNote(Note(id, note.text, note.subject), color, position) },
+                onError = { throwable -> Timber.e(throwable) }
+            )
     }
 }

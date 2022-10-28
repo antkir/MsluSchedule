@@ -17,11 +17,12 @@ import timber.log.Timber
 import javax.inject.Inject
 
 class AddGroupPresenter @Inject constructor(
-        private val databaseRepository: DatabaseRepository,
-        private val networkRepository: NetworkRepository,
-        private val currentDate: CurrentDate,
-        private val schedulerProvider: SchedulerProvider
+    private val databaseRepository: DatabaseRepository,
+    private val networkRepository: NetworkRepository,
+    private val currentDate: CurrentDate,
+    private val schedulerProvider: SchedulerProvider
 ) : Presenter<AddGroupView>() {
+
     private val disposables: CompositeDisposable = CompositeDisposable()
     private var faculties: ScheduleFilter? = null
     private var courses: ScheduleFilter? = null
@@ -62,64 +63,64 @@ class AddGroupPresenter @Inject constructor(
 
     fun getFacultyScheduleFilter() {
         databaseRepository.getScheduleContainers()
-                .toList()
-                .subscribeOn(schedulerProvider.io())
-                .subscribeBy(
-                        onSuccess = { scheduleContaners = it },
-                        onError = { throwable -> Timber.e(throwable) }
-                )
+            .toList()
+            .subscribeOn(schedulerProvider.io())
+            .subscribeBy(
+                onSuccess = { scheduleContaners = it },
+                onError = { throwable -> Timber.e(throwable) }
+            )
 
         disposables += networkRepository.getFaculties()
-                .subscribeOn(schedulerProvider.single())
-                .observeOn(schedulerProvider.ui())
-                .subscribeBy(
-                        onSuccess = { scheduleFilter ->
-                            faculties = scheduleFilter
-                            populateFacultiesAdapter()
-                        },
-                        onError = { throwable ->
-                            Timber.i(throwable)
-                            view?.showError(throwable)
-                        }
-                )
+            .subscribeOn(schedulerProvider.single())
+            .observeOn(schedulerProvider.ui())
+            .subscribeBy(
+                onSuccess = { scheduleFilter ->
+                    faculties = scheduleFilter
+                    populateFacultiesAdapter()
+                },
+                onError = { throwable ->
+                    Timber.i(throwable)
+                    view?.showError(throwable)
+                }
+            )
     }
 
     private fun getCourseScheduleFilter() {
         disposables += networkRepository.getCourses()
-                .subscribeOn(schedulerProvider.single())
-                .observeOn(schedulerProvider.ui())
-                .subscribeBy(
-                        onSuccess = { scheduleFilter ->
-                            courses = scheduleFilter
-                            populateCoursesAdapter()
-                        },
-                        onError = { throwable ->
-                            Timber.i(throwable)
-                            view?.showError(throwable)
-                        }
-                )
+            .subscribeOn(schedulerProvider.single())
+            .observeOn(schedulerProvider.ui())
+            .subscribeBy(
+                onSuccess = { scheduleFilter ->
+                    courses = scheduleFilter
+                    populateCoursesAdapter()
+                },
+                onError = { throwable ->
+                    Timber.i(throwable)
+                    view?.showError(throwable)
+                }
+            )
     }
 
     fun getScheduleGroups(showGroupsForAllCourses: Boolean = true) {
         val courseKey = if (course > 0) course else COURSE_VALUE
         val year = if (!showGroupsForAllCourses) currentDate.academicYear else 0
         disposables += networkRepository.getGroups(faculty, courseKey, year)
-                .subscribeOn(schedulerProvider.single())
-                .observeOn(schedulerProvider.ui())
-                .subscribeBy(
-                        onSuccess = { scheduleFilter ->
-                            if (scheduleFilter.size > 0 && course == 0 && !scheduleFilter.canDetectCourse) {
-                                getCourseScheduleFilter()
-                            } else {
-                                groups = scheduleFilter
-                                populateGroupsAdapter()
-                            }
-                        },
-                        onError = { throwable ->
-                            Timber.i(throwable)
-                            view?.showError(throwable)
-                        }
-                )
+            .subscribeOn(schedulerProvider.single())
+            .observeOn(schedulerProvider.ui())
+            .subscribeBy(
+                onSuccess = { scheduleFilter ->
+                    if (scheduleFilter.size > 0 && course == 0 && !scheduleFilter.canDetectCourse) {
+                        getCourseScheduleFilter()
+                    } else {
+                        groups = scheduleFilter
+                        populateGroupsAdapter()
+                    }
+                },
+                onError = { throwable ->
+                    Timber.i(throwable)
+                    view?.showError(throwable)
+                }
+            )
     }
 
     fun setGroupValue(value: Int) {
@@ -132,10 +133,10 @@ class AddGroupPresenter @Inject constructor(
 
     fun isGroupStored(name: String): Boolean {
         return scheduleContaners
-                ?.filter { scheduleContainer -> scheduleContainer.year == currentDate.academicYear }
-                ?.filter { scheduleContainer -> scheduleContainer.faculty == faculty }
-                ?.map { scheduleContainer -> scheduleContainer.name }
-                ?.any { it == name } == true
+            ?.filter { scheduleContainer -> scheduleContainer.year == currentDate.academicYear }
+            ?.filter { scheduleContainer -> scheduleContainer.faculty == faculty }
+            ?.map { scheduleContainer -> scheduleContainer.name }
+            ?.any { it == name } == true
     }
 
     fun getStudyGroup(): StudyGroup? {

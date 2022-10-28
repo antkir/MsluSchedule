@@ -19,15 +19,21 @@ abstract class ItemSwipeCallback(context: Context) :
         context.resources.getDimension(R.dimen.item_note_deleteicon_margin_right).toInt()
 
     override fun onMove(
-        recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder,
+        recyclerView: RecyclerView,
+        viewHolder: RecyclerView.ViewHolder,
         target: RecyclerView.ViewHolder
     ): Boolean {
         return false
     }
 
     override fun onChildDraw(
-        c: Canvas, recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder,
-        dX: Float, dY: Float, actionState: Int, isCurrentlyActive: Boolean
+        c: Canvas,
+        recyclerView: RecyclerView,
+        viewHolder: RecyclerView.ViewHolder,
+        dX: Float,
+        dY: Float,
+        actionState: Int,
+        isCurrentlyActive: Boolean
     ) {
         val itemView = viewHolder.itemView
         background.color = backgroundColor

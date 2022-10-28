@@ -23,6 +23,7 @@ const val VIEWTYPE_NOTE = 201
 const val VIEWTYPE_NOTE_HEADER = 202
 
 class NoteRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
     private val data = mutableListOf<BaseRVItemView>()
     private val colors = mutableListOf<Int>()
     private val sortedLesssons = mutableListOf<Lesson>()
@@ -75,10 +76,10 @@ class NoteRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() 
             if (notes.isNotEmpty()) {
                 val header = if (subject == EMPTY_STRING) otherNotesHeader else subject
                 val filteredLessons = sortedLesssons
-                        .filter {
-                            val subjectKey = if (it.type != EMPTY_STRING) "${it.subject}, ${it.type}" else it.subject
-                            return@filter subjectKey == header
-                        }
+                    .filter {
+                        val subjectKey = if (it.type != EMPTY_STRING) "${it.subject}, ${it.type}" else it.subject
+                        return@filter subjectKey == header
+                    }
                 var time = EMPTY_STRING
                 for (lesson in filteredLessons) {
                     time = time.plus(lesson.startTime + " / ")
@@ -225,8 +226,10 @@ class NoteRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() 
         val time: TextView = view.findViewById(R.id.text_note_time)
     }
 
-    private class DiffUtilCallback(private val oldData: List<BaseRVItemView>,
-                                   private val newData: List<BaseRVItemView>) : DiffUtil.Callback() {
+    private class DiffUtilCallback(
+        private val oldData: List<BaseRVItemView>,
+        private val newData: List<BaseRVItemView>
+    ) : DiffUtil.Callback() {
 
         override fun getOldListSize(): Int = oldData.size
 
@@ -235,18 +238,21 @@ class NoteRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() 
         override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
             val oldItem = oldData[oldItemPosition]
             val newItem = newData[newItemPosition]
-            return (oldItem is NoteView && newItem is NoteView && oldItem.note.id == newItem.note.id) ||
-                    (oldItem is NoteHeaderView && newItem is NoteHeaderView && oldItem.header == newItem.header)
+            val isSameNoteView = oldItem is NoteView && newItem is NoteView && oldItem.note.id == newItem.note.id
+            val isSameNoteHeaderView = oldItem is NoteHeaderView && newItem is NoteHeaderView && oldItem.header == newItem.header
+            return isSameNoteView || isSameNoteHeaderView
         }
 
         override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
             val oldItem = oldData[oldItemPosition]
             val newItem = newData[newItemPosition]
-            return (oldItem is NoteView && newItem is NoteView &&
-                    oldItem.note.id == newItem.note.id &&
-                    oldItem.note.text == newItem.note.text &&
-                    oldItem.note.subject == newItem.note.subject) ||
-                    (oldItem is NoteHeaderView && newItem is NoteHeaderView && oldItem.header == newItem.header)
+            val isSameContentNoteView = oldItem is NoteView &&
+                newItem is NoteView &&
+                oldItem.note.id == newItem.note.id &&
+                oldItem.note.text == newItem.note.text &&
+                oldItem.note.subject == newItem.note.subject
+            val isSameContentNoteHeaderView = oldItem is NoteHeaderView && newItem is NoteHeaderView && oldItem.header == newItem.header
+            return isSameContentNoteView || isSameContentNoteHeaderView
         }
     }
 }

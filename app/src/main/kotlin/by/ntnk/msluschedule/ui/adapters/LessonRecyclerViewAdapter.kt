@@ -32,6 +32,7 @@ private const val VIEWTYPE_BLANK = 104
 private const val VIEWTYPE_DAYEND = 105
 
 class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
     private val data = mutableListOf<BaseRVItemView>()
     private val onClickSubject = PublishSubject.create<BaseRVItemView>()
 
@@ -64,14 +65,14 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
 
                 for (lesson in day.lessons) {
                     val lessonView: BaseRVItemView =
-                            when (lesson) {
-                                is StudyGroupLesson -> {
-                                    val isClassAlternative: Boolean = prevStartTime == lesson.startTime
-                                    StudyGroupLessonView(lesson, isClassAlternative)
-                                }
-                                is TeacherLesson -> TeacherLessonView(lesson)
-                                else -> throw NullPointerException()
+                        when (lesson) {
+                            is StudyGroupLesson -> {
+                                val isClassAlternative: Boolean = prevStartTime == lesson.startTime
+                                StudyGroupLessonView(lesson, isClassAlternative)
                             }
+                            is TeacherLesson -> TeacherLessonView(lesson)
+                            else -> throw NullPointerException()
+                        }
                     data.add(lessonView)
 
                     prevStartTime = lesson.startTime
@@ -124,19 +125,21 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
                 StudyGroupLessonViewHolder(view).apply {
                     itemView.setOnClickListener {
                         if (adapterPosition != NO_POSITION &&
-                                (data[adapterPosition] as StudyGroupLessonView).lesson.subject != EMPTY_STRING) {
+                            (data[adapterPosition] as StudyGroupLessonView).lesson.subject != EMPTY_STRING
+                        ) {
                             onClickSubject.onNext(data[adapterPosition])
                         }
                     }
 
                     itemView.setOnLongClickListener {
                         if (adapterPosition != NO_POSITION &&
-                                (data[adapterPosition] as StudyGroupLessonView).isClassAlternative) {
+                            (data[adapterPosition] as StudyGroupLessonView).isClassAlternative
+                        ) {
                             if (itemView.context != null) {
                                 Toast.makeText(
-                                        itemView.context,
-                                        itemView.context.resources.getString(R.string.class_same_time_description),
-                                        Toast.LENGTH_SHORT
+                                    itemView.context,
+                                    itemView.context.resources.getString(R.string.class_same_time_description),
+                                    Toast.LENGTH_SHORT
                                 ).show()
                             }
                         }
@@ -149,7 +152,8 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
                 TeacherLessonViewHolder(view).apply {
                     itemView.setOnClickListener {
                         if (adapterPosition != NO_POSITION &&
-                                (data[adapterPosition] as TeacherLessonView).lesson.subject != EMPTY_STRING) {
+                            (data[adapterPosition] as TeacherLessonView).lesson.subject != EMPTY_STRING
+                        ) {
                             onClickSubject.onNext(data[adapterPosition])
                         }
                     }
@@ -215,7 +219,8 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
                 val blendMode = if (hasNotes) BlendModeCompat.SRC_IN else BlendModeCompat.DST_IN
                 notesIconDrawable?.mutate()?.colorFilter =
                     BlendModeColorFilterCompat.createBlendModeColorFilterCompat(
-                        accentColor, blendMode
+                        accentColor,
+                        blendMode
                     )
                 notesIcon.setImageDrawable(notesIconDrawable)
             }

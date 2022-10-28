@@ -23,6 +23,7 @@ import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
 class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), AddGroupView {
+
     private lateinit var listener: DialogListener
     private lateinit var facultyView: LoadingAutoCompleteTextView
     private lateinit var courseView: LoadingAutoCompleteTextView
@@ -55,25 +56,25 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
         dialog.window?.attributes?.windowAnimations = R.style.DialogAnimation
         dialog.setOnShowListener {
             (it as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE).isEnabled =
-                    presenter.isValidGroup(groupView.text.toString())
+                presenter.isValidGroup(groupView.text.toString())
         }
         return dialog
     }
 
     private fun initMaterialDialog(layout: View): Dialog {
         return MaterialAlertDialogBuilder(requireActivity(), R.style.MsluTheme_Dialog_Alert)
-                .setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.rounded_corners_rect))
-                .setTitle((R.string.add_group_title))
-                .setView(layout)
-                .setPositiveButton(R.string.button_add) { _, _ ->
-                    val studyGroup = presenter.getStudyGroup()
-                    studyGroup ?: return@setPositiveButton
-                    listener.onNewStudyGroup(studyGroup)
-                }
-                .setNegativeButton(R.string.button_cancel) { _, _ ->
-                    dismiss()
-                }
-                .create()
+            .setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.rounded_corners_rect))
+            .setTitle((R.string.add_group_title))
+            .setView(layout)
+            .setPositiveButton(R.string.button_add) { _, _ ->
+                val studyGroup = presenter.getStudyGroup()
+                studyGroup ?: return@setPositiveButton
+                listener.onNewStudyGroup(studyGroup)
+            }
+            .setNegativeButton(R.string.button_cancel) { _, _ ->
+                dismiss()
+            }
+            .create()
     }
 
     private fun initViews(layout: View) {
@@ -150,7 +151,8 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
                     presenter.populateCoursesAdapter()
                 }
                 if ((presenter.isFacultySet() && textinputlayoutCourseView.visibility != View.VISIBLE) ||
-                        (presenter.isFacultySet() && presenter.isCourseSet() && !presenter.isGroupsInitialized())) {
+                    (presenter.isFacultySet() && presenter.isCourseSet() && !presenter.isGroupsInitialized())
+                ) {
                     groupView.progressBarVisibility = View.VISIBLE
                 }
                 if (presenter.isGroupsInitialized()) {
@@ -202,12 +204,12 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
         with(groupView) {
             inputType = if (presenter.isCourseSet()) {
                 InputType.TYPE_CLASS_TEXT or
-                        InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD or
-                        InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+                    InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD or
+                    InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
             } else {
                 InputType.TYPE_CLASS_NUMBER or
-                        InputType.TYPE_NUMBER_VARIATION_NORMAL or
-                        InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+                    InputType.TYPE_NUMBER_VARIATION_NORMAL or
+                    InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
             }
             setTypeface(null, Typeface.NORMAL)
             progressBarVisibility = View.GONE
@@ -219,9 +221,9 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
 
     private fun initAdapter(data: ScheduleFilter): ScheduleFilterAdapter {
         return ScheduleFilterAdapter(
-                requireActivity(),
-                android.R.layout.simple_spinner_dropdown_item,
-                data
+            requireActivity(),
+            android.R.layout.simple_spinner_dropdown_item,
+            data
         )
     }
 

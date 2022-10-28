@@ -6,7 +6,10 @@ import android.content.res.Configuration
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
@@ -14,7 +17,11 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.ListFragment
-import androidx.preference.*
+import androidx.preference.CheckBoxPreference
+import androidx.preference.ListPreference
+import androidx.preference.Preference
+import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.SwitchPreferenceCompat
 import by.ntnk.msluschedule.BuildConfig
 import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
@@ -27,6 +34,7 @@ import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
 class SettingsActivity : AppCompatActivity(), HasAndroidInjector {
+
     @Inject
     lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Any>
 
@@ -82,9 +90,11 @@ class SettingsActivity : AppCompatActivity(), HasAndroidInjector {
             super.onCreate(savedInstanceState)
 
             val themePreference = findPreference<ListPreference>(getString(R.string.key_theme))!!
-            val values = arrayOf(AppCompatDelegate.MODE_NIGHT_NO.toString(),
-                                 AppCompatDelegate.MODE_NIGHT_YES.toString(),
-                                 AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM.toString())
+            val values = arrayOf(
+                AppCompatDelegate.MODE_NIGHT_NO.toString(),
+                AppCompatDelegate.MODE_NIGHT_YES.toString(),
+                AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM.toString()
+            )
             themePreference.entryValues = values
             themePreference.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { preference, value ->
                 preference as ListPreference
@@ -116,15 +126,17 @@ class SettingsActivity : AppCompatActivity(), HasAndroidInjector {
             sendFeedback.setOnPreferenceClickListener {
                 try {
                     val packageName = requireContext().packageName.removeSuffix(".debug")
-                    val uri = Uri.parse("market://details?id=${packageName}")
+                    val uri = Uri.parse("market://details?id=$packageName")
                     val playStoreIntent = Intent(Intent.ACTION_VIEW, uri)
-                    playStoreIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY or
-                                                     Intent.FLAG_ACTIVITY_MULTIPLE_TASK)
+                    playStoreIntent.addFlags(
+                        Intent.FLAG_ACTIVITY_NO_HISTORY or
+                            Intent.FLAG_ACTIVITY_MULTIPLE_TASK
+                    )
                     startActivity(playStoreIntent)
                 } catch (e: Exception) {
                     val emailIntent = Intent(Intent.ACTION_SENDTO, Uri.parse(getString(R.string.send_feedback_uri)))
                     val text = "App Version: ${BuildConfig.VERSION_NAME}\n" +
-                            "Device and Android Version: ${Build.MODEL} - ${Build.VERSION.RELEASE}\n\n"
+                        "Device and Android Version: ${Build.MODEL} - ${Build.VERSION.RELEASE}\n\n"
                     emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Feedback")
                     emailIntent.putExtra(Intent.EXTRA_TEXT, text)
                     startActivity(Intent.createChooser(emailIntent, getString(R.string.pref_send_feedback_title)))
@@ -135,10 +147,10 @@ class SettingsActivity : AppCompatActivity(), HasAndroidInjector {
             val libraries = findPreference<Preference>(getString(R.string.key_libraries))!!
             libraries.setOnPreferenceClickListener {
                 activity?.supportFragmentManager?.beginTransaction()
-                        ?.setCustomAnimations(R.anim.dialog_zoom_in, 0, 0, R.anim.dialog_zoom_out)
-                        ?.replace(android.R.id.content, SettingsLibrariesFragment())
-                        ?.addToBackStack(null)
-                        ?.commit()
+                    ?.setCustomAnimations(R.anim.dialog_zoom_in, 0, 0, R.anim.dialog_zoom_out)
+                    ?.replace(android.R.id.content, SettingsLibrariesFragment())
+                    ?.addToBackStack(null)
+                    ?.commit()
                 return@setOnPreferenceClickListener true
             }
 
@@ -149,8 +161,7 @@ class SettingsActivity : AppCompatActivity(), HasAndroidInjector {
         class SettingsLibrariesFragment : ListFragment(), AdapterView.OnItemClickListener {
             private lateinit var libraryUrls: Array<String>
 
-            override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                                      savedInstanceState: Bundle?): View? {
+            override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
                 return inflater.inflate(R.layout.fragment_libraries, container, false)
             }
 
@@ -158,7 +169,10 @@ class SettingsActivity : AppCompatActivity(), HasAndroidInjector {
                 super.onViewCreated(view, savedInstanceState)
                 libraryUrls = resources.getStringArray(R.array.library_urls)
                 val adapter = ArrayAdapter.createFromResource(
-                        requireActivity(), R.array.library_list, android.R.layout.simple_list_item_1)
+                    requireActivity(),
+                    R.array.library_list,
+                    android.R.layout.simple_list_item_1
+                )
                 listAdapter = adapter
                 listView.onItemClickListener = this
             }

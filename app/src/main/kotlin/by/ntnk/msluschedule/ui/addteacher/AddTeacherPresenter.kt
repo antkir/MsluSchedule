@@ -14,11 +14,12 @@ import timber.log.Timber
 import javax.inject.Inject
 
 class AddTeacherPresenter @Inject constructor(
-        private val databaseRepository: DatabaseRepository,
-        private val networkRequestRepository: NetworkRepository,
-        private val currentDate: CurrentDate,
-        private val schedulerProvider: SchedulerProvider
+    private val databaseRepository: DatabaseRepository,
+    private val networkRequestRepository: NetworkRepository,
+    private val currentDate: CurrentDate,
+    private val schedulerProvider: SchedulerProvider
 ) : Presenter<AddTeacherView>() {
+
     private lateinit var disposable: Disposable
     private var teachers: ScheduleFilter? = null
     private var teacher: Int = 0
@@ -29,26 +30,26 @@ class AddTeacherPresenter @Inject constructor(
 
     fun getTeachersScheduleFilter() {
         databaseRepository.getScheduleContainers()
-                .toList()
-                .subscribeOn(schedulerProvider.io())
-                .subscribeBy(
-                        onSuccess = { scheduleContaners = it },
-                        onError = { throwable -> Timber.e(throwable) }
-                )
+            .toList()
+            .subscribeOn(schedulerProvider.io())
+            .subscribeBy(
+                onSuccess = { scheduleContaners = it },
+                onError = { throwable -> Timber.e(throwable) }
+            )
 
         disposable = networkRequestRepository.getTeachers()
-                .subscribeOn(schedulerProvider.single())
-                .observeOn(schedulerProvider.ui())
-                .subscribeBy(
-                        onSuccess = { scheduleFilter ->
-                            teachers = scheduleFilter
-                            populateTeachersAdapter()
-                        },
-                        onError = { throwable ->
-                            Timber.i(throwable)
-                            view?.showError(throwable)
-                        }
-                )
+            .subscribeOn(schedulerProvider.single())
+            .observeOn(schedulerProvider.ui())
+            .subscribeBy(
+                onSuccess = { scheduleFilter ->
+                    teachers = scheduleFilter
+                    populateTeachersAdapter()
+                },
+                onError = { throwable ->
+                    Timber.i(throwable)
+                    view?.showError(throwable)
+                }
+            )
     }
 
     fun setTeacherValue(value: Int) {
@@ -61,9 +62,9 @@ class AddTeacherPresenter @Inject constructor(
 
     fun isTeacherStored(name: String): Boolean {
         return scheduleContaners
-                ?.filter { scheduleContainer -> scheduleContainer.year == currentDate.academicYear }
-                ?.map { scheduleContainer -> scheduleContainer.name }
-                ?.any { it == name } == true
+            ?.filter { scheduleContainer -> scheduleContainer.year == currentDate.academicYear }
+            ?.map { scheduleContainer -> scheduleContainer.name }
+            ?.any { it == name } == true
     }
 
     fun getTeacher() = Teacher(teacher, teachers!!.getValue(teacher), currentDate.academicYear)

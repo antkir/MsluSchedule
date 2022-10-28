@@ -21,6 +21,7 @@ import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
 class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView>(), AddTeacherView {
+
     private lateinit var listener: DialogListener
     private lateinit var teacherView: LoadingAutoCompleteTextView
 
@@ -49,7 +50,7 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
         dialog.window?.attributes?.windowAnimations = R.style.DialogAnimation
         dialog.setOnShowListener {
             (it as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE).isEnabled =
-                    presenter.isValidTeacher(teacherView.text.toString())
+                presenter.isValidTeacher(teacherView.text.toString())
         }
         return dialog
     }
@@ -75,16 +76,16 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
 
     private fun initMaterialDialog(layout: View): Dialog {
         return MaterialAlertDialogBuilder(requireActivity(), R.style.MsluTheme_Dialog_Alert)
-                .setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.rounded_corners_rect))
-                .setTitle((R.string.add_teacher_title))
-                .setView(layout)
-                .setPositiveButton(R.string.button_add) { _, _ ->
-                    listener.onNewTeacher(presenter.getTeacher())
-                }
-                .setNegativeButton(R.string.button_cancel) { _, _ ->
-                    dismiss()
-                }
-                .create()
+            .setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.rounded_corners_rect))
+            .setTitle((R.string.add_teacher_title))
+            .setView(layout)
+            .setPositiveButton(R.string.button_add) { _, _ ->
+                listener.onNewTeacher(presenter.getTeacher())
+            }
+            .setNegativeButton(R.string.button_cancel) { _, _ ->
+                dismiss()
+            }
+            .create()
     }
 
     override fun onStart() {
@@ -109,9 +110,9 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
 
     private fun initAdapter(data: ScheduleFilter): ScheduleFilterAdapter {
         return ScheduleFilterAdapter(
-                requireActivity(),
-                android.R.layout.simple_spinner_dropdown_item,
-                data
+            requireActivity(),
+            android.R.layout.simple_spinner_dropdown_item,
+            data
         )
     }
 

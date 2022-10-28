@@ -10,9 +10,9 @@ import by.ntnk.msluschedule.utils.ImmutableEntry
 private const val ARG_WEEK_ID = "weekId"
 
 class WeekFragmentViewPagerAdapter(
-        fragmentManager: FragmentManager,
-        private var fragmentsInfo: List<ImmutableEntry>,
-        private var currentWeekIndex: Int
+    fragmentManager: FragmentManager,
+    private var fragmentsInfo: List<ImmutableEntry>,
+    private var currentWeekIndex: Int
 ) : FragmentStatePagerAdapter(fragmentManager) {
 
     fun swapData(fragmentsInfo: List<ImmutableEntry>, currentWeekIndex: Int): Boolean {

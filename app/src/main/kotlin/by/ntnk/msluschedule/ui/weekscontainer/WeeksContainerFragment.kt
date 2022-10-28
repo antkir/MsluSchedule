@@ -4,7 +4,12 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import androidx.core.text.TextUtilsCompat
 import androidx.core.view.MenuProvider
 import androidx.core.view.ViewCompat
@@ -26,9 +31,10 @@ private const val SELECTED_TAB_POSITION = "tab_position"
 private const val WARNING_DIALOG_FRAGMENT = "WarningDialogFragment"
 
 class WeeksContainerFragment :
-        MvpFragment<WeeksContainerPresenter, WeeksContainerView>(),
-        WeeksContainerView,
-        WarningDialogFragment.DialogListener {
+    MvpFragment<WeeksContainerPresenter, WeeksContainerView>(),
+    WeeksContainerView,
+    WarningDialogFragment.DialogListener {
+
     private var savedCurrentPosition = INVALID_VALUE
     private var currentWeekItemIndex = INVALID_VALUE
     private lateinit var listener: OnScheduleContainerDeletedListener
@@ -74,27 +80,31 @@ class WeeksContainerFragment :
             binding.tabLayoutWeeks.layoutDirection = View.LAYOUT_DIRECTION_LTR
         }
 
-        requireActivity().addMenuProvider(object : MenuProvider {
-            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                menuInflater.inflate(R.menu.fragment_weekscontainer_menu, menu)
-            }
-
-            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                when (menuItem.itemId) {
-                    R.id.item_weekscontainer_today -> {
-                        binding.viewpagerWeeks.currentItem = currentWeekItemIndex
-                        adapter?.getFragment(currentWeekItemIndex)?.highlightToday()
-                        return true
-                    }
-                    R.id.item_weekscontainer_delete -> {
-                        val warningFragment = WarningDialogFragment()
-                        warningFragment.show(childFragmentManager, WARNING_DIALOG_FRAGMENT)
-                        return true
-                    }
+        requireActivity().addMenuProvider(
+            object : MenuProvider {
+                override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                    menuInflater.inflate(R.menu.fragment_weekscontainer_menu, menu)
                 }
-                return false
-            }
-        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
+
+                override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                    when (menuItem.itemId) {
+                        R.id.item_weekscontainer_today -> {
+                            binding.viewpagerWeeks.currentItem = currentWeekItemIndex
+                            adapter?.getFragment(currentWeekItemIndex)?.highlightToday()
+                            return true
+                        }
+                        R.id.item_weekscontainer_delete -> {
+                            val warningFragment = WarningDialogFragment()
+                            warningFragment.show(childFragmentManager, WARNING_DIALOG_FRAGMENT)
+                            return true
+                        }
+                    }
+                    return false
+                }
+            },
+            viewLifecycleOwner,
+            Lifecycle.State.RESUMED
+        )
     }
 
     override fun onStart() {
