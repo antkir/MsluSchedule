@@ -21,11 +21,11 @@ import javax.inject.Inject
 
 @PerApp
 class NetworkRepository @Inject constructor(
-        private val localCookieJar: LocalCookieJar,
-        private val networkHelper: NetworkHelper,
-        private val sharedPreferencesRepository: SharedPreferencesRepository,
-        private val scheduleApi: ScheduleApi,
-        private val xlsParser: XlsParser
+    private val localCookieJar: LocalCookieJar,
+    private val networkHelper: NetworkHelper,
+    private val sharedPreferencesRepository: SharedPreferencesRepository,
+    private val scheduleApi: ScheduleApi,
+    private val xlsParser: XlsParser
 ) {
     fun getFaculties(): Single<ScheduleFilter> {
         return wrapRequest {
@@ -56,10 +56,10 @@ class NetworkRepository @Inject constructor(
         val requestDataList = networkHelper.getYearsFilterDataList()
         return wrapRequest {
             getDataFromJsonRequest(
-                    networkHelper.weekRequestInfo,
-                    // Weeks are equal for groups and teachers, so we can use either request
-                    NetworkHelper.teacherSchedule,
-                    requestDataList
+                networkHelper.weekRequestInfo,
+                // Weeks are equal for groups and teachers, so we can use either request
+                NetworkHelper.teacherSchedule,
+                requestDataList
             )
         }
     }
@@ -67,13 +67,13 @@ class NetworkRepository @Inject constructor(
     fun getSchedule(studyGroup: StudyGroup, weekKey: Int): Observable<WeekdayWithStudyGroupLessons> {
         val requestDataList = networkHelper.getStudyGroupRequestDataList(studyGroup, weekKey)
         return wrapRequest { getScheduleData(NetworkHelper.groupSchedule, requestDataList) }
-                .flatMapObservable { xlsParser.parseStudyGroupXls(it) }
+            .flatMapObservable { xlsParser.parseStudyGroupXls(it) }
     }
 
     fun getSchedule(teacher: Teacher, weekKey: Int): Observable<WeekdayWithTeacherLessons> {
         val requestDataList = networkHelper.getTeacherRequestDataList(teacher, weekKey)
         return wrapRequest { getScheduleData(NetworkHelper.teacherSchedule, requestDataList) }
-                .flatMapObservable { xlsParser.parseTeacherXls(it) }
+            .flatMapObservable { xlsParser.parseTeacherXls(it) }
     }
 
     /*
@@ -83,89 +83,89 @@ class NetworkRepository @Inject constructor(
      */
     private inline fun <T> wrapRequest(request: () -> Single<T>): Single<T> {
         return initSession()
-                .andThen(request())
-                .doOnEvent { _, _ -> closeSession() }
+            .andThen(request())
+            .doOnEvent { _, _ -> closeSession() }
     }
 
     private fun closeSession() = localCookieJar.removeCookie()
 
     private fun getDataFromJsonRequest(
-            requestInfo: RequestInfo,
-            scheduleType: String,
-            requestDataList: List<RequestData>
+        requestInfo: RequestInfo,
+        scheduleType: String,
+        requestDataList: List<RequestData>
     ): Single<ScheduleFilter> {
         return Observable
-                .fromIterable(requestDataList)
-                .flatMapSingle { changeScheduleFilter(scheduleType, it) }
-                .lastOrError()
-                .flatMap { networkHelper.parseDataFromJsonResponse(requestInfo, it) }
+            .fromIterable(requestDataList)
+            .flatMapSingle { changeScheduleFilter(scheduleType, it) }
+            .lastOrError()
+            .flatMap { networkHelper.parseDataFromJsonResponse(requestInfo, it) }
     }
 
     private fun getDataFromHtmlRequest(scheduleType: String, scheduleFilter: RequestInfo): Single<ScheduleFilter> {
         return getHtmlBody(scheduleType)
-                .flatMap { networkHelper.parseDataFromHtmlBody(scheduleFilter, it) }
+            .flatMap { networkHelper.parseDataFromHtmlBody(scheduleFilter, it) }
     }
 
     private fun getScheduleData(
-            requestedScheduleType: String,
-            requestDataList: List<RequestData>
+        requestedScheduleType: String,
+        requestDataList: List<RequestData>
     ): Single<InputStream> {
         return Observable.fromIterable(requestDataList)
-                .flatMapSingle { changeScheduleFilter(requestedScheduleType, it) }
-                .flatMapCompletable {
-                    val isFullSubjectNameUsed = sharedPreferencesRepository.isFullSubjectNameUsed()
-                    return@flatMapCompletable if (isFullSubjectNameUsed) {
-                        val filterData = networkHelper.getSubjectLengthFilterData(isFullSubjectNameUsed)
-                        changeScheduleFilter(NetworkHelper.groupSchedule, filterData).ignoreElement()
-                    } else {
-                        Completable.complete()
-                    }
+            .flatMapSingle { changeScheduleFilter(requestedScheduleType, it) }
+            .flatMapCompletable {
+                return@flatMapCompletable if (sharedPreferencesRepository.isFullSubjectNameUsed()) {
+                    val filterData = networkHelper.getSubjectLengthFilterData(isFullSubjectName = true)
+                    changeScheduleFilter(NetworkHelper.groupSchedule, filterData).ignoreElement()
+                } else {
+                    Completable.complete()
                 }
-                .andThen(getScheduleInputStream(requestedScheduleType))
+            }
+            .andThen(getScheduleInputStream(requestedScheduleType))
     }
 
     private fun initSession(): Completable {
         return scheduleApi
-                .initSession()
-                .doOnSuccess { checkErrors(it) }
-                .ignoreElement()
+            .initSession()
+            .doOnSuccess { checkErrors(it) }
+            .ignoreElement()
     }
 
     private fun changeScheduleFilter(scheduleType: String, requestData: RequestData): Single<JsonBody> {
         val formIds = networkHelper.getFormIdPair(scheduleType, requestData)
         return scheduleApi
-                .changeScheduleFilter(
-                        scheduleType,
-                        requestData.requestName,
-                        requestData.requestRelatedName,
-                        formIds.first,
-                        formIds.second,
-                        requestData.selectedValue)
-                .doOnSuccess { checkErrors(it) }
-                .map { it.body() }
+            .changeScheduleFilter(
+                scheduleType,
+                requestData.requestName,
+                requestData.requestRelatedName,
+                formIds.first,
+                formIds.second,
+                requestData.selectedValue
+            )
+            .doOnSuccess { checkErrors(it) }
+            .map { it.body() }
     }
 
     private fun getHtmlBody(scheduleType: String): Single<String> {
         return scheduleApi
-                .getHtmlBody(scheduleType)
-                .doOnSuccess { checkErrors(it) }
-                .map { it.body()?.string() ?: EMPTY_STRING }
+            .getHtmlBody(scheduleType)
+            .doOnSuccess { checkErrors(it) }
+            .map { it.body()?.string() ?: EMPTY_STRING }
     }
 
     private fun getScheduleInputStream(scheduleType: String): Single<InputStream> {
         return scheduleApi
-                .getSchedule(scheduleType)
-                .doOnSuccess { checkErrors(it) }
-                .map { it.body()?.byteStream() }
+            .getSchedule(scheduleType)
+            .doOnSuccess { checkErrors(it) }
+            .map { it.body()?.byteStream() }
     }
 
     @Throws(HttpStatusException::class)
     private fun <T> checkErrors(response: Response<T>) {
         if (!response.isSuccessful) {
             throw HttpStatusException(
-                    response.message(),
-                    response.code(),
-                    response.raw().request().url().toString()
+                response.message(),
+                response.code(),
+                response.raw().request().url().toString()
             )
         }
     }

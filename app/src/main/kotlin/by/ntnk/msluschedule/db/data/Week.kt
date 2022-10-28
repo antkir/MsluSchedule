@@ -6,19 +6,19 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(
-        foreignKeys = [
-            ForeignKey(
-                    entity = ScheduleContainer::class,
-                    parentColumns = ["id"],
-                    childColumns = ["containerId"],
-                    onDelete = ForeignKey.CASCADE
-            )
-        ],
-        indices = [Index(value = ["containerId"])]
+    foreignKeys = [
+        ForeignKey(
+            entity = ScheduleContainer::class,
+            parentColumns = ["id"],
+            childColumns = ["containerId"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ],
+    indices = [Index(value = ["containerId"])]
 )
 data class Week constructor(
-        val key: Int,
-        val value: String,
-        val containerId: Int,
-        @PrimaryKey(autoGenerate = true) val id: Int = 0
+    val key: Int,
+    val value: String,
+    val containerId: Int,
+    @PrimaryKey(autoGenerate = true) val id: Int = 0
 )

@@ -2,9 +2,9 @@ package by.ntnk.msluschedule.utils
 
 import android.os.Looper
 import by.ntnk.msluschedule.di.PerApp
-import io.reactivex.schedulers.Schedulers
 import io.reactivex.Scheduler
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.Executors
 import javax.inject.Inject
 

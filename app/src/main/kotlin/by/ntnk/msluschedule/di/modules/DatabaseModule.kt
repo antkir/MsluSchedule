@@ -1,14 +1,13 @@
 package by.ntnk.msluschedule.di.modules
 
 import androidx.room.Room
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import by.ntnk.msluschedule.MsluScheduleApp
 import by.ntnk.msluschedule.db.AppDatabase
 import by.ntnk.msluschedule.di.PerApp
-
 import dagger.Module
 import dagger.Provides
-import androidx.sqlite.db.SupportSQLiteDatabase
-import androidx.room.migration.Migration
 
 const val DATABASE_NAME = "application_db"
 
@@ -30,8 +29,8 @@ class DatabaseModule {
     @Provides
     fun provideAppDatabase(app: MsluScheduleApp): AppDatabase {
         return Room.databaseBuilder(app, AppDatabase::class.java, DATABASE_NAME)
-                .addMigrations(migration8to9)
-                .addMigrations(migration9to10)
-                .build()
+            .addMigrations(migration8to9)
+            .addMigrations(migration9to10)
+            .build()
     }
 }

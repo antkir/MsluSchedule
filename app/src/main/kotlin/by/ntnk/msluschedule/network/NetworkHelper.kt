@@ -127,7 +127,8 @@ class NetworkHelper @Inject constructor(private val currentDate: CurrentDate) {
         var formComponentID = ""
         if (scheduleType == teacherSchedule) {
             if (requestData.requestName == teacherRequestInfo.requestName ||
-                    requestData.requestName == weekRequestInfo.requestName) {
+                requestData.requestName == weekRequestInfo.requestName
+            ) {
                 formID = teacherFormID
                 formComponentID = teacherFormComponentID
             } else if (requestData.requestName == yearRequestInfo.requestName) {

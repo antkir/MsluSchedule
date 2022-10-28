@@ -35,8 +35,8 @@ class MsluScheduleApp : MultiDexApplication(), HasAndroidInjector {
 
     private fun buildAppComponent(): AndroidInjector<MsluScheduleApp> {
         return DaggerAppComponent
-                .factory()
-                .create(this)
+            .factory()
+            .create(this)
     }
 
     override fun androidInjector(): AndroidInjector<Any> = dispatchingAndroidInjector

@@ -90,11 +90,13 @@ class LocalCookieJar : CookieJar {
                 value = value.substring(1, value.length - 1)
             }
 
-            result.add(Cookie.Builder()
-                               .name(name)
-                               .value(value)
-                               .domain(url.host())
-                               .build())
+            result.add(
+                Cookie.Builder()
+                    .name(name)
+                    .value(value)
+                    .domain(url.host())
+                    .build()
+            )
             pos = pairEnd + 1
         }
         return result

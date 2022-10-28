@@ -6,18 +6,19 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(
-        foreignKeys = [
-            ForeignKey(
-                    entity = Weekday::class,
-                    parentColumns = ["id"],
-                    childColumns = ["weekdayId"],
-                    onDelete = ForeignKey.CASCADE)
-        ],
-        indices = [Index(value = ["weekdayId"])]
+    foreignKeys = [
+        ForeignKey(
+            entity = Weekday::class,
+            parentColumns = ["id"],
+            childColumns = ["weekdayId"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ],
+    indices = [Index(value = ["weekdayId"])]
 )
 data class DbNote constructor(
-        val text: String,
-        val subject: String,
-        val weekdayId: Int,
-        @PrimaryKey(autoGenerate = true) val id: Int = 0
+    val text: String,
+    val subject: String,
+    val weekdayId: Int,
+    @PrimaryKey(autoGenerate = true) val id: Int = 0
 )

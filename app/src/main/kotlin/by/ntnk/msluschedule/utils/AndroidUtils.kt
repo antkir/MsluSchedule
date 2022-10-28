@@ -21,10 +21,10 @@ import java.net.UnknownHostException
 import java.util.Random
 import java.util.concurrent.ThreadLocalRandom
 
-val onThemeChanged : PublishSubject<Boolean> = PublishSubject.create()
+val onThemeChanged: PublishSubject<Boolean> = PublishSubject.create()
 
 fun Context.dipToPixels(dipValue: Float) =
-        TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dipValue, resources.displayMetrics).toInt()
+    TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dipValue, resources.displayMetrics).toInt()
 
 fun IntRange.random(): Int {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -66,12 +66,12 @@ object AndroidUtils {
             val activeNetwork = connectivityManager?.activeNetwork
             val networkCapabilities = connectivityManager?.getNetworkCapabilities(activeNetwork) ?: return false
             return networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
-                    networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
-                    networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)
+                networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
+                networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)
         } else {
             @Suppress("DEPRECATION")
             return connectivityManager?.activeNetworkInfo != null &&
-                    connectivityManager.activeNetworkInfo?.isConnected == true
+                connectivityManager.activeNetworkInfo?.isConnected == true
         }
     }
 
@@ -94,13 +94,13 @@ object AndroidUtils {
 
     fun getWeekdayFromTag(weekdayTag: String, context: Context): String {
         return when (weekdayTag) {
-            MONDAY -> context.resources.getString(R.string.monday)
-            TUESDAY -> context.resources.getString(R.string.tuesday)
-            WEDNESDAY -> context.resources.getString(R.string.wednesday)
-            THURSDAY -> context.resources.getString(R.string.thursday)
-            FRIDAY -> context.resources.getString(R.string.friday)
-            SATURDAY -> context.resources.getString(R.string.saturday)
-            SUNDAY -> context.resources.getString(R.string.sunday)
+            Days.MONDAY -> context.resources.getString(R.string.monday)
+            Days.TUESDAY -> context.resources.getString(R.string.tuesday)
+            Days.WEDNESDAY -> context.resources.getString(R.string.wednesday)
+            Days.THURSDAY -> context.resources.getString(R.string.thursday)
+            Days.FRIDAY -> context.resources.getString(R.string.friday)
+            Days.SATURDAY -> context.resources.getString(R.string.saturday)
+            Days.SUNDAY -> context.resources.getString(R.string.sunday)
             else -> EMPTY_STRING
         }
     }

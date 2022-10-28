@@ -1,37 +1,41 @@
 package by.ntnk.msluschedule.db.data
 
-import androidx.room.*
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Ignore
+import androidx.room.Index
+import androidx.room.PrimaryKey
 import by.ntnk.msluschedule.data.StudyGroupLesson
 
 @Entity(
-        foreignKeys = [
-            (ForeignKey(
-                    entity = Weekday::class,
-                    parentColumns = ["id"],
-                    childColumns = ["weekdayId"],
-                    onDelete = ForeignKey.CASCADE
-            ))
-        ],
-        indices = [(Index(value = ["weekdayId"]))]
+    foreignKeys = [
+        ForeignKey(
+            entity = Weekday::class,
+            parentColumns = ["id"],
+            childColumns = ["weekdayId"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ],
+    indices = [(Index(value = ["weekdayId"]))]
 )
 data class DbStudyGroupLesson constructor(
-        val subject: String,
-        val type: String,
-        val teacher: String,
-        val classroom: String,
-        val startTime: String,
-        val endTime: String,
-        val weekdayId: Int,
-        @PrimaryKey(autoGenerate = true) val id: Int = 0
+    val subject: String,
+    val type: String,
+    val teacher: String,
+    val classroom: String,
+    val startTime: String,
+    val endTime: String,
+    val weekdayId: Int,
+    @PrimaryKey(autoGenerate = true) val id: Int = 0
 ) {
     @Ignore
     constructor(lesson: StudyGroupLesson, weekdayId: Int) : this(
-            lesson.subject,
-            lesson.type,
-            lesson.teacher,
-            lesson.classroom,
-            lesson.startTime,
-            lesson.endTime,
-            weekdayId
+        lesson.subject,
+        lesson.type,
+        lesson.teacher,
+        lesson.classroom,
+        lesson.startTime,
+        lesson.endTime,
+        weekdayId
     )
 }

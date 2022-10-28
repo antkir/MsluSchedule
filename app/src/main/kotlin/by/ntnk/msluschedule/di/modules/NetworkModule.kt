@@ -39,27 +39,27 @@ class NetworkModule {
     @Provides
     @PerApp
     fun provideOkHttpClient(
-            httpLoggingInterceptor: HttpLoggingInterceptor,
-            localCookieJar: LocalCookieJar
+        httpLoggingInterceptor: HttpLoggingInterceptor,
+        localCookieJar: LocalCookieJar
     ): OkHttpClient {
         return OkHttpClient().newBuilder()
-                .addNetworkInterceptor(httpLoggingInterceptor)
-                .cookieJar(localCookieJar)
-                .connectTimeout(2, TimeUnit.MINUTES)
-                .readTimeout(2, TimeUnit.MINUTES)
-                .writeTimeout(2, TimeUnit.MINUTES)
-                .build()
+            .addNetworkInterceptor(httpLoggingInterceptor)
+            .cookieJar(localCookieJar)
+            .connectTimeout(2, TimeUnit.MINUTES)
+            .readTimeout(2, TimeUnit.MINUTES)
+            .writeTimeout(2, TimeUnit.MINUTES)
+            .build()
     }
 
     @Provides
     @PerApp
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-                .baseUrl("http://raspisanie.mslu.by/")
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .addConverterFactory(MoshiConverterFactory.create())
-                .client(okHttpClient)
-                .build()
+            .baseUrl("http://raspisanie.mslu.by/")
+            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+            .addConverterFactory(MoshiConverterFactory.create())
+            .client(okHttpClient)
+            .build()
     }
 
     @Provides

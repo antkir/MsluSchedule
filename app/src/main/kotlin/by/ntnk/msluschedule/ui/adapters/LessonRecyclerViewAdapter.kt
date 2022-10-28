@@ -19,8 +19,8 @@ import by.ntnk.msluschedule.data.TeacherLesson
 import by.ntnk.msluschedule.data.WeekdayWithLessons
 import by.ntnk.msluschedule.utils.AndroidUtils
 import by.ntnk.msluschedule.utils.BaseRVItemView
+import by.ntnk.msluschedule.utils.Days
 import by.ntnk.msluschedule.utils.EMPTY_STRING
-import by.ntnk.msluschedule.utils.WEEKDAYS_NUMBER
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import java.util.ArrayList
@@ -53,7 +53,7 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
         var hasNotesIdx = 0
         for (day in days) {
             val dayView = DayView(day.weekdayId, day.weekday)
-            if (hasNotesList.size == WEEKDAYS_NUMBER) {
+            if (hasNotesList.size == Days.num()) {
                 dayView.hasNotes = hasNotesList[hasNotesIdx]
                 hasNotesIdx++
             }
