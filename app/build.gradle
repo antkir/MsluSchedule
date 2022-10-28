@@ -75,8 +75,8 @@ ext {
     jsoupVersion = '1.15.3'
     junitVersion = '4.13.2'
     leakcanaryVersion = '2.9.1'
-    materialVersion = '1.6.1'
-    mockitoVersion = '4.8.0'
+    materialVersion = '1.7.0'
+    mockitoVersion = '4.8.1'
     multidexVersion = '2.0.1'
     // OkHttp 3.13.0 release bumps minimum requirements to Android 5+.
     okhttpVersion = '3.12.13'
@@ -92,10 +92,10 @@ ext {
     rxkotlinVersion = '2.4.0'
     spotlightVersion = '1.7.0'
     swipeRefreshLayoutVersion = '1.1.0'
-    threetenbpVersion = '1.6.2'
+    threetenbpVersion = '1.6.3'
     timberVersion = '5.0.1'
 
-    crashlyticsVersion = '18.2.13'
+    crashlyticsVersion = '18.3.1'
     // Firebase Analytics 20.0.0+ release bumps minimum requirements to Android 4.4+.
     firebaseAnalyticsVersion = '19.0.2'
 }
