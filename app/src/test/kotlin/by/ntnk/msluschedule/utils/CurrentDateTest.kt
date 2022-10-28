@@ -10,6 +10,7 @@ import org.threeten.bp.LocalDate
 import timber.log.Timber
 
 class CurrentDateTest {
+
     private val currentDate = object : CurrentDate() {
         override var date = LocalDate.of(1970, 9, 1)
     }

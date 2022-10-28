@@ -15,6 +15,7 @@ import timber.log.Timber
 import org.mockito.Mockito.`when` as whenever
 
 class NetworkHelperTest {
+
     @Mock
     private lateinit var currentDate: CurrentDate
     private lateinit var networkHelper: NetworkHelper

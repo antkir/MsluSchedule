@@ -2,7 +2,14 @@ package by.ntnk.msluschedule.ui.week
 
 import by.ntnk.msluschedule.TestTree
 import by.ntnk.msluschedule.any
-import by.ntnk.msluschedule.data.*
+import by.ntnk.msluschedule.data.Lesson
+import by.ntnk.msluschedule.data.Note
+import by.ntnk.msluschedule.data.ScheduleContainerInfo
+import by.ntnk.msluschedule.data.StudyGroup
+import by.ntnk.msluschedule.data.Teacher
+import by.ntnk.msluschedule.data.WeekdayWithLessons
+import by.ntnk.msluschedule.data.WeekdayWithStudyGroupLessons
+import by.ntnk.msluschedule.data.WeekdayWithTeacherLessons
 import by.ntnk.msluschedule.db.DatabaseDataMapper
 import by.ntnk.msluschedule.db.DatabaseRepository
 import by.ntnk.msluschedule.db.data.ScheduleContainer
@@ -28,6 +35,7 @@ import timber.log.Timber
 import org.mockito.Mockito.`when` as whenever
 
 class WeekPresenterTest {
+
     @Mock
     private lateinit var currentDate: CurrentDate
 
@@ -73,59 +81,81 @@ class WeekPresenterTest {
 
         whenever(networkRepositoryLazy.get()).thenReturn(mock(NetworkRepository::class.java))
         whenever(sharedPreferencesRepository.getSelectedScheduleContainerInfo())
-                .thenReturn(ScheduleContainerInfo(0, "", ScheduleType.STUDYGROUP))
+            .thenReturn(ScheduleContainerInfo(0, "", ScheduleType.STUDYGROUP))
         whenever(databaseRepository.getScheduleContainer(anyInt()))
-                .thenReturn(Single.just(ScheduleContainer(0, "", ScheduleType.STUDYGROUP, 0))
-                                    .doOnSubscribe { getScheduleContainerTest.onSubscribe(it) })
+            .thenReturn(
+                Single.just(ScheduleContainer(0, "", ScheduleType.STUDYGROUP, 0))
+                    .doOnSubscribe { getScheduleContainerTest.onSubscribe(it) }
+            )
         whenever(databaseRepository.getWeekKey(anyInt()))
-                .thenReturn(Single.just(0)
-                                    .doOnSubscribe { getWeekKeyTest.onSubscribe(it) })
+            .thenReturn(
+                Single.just(0)
+                    .doOnSubscribe { getWeekKeyTest.onSubscribe(it) }
+            )
         whenever(databaseRepository.deleteLessons(anyInt(), any()))
-                .thenReturn(Completable.complete()
-                                    .doOnSubscribe { deleteLessonsForWeekTest.onSubscribe(it) })
+            .thenReturn(
+                Completable.complete()
+                    .doOnSubscribe { deleteLessonsForWeekTest.onSubscribe(it) }
+            )
         whenever(databaseRepository.getWeekdaysWithStudyGroupLessons(anyInt()))
-                .thenReturn(Observable.just(WeekdayWithStudyGroupLessons("") as WeekdayWithLessons<Lesson>)
-                                    .doOnSubscribe { getWeekdayWithStudyGroupLessonsForWeekTest.onSubscribe(it) })
+            .thenReturn(
+                Observable.just(WeekdayWithStudyGroupLessons("") as WeekdayWithLessons<Lesson>)
+                    .doOnSubscribe { getWeekdayWithStudyGroupLessonsForWeekTest.onSubscribe(it) }
+            )
         whenever(databaseRepository.getWeekdaysWithTeacherLessons(anyInt()))
-                .thenReturn(Observable.just(WeekdayWithTeacherLessons("") as WeekdayWithLessons<Lesson>)
-                                    .doOnSubscribe { getWeekdayWithTeacherLessonsForWeekTest.onSubscribe(it) })
+            .thenReturn(
+                Observable.just(WeekdayWithTeacherLessons("") as WeekdayWithLessons<Lesson>)
+                    .doOnSubscribe { getWeekdayWithTeacherLessonsForWeekTest.onSubscribe(it) }
+            )
         whenever(databaseRepository.insertStudyGroupSchedule(any(), anyInt()))
-                .thenReturn(Single.just(listOf(WeekdayWithStudyGroupLessons("")))
-                                    .doOnSubscribe { insertStudyGroupScheduleTest.onSubscribe(it) })
+            .thenReturn(
+                Single.just(listOf(WeekdayWithStudyGroupLessons("")))
+                    .doOnSubscribe { insertStudyGroupScheduleTest.onSubscribe(it) }
+            )
         whenever(databaseRepository.insertTeacherSchedule(any(), anyInt()))
-                .thenReturn(Single.just(listOf(WeekdayWithTeacherLessons("")))
-                                    .doOnSubscribe { insertTeacherScheduleTest.onSubscribe(it) })
+            .thenReturn(
+                Single.just(listOf(WeekdayWithTeacherLessons("")))
+                    .doOnSubscribe { insertTeacherScheduleTest.onSubscribe(it) }
+            )
         whenever(databaseRepository.insertWeekdays(anyInt()))
-                .thenReturn(Completable.complete()
-                                    .doOnSubscribe { insertWeekdaysTest.onSubscribe(it) })
+            .thenReturn(
+                Completable.complete()
+                    .doOnSubscribe { insertWeekdaysTest.onSubscribe(it) }
+            )
         whenever(databaseRepository.getNotesForWeekday(anyInt()))
-                .thenReturn(Observable.fromIterable(List(1) { return@List Note(0, "", "") })
-                                    .doOnSubscribe { getNotesForWeekdayTest.onSubscribe(it) })
+            .thenReturn(
+                Observable.fromIterable(List(1) { return@List Note(0, "", "") })
+                    .doOnSubscribe { getNotesForWeekdayTest.onSubscribe(it) }
+            )
         whenever(networkRepository.getSchedule(any<StudyGroup>(), anyInt()))
-                .thenReturn(Observable.just(WeekdayWithStudyGroupLessons(""))
-                                    .doOnSubscribe { getStudyGroupScheduleTest.onSubscribe(it) })
+            .thenReturn(
+                Observable.just(WeekdayWithStudyGroupLessons(""))
+                    .doOnSubscribe { getStudyGroupScheduleTest.onSubscribe(it) }
+            )
         whenever(networkRepository.getSchedule(any<Teacher>(), anyInt()))
-                .thenReturn(Observable.just(WeekdayWithTeacherLessons(""))
-                                    .doOnSubscribe { getTeacherScheduleTest.onSubscribe(it) })
+            .thenReturn(
+                Observable.just(WeekdayWithTeacherLessons(""))
+                    .doOnSubscribe { getTeacherScheduleTest.onSubscribe(it) }
+            )
         whenever(databaseDataMapper.mapToStudyGroup(any()))
-                .thenReturn(StudyGroup(0, "", 0, 0, 0))
+            .thenReturn(StudyGroup(0, "", 0, 0, 0))
         whenever(databaseDataMapper.mapToTeacher(any()))
-                .thenReturn(Teacher(0, "", 0))
+            .thenReturn(Teacher(0, "", 0))
 
         whenever(schedulerProvider.single())
-                .thenReturn(Schedulers.trampoline())
+            .thenReturn(Schedulers.trampoline())
         whenever(schedulerProvider.ui())
-                .thenReturn(Schedulers.trampoline())
+            .thenReturn(Schedulers.trampoline())
         whenever(schedulerProvider.cachedThreadPool())
-                .thenReturn(Schedulers.trampoline())
+            .thenReturn(Schedulers.trampoline())
 
         presenter = WeekPresenter(
-                currentDate,
-                databaseRepository,
-                databaseDataMapper,
-                sharedPreferencesRepository,
-                schedulerProvider,
-                networkRepositoryLazy
+            currentDate,
+            databaseRepository,
+            databaseDataMapper,
+            sharedPreferencesRepository,
+            schedulerProvider,
+            networkRepositoryLazy
         )
         presenter.bindView(view)
     }
@@ -136,8 +166,10 @@ class WeekPresenterTest {
         val weekId = 0
         val isWeekInitializedTest = TestObserver.create<Boolean>()
         whenever(databaseRepository.isWeekInitialized(anyInt()))
-                .thenReturn(Single.just(false)
-                                    .doOnSubscribe { isWeekInitializedTest.onSubscribe(it) })
+            .thenReturn(
+                Single.just(false)
+                    .doOnSubscribe { isWeekInitializedTest.onSubscribe(it) }
+            )
         // when
         presenter.getSchedule(weekId, true)
         // then
@@ -162,10 +194,12 @@ class WeekPresenterTest {
         val weekId = 0
         val isWeekInitializedTest = TestObserver.create<Boolean>()
         whenever(databaseRepository.isWeekInitialized(anyInt()))
-                .thenReturn(Single.just(false)
-                                    .doOnSubscribe { isWeekInitializedTest.onSubscribe(it) })
+            .thenReturn(
+                Single.just(false)
+                    .doOnSubscribe { isWeekInitializedTest.onSubscribe(it) }
+            )
         whenever(networkRepository.getSchedule(any<StudyGroup>(), anyInt()))
-                .thenReturn(Observable.error(NullPointerException()))
+            .thenReturn(Observable.error(NullPointerException()))
         // when
         presenter.getSchedule(weekId, true)
         // then
@@ -210,7 +244,7 @@ class WeekPresenterTest {
         // given
         val weekId = 0
         whenever(networkRepository.getSchedule(any<StudyGroup>(), anyInt()))
-                .thenReturn(Observable.error(NullPointerException()))
+            .thenReturn(Observable.error(NullPointerException()))
         // when
         presenter.updateSchedule(weekId)
         // then

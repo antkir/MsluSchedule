@@ -7,6 +7,7 @@ import org.junit.Test
 import timber.log.Timber
 
 class ScheduleFilterTest {
+
     @Before
     fun setUp() {
         Timber.plant(TestTree())

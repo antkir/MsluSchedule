@@ -27,6 +27,7 @@ import timber.log.Timber
 import org.mockito.Mockito.`when` as whenever
 
 class MainPresenterTest {
+
     @Mock
     private lateinit var currentDate: CurrentDate
 
@@ -63,29 +64,29 @@ class MainPresenterTest {
 
         whenever(networkRepositoryLazy.get()).thenReturn(Mockito.mock(NetworkRepository::class.java))
         whenever(networkRepository.getWeeks())
-                .thenReturn(Single.just(ScheduleFilter()).doOnSubscribe { getWeeksTest.onSubscribe(it) })
+            .thenReturn(Single.just(ScheduleFilter()).doOnSubscribe { getWeeksTest.onSubscribe(it) })
         whenever(databaseRepository.insertStudyGroup(any()))
-                .thenReturn(Single.just(0).doOnSubscribe { insertStudyGroupTest.onSubscribe(it) })
+            .thenReturn(Single.just(0).doOnSubscribe { insertStudyGroupTest.onSubscribe(it) })
         whenever(databaseRepository.insertTeacher(any()))
-                .thenReturn(Single.just(0).doOnSubscribe { insertTeacherTest.onSubscribe(it) })
+            .thenReturn(Single.just(0).doOnSubscribe { insertTeacherTest.onSubscribe(it) })
         whenever(databaseRepository.insertWeeksGetIds(any(), eq(0)))
-                .thenReturn(Observable.just(0).doOnSubscribe { insertWeeksGetIdsTest.onSubscribe(it) })
+            .thenReturn(Observable.just(0).doOnSubscribe { insertWeeksGetIdsTest.onSubscribe(it) })
         whenever(databaseRepository.deleteScheduleContainer(eq(0)))
-                .thenReturn(Completable.complete().doOnSubscribe { deleteScheduleContainerTest.onSubscribe(it) })
+            .thenReturn(Completable.complete().doOnSubscribe { deleteScheduleContainerTest.onSubscribe(it) })
 
         whenever(schedulerProvider.single())
-                .thenReturn(Schedulers.trampoline())
+            .thenReturn(Schedulers.trampoline())
         whenever(schedulerProvider.ui())
-                .thenReturn(Schedulers.trampoline())
+            .thenReturn(Schedulers.trampoline())
         whenever(schedulerProvider.cachedThreadPool())
-                .thenReturn(Schedulers.trampoline())
+            .thenReturn(Schedulers.trampoline())
 
         presenter = MainPresenter(
-                currentDate,
-                databaseRepository,
-                networkRepositoryLazy,
-                sharedPreferencesRepository,
-                schedulerProvider
+            currentDate,
+            databaseRepository,
+            networkRepositoryLazy,
+            sharedPreferencesRepository,
+            schedulerProvider
         )
         presenter.bindView(view)
     }
