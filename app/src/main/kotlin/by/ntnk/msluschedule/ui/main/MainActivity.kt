@@ -13,6 +13,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.view.animation.OvershootInterpolator
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.content.ContextCompat
 import androidx.core.text.TextUtilsCompat
@@ -81,6 +82,12 @@ class MainActivity :
 
     override val view: MainView
         get() = this
+
+    private val onDrawerOpenBackPressedCallback = object : OnBackPressedCallback(false) {
+        override fun handleOnBackPressed() {
+            binding.drawerLayout.closeDrawer(GravityCompat.START)
+        }
+    }
 
     @Inject
     lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Any>
@@ -203,6 +210,8 @@ class MainActivity :
         if (sharedPreferencesRepository.isFirstAppLaunch) {
             showTutorial()
         }
+
+        onBackPressedDispatcher.addCallback(this, onDrawerOpenBackPressedCallback)
     }
 
     private class NavigationDrawerRunnable(context: DrawerLayout?) : Runnable {
@@ -303,7 +312,7 @@ class MainActivity :
             val subMenuSize = binding.navView.menu
                 .findItem(getContainerMenuViewId(type))
                 .subMenu
-                .size()
+                ?.size() ?: 0
             size += subMenuSize
         }
         return size == 0
@@ -319,26 +328,20 @@ class MainActivity :
         onThemeChangedDisposable.dispose()
     }
 
-    override fun onBackPressed() {
-        if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            binding.drawerLayout.closeDrawer(GravityCompat.START)
-        } else {
-            super.onBackPressed()
-        }
-    }
-
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         // Handle navigation view item clicks here.
         if (!item.isChecked) {
-            val isStudyGroupItem = binding.navView.menu
+            val subMenu = binding.navView.menu
                 .findItem(getContainerMenuViewId(ScheduleType.STUDYGROUP))
                 .subMenu
-                .findItem(item.itemId) != null
-            val type = if (isStudyGroupItem) ScheduleType.STUDYGROUP else ScheduleType.TEACHER
-            supportActionBar?.title = item.title
-            sharedPreferencesRepository.putSelectedScheduleContainer(item.itemId, item.title.toString(), type)
-            isUpdatingWeeksContainer = true
-            binding.drawerLayout.closeDrawer(GravityCompat.START)
+            if (subMenu != null) {
+                val isStudyGroupItem = subMenu.findItem(item.itemId) != null
+                val type = if (isStudyGroupItem) ScheduleType.STUDYGROUP else ScheduleType.TEACHER
+                supportActionBar?.title = item.title
+                sharedPreferencesRepository.putSelectedScheduleContainer(item.itemId, item.title.toString(), type)
+                isUpdatingWeeksContainer = true
+                binding.drawerLayout.closeDrawer(GravityCompat.START)
+            }
         }
         return true
     }
@@ -350,6 +353,12 @@ class MainActivity :
                 window.statusBarColor = ContextCompat.getColor(this, R.color.statusbar_nav_drawer)
             }
         }
+
+        onDrawerOpenBackPressedCallback.isEnabled = true
+    }
+
+    override fun onDrawerClosed(drawerView: View) {
+        onDrawerOpenBackPressedCallback.isEnabled = false
     }
 
     override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
@@ -456,7 +465,7 @@ class MainActivity :
             .setDuration(100)
             .setInterpolator(FastOutSlowInInterpolator())
             .setListener(object : SimpleAnimatorListener {
-                override fun onAnimationEnd(animation: Animator?) {
+                override fun onAnimationEnd(animation: Animator) {
                     binding.fam.fabGroup.visibility = View.INVISIBLE
                     binding.fam.fabGroup.animate()?.setListener(null)
                 }
@@ -470,7 +479,7 @@ class MainActivity :
             .setDuration(100)
             .setInterpolator(FastOutSlowInInterpolator())
             .setListener(object : SimpleAnimatorListener {
-                override fun onAnimationEnd(animation: Animator?) {
+                override fun onAnimationEnd(animation: Animator) {
                     binding.fam.fabTeacher.visibility = View.INVISIBLE
                     binding.fam.fabTeacher.animate()?.setListener(null)
                 }
@@ -517,11 +526,11 @@ class MainActivity :
     }
 
     override fun addScheduleContainerMenuItem(scheduleContainerInfo: ScheduleContainerInfo) {
-        binding.navView.menu
+        val subMenu = binding.navView.menu
             .findItem(getContainerMenuViewId(scheduleContainerInfo.type!!))
             .subMenu
-            .add(Menu.NONE, scheduleContainerInfo.id, Menu.NONE, scheduleContainerInfo.value)
-            .isCheckable = true
+        val menuItem = subMenu?.add(Menu.NONE, scheduleContainerInfo.id, Menu.NONE, scheduleContainerInfo.value)
+        menuItem?.isCheckable = true
     }
 
     private fun getContainerMenuViewId(scheduleType: ScheduleType): Int {
@@ -537,11 +546,13 @@ class MainActivity :
             val subMenu = binding.navView.menu
                 .findItem(getContainerMenuViewId(scheduleContainerInfo.type))
                 .subMenu
-            for (i in 0 until subMenu.size()) {
-                val item = subMenu.getItem(i)
-                if (scheduleContainerInfo.id == item.itemId) {
-                    binding.navView.setCheckedItem(item.itemId)
-                    break
+            if (subMenu != null) {
+                for (i in 0 until subMenu.size()) {
+                    val item = subMenu.getItem(i)
+                    if (scheduleContainerInfo.id == item.itemId) {
+                        binding.navView.setCheckedItem(item.itemId)
+                        break
+                    }
                 }
             }
         }
@@ -580,7 +591,7 @@ class MainActivity :
         binding.navView.menu
             .findItem(getContainerMenuViewId(info.type!!))
             .subMenu
-            .removeItem(info.id)
+            ?.removeItem(info.id)
     }
 
     private fun removeWeeksContainerFragment() {

@@ -22,7 +22,7 @@ object Days {
     const val SUNDAY = "ВС"
 
     fun list() = listOf(MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY)
-    fun num() = 7
+    fun num() = list().size
 }
 
 fun Boolean.toInt() = if (this) 1 else 0

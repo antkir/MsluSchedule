@@ -60,7 +60,7 @@ class SettingsActivity : AppCompatActivity(), HasAndroidInjector {
     override fun onOptionsItemSelected(menuItem: MenuItem): Boolean {
         when (menuItem.itemId) {
             android.R.id.home -> {
-                onBackPressed()
+                onBackPressedDispatcher.onBackPressed()
                 return true
             }
         }

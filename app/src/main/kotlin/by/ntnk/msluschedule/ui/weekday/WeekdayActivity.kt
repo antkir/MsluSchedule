@@ -13,6 +13,7 @@ import android.view.ViewTreeObserver
 import android.view.animation.AlphaAnimation
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import androidx.core.app.NavUtils
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
@@ -67,6 +68,12 @@ class WeekdayActivity :
     override val view: WeekdayView
         get() = this
 
+    private val onEditNoteBackPressedCallback = object : OnBackPressedCallback(false) {
+        override fun handleOnBackPressed() {
+            hideEditNoteLayout(resetViews = true, isEditNoteLayoutAnimEnabled = true)
+        }
+    }
+
     @Inject
     lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Any>
 
@@ -119,6 +126,8 @@ class WeekdayActivity :
                 insetsController.isAppearanceLightNavigationBars = true
             }
         }
+
+        onBackPressedDispatcher.addCallback(this, onEditNoteBackPressedCallback)
     }
 
     private fun showNoteEditLayout() {
@@ -144,11 +153,11 @@ class WeekdayActivity :
                     duration = editNoteLayoutAnimDuration
                 }
 
-                override fun onAnimationStart(animation: Animator?) {
+                override fun onAnimationStart(animation: Animator) {
                     binding.layoutEditNote.startAnimation(alphaAnimation)
                 }
 
-                override fun onAnimationEnd(animation: Animator?) {
+                override fun onAnimationEnd(animation: Animator) {
                     binding.layoutEditNote.animate()?.setListener(null)
                 }
             })
@@ -167,6 +176,8 @@ class WeekdayActivity :
 
         val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager.showSoftInput(binding.edittextNote, InputMethodManager.SHOW_IMPLICIT)
+
+        onEditNoteBackPressedCallback.isEnabled = true
     }
 
     private fun onSaveNoteClick() {
@@ -213,7 +224,7 @@ class WeekdayActivity :
                 .setDuration(editNoteLayoutAnimDuration)
                 .setInterpolator(FastOutSlowInInterpolator())
                 .setListener(object : SimpleAnimatorListener {
-                    override fun onAnimationEnd(animation: Animator?) {
+                    override fun onAnimationEnd(animation: Animator) {
                         binding.scrollViewChips.translationY = binding.scrollViewChips.height.toFloat()
                         binding.scrollViewChips.visibility = View.INVISIBLE
 
@@ -236,6 +247,8 @@ class WeekdayActivity :
                 resetEditNoteLayoutViews()
             }
         }
+
+        onEditNoteBackPressedCallback.isEnabled = false
     }
 
     private fun resetEditNoteLayoutViews() {
@@ -348,14 +361,6 @@ class WeekdayActivity :
     override fun onDestroy() {
         super.onDestroy()
         disposables.clear()
-    }
-
-    override fun onBackPressed() {
-        if (binding.layoutEditNote.visibility == View.VISIBLE) {
-            hideEditNoteLayout(resetViews = true, isEditNoteLayoutAnimEnabled = true)
-        } else {
-            super.onBackPressed()
-        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

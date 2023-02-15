@@ -289,7 +289,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
             .translationY(-binding.progressbarUpdate.height.toFloat())
             .setDuration(200)
             .setListener(object : SimpleAnimatorListener {
-                override fun onAnimationEnd(animation: Animator?) {
+                override fun onAnimationEnd(animation: Animator) {
                     binding.progressbarUpdate.animate()?.setListener(null)
                     binding.progressbarUpdate.visibility = View.INVISIBLE
                 }

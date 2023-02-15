@@ -10,8 +10,8 @@ android {
     def versionPatch = 2
     def versionBuild = 2
 
-    compileSdkVersion 32
-    buildToolsVersion "32.0.0"
+    compileSdkVersion 33
+    buildToolsVersion "33.0.2"
 
     buildFeatures {
         viewBinding true
@@ -68,14 +68,14 @@ android {
 }
 
 ext {
-    appcompatVersion = '1.5.1'
+    appcompatVersion = '1.6.1'
     constraintlayoutVersion = '2.1.4'
-    daggerVersion = '2.44'
-    fragmentVersion = '1.5.3'
+    daggerVersion = '2.45'
+    fragmentVersion = '1.5.5'
     jsoupVersion = '1.15.3'
     junitVersion = '4.13.2'
-    leakcanaryVersion = '2.9.1'
-    materialVersion = '1.7.0'
+    leakcanaryVersion = '2.10'
+    materialVersion = '1.8.0'
     mockitoVersion = '4.8.1'
     multidexVersion = '2.0.1'
     // OkHttp 3.13.0 release bumps minimum requirements to Android 5+.
@@ -85,17 +85,17 @@ ext {
     preferenceVersion = '1.2.0'
     // Retrofit 2.7.0 release bumps minimum requirements to Android 5+.
     retrofitVersion = '2.6.4'
-    roomVersion = '2.4.3'
+    roomVersion = '2.5.0'
     rxandroidVersion = '2.1.1'
     // RxJava 3.1.0 release bumps minimum requirements to Android 5+.
     rxjavaVersion = '2.2.21'
     rxkotlinVersion = '2.4.0'
     spotlightVersion = '1.7.0'
     swipeRefreshLayoutVersion = '1.1.0'
-    threetenbpVersion = '1.6.3'
+    threetenbpVersion = '1.6.5'
     timberVersion = '5.0.1'
 
-    crashlyticsVersion = '18.3.1'
+    crashlyticsVersion = '18.3.3'
     // Firebase Analytics 20.0.0+ release bumps minimum requirements to Android 4.4+.
     firebaseAnalyticsVersion = '19.0.2'
 }
