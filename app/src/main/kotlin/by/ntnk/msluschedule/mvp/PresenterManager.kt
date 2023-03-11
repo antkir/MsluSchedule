@@ -1,12 +1,12 @@
 package by.ntnk.msluschedule.mvp
 
-import android.util.SparseArray
+import androidx.collection.SparseArrayCompat
 import by.ntnk.msluschedule.di.PerApp
 import javax.inject.Inject
 
 @PerApp
 class PresenterManager @Inject constructor() {
-    private val presenters = SparseArray<Presenter<*>>()
+    private val presenters = SparseArrayCompat<Presenter<*>>()
 
     internal fun getPresenter(id: Int): Presenter<*>? {
         return presenters[id]
