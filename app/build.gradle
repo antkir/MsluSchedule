@@ -1,8 +1,10 @@
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
-apply plugin: 'com.google.gms.google-services'
-apply plugin: 'com.google.firebase.crashlytics'
+plugins {
+    id 'org.jetbrains.kotlin.android'
+    id 'org.jetbrains.kotlin.kapt'
+    id 'com.android.application'
+    id 'com.google.gms.google-services'
+    id 'com.google.firebase.crashlytics'
+}
 
 android {
     def versionMajor = 1
@@ -10,7 +12,9 @@ android {
     def versionPatch = 2
     def versionBuild = 2
 
-    compileSdkVersion 33
+    namespace 'by.ntnk.msluschedule'
+
+    compileSdk 33
     buildToolsVersion "33.0.2"
 
     buildFeatures {
@@ -19,6 +23,9 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
     }
     lint {
         disable 'InvalidPackage', 'TrustAllX509TrustManager', 'OldTargetApi'
@@ -30,9 +37,6 @@ android {
         test.java.srcDirs += 'src/test/kotlin'
         androidTest.java.srcDirs += 'src/androidTest/kotlin'
     }
-    testOptions {
-        unitTests.returnDefaultValues = true
-    }
     packagingOptions {
         resources {
             excludes += ['META-INF/CHANGES', 'META-INF/README.md', 'org/apache/**']
@@ -40,15 +44,17 @@ android {
     }
     defaultConfig {
         applicationId "by.ntnk.msluschedule"
-        minSdkVersion 16
-        targetSdkVersion 32
+        minSdk 16
+        targetSdk 32
         versionCode versionMajor * 1000000 + versionMinor * 10000 + versionPatch * 100 + versionBuild
         versionName "${versionMajor}.${versionMinor}.${versionPatch}"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        kapt {
-            arguments {
-                arg("room.schemaLocation", "$projectDir/schemas".toString())
-                arg("room.incremental", "true")
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments += [
+                        "room.schemaLocation":"$projectDir/schemas".toString(),
+                        "room.incremental":"true"
+                ]
             }
         }
     }
@@ -64,7 +70,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-    namespace 'by.ntnk.msluschedule'
 }
 
 ext {
@@ -72,11 +77,11 @@ ext {
     constraintlayoutVersion = '2.1.4'
     daggerVersion = '2.45'
     fragmentVersion = '1.5.5'
-    jsoupVersion = '1.15.3'
+    jsoupVersion = '1.15.4'
     junitVersion = '4.13.2'
     leakcanaryVersion = '2.10'
     materialVersion = '1.8.0'
-    mockitoVersion = '4.8.1'
+    mockitoVersion = '5.1.1'
     multidexVersion = '2.0.1'
     // OkHttp 3.13.0 release bumps minimum requirements to Android 5+.
     okhttpVersion = '3.12.13'
@@ -95,15 +100,13 @@ ext {
     threetenbpVersion = '1.6.5'
     timberVersion = '5.0.1'
 
-    crashlyticsVersion = '18.3.3'
+    crashlyticsVersion = '18.3.5'
     // Firebase Analytics 20.0.0+ release bumps minimum requirements to Android 4.4+.
     firebaseAnalyticsVersion = '19.0.2'
 }
 
 dependencies {
-    // Kotlin
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    // Support libraries
+    // Android libraries
     implementation "androidx.appcompat:appcompat:$appcompatVersion"
     implementation "androidx.constraintlayout:constraintlayout:$constraintlayoutVersion"
     implementation "androidx.fragment:fragment-ktx:$fragmentVersion"
