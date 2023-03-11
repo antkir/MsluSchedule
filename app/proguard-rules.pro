@@ -16,7 +16,7 @@
 -keepclassmembers public class org.apache.poi.** { *; }
 -dontwarn java.awt.**
 -dontwarn javax.imageio.**
--dontwarn javax.swing.JLabel
+-dontwarn javax.swing.**
 -dontwarn javax.xml.bind.**
 
 # Dagger
