@@ -3,27 +3,28 @@ package by.ntnk.msluschedule.ui.addteacher
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.core.widget.doOnTextChanged
 import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.data.Teacher
+import by.ntnk.msluschedule.databinding.FragmentAddTeacherBinding
 import by.ntnk.msluschedule.mvp.views.MvpDialogFragment
 import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.ui.adapters.ScheduleFilterAdapter
-import by.ntnk.msluschedule.ui.customviews.LoadingAutoCompleteTextView
 import by.ntnk.msluschedule.utils.EMPTY_STRING
-import by.ntnk.msluschedule.utils.SimpleTextWatcher
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.textfield.TextInputLayout
 import dagger.Lazy
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
 class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView>(), AddTeacherView {
 
+    private var fragmentBinding: FragmentAddTeacherBinding? = null
+    private val binding get() = fragmentBinding!!
     private lateinit var listener: DialogListener
-    private lateinit var teacherView: LoadingAutoCompleteTextView
 
     override val view: AddTeacherView
         get() = this
@@ -44,43 +45,42 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val layout = View.inflate(activity, R.layout.add_teacher_view, null)
-        initViews(layout)
-        val dialog = initMaterialDialog(layout)
+        fragmentBinding = FragmentAddTeacherBinding.inflate(LayoutInflater.from(context))
+        setupViews()
+        val dialog = createDialog()
         dialog.window?.attributes?.windowAnimations = R.style.DialogAnimation
-        dialog.setOnShowListener {
-            (it as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE).isEnabled =
-                presenter.isValidTeacher(teacherView.text.toString())
+        dialog.setOnShowListener { dialogInterface ->
+            dialogInterface as AlertDialog
+            val isTeacherValid = presenter.isValidTeacher(binding.autocompletetextTeacher.text.toString())
+            dialogInterface.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = isTeacherValid
         }
         return dialog
     }
 
-    private fun initViews(layout: View) {
-        teacherView = layout.findViewById(R.id.actv_dialog_teacher)
-        teacherView.progressBar = layout.findViewById(R.id.progressbar_dialog_teacher)
-        val teacherTextInputLayout: TextInputLayout = layout.findViewById(R.id.textinputlayout_teacher)
-        teacherView.setEnabledFocusable(false)
-        teacherView.setOnItemClickListener { _, _, _, id -> presenter.setTeacherValue(id.toInt()) }
-        teacherView.addTextChangedListener(object : SimpleTextWatcher {
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                teacherTextInputLayout.error = EMPTY_STRING
-                var isEnabled = presenter.isValidTeacher(s.toString())
-                if (presenter.isTeacherStored(s.toString())) {
-                    teacherTextInputLayout.error = resources.getString(R.string.teacher_already_added)
-                    isEnabled = false
-                }
-                (dialog as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = isEnabled
+    private fun setupViews() {
+        binding.autocompletetextTeacher.setEnabledFocusable(false)
+        binding.autocompletetextTeacher.setOnItemClickListener { _, _, _, id ->
+            presenter.setTeacherId(id.toInt())
+        }
+        binding.autocompletetextTeacher.doOnTextChanged { text, _, _, _ ->
+            var isEnabled = presenter.isValidTeacher(text.toString())
+            if (presenter.isTeacherStored(text.toString())) {
+                binding.textinputlayoutTeacher.error = resources.getString(R.string.teacher_already_added)
+                isEnabled = false
+            } else {
+                binding.textinputlayoutTeacher.error = EMPTY_STRING
             }
-        })
+            (dialog as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = isEnabled
+        }
     }
 
-    private fun initMaterialDialog(layout: View): Dialog {
+    private fun createDialog(): AlertDialog {
         return MaterialAlertDialogBuilder(requireActivity(), R.style.MsluTheme_Dialog_Alert)
             .setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.rounded_corners_rect))
             .setTitle((R.string.add_teacher_title))
-            .setView(layout)
+            .setView(binding.root)
             .setPositiveButton(R.string.button_add) { _, _ ->
-                listener.onNewTeacher(presenter.getTeacher())
+                listener.onNewTeacher(presenter.createSelectedTeacherObject())
             }
             .setNegativeButton(R.string.button_cancel) { _, _ ->
                 dismiss()
@@ -90,25 +90,31 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
 
     override fun onStart() {
         super.onStart()
-        when {
-            presenter.isTeachersNotEmpty() -> presenter.populateTeachersAdapter()
-            else -> {
-                teacherView.progressBarVisibility = View.VISIBLE
-                presenter.getTeachersScheduleFilter()
-            }
+        if (presenter.isTeachersNotEmpty()) {
+            presenter.populateTeachersAdapter()
+        } else {
+            binding.progressindicatorTeacher.visibility = View.VISIBLE
+            presenter.getTeachersScheduleFilter()
         }
     }
 
-    override fun populateTeachersView(data: ScheduleFilter) {
-        teacherView.progressBarVisibility = View.GONE
-        teacherView.setEnabledFocusable(true)
-        val adapter = initAdapter(data)
-        adapter.isIgnoreCaseFilterActive = true
-        teacherView.setAdapter(adapter)
-        teacherView.requestFocus()
+    override fun onDestroyView() {
+        super.onDestroyView()
+        fragmentBinding = null
     }
 
-    private fun initAdapter(data: ScheduleFilter): ScheduleFilterAdapter {
+    override fun populateTeachersView(data: ScheduleFilter) {
+        binding.progressindicatorTeacher.visibility = View.GONE
+        val adapter = createAdapter(data)
+        adapter.isIgnoreCaseFilterActive = true
+        with (binding.autocompletetextTeacher) {
+            setEnabledFocusable(true)
+            setAdapter(adapter)
+            requestFocus()
+        }
+    }
+
+    private fun createAdapter(data: ScheduleFilter): ScheduleFilterAdapter {
         return ScheduleFilterAdapter(
             requireActivity(),
             android.R.layout.simple_spinner_dropdown_item,

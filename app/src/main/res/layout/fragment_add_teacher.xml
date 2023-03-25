@@ -18,7 +18,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <by.ntnk.msluschedule.ui.customviews.LoadingAutoCompleteTextView
-            android:id="@+id/actv_dialog_teacher"
+            android:id="@+id/autocompletetext_teacher"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:hint="@string/teacher"
@@ -34,7 +34,7 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.progressindicator.CircularProgressIndicator
-        android:id="@+id/progressbar_dialog_teacher"
+        android:id="@+id/progressindicator_teacher"
         android:layout_width="@dimen/actv_progressbar_size"
         android:layout_height="@dimen/actv_progressbar_size"
         android:indeterminate="true"
