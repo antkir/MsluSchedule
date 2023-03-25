@@ -39,7 +39,8 @@ class WeeksContainerFragment :
     private var currentWeekItemIndex = INVALID_VALUE
     private lateinit var listener: OnScheduleContainerDeletedListener
 
-    private lateinit var binding: FragmentWeekscontainerBinding
+    private var fragmentBinding: FragmentWeekscontainerBinding? = null
+    private val binding get() = fragmentBinding!!
 
     private val adapter: WeekFragmentViewPagerAdapter?
         get() = binding.viewpagerWeeks.adapter as WeekFragmentViewPagerAdapter?
@@ -68,7 +69,7 @@ class WeeksContainerFragment :
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        binding = FragmentWeekscontainerBinding.inflate(inflater, container, false)
+        fragmentBinding = FragmentWeekscontainerBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -117,6 +118,11 @@ class WeeksContainerFragment :
         super.onStop()
         presenter.clearDisposables()
         savedCurrentPosition = binding.tabLayoutWeeks.selectedTabPosition
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        fragmentBinding = null
     }
 
     override fun initWeeksAdapter(weekIds: List<ImmutableEntry>, currentWeekItemIndex: Int) {

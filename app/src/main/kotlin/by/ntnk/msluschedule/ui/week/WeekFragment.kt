@@ -61,7 +61,8 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     private var layoutManagerSavedState: Parcelable? = null
     private lateinit var adapterOnClickDisposable: Disposable
 
-    private lateinit var binding: FragmentWeekBinding
+    private var fragmentBinding: FragmentWeekBinding? = null
+    private val binding get() = fragmentBinding!!
 
     private val adapter: LessonRecyclerViewAdapter
         get() = binding.recyclerViewDays.adapter as LessonRecyclerViewAdapter? ?: LessonRecyclerViewAdapter()
@@ -87,7 +88,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        binding = FragmentWeekBinding.inflate(inflater, container, false)
+        fragmentBinding = FragmentWeekBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -190,6 +191,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     override fun onDestroyView() {
         super.onDestroyView()
         adapterOnClickDisposable.dispose()
+        fragmentBinding = null
     }
 
     fun highlightToday() {
