@@ -1,5 +1,6 @@
-package by.ntnk.msluschedule.ui.customviews
+package by.ntnk.msluschedule.ui.main.onboarding
 
+import android.animation.TimeInterpolator
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
@@ -11,16 +12,23 @@ import androidx.core.view.ViewCompat
 import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.utils.dipToPixels
 import com.google.android.material.appbar.MaterialToolbar
-import com.takusemba.spotlight.shape.Circle
 import java.util.Locale
 import kotlin.math.roundToInt
 
-class ActionMenuCircle(radius: Float, context: Context, private val toolbar: MaterialToolbar) : Circle(radius) {
+class ActionMenuCircle(
+    context: Context,
+    private val toolbar: MaterialToolbar,
+    radius: Float,
+    override val duration: Long = DEFAULT_DURATION,
+    override val interpolator: TimeInterpolator = DEFAULT_INTERPOLATOR
+) : SimpleCircle(radius, duration, interpolator) {
+
     private val moreIcon = ContextCompat.getDrawable(context, R.drawable.ic_more) as Drawable
     private val actionMenuXMargin = context.dipToPixels(10f)
 
     override fun draw(canvas: Canvas, point: PointF, value: Float, paint: Paint) {
         super.draw(canvas, point, value, paint)
+
         val layoutDirection = TextUtilsCompat.getLayoutDirectionFromLocale(Locale.getDefault())
         val isRTL = layoutDirection == ViewCompat.LAYOUT_DIRECTION_RTL
         val toolbarLocation = IntArray(2)

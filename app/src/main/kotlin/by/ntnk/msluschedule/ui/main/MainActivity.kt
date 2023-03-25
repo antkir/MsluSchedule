@@ -3,6 +3,7 @@ package by.ntnk.msluschedule.ui.main
 import android.animation.Animator
 import android.content.res.Configuration
 import android.graphics.Color
+import android.graphics.PointF
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -11,7 +12,6 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewTreeObserver
 import android.view.animation.OvershootInterpolator
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -22,6 +22,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.doOnPreDraw
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.viewpager.widget.ViewPager
@@ -33,7 +34,9 @@ import by.ntnk.msluschedule.databinding.ActivityMainBinding
 import by.ntnk.msluschedule.mvp.views.MvpActivity
 import by.ntnk.msluschedule.ui.addgroup.AddGroupFragment
 import by.ntnk.msluschedule.ui.addteacher.AddTeacherFragment
-import by.ntnk.msluschedule.ui.customviews.ActionMenuCircle
+import by.ntnk.msluschedule.ui.main.onboarding.ActionMenuCircle
+import by.ntnk.msluschedule.ui.main.onboarding.OverlayLayout
+import by.ntnk.msluschedule.ui.main.onboarding.SimpleCircle
 import by.ntnk.msluschedule.ui.settings.SettingsActivity
 import by.ntnk.msluschedule.ui.weekscontainer.WeeksContainerFragment
 import by.ntnk.msluschedule.utils.AndroidUtils
@@ -46,10 +49,9 @@ import by.ntnk.msluschedule.utils.dipToPixels
 import by.ntnk.msluschedule.utils.onThemeChanged
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
-import com.takusemba.spotlight.OnSpotlightStateChangedListener
+import com.takusemba.spotlight.OnSpotlightListener
 import com.takusemba.spotlight.Spotlight
-import com.takusemba.spotlight.shape.Circle
-import com.takusemba.spotlight.target.SimpleTarget
+import com.takusemba.spotlight.Target
 import dagger.Lazy
 import dagger.android.AndroidInjection
 import dagger.android.AndroidInjector
@@ -208,7 +210,7 @@ class MainActivity :
             .subscribe { recreate() }
 
         if (sharedPreferencesRepository.isFirstAppLaunch) {
-            showTutorial()
+            binding.root.doOnPreDraw { startOnboarding() }
         }
 
         onBackPressedDispatcher.addCallback(this, onDrawerOpenBackPressedCallback)
@@ -222,72 +224,127 @@ class MainActivity :
         }
     }
 
-    private fun showTutorial() {
-        binding.drawerLayout.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
-            override fun onGlobalLayout() {
-                binding.drawerLayout.viewTreeObserver?.removeOnGlobalLayoutListener(this)
+    private fun getViewLocationInWindow(view: View): PointF {
+        val location = IntArray(2)
+        view.getLocationInWindow(location)
+        val x = location[0].toFloat() + view.width / 2f
+        val y = location[1].toFloat() + view.height / 2f
+        return PointF(x, y)
+    }
 
-                val layoutDirection = TextUtilsCompat.getLayoutDirectionFromLocale(Locale.getDefault())
-                val isRTL = layoutDirection == ViewCompat.LAYOUT_DIRECTION_RTL
-                val insetsSystemBars = WindowInsetsCompat.Type.systemBars()
-                val insetsTop = ViewCompat.getRootWindowInsets(window.decorView)?.getInsets(insetsSystemBars)?.top ?: 0
+    private fun startOnboarding() {
+        val layoutDirection = TextUtilsCompat.getLayoutDirectionFromLocale(Locale.getDefault())
+        val isRTL = layoutDirection == ViewCompat.LAYOUT_DIRECTION_RTL
+        val insetsSystemBars = WindowInsetsCompat.Type.systemBars()
+        val insetTop = ViewCompat.getRootWindowInsets(window.decorView)?.getInsets(insetsSystemBars)?.top ?: 0
 
-                val navIconOffsetX = dipToPixels(28f).toFloat()
-                val navigationViewTargetX = if (isRTL) binding.toolbar.right.toFloat() - navIconOffsetX else navIconOffsetX
-                val navigationViewTargetY = insetsTop.toFloat() + binding.toolbar.height / 2
+        val navIconOffsetX = dipToPixels(28f).toFloat()
+        val navigationViewTargetX = if (isRTL) binding.toolbar.right.toFloat() - navIconOffsetX else navIconOffsetX
+        val navigationViewTargetY = insetTop.toFloat() + binding.toolbar.height / 2
 
-                val actIconOffsetX = dipToPixels(22f).toFloat()
-                val actionMenuTargetX = if (isRTL) actIconOffsetX else binding.toolbar.right.toFloat() - actIconOffsetX
-                val actionMenuTargetY = insetsTop.toFloat() + binding.toolbar.height / 2
+        val actIconOffsetX = dipToPixels(22f).toFloat()
+        val actionMenuTargetX = if (isRTL) actIconOffsetX else binding.toolbar.right.toFloat() - actIconOffsetX
+        val actionMenuTargetY = insetTop.toFloat() + binding.toolbar.height / 2
 
-                val welcomeTarget = SimpleTarget.Builder(this@MainActivity)
-                    .setPoint(binding.content.imageSmile)
-                    .setShape(Circle(dipToPixels(60f).toFloat()))
-                    .setTitle(getString(R.string.tutorial_welcome_title))
-                    .setDescription(getString(R.string.tutorial_welcome_description))
-                    .build()
-                val addScheduleTarget = SimpleTarget.Builder(this@MainActivity)
-                    .setPoint(binding.fam.fabBase)
-                    .setShape(Circle(dipToPixels(60f).toFloat()))
-                    .setTitle(getString(R.string.tutorial_add_schedule_title))
-                    .setDescription(getString(R.string.tutorial_add_schedule_description))
-                    .build()
-                val navigationViewTarget = SimpleTarget.Builder(this@MainActivity)
-                    .setPoint(navigationViewTargetX, navigationViewTargetY)
-                    .setShape(Circle(dipToPixels(120f).toFloat()))
-                    .setTitle(getString(R.string.tutorial_navigation_view_title))
-                    .setDescription(getString(R.string.tutorial_navigation_view_description))
-                    .build()
-                val actionMenuTarget = SimpleTarget.Builder(this@MainActivity)
-                    .setPoint(actionMenuTargetX, actionMenuTargetY)
-                    .setShape(ActionMenuCircle(dipToPixels(120f).toFloat(), this@MainActivity, binding.toolbar))
-                    .setTitle(getString(R.string.tutorial_action_menu_title))
-                    .setDescription(getString(R.string.tutorial_action_menu_description))
-                    .build()
-                val finishTarget = SimpleTarget.Builder(this@MainActivity)
-                    .setPoint(binding.content.imageSmile)
-                    .setShape(Circle(dipToPixels(60f).toFloat()))
-                    .setTitle(getString(R.string.tutorial_finish_title))
-                    .setDescription(getString(R.string.tutorial_finish_description))
-                    .build()
+        val welcomeAnchorPoint = getViewLocationInWindow(binding.content.imageSmile)
+        val welcomeShapeRadius = dipToPixels(60f).toFloat()
+        val welcomeOverlay = OverlayLayout(
+            this@MainActivity,
+            welcomeAnchorPoint,
+            welcomeShapeRadius,
+            getString(R.string.tutorial_welcome_title),
+            getString(R.string.tutorial_welcome_description)
+        )
+        val welcomeTarget = Target.Builder()
+            .setAnchor(welcomeAnchorPoint)
+            .setShape(SimpleCircle(welcomeShapeRadius))
+            .setOverlay(welcomeOverlay)
+            .build()
 
-                Spotlight.with(this@MainActivity)
-                    .setTargets(
-                        welcomeTarget,
-                        addScheduleTarget,
-                        navigationViewTarget,
-                        actionMenuTarget,
-                        finishTarget
-                    )
-                    .setOnSpotlightStateListener(object : OnSpotlightStateChangedListener {
-                        override fun onStarted() = Unit
-                        override fun onEnded() {
-                            sharedPreferencesRepository.isFirstAppLaunch = false
-                        }
-                    })
-                    .start()
-            }
-        })
+        val addScheduleAnchorPoint = getViewLocationInWindow(binding.fam.fabBase)
+        val addScheduleShapeRadius = dipToPixels(60f).toFloat()
+        val addScheduleOverlay = OverlayLayout(
+            this@MainActivity,
+            addScheduleAnchorPoint,
+            addScheduleShapeRadius,
+            getString(R.string.tutorial_add_schedule_title),
+            getString(R.string.tutorial_add_schedule_description)
+        )
+        val addScheduleTarget = Target.Builder()
+            .setAnchor(addScheduleAnchorPoint)
+            .setShape(SimpleCircle(addScheduleShapeRadius))
+            .setOverlay(addScheduleOverlay)
+            .build()
+
+        val navigationViewAnchorPoint = PointF(navigationViewTargetX, navigationViewTargetY)
+        val navigationViewShapeRadius = dipToPixels(120f).toFloat()
+        val navigationViewOverlay = OverlayLayout(
+            this@MainActivity,
+            navigationViewAnchorPoint,
+            navigationViewShapeRadius,
+            getString(R.string.tutorial_navigation_view_title),
+            getString(R.string.tutorial_navigation_view_description)
+        )
+        val navigationViewTarget = Target.Builder()
+            .setAnchor(navigationViewAnchorPoint)
+            .setShape(SimpleCircle(navigationViewShapeRadius))
+            .setOverlay(navigationViewOverlay)
+            .build()
+
+        val actionMenuAnchorPoint = PointF(actionMenuTargetX, actionMenuTargetY)
+        val actionMenuShapeRadius = dipToPixels(120f).toFloat()
+        val actionMenuOverlay = OverlayLayout(
+            this@MainActivity,
+            actionMenuAnchorPoint,
+            actionMenuShapeRadius,
+            getString(R.string.tutorial_action_menu_title),
+            getString(R.string.tutorial_action_menu_description)
+        )
+        val actionMenuTarget = Target.Builder()
+            .setAnchor(actionMenuAnchorPoint)
+            .setShape(ActionMenuCircle(this@MainActivity, binding.toolbar, actionMenuShapeRadius))
+            .setOverlay(actionMenuOverlay)
+            .build()
+
+        val finishAnchorPoint = getViewLocationInWindow(binding.content.imageSmile)
+        val finishShapeRadius = dipToPixels(60f).toFloat()
+        val finishOverlay = OverlayLayout(
+            this@MainActivity,
+            finishAnchorPoint,
+            finishShapeRadius,
+            getString(R.string.tutorial_finish_title),
+            getString(R.string.tutorial_finish_description)
+        )
+        val finishTarget = Target.Builder()
+            .setAnchor(finishAnchorPoint)
+            .setShape(SimpleCircle(finishShapeRadius))
+            .setOverlay(finishOverlay)
+            .build()
+
+        val targets = listOf(
+            welcomeTarget,
+            addScheduleTarget,
+            navigationViewTarget,
+            actionMenuTarget,
+            finishTarget
+        )
+        val overlayColor = ContextCompat.getColor(this@MainActivity, R.color.onboarding_overlay)
+        val spotlight = Spotlight.Builder(this@MainActivity)
+            .setTargets(targets)
+            .setBackgroundColor(overlayColor)
+            .setOnSpotlightListener(object : OnSpotlightListener {
+                override fun onStarted() = Unit
+                override fun onEnded() {
+                    sharedPreferencesRepository.isFirstAppLaunch = false
+                }
+            })
+            .build()
+
+        for (target in targets) {
+            target.overlay?.setOnClickListener { spotlight.next() }
+        }
+
+        spotlight.start()
     }
 
     override fun onStart() {

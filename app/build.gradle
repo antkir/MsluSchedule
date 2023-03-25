@@ -81,7 +81,7 @@ ext {
     junitVersion = '4.13.2'
     leakcanaryVersion = '2.10'
     materialVersion = '1.8.0'
-    mockitoVersion = '5.1.1'
+    mockitoVersion = '5.2.0'
     multidexVersion = '2.0.1'
     // OkHttp 3.13.0 release bumps minimum requirements to Android 5+.
     okhttpVersion = '3.12.13'
@@ -95,10 +95,11 @@ ext {
     // RxJava 3.1.0 release bumps minimum requirements to Android 5+.
     rxjavaVersion = '2.2.21'
     rxkotlinVersion = '2.4.0'
-    spotlightVersion = '1.7.0'
+    spotlightVersion = '2.0.5'
     swipeRefreshLayoutVersion = '1.1.0'
     threetenbpVersion = '1.6.5'
     timberVersion = '5.0.1'
+    windowVersion = '1.0.0'
 
     crashlyticsVersion = '18.3.5'
     // Firebase Analytics 20.0.0+ release bumps minimum requirements to Android 4.4+.
@@ -113,6 +114,7 @@ dependencies {
     implementation "androidx.multidex:multidex:$multidexVersion"
     implementation "androidx.preference:preference-ktx:$preferenceVersion"
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:$swipeRefreshLayoutVersion"
+    implementation "androidx.window:window:$windowVersion"
     implementation "com.google.android.material:material:$materialVersion"
     // Dagger
     implementation "com.google.dagger:dagger:$daggerVersion"

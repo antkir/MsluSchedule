@@ -95,7 +95,7 @@
     <string name="pref_libraries_title">Open-source libraries</string>
     <string name="pref_app_version_title">Version</string>
 
-    <!-- Walkthrough -->
+    <!-- Onboarding -->
     <string name="tutorial_welcome_title">Welcome to `MSLU Schedule`</string>
     <string name="tutorial_welcome_description">Press to continue.</string>
     <string name="tutorial_add_schedule_title">Add a schedule</string>

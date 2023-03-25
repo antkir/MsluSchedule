@@ -38,4 +38,6 @@
     <color name="transparent">#00000000</color>
 
     <color name="fab_icon">#000000</color>
+
+    <color name="onboarding_overlay">#E6000000</color>
 </resources>
