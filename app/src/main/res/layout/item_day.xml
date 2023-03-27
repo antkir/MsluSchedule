@@ -8,7 +8,7 @@
     tools:ignore="UnusedAttribute">
 
     <TextView
-        android:id="@+id/text_day"
+        android:id="@+id/text_weekday"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginStart="16dp"
@@ -18,15 +18,15 @@
         android:gravity="start|center_vertical"
         android:layout_alignParentStart="true"
         android:layout_alignParentLeft="true"
-        android:layout_toLeftOf="@id/imageview_notes_day"
-        android:layout_toStartOf="@id/imageview_notes_day"
+        android:layout_toLeftOf="@id/image_notes"
+        android:layout_toStartOf="@id/image_notes"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
         android:textColor="@color/primary_text"
         android:textStyle="bold"
         tools:text="Monday" />
 
     <ImageView
-        android:id="@+id/imageview_notes_day"
+        android:id="@+id/image_notes"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"

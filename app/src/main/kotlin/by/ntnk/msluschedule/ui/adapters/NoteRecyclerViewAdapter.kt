@@ -4,15 +4,15 @@ import android.content.res.Resources
 import android.graphics.Color
 import android.util.SparseBooleanArray
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.NO_POSITION
 import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.data.Lesson
 import by.ntnk.msluschedule.data.Note
+import by.ntnk.msluschedule.databinding.ItemNoteBinding
+import by.ntnk.msluschedule.databinding.ItemNoteHeaderBinding
 import by.ntnk.msluschedule.utils.BaseRVItemView
 import by.ntnk.msluschedule.utils.EMPTY_STRING
 import io.reactivex.Observable
@@ -162,15 +162,14 @@ class NoteRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() 
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
             VIEWTYPE_NOTE_HEADER -> {
-                val view = inflater.inflate(R.layout.item_note_header, parent, false)
-                NoteHeaderViewHolder(view)
+                val binding = ItemNoteHeaderBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                NoteHeaderViewHolder(binding)
             }
             else -> {
-                val view = inflater.inflate(R.layout.item_note, parent, false)
-                NoteViewHolder(view).apply {
+                val binding = ItemNoteBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                NoteViewHolder(binding).apply {
                     itemView.setOnLongClickListener {
                         if (adapterPosition != NO_POSITION) {
                             val noteView = data[adapterPosition] as NoteView
@@ -197,9 +196,9 @@ class NoteRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() 
 
         override fun bindViewHolder(viewHolder: RecyclerView.ViewHolder) {
             with(viewHolder as NoteHeaderViewHolder) {
-                subject.text = header
+                binding.textSubject.text = header
                 if (startTime != null) {
-                    time.text = startTime
+                    binding.textTime.text = startTime
                 }
             }
         }
@@ -210,21 +209,15 @@ class NoteRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() 
 
         override fun bindViewHolder(viewHolder: RecyclerView.ViewHolder) {
             with(viewHolder as NoteViewHolder) {
-                noteText.text = note.text
-                colorStripe.setBackgroundColor(color)
+                binding.textNote.text = note.text
+                binding.viewStripeSide.setBackgroundColor(color)
             }
         }
     }
 
-    private class NoteViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val noteText: TextView = view.findViewById(R.id.text_note)
-        val colorStripe: View = view.findViewById(R.id.view_note_colorstripe)
-    }
+    private class NoteViewHolder(val binding: ItemNoteBinding) : RecyclerView.ViewHolder(binding.root)
 
-    private class NoteHeaderViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val subject: TextView = view.findViewById(R.id.text_note_subject)
-        val time: TextView = view.findViewById(R.id.text_note_time)
-    }
+    private class NoteHeaderViewHolder(val binding: ItemNoteHeaderBinding) : RecyclerView.ViewHolder(binding.root)
 
     private class DiffUtilCallback(
         private val oldData: List<BaseRVItemView>,

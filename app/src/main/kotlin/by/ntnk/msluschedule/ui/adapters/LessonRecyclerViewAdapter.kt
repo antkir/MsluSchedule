@@ -4,8 +4,6 @@ import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.BlendModeColorFilterCompat
@@ -17,6 +15,11 @@ import by.ntnk.msluschedule.data.Lesson
 import by.ntnk.msluschedule.data.StudyGroupLesson
 import by.ntnk.msluschedule.data.TeacherLesson
 import by.ntnk.msluschedule.data.WeekdayWithLessons
+import by.ntnk.msluschedule.databinding.ItemClassBlankBinding
+import by.ntnk.msluschedule.databinding.ItemClassStudygroupBinding
+import by.ntnk.msluschedule.databinding.ItemClassTeacherBinding
+import by.ntnk.msluschedule.databinding.ItemDayBinding
+import by.ntnk.msluschedule.databinding.ItemDayEndBinding
 import by.ntnk.msluschedule.utils.AndroidUtils
 import by.ntnk.msluschedule.utils.BaseRVItemView
 import by.ntnk.msluschedule.utils.Days
@@ -67,8 +70,8 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
                     val lessonView: BaseRVItemView =
                         when (lesson) {
                             is StudyGroupLesson -> {
-                                val isClassAlternative: Boolean = prevStartTime == lesson.startTime
-                                StudyGroupLessonView(lesson, isClassAlternative)
+                                val hasClassOverlap: Boolean = prevStartTime == lesson.startTime
+                                StudyGroupLessonView(lesson, hasClassOverlap)
                             }
                             is TeacherLesson -> TeacherLessonView(lesson)
                             else -> throw NullPointerException()
@@ -118,11 +121,10 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
             VIEWTYPE_STUDYGROUP -> {
-                val view = inflater.inflate(R.layout.item_studygrouplesson, parent, false)
-                StudyGroupLessonViewHolder(view).apply {
+                val binding = ItemClassStudygroupBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                StudyGroupClassViewHolder(binding).apply {
                     itemView.setOnClickListener {
                         if (adapterPosition != NO_POSITION &&
                             (data[adapterPosition] as StudyGroupLessonView).lesson.subject != EMPTY_STRING
@@ -133,7 +135,7 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
 
                     itemView.setOnLongClickListener {
                         if (adapterPosition != NO_POSITION &&
-                            (data[adapterPosition] as StudyGroupLessonView).isClassAlternative
+                            (data[adapterPosition] as StudyGroupLessonView).hasClassOverlap
                         ) {
                             if (itemView.context != null) {
                                 Toast.makeText(
@@ -148,8 +150,8 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
                 }
             }
             VIEWTYPE_TEACHER -> {
-                val view = inflater.inflate(R.layout.item_teacherlesson, parent, false)
-                TeacherLessonViewHolder(view).apply {
+                val binding = ItemClassTeacherBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                TeacherClassViewHolder(binding).apply {
                     itemView.setOnClickListener {
                         if (adapterPosition != NO_POSITION &&
                             (data[adapterPosition] as TeacherLessonView).lesson.subject != EMPTY_STRING
@@ -160,8 +162,8 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
                 }
             }
             VIEWTYPE_WEEKDAY -> {
-                val view = inflater.inflate(R.layout.item_day, parent, false)
-                DayViewHolder(view).apply {
+                val binding = ItemDayBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                DayViewHolder(binding).apply {
                     itemView.setOnClickListener {
                         if (adapterPosition != NO_POSITION) {
                             onClickSubject.onNext(data[adapterPosition])
@@ -170,12 +172,12 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
                 }
             }
             VIEWTYPE_DAYEND -> {
-                val view = inflater.inflate(R.layout.item_dayend, parent, false)
-                DayEndViewHolder(view)
+                val binding = ItemDayEndBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                DayEndViewHolder(binding)
             }
             else -> {
-                val view = inflater.inflate(R.layout.item_blanklesson, parent, false)
-                BlankViewHolder(view)
+                val binding = ItemClassBlankBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                BlankViewHolder(binding)
             }
         }
     }
@@ -215,40 +217,40 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
 
         override fun bindViewHolder(viewHolder: RecyclerView.ViewHolder) {
             with(viewHolder as DayViewHolder) {
-                weekday.text = AndroidUtils.getWeekdayFromTag(weekdayTag, itemView.context)
+                binding.textWeekday.text = AndroidUtils.getWeekdayFromTag(weekdayTag, itemView.context)
                 val blendMode = if (hasNotes) BlendModeCompat.SRC_IN else BlendModeCompat.DST_IN
                 notesIconDrawable?.mutate()?.colorFilter =
                     BlendModeColorFilterCompat.createBlendModeColorFilterCompat(
                         accentColor,
                         blendMode
                     )
-                notesIcon.setImageDrawable(notesIconDrawable)
+                binding.imageNotes.setImageDrawable(notesIconDrawable)
             }
         }
     }
 
-    class StudyGroupLessonView(val lesson: StudyGroupLesson, val isClassAlternative: Boolean) : BaseRVItemView {
+    class StudyGroupLessonView(val lesson: StudyGroupLesson, val hasClassOverlap: Boolean) : BaseRVItemView {
         override val viewType: Int = VIEWTYPE_STUDYGROUP
 
         override fun bindViewHolder(viewHolder: RecyclerView.ViewHolder) {
-            with(viewHolder as StudyGroupLessonViewHolder) {
-                lessonStartTime.text = if (isClassAlternative) EMPTY_STRING else lesson.startTime
-                lessonEndTime.text = if (isClassAlternative) EMPTY_STRING else lesson.endTime
-                lessonSubject.text = lesson.subject
-                lessonTeacher.text = lesson.teacher
-                lessonClassroom.text = lesson.classroom
-                lessonType.text = lesson.type
+            with(viewHolder as StudyGroupClassViewHolder) {
+                binding.textTimeStart.text = if (hasClassOverlap) EMPTY_STRING else lesson.startTime
+                binding.textTimeEnd.text = if (hasClassOverlap) EMPTY_STRING else lesson.endTime
+                binding.textSubject.text = lesson.subject
+                binding.textTeacher.text = lesson.teacher
+                binding.textClassroom.text = lesson.classroom
+                binding.textClassType.text = lesson.type
 
-                if (isClassAlternative) {
-                    lessonImgTime.visibility = View.VISIBLE
+                if (hasClassOverlap) {
+                    binding.imageClassOverlap.visibility = View.VISIBLE
                 } else {
-                    lessonImgTime.visibility = View.GONE
+                    binding.imageClassOverlap.visibility = View.GONE
                 }
 
-                if (lessonType.text.isBlank()) {
-                    lessonType.visibility = View.GONE
+                if (binding.textClassType.text.isBlank()) {
+                    binding.textClassType.visibility = View.GONE
                 } else {
-                    lessonType.visibility = View.VISIBLE
+                    binding.textClassType.visibility = View.VISIBLE
                 }
             }
         }
@@ -258,52 +260,34 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
         override val viewType: Int = VIEWTYPE_TEACHER
 
         override fun bindViewHolder(viewHolder: RecyclerView.ViewHolder) {
-            with(viewHolder as TeacherLessonViewHolder) {
-                lessonStartTime.text = lesson.startTime
-                lessonEndTime.text = lesson.endTime
-                lessonSubject.text = lesson.subject
-                lessonGroups.text = lesson.groups
-                lessonClassroom.text = lesson.classroom
-                lessonType.text = lesson.type
-                lessonFaculty.text = lesson.faculty
+            with(viewHolder as TeacherClassViewHolder) {
+                binding.textTimeStart.text = lesson.startTime
+                binding.textTimeEnd.text = lesson.endTime
+                binding.textSubject.text = lesson.subject
+                binding.textGroups.text = lesson.groups
+                binding.textClassroom.text = lesson.classroom
+                binding.textClassType.text = lesson.type
+                binding.textFaculty.text = lesson.faculty
 
-                if (lessonType.text.isBlank()) {
-                    lessonType.visibility = View.GONE
+                if (binding.textClassType.text.isBlank()) {
+                    binding.textClassType.visibility = View.GONE
                 } else {
-                    lessonType.visibility = View.VISIBLE
+                    binding.textClassType.visibility = View.VISIBLE
                 }
             }
         }
     }
 
-    private class StudyGroupLessonViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val lessonImgTime: ImageView = view.findViewById(R.id.img_studygrouplesson_same_time)
-        val lessonStartTime: TextView = view.findViewById(R.id.text_studygrouplesson_starttime)
-        val lessonEndTime: TextView = view.findViewById(R.id.text_studygrouplesson_endtime)
-        val lessonSubject: TextView = view.findViewById(R.id.text_studygrouplesson_subject)
-        val lessonTeacher: TextView = view.findViewById(R.id.text_studygrouplesson_teacher)
-        val lessonType: TextView = view.findViewById(R.id.text_studygrouplesson_type)
-        val lessonClassroom: TextView = view.findViewById(R.id.text_studygrouplesson_classroom)
+    private class StudyGroupClassViewHolder(val binding: ItemClassStudygroupBinding) : RecyclerView.ViewHolder(binding.root)
+
+    private class TeacherClassViewHolder(val binding: ItemClassTeacherBinding) : RecyclerView.ViewHolder(binding.root)
+
+    private class DayViewHolder(val binding: ItemDayBinding) : RecyclerView.ViewHolder(binding.root) {
+        val notesIconDrawable: Drawable? = ContextCompat.getDrawable(binding.root.context, R.drawable.ic_note_day)
+        val accentColor = ContextCompat.getColor(binding.root.context, R.color.colorAccent)
     }
 
-    private class TeacherLessonViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val lessonStartTime: TextView = view.findViewById(R.id.text_teacherlesson_starttime)
-        val lessonEndTime: TextView = view.findViewById(R.id.text_teacherlesson_endtime)
-        val lessonSubject: TextView = view.findViewById(R.id.text_teacherlesson_subject)
-        val lessonGroups: TextView = view.findViewById(R.id.text_teacherlesson_groups)
-        val lessonType: TextView = view.findViewById(R.id.text_teacherlesson_type)
-        val lessonFaculty: TextView = view.findViewById(R.id.text_teacherlesson_faculty)
-        val lessonClassroom: TextView = view.findViewById(R.id.text_teacherlesson_classroom)
-    }
+    private class BlankViewHolder(binding: ItemClassBlankBinding) : RecyclerView.ViewHolder(binding.root)
 
-    private class DayViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val weekday: TextView = view.findViewById(R.id.text_day)
-        val notesIcon: ImageView = view.findViewById(R.id.imageview_notes_day)
-        val notesIconDrawable: Drawable? = ContextCompat.getDrawable(view.context, R.drawable.ic_note_day)
-        val accentColor = ContextCompat.getColor(view.context, R.color.colorAccent)
-    }
-
-    private class BlankViewHolder(view: View) : RecyclerView.ViewHolder(view)
-
-    private class DayEndViewHolder(view: View) : RecyclerView.ViewHolder(view)
+    private class DayEndViewHolder(binding: ItemDayEndBinding) : RecyclerView.ViewHolder(binding.root)
 }

@@ -3,40 +3,52 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="94dp"
+    android:layout_height="74dp"
     android:background="@drawable/item_surface"
     android:foreground="?attr/selectableItemBackground"
     tools:ignore="UnusedAttribute">
 
-    <TextView
-        android:id="@+id/text_teacherlesson_starttime"
+    <ImageView
+        android:id="@+id/image_class_overlap"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginEnd="21dp"
+        android:layout_marginRight="21dp"
+        android:clickable="false"
+        android:contentDescription="@string/class_same_time_description"
+        android:src="@drawable/ic_list_arrow_up"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/text_subject"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/text_time_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textColor="@color/tertiary_text"
-        app:layout_constraintBottom_toTopOf="@+id/text_teacherlesson_endtime"
-        app:layout_constraintEnd_toEndOf="@+id/text_teacherlesson_endtime"
+        app:layout_constraintBottom_toTopOf="@+id/text_time_end"
+        app:layout_constraintEnd_toEndOf="@+id/text_time_end"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="packed"
         tools:text="1:40" />
 
     <TextView
-        android:id="@+id/text_teacherlesson_endtime"
+        android:id="@+id/text_time_end"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
-        android:layout_marginBottom="8dp"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textColor="@color/tertiary_text"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/text_teacherlesson_subject"
-        app:layout_constraintTop_toBottomOf="@+id/text_teacherlesson_starttime"
+        app:layout_constraintEnd_toStartOf="@+id/text_subject"
+        app:layout_constraintTop_toBottomOf="@+id/text_time_start"
         tools:text="13:15" />
 
     <TextView
-        android:id="@+id/text_teacherlesson_subject"
+        android:id="@+id/text_subject"
         android:layout_width="0dp"
         android:layout_height="@dimen/item_lesson_text_height"
         android:layout_marginStart="72dp"
@@ -47,53 +59,28 @@
         android:singleLine="true"
         android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
         android:textColor="@color/primary_text"
-        app:layout_constraintBottom_toTopOf="@+id/wrapper_teacherlesson_type"
+        app:layout_constraintBottom_toTopOf="@+id/text_type"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
         tools:text="Мод. &quot;Экономика&quot;: Экон. теория" />
 
-    <LinearLayout
-        android:id="@+id/wrapper_teacherlesson_type"
-        android:layout_width="0dp"
-        android:layout_height="@dimen/item_lesson_subtext_height"
-        app:layout_constraintBottom_toTopOf="@+id/text_teacherlesson_faculty"
-        app:layout_constraintEnd_toEndOf="@+id/text_teacherlesson_subject"
-        app:layout_constraintStart_toStartOf="@+id/text_teacherlesson_subject"
-        app:layout_constraintTop_toBottomOf="@+id/text_teacherlesson_subject">
-
-        <TextView
-            android:id="@+id/text_teacherlesson_type"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:background="@drawable/lesson_type_rect"
-            android:paddingLeft="8dp"
-            android:paddingTop="2dp"
-            android:paddingRight="8dp"
-            android:paddingBottom="2dp"
-            android:singleLine="true"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-            android:textColor="@color/chip_text"
-            android:textSize="12sp"
-            tools:text="ЛК (В онлайн режиме)" />
-
-    </LinearLayout>
-
     <TextView
-        android:id="@+id/text_teacherlesson_faculty"
+        android:id="@+id/text_class_type"
         android:layout_width="0dp"
         android:layout_height="@dimen/item_lesson_subtext_height"
         android:singleLine="true"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textColor="@color/tertiary_text"
-        app:layout_constraintBottom_toTopOf="@+id/text_teacherlesson_groups"
-        app:layout_constraintEnd_toEndOf="@+id/text_teacherlesson_subject"
-        app:layout_constraintStart_toStartOf="@+id/text_teacherlesson_subject"
-        app:layout_constraintTop_toBottomOf="@+id/wrapper_teacherlesson_type"
-        tools:text="Меж.ком." />
+        app:layout_constraintBottom_toTopOf="@+id/text_teacher"
+        app:layout_constraintEnd_toEndOf="@+id/text_subject"
+        app:layout_constraintStart_toStartOf="@+id/text_subject"
+        app:layout_constraintTop_toBottomOf="@+id/text_subject"
+        tools:text="ЛК (В онлайн режиме)" />
 
     <TextView
-        android:id="@+id/text_teacherlesson_groups"
+        android:id="@+id/text_teacher"
         android:layout_width="0dp"
         android:layout_height="@dimen/item_lesson_subtext_height"
         android:layout_marginBottom="6dp"
@@ -101,28 +88,27 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textColor="@color/tertiary_text"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/text_teacherlesson_faculty"
-        app:layout_constraintStart_toStartOf="@+id/text_teacherlesson_faculty"
-        app:layout_constraintTop_toBottomOf="@+id/text_teacherlesson_faculty"
-        tools:text="308 мк_а-н, 309 мк_а-ит, 310 мк_а-ит, 311 мк_а-кит, 312 мк_а-нем, 313 мк_а-фр, 314 мк_а_фр, 315 мк_а-фр" />
+        app:layout_constraintEnd_toEndOf="@+id/text_subject"
+        app:layout_constraintStart_toStartOf="@+id/text_subject"
+        app:layout_constraintTop_toBottomOf="@+id/text_class_type"
+        tools:text="ст.пр. Петров Николай Владимирович." />
 
     <TextView
-        android:id="@+id/text_teacherlesson_classroom"
-        android:layout_width="wrap_content"
+        android:id="@+id/text_classroom"
+        android:layout_width="50dp"
         android:layout_height="match_parent"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="6dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginRight="1dp"
+        android:layout_marginBottom="6dp"
         android:gravity="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textColor="@color/primary_text"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/text_teacherlesson_subject"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="Д301/П" />
+        tools:text="Д418/1" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
