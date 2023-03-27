@@ -4,17 +4,9 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.KeyEvent
 import android.view.inputmethod.InputMethodManager
-import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 
 class LoadingAutoCompleteTextView : MaterialAutoCompleteTextView {
-    var progressBar: CircularProgressIndicator? = null
-    var progressBarVisibility: Int
-        get() = progressBar?.visibility!!
-        set(value) {
-            progressBar?.visibility = value
-        }
-
     constructor(context: Context) : super(context)
 
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)

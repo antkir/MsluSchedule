@@ -8,7 +8,6 @@ import by.ntnk.msluschedule.network.NetworkRepository
 import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.utils.COURSE_VALUE
 import by.ntnk.msluschedule.utils.CurrentDate
-import by.ntnk.msluschedule.utils.EMPTY_STRING
 import by.ntnk.msluschedule.utils.SchedulerProvider
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
@@ -29,7 +28,7 @@ class AddGroupPresenter @Inject constructor(
     private var groups: ScheduleFilter? = null
     private var faculty: Int = 0
     private var course: Int = 0
-    private var group: Int = 0
+    private var groupId: Int = 0
 
     private var scheduleContaners: List<ScheduleContainer>? = null
 
@@ -58,7 +57,7 @@ class AddGroupPresenter @Inject constructor(
 
     fun setGroupsNull() {
         groups = null
-        group = 0
+        groupId = 0
     }
 
     fun getFacultyScheduleFilter() {
@@ -101,7 +100,7 @@ class AddGroupPresenter @Inject constructor(
             )
     }
 
-    fun getScheduleGroups(showGroupsForAllCourses: Boolean = true) {
+    fun getStudyGroupScheduleFilter(showGroupsForAllCourses: Boolean = true) {
         val courseKey = if (course > 0) course else COURSE_VALUE
         val year = if (!showGroupsForAllCourses) currentDate.academicYear else 0
         disposables += networkRepository.getGroups(faculty, courseKey, year)
@@ -123,8 +122,8 @@ class AddGroupPresenter @Inject constructor(
             )
     }
 
-    fun setGroupValue(value: Int) {
-        group = value
+    fun setGroupId(id: Int) {
+        groupId = id
     }
 
     fun isValidGroup(name: String): Boolean {
@@ -136,22 +135,13 @@ class AddGroupPresenter @Inject constructor(
             ?.filter { scheduleContainer -> scheduleContainer.year == currentDate.academicYear }
             ?.filter { scheduleContainer -> scheduleContainer.faculty == faculty }
             ?.map { scheduleContainer -> scheduleContainer.name }
-            ?.any { it == name } == true
+            ?.any { studyGroup -> studyGroup == name } == true
     }
 
-    fun getStudyGroup(): StudyGroup? {
-        val groupValue = groups!!.getValue(group)
-        if (groupValue == EMPTY_STRING) {
-            val exception = IllegalStateException("Group value wasn't found in the array.")
-            view?.showError(exception)
-            return null
-        }
-        val courseKey = if (course > 0) {
-            course
-        } else {
-            Character.getNumericValue(groupValue[0])
-        }
-        return StudyGroup(group, groupValue, faculty, courseKey, currentDate.academicYear)
+    fun createSelectedStudyGroupObject(): StudyGroup {
+        val groupValue = groups!!.getValue(groupId)
+        val courseKey = if (course > 0) course else Character.getNumericValue(groupValue[0])
+        return StudyGroup(groupId, groupValue, faculty, courseKey, currentDate.academicYear)
     }
 
     fun populateFacultiesAdapter() = view?.populateFacultiesAdapter(faculties!!)

@@ -5,30 +5,29 @@ import android.content.Context
 import android.graphics.Typeface
 import android.os.Bundle
 import android.text.InputType
+import android.view.LayoutInflater
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.core.widget.doOnTextChanged
 import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.data.StudyGroup
+import by.ntnk.msluschedule.databinding.FragmentAddGroupBinding
 import by.ntnk.msluschedule.mvp.views.MvpDialogFragment
 import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.ui.adapters.ScheduleFilterAdapter
 import by.ntnk.msluschedule.ui.customviews.LoadingAutoCompleteTextView
 import by.ntnk.msluschedule.utils.EMPTY_STRING
-import by.ntnk.msluschedule.utils.SimpleTextWatcher
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.textfield.TextInputLayout
 import dagger.Lazy
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
 class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), AddGroupView {
 
+    private var fragmentBinding: FragmentAddGroupBinding? = null
+    private val binding get() = fragmentBinding!!
     private lateinit var listener: DialogListener
-    private lateinit var facultyView: LoadingAutoCompleteTextView
-    private lateinit var courseView: LoadingAutoCompleteTextView
-    private lateinit var textinputlayoutCourseView: TextInputLayout
-    private lateinit var groupView: LoadingAutoCompleteTextView
 
     override val view: AddGroupView
         get() = this
@@ -49,27 +48,25 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val layout = View.inflate(activity, R.layout.add_group_view, null)
-        initViews(layout)
-
-        val dialog = initMaterialDialog(layout)
+        fragmentBinding = FragmentAddGroupBinding.inflate(LayoutInflater.from(context))
+        setupViews()
+        val dialog = createDialog()
         dialog.window?.attributes?.windowAnimations = R.style.DialogAnimation
-        dialog.setOnShowListener {
-            (it as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE).isEnabled =
-                presenter.isValidGroup(groupView.text.toString())
+        dialog.setOnShowListener { dialogInterface ->
+            dialogInterface as AlertDialog
+            val isGroupValid = presenter.isValidGroup(binding.autocompletetextGroup.text.toString())
+            dialogInterface.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = isGroupValid
         }
         return dialog
     }
 
-    private fun initMaterialDialog(layout: View): Dialog {
+    private fun createDialog(): AlertDialog {
         return MaterialAlertDialogBuilder(requireActivity(), R.style.MsluTheme_Dialog_Alert)
             .setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.rounded_corners_rect))
             .setTitle((R.string.add_group_title))
-            .setView(layout)
+            .setView(binding.root)
             .setPositiveButton(R.string.button_add) { _, _ ->
-                val studyGroup = presenter.getStudyGroup()
-                studyGroup ?: return@setPositiveButton
-                listener.onNewStudyGroup(studyGroup)
+                listener.onNewStudyGroup(presenter.createSelectedStudyGroupObject())
             }
             .setNegativeButton(R.string.button_cancel) { _, _ ->
                 dismiss()
@@ -77,92 +74,101 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
             .create()
     }
 
-    private fun initViews(layout: View) {
-        textinputlayoutCourseView = layout.findViewById(R.id.textinputlayout_course)
-        facultyView = layout.findViewById(R.id.actv_dialog_faculty)
-        courseView = layout.findViewById(R.id.actv_dialog_course)
-        groupView = layout.findViewById(R.id.actv_dialog_group)
-
-        with(groupView) {
-            progressBar = layout.findViewById(R.id.progressbar_dialog_group)
+    private fun setupViews() {
+        with(binding.autocompletetextGroup) {
             setEnabledFocusable(false)
-            setOnItemClickListener { _, _, _, id -> presenter.setGroupValue(id.toInt()) }
-
-            val groupTextInputLayout: TextInputLayout = layout.findViewById(R.id.textinputlayout_group)
-            addTextChangedListener(object : SimpleTextWatcher {
-                override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                    groupTextInputLayout.error = EMPTY_STRING
-                    var isEnabled = presenter.isValidGroup(s.toString())
-                    if (presenter.isGroupStored(s.toString())) {
-                        groupTextInputLayout.error = resources.getString(R.string.group_already_added)
-                        isEnabled = false
-                    }
-                    (dialog as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = isEnabled
+            setOnItemClickListener { _, _, _, id ->
+                presenter.setGroupId(id.toInt())
+            }
+            doOnTextChanged { text, _, _, _ ->
+                var isEnabled = presenter.isValidGroup(text.toString())
+                if (presenter.isGroupStored(text.toString())) {
+                    binding.textinputlayoutGroup.error = resources.getString(R.string.group_already_added)
+                    isEnabled = false
+                } else {
+                    binding.textinputlayoutGroup.error = EMPTY_STRING
                 }
-            })
-
-            setOnClickListener {
+                (dialog as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = isEnabled
+            }
+            setOnClickListener { view ->
                 if (presenter.isCourseSet()) {
-                    it as LoadingAutoCompleteTextView
-                    it.showDropDown()
+                    view as LoadingAutoCompleteTextView
+                    view.showDropDown()
                 }
             }
         }
 
-        with(courseView) {
-            setEnabledFocusable(false)
+        with(binding.autocompletetextCourse) {
             keyListener = null
-            setOnClickListener { courseView.showDropDown() }
+            setEnabledFocusable(false)
             setOnItemClickListener { _, _, position, _ ->
-                groupView.progressBarVisibility = View.VISIBLE
-                groupView.text.clear()
-                groupView.setEnabledFocusable(false)
                 presenter.setCourseKeyFromPosition(position)
+
+                binding.progressindicatorGroup.visibility = View.VISIBLE
+                binding.autocompletetextGroup.text.clear()
+                binding.autocompletetextGroup.setEnabledFocusable(false)
                 presenter.setGroupsNull()
-                presenter.getScheduleGroups(showGroupsForAllCourses = false)
+
+                presenter.getStudyGroupScheduleFilter(showGroupsForAllCourses = false)
+            }
+            setOnClickListener { view ->
+                view as LoadingAutoCompleteTextView
+                view.showDropDown()
             }
         }
 
-        with(facultyView) {
-            progressBar = layout.findViewById(R.id.progressbar_dialog_faculty)
-            setEnabledFocusable(false)
+        with(binding.autocompletetextFaculty) {
             keyListener = null
-            setOnClickListener { facultyView.showDropDown() }
+            setEnabledFocusable(false)
             setOnItemClickListener { _, _, position, _ ->
-                textinputlayoutCourseView.visibility = View.GONE
-                groupView.progressBarVisibility = View.VISIBLE
-                groupView.text.clear()
-                groupView.setEnabledFocusable(false)
-                courseView.text.clear()
                 presenter.setFacultyKeyFromPosition(position)
+
+                binding.textinputlayoutCourse.visibility = View.GONE
+                binding.autocompletetextCourse.text.clear()
+                binding.autocompletetextCourse.setEnabledFocusable(false)
                 presenter.setCoursesNull()
+
+                binding.progressindicatorGroup.visibility = View.VISIBLE
+                binding.autocompletetextGroup.text.clear()
+                binding.autocompletetextGroup.setEnabledFocusable(false)
                 presenter.setGroupsNull()
-                presenter.getScheduleGroups()
+
+                presenter.getStudyGroupScheduleFilter()
+            }
+            setOnClickListener { view ->
+                view as LoadingAutoCompleteTextView
+                view.showDropDown()
             }
         }
     }
 
     override fun onStart() {
         super.onStart()
-        when {
-            presenter.isFacultiesInitialized() -> {
-                presenter.populateFacultiesAdapter()
+        if (presenter.isFacultiesInitialized()) {
+            presenter.populateFacultiesAdapter()
+
+            if (presenter.isFacultySet()) {
                 if (presenter.isCoursesInitialized()) {
                     presenter.populateCoursesAdapter()
-                }
-                if ((presenter.isFacultySet() && textinputlayoutCourseView.visibility != View.VISIBLE) ||
-                    (presenter.isFacultySet() && presenter.isCourseSet() && !presenter.isGroupsInitialized())
-                ) {
-                    groupView.progressBarVisibility = View.VISIBLE
-                }
-                if (presenter.isGroupsInitialized()) {
-                    presenter.populateGroupsAdapter()
+
+                    if (presenter.isCourseSet()) {
+                        if (presenter.isGroupsInitialized()) {
+                            presenter.populateGroupsAdapter()
+                        } else {
+                            binding.progressindicatorGroup.visibility = View.VISIBLE
+                        }
+                    }
+                } else {
+                    if (presenter.isGroupsInitialized()) {
+                        presenter.populateGroupsAdapter()
+                    } else {
+                        binding.progressindicatorGroup.visibility = View.VISIBLE
+                    }
                 }
             }
-            else -> {
-                facultyView.progressBarVisibility = View.VISIBLE
-                presenter.getFacultyScheduleFilter()
-            }
+        } else {
+            binding.progressindicatorFaculty.visibility = View.VISIBLE
+            presenter.getFacultyScheduleFilter()
         }
     }
 
@@ -172,24 +178,22 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
     }
 
     override fun populateFacultiesAdapter(data: ScheduleFilter) {
-        val adapter = initAdapter(data)
+        binding.progressindicatorFaculty.visibility = View.GONE
+        binding.autocompletetextFaculty.setEnabledFocusable(true)
+        val adapter = createAdapter(data)
         adapter.isFilteringEnabled = false
-        with(facultyView) {
-            progressBarVisibility = View.GONE
-            setEnabledFocusable(true)
-            setAdapter(adapter)
-            requestFocus()
-        }
+        binding.autocompletetextFaculty.setAdapter(adapter)
+        binding.autocompletetextFaculty.requestFocus()
     }
 
     override fun populateCoursesAdapter(data: ScheduleFilter) {
-        val adapter = initAdapter(data)
+        binding.progressindicatorGroup.visibility = View.GONE
+        binding.autocompletetextGroup.text.clear()
+
+        binding.textinputlayoutCourse.visibility = View.VISIBLE
+        val adapter = createAdapter(data)
         adapter.isFilteringEnabled = false
-        textinputlayoutCourseView.visibility = View.VISIBLE
-        groupView.progressBarVisibility = View.GONE
-        groupView.text.clear()
-        with(courseView) {
-            progressBarVisibility = View.GONE
+        with(binding.autocompletetextCourse) {
             setEnabledFocusable(true)
             setAdapter(adapter)
             requestFocus()
@@ -197,11 +201,11 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
     }
 
     override fun populateGroupsAdapter(data: ScheduleFilter) {
-        val adapter = initAdapter(data)
-        val isStartsWithFilterActive = !presenter.isCourseSet()
-        adapter.isStartsWithFilterActive = isStartsWithFilterActive
+        binding.progressindicatorGroup.visibility = View.GONE
+        val adapter = createAdapter(data)
+        adapter.isStartsWithFilterActive = !presenter.isCourseSet()
         adapter.isIgnoreCaseFilterActive = presenter.isCourseSet()
-        with(groupView) {
+        with(binding.autocompletetextGroup) {
             inputType = if (presenter.isCourseSet()) {
                 InputType.TYPE_CLASS_TEXT or
                     InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD or
@@ -212,14 +216,13 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
                     InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
             }
             setTypeface(null, Typeface.NORMAL)
-            progressBarVisibility = View.GONE
             setEnabledFocusable(true)
             setAdapter(adapter)
             requestFocus()
         }
     }
 
-    private fun initAdapter(data: ScheduleFilter): ScheduleFilterAdapter {
+    private fun createAdapter(data: ScheduleFilter): ScheduleFilterAdapter {
         return ScheduleFilterAdapter(
             requireActivity(),
             android.R.layout.simple_spinner_dropdown_item,
