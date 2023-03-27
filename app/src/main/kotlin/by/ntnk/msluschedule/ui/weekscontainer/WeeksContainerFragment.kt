@@ -19,7 +19,7 @@ import by.ntnk.msluschedule.data.ScheduleContainerInfo
 import by.ntnk.msluschedule.databinding.FragmentWeekscontainerBinding
 import by.ntnk.msluschedule.mvp.views.MvpFragment
 import by.ntnk.msluschedule.ui.adapters.WeekFragmentViewPagerAdapter
-import by.ntnk.msluschedule.ui.warningdialog.WarningDialogFragment
+import by.ntnk.msluschedule.ui.deleteschedule.DeleteScheduleFragment
 import by.ntnk.msluschedule.utils.INVALID_VALUE
 import by.ntnk.msluschedule.utils.ImmutableEntry
 import dagger.Lazy
@@ -28,12 +28,12 @@ import java.util.Locale
 import javax.inject.Inject
 
 private const val SELECTED_TAB_POSITION = "tab_position"
-private const val WARNING_DIALOG_FRAGMENT = "WarningDialogFragment"
+private const val DELETE_SCHEDULE_FRAGMENT = "DeleteScheduleFragment"
 
 class WeeksContainerFragment :
     MvpFragment<WeeksContainerPresenter, WeeksContainerView>(),
     WeeksContainerView,
-    WarningDialogFragment.DialogListener {
+    DeleteScheduleFragment.DialogListener {
 
     private var savedCurrentPosition = INVALID_VALUE
     private var currentWeekItemIndex = INVALID_VALUE
@@ -95,8 +95,8 @@ class WeeksContainerFragment :
                             return true
                         }
                         R.id.item_weekscontainer_delete -> {
-                            val warningFragment = WarningDialogFragment()
-                            warningFragment.show(childFragmentManager, WARNING_DIALOG_FRAGMENT)
+                            val deleteScheduleFragment = DeleteScheduleFragment()
+                            deleteScheduleFragment.show(childFragmentManager, DELETE_SCHEDULE_FRAGMENT)
                             return true
                         }
                     }

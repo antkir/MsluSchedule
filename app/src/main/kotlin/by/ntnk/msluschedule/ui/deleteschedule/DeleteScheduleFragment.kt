@@ -1,4 +1,4 @@
-package by.ntnk.msluschedule.ui.warningdialog
+package by.ntnk.msluschedule.ui.deleteschedule
 
 import android.app.Dialog
 import android.content.Context
@@ -16,7 +16,7 @@ import io.reactivex.rxkotlin.subscribeBy
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
-class WarningDialogFragment : DialogFragment() {
+class DeleteScheduleFragment : DialogFragment() {
 
     private lateinit var disposable: Disposable
     private lateinit var listener: DialogListener
