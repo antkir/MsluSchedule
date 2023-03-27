@@ -6,7 +6,7 @@ import android.view.KeyEvent
 import android.view.inputmethod.InputMethodManager
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 
-class LoadingAutoCompleteTextView : MaterialAutoCompleteTextView {
+class AutoCompleteTextView : MaterialAutoCompleteTextView {
     constructor(context: Context) : super(context)
 
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)

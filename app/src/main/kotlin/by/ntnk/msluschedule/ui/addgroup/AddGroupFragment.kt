@@ -16,7 +16,7 @@ import by.ntnk.msluschedule.databinding.FragmentAddGroupBinding
 import by.ntnk.msluschedule.mvp.views.MvpDialogFragment
 import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.ui.adapters.ScheduleFilterAdapter
-import by.ntnk.msluschedule.ui.customviews.LoadingAutoCompleteTextView
+import by.ntnk.msluschedule.ui.customviews.AutoCompleteTextView
 import by.ntnk.msluschedule.utils.EMPTY_STRING
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.Lazy
@@ -96,7 +96,7 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
                 presenter.getCourseScheduleFilter()
             }
             setOnClickListener { view ->
-                view as LoadingAutoCompleteTextView
+                view as AutoCompleteTextView
                 view.showDropDown()
             }
         }
@@ -116,7 +116,7 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
                 presenter.getStudyGroupScheduleFilter()
             }
             setOnClickListener { view ->
-                view as LoadingAutoCompleteTextView
+                view as AutoCompleteTextView
                 view.showDropDown()
             }
         }
@@ -137,7 +137,7 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
                 (dialog as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = isEnabled
             }
             setOnClickListener { view ->
-                view as LoadingAutoCompleteTextView
+                view as AutoCompleteTextView
                 view.showDropDown()
             }
         }
