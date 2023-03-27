@@ -48,6 +48,7 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
         fragmentBinding = FragmentAddTeacherBinding.inflate(LayoutInflater.from(context))
         setupViews()
         val dialog = createDialog()
+        dialog.setCanceledOnTouchOutside(false)
         dialog.window?.attributes?.windowAnimations = R.style.DialogAnimation
         dialog.setOnShowListener { dialogInterface ->
             dialogInterface as AlertDialog

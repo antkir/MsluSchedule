@@ -31,16 +31,17 @@ class DeleteScheduleFragment : DialogFragment() {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val dialog = initMaterialDialog()
+        val dialog = createDialog()
+        dialog.setCanceledOnTouchOutside(false)
         dialog.window?.attributes?.windowAnimations = R.style.DialogAnimation
         dialog.setOnShowListener {
             val positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
-            initPositiveButtonCountdown(positiveButton)
+            startPositiveButtonCountdown(positiveButton)
         }
         return dialog
     }
 
-    private fun initMaterialDialog(): AlertDialog {
+    private fun createDialog(): AlertDialog {
         return MaterialAlertDialogBuilder(requireActivity(), R.style.MsluTheme_Dialog_Alert)
             .setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.rounded_corners_rect))
             .setTitle(R.string.dialog_delete_container_title)
@@ -52,7 +53,7 @@ class DeleteScheduleFragment : DialogFragment() {
             .create()
     }
 
-    private fun initPositiveButtonCountdown(button: Button) {
+    private fun startPositiveButtonCountdown(button: Button) {
         context ?: return
         button.isEnabled = false
         val buttonDeleteString = resources.getString(R.string.button_delete)
