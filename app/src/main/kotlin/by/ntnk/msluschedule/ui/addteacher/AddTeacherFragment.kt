@@ -106,7 +106,6 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
     override fun populateTeachersView(data: ScheduleFilter) {
         binding.progressindicatorTeacher.visibility = View.GONE
         val adapter = createAdapter(data)
-        adapter.isIgnoreCaseFilterActive = true
         with (binding.autocompletetextTeacher) {
             setEnabledFocusable(true)
             setAdapter(adapter)
@@ -118,7 +117,8 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
         return ScheduleFilterAdapter(
             requireActivity(),
             android.R.layout.simple_spinner_dropdown_item,
-            data
+            data,
+            isFilteringEnabled = true
         )
     }
 

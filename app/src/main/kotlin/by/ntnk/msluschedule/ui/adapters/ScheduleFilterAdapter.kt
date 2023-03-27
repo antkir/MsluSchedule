@@ -14,25 +14,14 @@ import by.ntnk.msluschedule.network.data.ScheduleFilter
 class ScheduleFilterAdapter(
     context: Context,
     @param:LayoutRes private val resource: Int,
-    private val unfilteredData: ScheduleFilter
+    private val unfilteredData: ScheduleFilter,
+    private val isFilteringEnabled: Boolean
 ) : BaseAdapter(), Filterable {
 
     private var filteredData: ScheduleFilter = unfilteredData
     private val filter: DataFilter by lazy { DataFilter() }
     private val dummyFilter: DummyFilter by lazy { DummyFilter() }
     private val layoutInflater: LayoutInflater = LayoutInflater.from(context)
-
-    /**
-     * Indicates if filtering checks if the string starts with the specified prefix.
-     * By default, filtering checks if the string contains the specified sequence of characters as a substring.
-     */
-    var isStartsWithFilterActive = false
-
-    /** Indicates if filtering ignores character case when comparing strings. */
-    var isIgnoreCaseFilterActive = false
-
-    /** Indicates if filtering is enabled. */
-    var isFilteringEnabled = true
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         return createViewFromResource(layoutInflater, position, convertView, parent, resource)
@@ -92,14 +81,8 @@ class ScheduleFilterAdapter(
                 for (i in 0 until unfilteredData.size) {
                     val key = unfilteredData.keyAt(i)
                     val value = unfilteredData.valueAt(i)
-                    if (isStartsWithFilterActive) {
-                        if (value.startsWith(constraintString, ignoreCase = isIgnoreCaseFilterActive)) {
-                            filteredData.put(key, value)
-                        }
-                    } else {
-                        if (value.contains(constraintString, ignoreCase = isIgnoreCaseFilterActive)) {
-                            filteredData.put(key, value)
-                        }
+                    if (value.contains(constraintString, ignoreCase = true)) {
+                        filteredData.put(key, value)
                     }
                 }
                 filterResults.values = filteredData

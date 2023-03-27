@@ -75,6 +75,51 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
     }
 
     private fun setupViews() {
+        with(binding.autocompletetextFaculty) {
+            keyListener = null
+            setEnabledFocusable(false)
+            setOnItemClickListener { _, _, position, _ ->
+                presenter.clearDisposables()
+                presenter.setFacultyKeyFromPosition(position)
+
+                binding.progressindicatorCourse.visibility = View.VISIBLE
+                binding.autocompletetextCourse.text.clear()
+                binding.autocompletetextCourse.setEnabledFocusable(false)
+                presenter.setCoursesNull()
+
+                binding.progressindicatorGroup.visibility = View.GONE
+                binding.autocompletetextGroup.text.clear()
+                binding.autocompletetextGroup.setEnabledFocusable(false)
+                presenter.setGroupsNull()
+
+                presenter.getCourseScheduleFilter()
+            }
+            setOnClickListener { view ->
+                view as LoadingAutoCompleteTextView
+                view.showDropDown()
+            }
+        }
+
+        with(binding.autocompletetextCourse) {
+            keyListener = null
+            setEnabledFocusable(false)
+            setOnItemClickListener { _, _, position, _ ->
+                presenter.clearDisposables()
+                presenter.setCourseKeyFromPosition(position)
+
+                binding.progressindicatorGroup.visibility = View.VISIBLE
+                binding.autocompletetextGroup.text.clear()
+                binding.autocompletetextGroup.setEnabledFocusable(false)
+                presenter.setGroupsNull()
+
+                presenter.getStudyGroupScheduleFilter()
+            }
+            setOnClickListener { view ->
+                view as LoadingAutoCompleteTextView
+                view.showDropDown()
+            }
+        }
+
         with(binding.autocompletetextGroup) {
             setEnabledFocusable(false)
             setOnItemClickListener { _, _, _, id ->
@@ -89,51 +134,6 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
                     binding.textinputlayoutGroup.error = EMPTY_STRING
                 }
                 (dialog as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = isEnabled
-            }
-            setOnClickListener { view ->
-                if (presenter.isCourseSet()) {
-                    view as LoadingAutoCompleteTextView
-                    view.showDropDown()
-                }
-            }
-        }
-
-        with(binding.autocompletetextCourse) {
-            keyListener = null
-            setEnabledFocusable(false)
-            setOnItemClickListener { _, _, position, _ ->
-                presenter.setCourseKeyFromPosition(position)
-
-                binding.progressindicatorGroup.visibility = View.VISIBLE
-                binding.autocompletetextGroup.text.clear()
-                binding.autocompletetextGroup.setEnabledFocusable(false)
-                presenter.setGroupsNull()
-
-                presenter.getStudyGroupScheduleFilter(showGroupsForAllCourses = false)
-            }
-            setOnClickListener { view ->
-                view as LoadingAutoCompleteTextView
-                view.showDropDown()
-            }
-        }
-
-        with(binding.autocompletetextFaculty) {
-            keyListener = null
-            setEnabledFocusable(false)
-            setOnItemClickListener { _, _, position, _ ->
-                presenter.setFacultyKeyFromPosition(position)
-
-                binding.textinputlayoutCourse.visibility = View.GONE
-                binding.autocompletetextCourse.text.clear()
-                binding.autocompletetextCourse.setEnabledFocusable(false)
-                presenter.setCoursesNull()
-
-                binding.progressindicatorGroup.visibility = View.VISIBLE
-                binding.autocompletetextGroup.text.clear()
-                binding.autocompletetextGroup.setEnabledFocusable(false)
-                presenter.setGroupsNull()
-
-                presenter.getStudyGroupScheduleFilter()
             }
             setOnClickListener { view ->
                 view as LoadingAutoCompleteTextView
@@ -156,14 +156,12 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
                             presenter.populateGroupsAdapter()
                         } else {
                             binding.progressindicatorGroup.visibility = View.VISIBLE
+                            presenter.getStudyGroupScheduleFilter()
                         }
                     }
                 } else {
-                    if (presenter.isGroupsInitialized()) {
-                        presenter.populateGroupsAdapter()
-                    } else {
-                        binding.progressindicatorGroup.visibility = View.VISIBLE
-                    }
+                    binding.progressindicatorCourse.visibility = View.VISIBLE
+                    presenter.getCourseScheduleFilter()
                 }
             }
         } else {
@@ -179,20 +177,17 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
 
     override fun populateFacultiesAdapter(data: ScheduleFilter) {
         binding.progressindicatorFaculty.visibility = View.GONE
-        binding.autocompletetextFaculty.setEnabledFocusable(true)
-        val adapter = createAdapter(data)
-        adapter.isFilteringEnabled = false
-        binding.autocompletetextFaculty.setAdapter(adapter)
-        binding.autocompletetextFaculty.requestFocus()
+        val adapter = createAdapter(data, isFilteringEnabled = false)
+        with(binding.autocompletetextFaculty) {
+            setEnabledFocusable(true)
+            setAdapter(adapter)
+            requestFocus()
+        }
     }
 
     override fun populateCoursesAdapter(data: ScheduleFilter) {
-        binding.progressindicatorGroup.visibility = View.GONE
-        binding.autocompletetextGroup.text.clear()
-
-        binding.textinputlayoutCourse.visibility = View.VISIBLE
-        val adapter = createAdapter(data)
-        adapter.isFilteringEnabled = false
+        binding.progressindicatorCourse.visibility = View.GONE
+        val adapter = createAdapter(data, isFilteringEnabled = false)
         with(binding.autocompletetextCourse) {
             setEnabledFocusable(true)
             setAdapter(adapter)
@@ -202,19 +197,11 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
 
     override fun populateGroupsAdapter(data: ScheduleFilter) {
         binding.progressindicatorGroup.visibility = View.GONE
-        val adapter = createAdapter(data)
-        adapter.isStartsWithFilterActive = !presenter.isCourseSet()
-        adapter.isIgnoreCaseFilterActive = presenter.isCourseSet()
+        val adapter = createAdapter(data, isFilteringEnabled = true)
         with(binding.autocompletetextGroup) {
-            inputType = if (presenter.isCourseSet()) {
-                InputType.TYPE_CLASS_TEXT or
-                    InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD or
-                    InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
-            } else {
-                InputType.TYPE_CLASS_NUMBER or
-                    InputType.TYPE_NUMBER_VARIATION_NORMAL or
-                    InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
-            }
+            inputType = InputType.TYPE_CLASS_TEXT or
+                InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD or
+                InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
             setTypeface(null, Typeface.NORMAL)
             setEnabledFocusable(true)
             setAdapter(adapter)
@@ -222,11 +209,12 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
         }
     }
 
-    private fun createAdapter(data: ScheduleFilter): ScheduleFilterAdapter {
+    private fun createAdapter(data: ScheduleFilter, isFilteringEnabled: Boolean): ScheduleFilterAdapter {
         return ScheduleFilterAdapter(
             requireActivity(),
             android.R.layout.simple_spinner_dropdown_item,
-            data
+            data,
+            isFilteringEnabled
         )
     }
 
