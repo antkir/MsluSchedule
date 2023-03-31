@@ -7,10 +7,13 @@ import by.ntnk.msluschedule.mvp.Presenter
 import by.ntnk.msluschedule.network.NetworkRepository
 import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.utils.CurrentDate
+import by.ntnk.msluschedule.utils.DEFAULT
 import by.ntnk.msluschedule.utils.SchedulerProvider
+import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.subjects.BehaviorSubject
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -22,41 +25,75 @@ class AddGroupPresenter @Inject constructor(
 ) : Presenter<AddGroupView>() {
 
     private val disposables: CompositeDisposable = CompositeDisposable()
-    private var faculties: ScheduleFilter? = null
-    private var courses: ScheduleFilter? = null
-    private var groups: ScheduleFilter? = null
-    private var faculty: Int = 0
-    private var course: Int = 0
-    private var groupId: Int = 0
 
-    private var scheduleContaners: List<ScheduleContainer>? = null
+    private val scheduleContaners: BehaviorSubject<List<ScheduleContainer>> = BehaviorSubject.createDefault(emptyList())
+    private val facultyFilter: BehaviorSubject<ScheduleFilter> = BehaviorSubject.createDefault(ScheduleFilter.DEFAULT)
+    private val facultyId: BehaviorSubject<Int> = BehaviorSubject.createDefault(Int.DEFAULT)
+    private val courseFilter: BehaviorSubject<ScheduleFilter> = BehaviorSubject.createDefault(ScheduleFilter.DEFAULT)
+    private val courseId: BehaviorSubject<Int> = BehaviorSubject.createDefault(Int.DEFAULT)
+    private val groupFilter: BehaviorSubject<ScheduleFilter> = BehaviorSubject.createDefault(ScheduleFilter.DEFAULT)
+    private val groupId: BehaviorSubject<Int> = BehaviorSubject.createDefault(Int.DEFAULT)
+    val facultyFilterObservable: Observable<ScheduleFilter>
+        get() = facultyFilter
+    val facultyIdObservable: Observable<Int>
+        get() = facultyId
+    val courseFilterObservable: Observable<ScheduleFilter>
+        get() = courseFilter
+    val courseIdObservable: Observable<Int>
+        get() = courseId
+    val groupFilterObservable: Observable<ScheduleFilter>
+        get() = groupFilter
+    val groupIdObservable: Observable<Int>
+        get() = groupId
 
-    fun isFacultiesInitialized(): Boolean = faculties != null
-
-    fun isCoursesInitialized(): Boolean = courses != null
-
-    fun isGroupsInitialized(): Boolean = groups != null
-
-    fun isFacultySet(): Boolean = faculty > 0
-
-    fun isCourseSet(): Boolean = course > 0
-
-    fun setFacultyKeyFromPosition(position: Int) {
-        faculty = faculties!!.keyAt(position)
+    fun isFacultyFilterDefault(): Boolean {
+        return facultyFilter.value == ScheduleFilter.DEFAULT
     }
 
-    fun setCourseKeyFromPosition(position: Int) {
-        course = courses!!.keyAt(position)
+    fun isFacultyIdDefault(): Boolean {
+        return facultyId.value == Int.DEFAULT
     }
 
-    fun setCoursesNull() {
-        courses = null
-        course = 0
+    fun isCourseFilterDefault(): Boolean {
+        return courseFilter.value == ScheduleFilter.DEFAULT
     }
 
-    fun setGroupsNull() {
-        groups = null
-        groupId = 0
+    fun isCourseIdDefault(): Boolean {
+        return courseId.value == Int.DEFAULT
+    }
+
+    fun isGroupFilterDefault(): Boolean {
+        return groupFilter.value == ScheduleFilter.DEFAULT
+    }
+
+    fun isGroupIdDefault(): Boolean {
+        return groupId.value == Int.DEFAULT
+    }
+
+    fun setFacultyIdFromPosition(position: Int) {
+        assert(position >= 0)
+        assert(facultyFilter.hasValue())
+        facultyId.onNext(facultyFilter.value!!.keyAt(position))
+    }
+
+    fun setCourseIdFromPosition(position: Int) {
+        assert(position >= 0)
+        assert(courseFilter.hasValue())
+        courseId.onNext(courseFilter.value!!.keyAt(position))
+    }
+
+    fun setGroupId(id: Int) {
+        groupId.onNext(id)
+    }
+
+    fun resetCourses() {
+        courseFilter.onNext(ScheduleFilter.DEFAULT)
+        courseId.onNext(Int.DEFAULT)
+    }
+
+    fun resetGroups() {
+        groupFilter.onNext(ScheduleFilter.DEFAULT)
+        groupId.onNext(Int.DEFAULT)
     }
 
     fun getFacultyScheduleFilter() {
@@ -64,7 +101,7 @@ class AddGroupPresenter @Inject constructor(
             .toList()
             .subscribeOn(schedulerProvider.io())
             .subscribeBy(
-                onSuccess = { scheduleContaners = it },
+                onSuccess = { scheduleContainers -> scheduleContaners.onNext(scheduleContainers) },
                 onError = { throwable -> Timber.e(throwable) }
             )
 
@@ -72,14 +109,8 @@ class AddGroupPresenter @Inject constructor(
             .subscribeOn(schedulerProvider.single())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
-                onSuccess = { scheduleFilter ->
-                    faculties = scheduleFilter
-                    populateFacultiesAdapter()
-                },
-                onError = { throwable ->
-                    Timber.i(throwable)
-                    view?.showError(throwable)
-                }
+                onSuccess = { scheduleFilter -> facultyFilter.onNext(scheduleFilter) },
+                onError = { throwable -> facultyFilter.onError(throwable) }
             )
     }
 
@@ -88,58 +119,38 @@ class AddGroupPresenter @Inject constructor(
             .subscribeOn(schedulerProvider.single())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
-                onSuccess = { scheduleFilter ->
-                    courses = scheduleFilter
-                    populateCoursesAdapter()
-                },
-                onError = { throwable ->
-                    Timber.i(throwable)
-                    view?.showError(throwable)
-                }
+                onSuccess = { scheduleFilter -> courseFilter.onNext(scheduleFilter) },
+                onError = { throwable -> courseFilter.onError(throwable) }
             )
     }
 
-    fun getStudyGroupScheduleFilter() {
-        disposables += networkRepository.getGroups(faculty, course, currentDate.academicYear)
+    fun getGroupScheduleFilter() {
+        assert(facultyId.hasValue() && courseId.hasValue())
+        disposables += networkRepository.getGroups(facultyId.value!!, courseId.value!!, currentDate.academicYear)
             .subscribeOn(schedulerProvider.single())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
-                onSuccess = { scheduleFilter ->
-                    groups = scheduleFilter
-                    populateGroupsAdapter()
-                },
-                onError = { throwable ->
-                    Timber.i(throwable)
-                    view?.showError(throwable)
-                }
+                onSuccess = { scheduleFilter -> groupFilter.onNext(scheduleFilter) },
+                onError = { throwable -> groupFilter.onError(throwable) }
             )
     }
 
-    fun setGroupId(id: Int) {
-        groupId = id
-    }
-
-    fun isValidGroup(name: String): Boolean {
-        return groups?.containsValue(name) == true
-    }
-
-    fun isGroupStored(name: String): Boolean {
-        return scheduleContaners
+    fun isGroupAdded(id: Int): Boolean {
+        assert(scheduleContaners.hasValue() && facultyId.hasValue() && groupFilter.hasValue())
+        return scheduleContaners.value
             ?.filter { scheduleContainer -> scheduleContainer.year == currentDate.academicYear }
-            ?.filter { scheduleContainer -> scheduleContainer.faculty == faculty }
+            ?.filter { scheduleContainer -> scheduleContainer.faculty == facultyId.value }
             ?.map { scheduleContainer -> scheduleContainer.name }
-            ?.any { studyGroup -> studyGroup == name } == true
+            ?.any { group -> group == groupFilter.value!!.getValue(id) } == true
     }
 
     fun createSelectedStudyGroupObject(): StudyGroup {
-        return StudyGroup(groupId, groups!!.getValue(groupId), faculty, course, currentDate.academicYear)
+        assert(facultyFilter.hasValue() && facultyId.hasValue())
+        assert(courseFilter.hasValue() && courseId.hasValue())
+        assert(groupFilter.hasValue() && groupId.hasValue())
+        val groupId = groupId.value!!
+        return StudyGroup(groupId, groupFilter.value!!.getValue(groupId), facultyId.value!!, courseId.value!!, currentDate.academicYear)
     }
-
-    fun populateFacultiesAdapter() = view?.populateFacultiesAdapter(faculties!!)
-
-    fun populateCoursesAdapter() = view?.populateCoursesAdapter(courses!!)
-
-    fun populateGroupsAdapter() = view?.populateGroupsAdapter(groups!!)
 
     fun clearDisposables() = disposables.clear()
 }

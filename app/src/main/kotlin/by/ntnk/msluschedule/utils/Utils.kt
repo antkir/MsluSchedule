@@ -6,6 +6,12 @@ const val EMPTY_STRING = ""
 
 const val INVALID_VALUE = -1
 
+val Int.Companion.DEFAULT: Int
+    get() = MIN_VALUE
+
+val String.Companion.DEFAULT: String
+    get() = ""
+
 const val PRESENTER_ID_KEY = "PresenterID"
 
 object Days {

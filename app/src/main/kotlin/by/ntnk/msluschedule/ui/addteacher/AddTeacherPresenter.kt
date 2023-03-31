@@ -7,69 +7,71 @@ import by.ntnk.msluschedule.mvp.Presenter
 import by.ntnk.msluschedule.network.NetworkRepository
 import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.utils.CurrentDate
+import by.ntnk.msluschedule.utils.DEFAULT
 import by.ntnk.msluschedule.utils.SchedulerProvider
+import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.subjects.BehaviorSubject
 import timber.log.Timber
 import javax.inject.Inject
 
 class AddTeacherPresenter @Inject constructor(
     private val databaseRepository: DatabaseRepository,
-    private val networkRequestRepository: NetworkRepository,
+    private val networkRepository: NetworkRepository,
     private val currentDate: CurrentDate,
     private val schedulerProvider: SchedulerProvider
 ) : Presenter<AddTeacherView>() {
 
     private lateinit var disposable: Disposable
-    private var teachers: ScheduleFilter? = null
-    private var teacherId: Int = 0
 
-    private var scheduleContaners: List<ScheduleContainer>? = null
+    private val scheduleContaners: BehaviorSubject<List<ScheduleContainer>> = BehaviorSubject.createDefault(emptyList())
+    private val teacherFilter: BehaviorSubject<ScheduleFilter> = BehaviorSubject.createDefault(ScheduleFilter.DEFAULT)
+    private val teacherId: BehaviorSubject<Int> = BehaviorSubject.createDefault(Int.DEFAULT)
+    val teacherFilterObservable: Observable<ScheduleFilter>
+        get() = teacherFilter
+    val teacherIdObservable: Observable<Int>
+        get() = teacherId
 
-    fun isTeachersNotEmpty(): Boolean = teachers != null
+    fun isTeacherFilterDefault(): Boolean {
+        return teacherFilter.value == ScheduleFilter.DEFAULT
+    }
 
-    fun getTeachersScheduleFilter() {
+    fun getTeacherScheduleFilter() {
         databaseRepository.getScheduleContainers()
             .toList()
             .subscribeOn(schedulerProvider.io())
             .subscribeBy(
-                onSuccess = { scheduleContaners = it },
+                onSuccess = { scheduleContainers -> scheduleContaners.onNext(scheduleContainers) },
                 onError = { throwable -> Timber.e(throwable) }
             )
 
-        disposable = networkRequestRepository.getTeachers()
+        disposable = networkRepository.getTeachers()
             .subscribeOn(schedulerProvider.single())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
-                onSuccess = { scheduleFilter ->
-                    teachers = scheduleFilter
-                    populateTeachersAdapter()
-                },
-                onError = { throwable ->
-                    Timber.i(throwable)
-                    view?.showError(throwable)
-                }
+                onSuccess = { scheduleFilter -> teacherFilter.onNext(scheduleFilter) },
+                onError = { throwable -> teacherFilter.onError(throwable) }
             )
     }
 
     fun setTeacherId(id: Int) {
-        teacherId = id
+        teacherId.onNext(id)
     }
 
-    fun isValidTeacher(name: String): Boolean {
-        return teachers?.containsValue(name) == true
-    }
-
-    fun isTeacherStored(name: String): Boolean {
-        return scheduleContaners
+    fun isTeacherAdded(id: Int): Boolean {
+        assert(scheduleContaners.hasValue() && teacherFilter.hasValue())
+        return scheduleContaners.value
             ?.filter { scheduleContainer -> scheduleContainer.year == currentDate.academicYear }
             ?.map { scheduleContainer -> scheduleContainer.name }
-            ?.any { it == name } == true
+            ?.any { teacher -> teacher == teacherFilter.value!!.getValue(id) } == true
     }
 
-    fun createSelectedTeacherObject() = Teacher(teacherId, teachers!!.getValue(teacherId), currentDate.academicYear)
-
-    fun populateTeachersAdapter() = view?.populateTeachersView(teachers!!)
+    fun createSelectedTeacherObject(): Teacher {
+        assert(teacherFilter.hasValue() && teacherId.hasValue())
+        val teacherId = teacherId.value!!
+        return Teacher(teacherId, teacherFilter.value!!.getValue(teacherId), currentDate.academicYear)
+    }
 
     fun clearDisposables() = disposable.dispose()
 }

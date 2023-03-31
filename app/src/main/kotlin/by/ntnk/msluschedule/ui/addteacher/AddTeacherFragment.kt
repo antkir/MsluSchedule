@@ -14,10 +14,14 @@ import by.ntnk.msluschedule.databinding.FragmentAddTeacherBinding
 import by.ntnk.msluschedule.mvp.views.MvpDialogFragment
 import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.ui.adapters.ScheduleFilterAdapter
-import by.ntnk.msluschedule.utils.EMPTY_STRING
+import by.ntnk.msluschedule.utils.DEFAULT
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.Lazy
 import dagger.android.support.AndroidSupportInjection
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.plusAssign
+import io.reactivex.rxkotlin.subscribeBy
+import timber.log.Timber
 import javax.inject.Inject
 
 class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView>(), AddTeacherView {
@@ -25,6 +29,7 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
     private var fragmentBinding: FragmentAddTeacherBinding? = null
     private val binding get() = fragmentBinding!!
     private lateinit var listener: DialogListener
+    private val disposables: CompositeDisposable = CompositeDisposable()
 
     override val view: AddTeacherView
         get() = this
@@ -50,28 +55,20 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
         val dialog = createDialog()
         dialog.setCanceledOnTouchOutside(false)
         dialog.window?.attributes?.windowAnimations = R.style.DialogAnimation
-        dialog.setOnShowListener { dialogInterface ->
-            dialogInterface as AlertDialog
-            val isTeacherValid = presenter.isValidTeacher(binding.autocompletetextTeacher.text.toString())
-            dialogInterface.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = isTeacherValid
-        }
         return dialog
     }
 
     private fun setupViews() {
-        binding.autocompletetextTeacher.setEnabledFocusable(false)
-        binding.autocompletetextTeacher.setOnItemClickListener { _, _, _, id ->
-            presenter.setTeacherId(id.toInt())
-        }
-        binding.autocompletetextTeacher.doOnTextChanged { text, _, _, _ ->
-            var isEnabled = presenter.isValidTeacher(text.toString())
-            if (presenter.isTeacherStored(text.toString())) {
-                binding.textinputlayoutTeacher.error = resources.getString(R.string.teacher_already_added)
-                isEnabled = false
-            } else {
-                binding.textinputlayoutTeacher.error = EMPTY_STRING
+        with(binding.autocompletetextTeacher) {
+            setEnabledFocusable(false)
+            setOnItemClickListener { _, _, _, id ->
+                presenter.setTeacherId(id.toInt())
             }
-            (dialog as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = isEnabled
+            doOnTextChanged { _, _, before, _ ->
+                if (before > 0) {
+                    presenter.setTeacherId(Int.DEFAULT)
+                }
+            }
         }
     }
 
@@ -91,12 +88,45 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
 
     override fun onStart() {
         super.onStart()
-        if (presenter.isTeachersNotEmpty()) {
-            presenter.populateTeachersAdapter()
-        } else {
+
+        if (presenter.isTeacherFilterDefault()) {
             binding.progressindicatorTeacher.visibility = View.VISIBLE
-            presenter.getTeachersScheduleFilter()
+            presenter.getTeacherScheduleFilter()
         }
+
+        disposables += presenter.teacherFilterObservable.subscribeBy(
+            onNext = { scheduleFilter ->
+                if (scheduleFilter != ScheduleFilter.DEFAULT) {
+                    populateTeachersView(scheduleFilter)
+                }
+            },
+            onError = { throwable ->
+                Timber.i(throwable)
+                showError(throwable)
+            }
+        )
+        disposables += presenter.teacherIdObservable.subscribeBy(
+            onNext = { id ->
+                val alertDialog = dialog as AlertDialog
+                var isEnabled = false
+                if (id != Int.DEFAULT) {
+                    if (presenter.isTeacherAdded(id)) {
+                        binding.textinputlayoutTeacher.error = resources.getString(R.string.teacher_already_added)
+                        isEnabled = false
+                    } else {
+                        isEnabled = true
+                    }
+                } else {
+                    binding.textinputlayoutTeacher.isErrorEnabled = false
+                }
+                alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = isEnabled
+            }
+        )
+    }
+
+    override fun onStop() {
+        super.onStop()
+        disposables.clear()
     }
 
     override fun onDestroyView() {
@@ -104,10 +134,11 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
         fragmentBinding = null
     }
 
-    override fun populateTeachersView(data: ScheduleFilter) {
+    private fun populateTeachersView(data: ScheduleFilter) {
         binding.progressindicatorTeacher.visibility = View.GONE
         val adapter = createAdapter(data)
-        with (binding.autocompletetextTeacher) {
+        adapter.filter.filter(binding.autocompletetextTeacher.text)
+        with(binding.autocompletetextTeacher) {
             setEnabledFocusable(true)
             setAdapter(adapter)
             requestFocus()
@@ -123,7 +154,7 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
         )
     }
 
-    override fun showError(t: Throwable) {
+    private fun showError(t: Throwable) {
         dismiss()
         listener.onError(t)
     }
