@@ -27,11 +27,11 @@ class AddTeacherPresenter @Inject constructor(
 
     private val scheduleContaners: BehaviorSubject<List<ScheduleContainer>> = BehaviorSubject.createDefault(emptyList())
     private val teacherFilter: BehaviorSubject<ScheduleFilter> = BehaviorSubject.createDefault(ScheduleFilter.DEFAULT)
-    private val teacherId: BehaviorSubject<Int> = BehaviorSubject.createDefault(Int.DEFAULT)
+    private val teacherKey: BehaviorSubject<Int> = BehaviorSubject.createDefault(Int.DEFAULT)
     val teacherFilterObservable: Observable<ScheduleFilter>
         get() = teacherFilter
-    val teacherIdObservable: Observable<Int>
-        get() = teacherId
+    val teacherKeyObservable: Observable<Int>
+        get() = teacherKey
 
     fun isTeacherFilterDefault(): Boolean {
         return teacherFilter.value == ScheduleFilter.DEFAULT
@@ -55,22 +55,22 @@ class AddTeacherPresenter @Inject constructor(
             )
     }
 
-    fun setTeacherId(id: Int) {
-        teacherId.onNext(id)
+    fun setTeacherKey(key: Int) {
+        teacherKey.onNext(key)
     }
 
-    fun isTeacherAdded(id: Int): Boolean {
+    fun isTeacherAdded(key: Int): Boolean {
         assert(scheduleContaners.hasValue() && teacherFilter.hasValue())
         return scheduleContaners.value
             ?.filter { scheduleContainer -> scheduleContainer.year == currentDate.academicYear }
             ?.map { scheduleContainer -> scheduleContainer.name }
-            ?.any { teacher -> teacher == teacherFilter.value!!.getValue(id) } == true
+            ?.any { teacher -> teacher == teacherFilter.value!!.getValue(key) } == true
     }
 
     fun createSelectedTeacherObject(): Teacher {
-        assert(teacherFilter.hasValue() && teacherId.hasValue())
-        val teacherId = teacherId.value!!
-        return Teacher(teacherId, teacherFilter.value!!.getValue(teacherId), currentDate.academicYear)
+        assert(teacherFilter.hasValue() && teacherKey.hasValue())
+        val teacherKey = teacherKey.value!!
+        return Teacher(teacherKey, teacherFilter.value!!.getValue(teacherKey), currentDate.academicYear)
     }
 
     fun clearDisposables() = disposable.dispose()

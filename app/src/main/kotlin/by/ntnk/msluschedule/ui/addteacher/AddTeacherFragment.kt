@@ -62,11 +62,11 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
         with(binding.autocompletetextTeacher) {
             setEnabledFocusable(false)
             setOnItemClickListener { _, _, _, id ->
-                presenter.setTeacherId(id.toInt())
+                presenter.setTeacherKey(id.toInt())
             }
             doOnTextChanged { _, _, before, _ ->
                 if (before > 0) {
-                    presenter.setTeacherId(Int.DEFAULT)
+                    presenter.setTeacherKey(Int.DEFAULT)
                 }
             }
         }
@@ -105,12 +105,12 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
                 showError(throwable)
             }
         )
-        disposables += presenter.teacherIdObservable.subscribeBy(
-            onNext = { id ->
+        disposables += presenter.teacherKeyObservable.subscribeBy(
+            onNext = { key ->
                 val alertDialog = dialog as AlertDialog
                 var isEnabled = false
-                if (id != Int.DEFAULT) {
-                    if (presenter.isTeacherAdded(id)) {
+                if (key != Int.DEFAULT) {
+                    if (presenter.isTeacherAdded(key)) {
                         binding.textinputlayoutTeacher.error = resources.getString(R.string.teacher_already_added)
                         isEnabled = false
                     } else {
