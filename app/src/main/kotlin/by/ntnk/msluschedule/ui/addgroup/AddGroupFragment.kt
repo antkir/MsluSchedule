@@ -92,7 +92,7 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
                 binding.autocompletetextGroup.setEnabledFocusable(false)
                 presenter.resetGroups()
 
-                presenter.setFacultyIdFromPosition(position)
+                presenter.setFacultyKeyFromPosition(position)
             }
             setOnClickListener { view ->
                 view as AutoCompleteTextView
@@ -111,7 +111,7 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
                 binding.autocompletetextGroup.setEnabledFocusable(false)
                 presenter.resetGroups()
 
-                presenter.setCourseIdFromPosition(position)
+                presenter.setCourseKeyFromPosition(position)
             }
             setOnClickListener { view ->
                 view as AutoCompleteTextView
@@ -122,16 +122,16 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
         with(binding.autocompletetextGroup) {
             setEnabledFocusable(false)
             setOnItemClickListener { _, _, _, id ->
-                presenter.setGroupId(id.toInt())
+                presenter.setGroupKey(id.toInt())
             }
             doOnTextChanged { _, _, before, _ ->
                 if (before > 0) {
-                    presenter.setGroupId(Int.DEFAULT)
+                    presenter.setGroupKey(Int.DEFAULT)
                 }
             }
             setOnClickListener { view ->
                 view as AutoCompleteTextView
-                if (presenter.isGroupIdDefault()) {
+                if (presenter.isGroupKeyDefault()) {
                     view.showDropDown()
                 }
             }
@@ -158,9 +158,9 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
             }
         )
 
-        disposables += presenter.facultyIdObservable.subscribeBy(
-            onNext = { id ->
-                if (id != Int.DEFAULT) {
+        disposables += presenter.facultyKeyObservable.subscribeBy(
+            onNext = { key ->
+                if (key != Int.DEFAULT) {
                     if (presenter.isCourseFilterDefault()) {
                         binding.progressindicatorCourse.visibility = View.VISIBLE
                         presenter.getCourseScheduleFilter()
@@ -172,7 +172,7 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
         disposables += presenter.courseFilterObservable.subscribeBy(
             onNext = { scheduleFilter ->
                 if (scheduleFilter != ScheduleFilter.DEFAULT) {
-                    if (!presenter.isFacultyIdDefault()) {
+                    if (!presenter.isFacultyKeyDefault()) {
                         populateCoursesView(scheduleFilter)
                     }
                 }
@@ -183,9 +183,9 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
             }
         )
 
-        disposables += presenter.courseIdObservable.subscribeBy(
-            onNext = { id ->
-                if (id != Int.DEFAULT) {
+        disposables += presenter.courseKeyObservable.subscribeBy(
+            onNext = { key ->
+                if (key != Int.DEFAULT) {
                     if (presenter.isGroupFilterDefault()) {
                         binding.progressindicatorGroup.visibility = View.VISIBLE
                         presenter.getGroupScheduleFilter()
@@ -197,7 +197,7 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
         disposables += presenter.groupFilterObservable.subscribeBy(
             onNext = { scheduleFilter ->
                 if (scheduleFilter != ScheduleFilter.DEFAULT) {
-                    if (!presenter.isFacultyIdDefault() && !presenter.isCourseIdDefault()) {
+                    if (!presenter.isFacultyKeyDefault() && !presenter.isCourseKeyDefault()) {
                         populateGroupsView(scheduleFilter)
                     }
                 }
@@ -208,12 +208,12 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
             }
         )
 
-        disposables += presenter.groupIdObservable.subscribeBy(
-            onNext = { id ->
+        disposables += presenter.groupKeyObservable.subscribeBy(
+            onNext = { key ->
                 val alertDialog = dialog as AlertDialog
                 var isEnabled = false
-                if (id != Int.DEFAULT) {
-                    if (presenter.isGroupAdded(id)) {
+                if (key != Int.DEFAULT) {
+                    if (presenter.isGroupAdded(key)) {
                         binding.textinputlayoutGroup.error = resources.getString(R.string.group_already_added)
                         isEnabled = false
                     } else {

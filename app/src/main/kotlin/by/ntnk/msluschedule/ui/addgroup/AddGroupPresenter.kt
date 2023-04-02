@@ -28,72 +28,72 @@ class AddGroupPresenter @Inject constructor(
 
     private val scheduleContaners: BehaviorSubject<List<ScheduleContainer>> = BehaviorSubject.createDefault(emptyList())
     private val facultyFilter: BehaviorSubject<ScheduleFilter> = BehaviorSubject.createDefault(ScheduleFilter.DEFAULT)
-    private val facultyId: BehaviorSubject<Int> = BehaviorSubject.createDefault(Int.DEFAULT)
+    private val facultyKey: BehaviorSubject<Int> = BehaviorSubject.createDefault(Int.DEFAULT)
     private val courseFilter: BehaviorSubject<ScheduleFilter> = BehaviorSubject.createDefault(ScheduleFilter.DEFAULT)
-    private val courseId: BehaviorSubject<Int> = BehaviorSubject.createDefault(Int.DEFAULT)
+    private val courseKey: BehaviorSubject<Int> = BehaviorSubject.createDefault(Int.DEFAULT)
     private val groupFilter: BehaviorSubject<ScheduleFilter> = BehaviorSubject.createDefault(ScheduleFilter.DEFAULT)
-    private val groupId: BehaviorSubject<Int> = BehaviorSubject.createDefault(Int.DEFAULT)
+    private val groupKey: BehaviorSubject<Int> = BehaviorSubject.createDefault(Int.DEFAULT)
     val facultyFilterObservable: Observable<ScheduleFilter>
         get() = facultyFilter
-    val facultyIdObservable: Observable<Int>
-        get() = facultyId
+    val facultyKeyObservable: Observable<Int>
+        get() = facultyKey
     val courseFilterObservable: Observable<ScheduleFilter>
         get() = courseFilter
-    val courseIdObservable: Observable<Int>
-        get() = courseId
+    val courseKeyObservable: Observable<Int>
+        get() = courseKey
     val groupFilterObservable: Observable<ScheduleFilter>
         get() = groupFilter
-    val groupIdObservable: Observable<Int>
-        get() = groupId
+    val groupKeyObservable: Observable<Int>
+        get() = groupKey
 
     fun isFacultyFilterDefault(): Boolean {
         return facultyFilter.value == ScheduleFilter.DEFAULT
     }
 
-    fun isFacultyIdDefault(): Boolean {
-        return facultyId.value == Int.DEFAULT
+    fun isFacultyKeyDefault(): Boolean {
+        return facultyKey.value == Int.DEFAULT
     }
 
     fun isCourseFilterDefault(): Boolean {
         return courseFilter.value == ScheduleFilter.DEFAULT
     }
 
-    fun isCourseIdDefault(): Boolean {
-        return courseId.value == Int.DEFAULT
+    fun isCourseKeyDefault(): Boolean {
+        return courseKey.value == Int.DEFAULT
     }
 
     fun isGroupFilterDefault(): Boolean {
         return groupFilter.value == ScheduleFilter.DEFAULT
     }
 
-    fun isGroupIdDefault(): Boolean {
-        return groupId.value == Int.DEFAULT
+    fun isGroupKeyDefault(): Boolean {
+        return groupKey.value == Int.DEFAULT
     }
 
-    fun setFacultyIdFromPosition(position: Int) {
+    fun setFacultyKeyFromPosition(position: Int) {
         assert(position >= 0)
         assert(facultyFilter.hasValue())
-        facultyId.onNext(facultyFilter.value!!.keyAt(position))
+        facultyKey.onNext(facultyFilter.value!!.keyAt(position))
     }
 
-    fun setCourseIdFromPosition(position: Int) {
+    fun setCourseKeyFromPosition(position: Int) {
         assert(position >= 0)
         assert(courseFilter.hasValue())
-        courseId.onNext(courseFilter.value!!.keyAt(position))
+        courseKey.onNext(courseFilter.value!!.keyAt(position))
     }
 
-    fun setGroupId(id: Int) {
-        groupId.onNext(id)
+    fun setGroupKey(key: Int) {
+        groupKey.onNext(key)
     }
 
     fun resetCourses() {
         courseFilter.onNext(ScheduleFilter.DEFAULT)
-        courseId.onNext(Int.DEFAULT)
+        courseKey.onNext(Int.DEFAULT)
     }
 
     fun resetGroups() {
         groupFilter.onNext(ScheduleFilter.DEFAULT)
-        groupId.onNext(Int.DEFAULT)
+        groupKey.onNext(Int.DEFAULT)
     }
 
     fun getFacultyScheduleFilter() {
@@ -115,7 +115,8 @@ class AddGroupPresenter @Inject constructor(
     }
 
     fun getCourseScheduleFilter() {
-        disposables += networkRepository.getCourses()
+        assert(facultyKey.hasValue())
+        disposables += networkRepository.getCourses(facultyKey.value!!)
             .subscribeOn(schedulerProvider.single())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
@@ -125,8 +126,8 @@ class AddGroupPresenter @Inject constructor(
     }
 
     fun getGroupScheduleFilter() {
-        assert(facultyId.hasValue() && courseId.hasValue())
-        disposables += networkRepository.getGroups(facultyId.value!!, courseId.value!!, currentDate.academicYear)
+        assert(facultyKey.hasValue() && courseKey.hasValue())
+        disposables += networkRepository.getGroups(facultyKey.value!!, courseKey.value!!, currentDate.academicYear)
             .subscribeOn(schedulerProvider.single())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
@@ -135,21 +136,21 @@ class AddGroupPresenter @Inject constructor(
             )
     }
 
-    fun isGroupAdded(id: Int): Boolean {
-        assert(scheduleContaners.hasValue() && facultyId.hasValue() && groupFilter.hasValue())
+    fun isGroupAdded(key: Int): Boolean {
+        assert(scheduleContaners.hasValue() && facultyKey.hasValue() && groupFilter.hasValue())
         return scheduleContaners.value
             ?.filter { scheduleContainer -> scheduleContainer.year == currentDate.academicYear }
-            ?.filter { scheduleContainer -> scheduleContainer.faculty == facultyId.value }
+            ?.filter { scheduleContainer -> scheduleContainer.faculty == facultyKey.value }
             ?.map { scheduleContainer -> scheduleContainer.name }
-            ?.any { group -> group == groupFilter.value!!.getValue(id) } == true
+            ?.any { group -> group == groupFilter.value!!.getValue(key) } == true
     }
 
     fun createSelectedStudyGroupObject(): StudyGroup {
-        assert(facultyFilter.hasValue() && facultyId.hasValue())
-        assert(courseFilter.hasValue() && courseId.hasValue())
-        assert(groupFilter.hasValue() && groupId.hasValue())
-        val groupId = groupId.value!!
-        return StudyGroup(groupId, groupFilter.value!!.getValue(groupId), facultyId.value!!, courseId.value!!, currentDate.academicYear)
+        assert(facultyFilter.hasValue() && facultyKey.hasValue())
+        assert(courseFilter.hasValue() && courseKey.hasValue())
+        assert(groupFilter.hasValue() && groupKey.hasValue())
+        val groupKey = groupKey.value!!
+        return StudyGroup(groupKey, groupFilter.value!!.getValue(groupKey), facultyKey.value!!, courseKey.value!!, currentDate.academicYear)
     }
 
     fun clearDisposables() = disposables.clear()
