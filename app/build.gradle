@@ -57,6 +57,7 @@ android {
                 ]
             }
         }
+        resourceConfigurations += ["en", "be", "ru"]
     }
     buildTypes {
         debug {
@@ -76,7 +77,7 @@ ext {
     appcompatVersion = '1.6.1'
     constraintlayoutVersion = '2.1.4'
     daggerVersion = '2.45'
-    fragmentVersion = '1.5.5'
+    fragmentVersion = '1.5.6'
     jsoupVersion = '1.15.4'
     junitVersion = '4.13.2'
     leakcanaryVersion = '2.10'
@@ -90,17 +91,17 @@ ext {
     preferenceVersion = '1.2.0'
     // Retrofit 2.7.0 release bumps minimum requirements to Android 5+.
     retrofitVersion = '2.6.4'
-    roomVersion = '2.5.0'
+    roomVersion = '2.5.1'
     rxandroidVersion = '2.1.1'
     // RxJava 3.1.0 release bumps minimum requirements to Android 5+.
     rxjavaVersion = '2.2.21'
     rxkotlinVersion = '2.4.0'
     spotlightVersion = '1.7.0'
     swipeRefreshLayoutVersion = '1.1.0'
-    threetenbpVersion = '1.6.5'
+    threetenbpVersion = '1.6.7'
     timberVersion = '5.0.1'
 
-    crashlyticsVersion = '18.3.5'
+    crashlyticsVersion = '18.3.6'
     // Firebase Analytics 20.0.0+ release bumps minimum requirements to Android 4.4+.
     firebaseAnalyticsVersion = '19.0.2'
 }
