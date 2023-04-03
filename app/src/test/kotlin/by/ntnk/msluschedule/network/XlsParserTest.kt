@@ -5,6 +5,7 @@ import by.ntnk.msluschedule.data.StudyGroupLesson
 import by.ntnk.msluschedule.data.TeacherLesson
 import by.ntnk.msluschedule.data.WeekdayWithStudyGroupLessons
 import by.ntnk.msluschedule.data.WeekdayWithTeacherLessons
+import by.ntnk.msluschedule.network.api.original.XlsParser
 import by.ntnk.msluschedule.utils.Days
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
 import org.junit.Before

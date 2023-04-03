@@ -1,11 +1,11 @@
-package by.ntnk.msluschedule.network
+package by.ntnk.msluschedule.network.api.original
 
 import by.ntnk.msluschedule.data.StudyGroup
 import by.ntnk.msluschedule.data.Teacher
 import by.ntnk.msluschedule.di.PerApp
-import by.ntnk.msluschedule.network.data.JsonBody
-import by.ntnk.msluschedule.network.data.RequestData
-import by.ntnk.msluschedule.network.data.RequestInfo
+import by.ntnk.msluschedule.network.api.original.data.JsonBody
+import by.ntnk.msluschedule.network.api.original.data.RequestData
+import by.ntnk.msluschedule.network.api.original.data.RequestInfo
 import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.utils.CurrentDate
 import by.ntnk.msluschedule.utils.EMPTY_STRING

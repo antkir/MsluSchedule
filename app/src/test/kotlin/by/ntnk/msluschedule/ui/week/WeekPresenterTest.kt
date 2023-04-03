@@ -14,6 +14,7 @@ import by.ntnk.msluschedule.db.DatabaseDataMapper
 import by.ntnk.msluschedule.db.DatabaseRepository
 import by.ntnk.msluschedule.db.data.ScheduleContainer
 import by.ntnk.msluschedule.network.NetworkRepository
+import by.ntnk.msluschedule.network.api.original.NetworkRepository as NetworkRepositoryOriginal
 import by.ntnk.msluschedule.utils.CurrentDate
 import by.ntnk.msluschedule.utils.ScheduleType
 import by.ntnk.msluschedule.utils.SchedulerProvider
@@ -79,7 +80,7 @@ class WeekPresenterTest {
         Timber.plant(TestTree())
         MockitoAnnotations.openMocks(this)
 
-        whenever(networkRepositoryLazy.get()).thenReturn(mock(NetworkRepository::class.java))
+        whenever(networkRepositoryLazy.get()).thenReturn(mock(NetworkRepositoryOriginal::class.java))
         whenever(sharedPreferencesRepository.getSelectedScheduleContainerInfo())
             .thenReturn(ScheduleContainerInfo(0, "", ScheduleType.STUDYGROUP))
         whenever(databaseRepository.getScheduleContainer(anyInt()))

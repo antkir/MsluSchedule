@@ -1,13 +1,14 @@
-package by.ntnk.msluschedule.network
+package by.ntnk.msluschedule.network.api.original
 
 import by.ntnk.msluschedule.data.StudyGroup
 import by.ntnk.msluschedule.data.Teacher
 import by.ntnk.msluschedule.data.WeekdayWithStudyGroupLessons
 import by.ntnk.msluschedule.data.WeekdayWithTeacherLessons
 import by.ntnk.msluschedule.di.PerApp
-import by.ntnk.msluschedule.network.data.JsonBody
-import by.ntnk.msluschedule.network.data.RequestData
-import by.ntnk.msluschedule.network.data.RequestInfo
+import by.ntnk.msluschedule.network.NetworkRepository
+import by.ntnk.msluschedule.network.api.original.data.JsonBody
+import by.ntnk.msluschedule.network.api.original.data.RequestData
+import by.ntnk.msluschedule.network.api.original.data.RequestInfo
 import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.utils.EMPTY_STRING
 import by.ntnk.msluschedule.utils.HttpStatusException
@@ -26,33 +27,33 @@ class NetworkRepository @Inject constructor(
     private val sharedPreferencesRepository: SharedPreferencesRepository,
     private val scheduleApi: ScheduleApi,
     private val xlsParser: XlsParser
-) {
-    fun getFaculties(): Single<ScheduleFilter> {
+) : NetworkRepository {
+    override fun getFaculties(): Single<ScheduleFilter> {
         return wrapRequest {
             getDataFromHtmlRequest(NetworkHelper.groupSchedule, networkHelper.facultyRequestInfo)
         }
     }
 
-    fun getCourses(): Single<ScheduleFilter> {
+    override fun getCourses(facultyKey: Int): Single<ScheduleFilter> {
         return wrapRequest {
             getDataFromHtmlRequest(NetworkHelper.groupSchedule, networkHelper.courseRequestInfo)
         }
     }
 
-    fun getGroups(faculty: Int, course: Int, year: Int = 0): Single<ScheduleFilter> {
-        val requestDataList = networkHelper.getStudyGroupsFilterDataList(faculty, course, year)
+    override fun getGroups(facultyKey: Int, courseKey: Int, yearKey: Int): Single<ScheduleFilter> {
+        val requestDataList = networkHelper.getStudyGroupsFilterDataList(facultyKey, courseKey, yearKey)
         return wrapRequest {
             getDataFromJsonRequest(networkHelper.groupRequestInfo, NetworkHelper.groupSchedule, requestDataList)
         }
     }
 
-    fun getTeachers(): Single<ScheduleFilter> {
+    override fun getTeachers(): Single<ScheduleFilter> {
         return wrapRequest {
             getDataFromHtmlRequest(NetworkHelper.teacherSchedule, networkHelper.teacherRequestInfo)
         }
     }
 
-    fun getWeeks(): Single<ScheduleFilter> {
+    override fun getWeeks(): Single<ScheduleFilter> {
         val requestDataList = networkHelper.getYearsFilterDataList()
         return wrapRequest {
             getDataFromJsonRequest(
@@ -64,13 +65,13 @@ class NetworkRepository @Inject constructor(
         }
     }
 
-    fun getSchedule(studyGroup: StudyGroup, weekKey: Int): Observable<WeekdayWithStudyGroupLessons> {
+    override fun getSchedule(studyGroup: StudyGroup, weekKey: Int): Observable<WeekdayWithStudyGroupLessons> {
         val requestDataList = networkHelper.getStudyGroupRequestDataList(studyGroup, weekKey)
         return wrapRequest { getScheduleData(NetworkHelper.groupSchedule, requestDataList) }
             .flatMapObservable { xlsParser.parseStudyGroupXls(it) }
     }
 
-    fun getSchedule(teacher: Teacher, weekKey: Int): Observable<WeekdayWithTeacherLessons> {
+    override fun getSchedule(teacher: Teacher, weekKey: Int): Observable<WeekdayWithTeacherLessons> {
         val requestDataList = networkHelper.getTeacherRequestDataList(teacher, weekKey)
         return wrapRequest { getScheduleData(NetworkHelper.teacherSchedule, requestDataList) }
             .flatMapObservable { xlsParser.parseTeacherXls(it) }

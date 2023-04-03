@@ -6,6 +6,7 @@ import by.ntnk.msluschedule.data.StudyGroup
 import by.ntnk.msluschedule.data.Teacher
 import by.ntnk.msluschedule.db.DatabaseRepository
 import by.ntnk.msluschedule.network.NetworkRepository
+import by.ntnk.msluschedule.network.api.original.NetworkRepository as NetworkRepositoryOriginal
 import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.utils.CurrentDate
 import by.ntnk.msluschedule.utils.SchedulerProvider
@@ -62,7 +63,7 @@ class MainPresenterTest {
         Timber.plant(TestTree())
         MockitoAnnotations.openMocks(this)
 
-        whenever(networkRepositoryLazy.get()).thenReturn(Mockito.mock(NetworkRepository::class.java))
+        whenever(networkRepositoryLazy.get()).thenReturn(Mockito.mock(NetworkRepositoryOriginal::class.java))
         whenever(networkRepository.getWeeks())
             .thenReturn(Single.just(ScheduleFilter()).doOnSubscribe { getWeeksTest.onSubscribe(it) })
         whenever(databaseRepository.insertStudyGroup(any()))

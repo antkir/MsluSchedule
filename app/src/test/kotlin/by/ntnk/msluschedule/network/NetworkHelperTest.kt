@@ -1,6 +1,7 @@
 package by.ntnk.msluschedule.network
 
 import by.ntnk.msluschedule.TestTree
+import by.ntnk.msluschedule.network.api.original.NetworkHelper
 import by.ntnk.msluschedule.utils.CurrentDate
 import by.ntnk.msluschedule.utils.EMPTY_STRING
 import by.ntnk.msluschedule.utils.InvalidYearException
