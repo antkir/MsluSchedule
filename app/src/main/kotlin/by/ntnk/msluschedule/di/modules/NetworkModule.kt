@@ -5,7 +5,7 @@ import by.ntnk.msluschedule.di.PerApp
 import by.ntnk.msluschedule.network.NetworkRepository
 import by.ntnk.msluschedule.network.api.original.LocalCookieJar
 import by.ntnk.msluschedule.network.api.original.NetworkRepository as NetworkRepositoryOriginal
-import by.ntnk.msluschedule.network.api.original.ScheduleApi as ScheduleApiOriginal
+import by.ntnk.msluschedule.network.api.original.ScheduleService as ScheduleServiceOriginal
 import dagger.Module
 import dagger.Provides
 import okhttp3.OkHttpClient
@@ -66,8 +66,8 @@ class NetworkModule {
 
     @Provides
     @PerApp
-    fun provideScheduleApi(retrofit: Retrofit): ScheduleApiOriginal {
-        return retrofit.create(ScheduleApiOriginal::class.java)
+    fun provideScheduleService(retrofit: Retrofit): ScheduleServiceOriginal {
+        return retrofit.create(ScheduleServiceOriginal::class.java)
     }
 
     @Provides

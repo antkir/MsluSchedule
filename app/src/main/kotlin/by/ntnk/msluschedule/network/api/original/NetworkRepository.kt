@@ -25,7 +25,7 @@ class NetworkRepository @Inject constructor(
     private val localCookieJar: LocalCookieJar,
     private val networkHelper: NetworkHelper,
     private val sharedPreferencesRepository: SharedPreferencesRepository,
-    private val scheduleApi: ScheduleApi,
+    private val scheduleService: ScheduleService,
     private val xlsParser: XlsParser
 ) : NetworkRepository {
     override fun getFaculties(): Single<ScheduleFilter> {
@@ -125,7 +125,7 @@ class NetworkRepository @Inject constructor(
     }
 
     private fun initSession(): Completable {
-        return scheduleApi
+        return scheduleService
             .initSession()
             .doOnSuccess { checkErrors(it) }
             .ignoreElement()
@@ -133,7 +133,7 @@ class NetworkRepository @Inject constructor(
 
     private fun changeScheduleFilter(scheduleType: String, requestData: RequestData): Single<JsonBody> {
         val formIds = networkHelper.getFormIdPair(scheduleType, requestData)
-        return scheduleApi
+        return scheduleService
             .changeScheduleFilter(
                 scheduleType,
                 requestData.requestName,
@@ -147,14 +147,14 @@ class NetworkRepository @Inject constructor(
     }
 
     private fun getHtmlBody(scheduleType: String): Single<String> {
-        return scheduleApi
+        return scheduleService
             .getHtmlBody(scheduleType)
             .doOnSuccess { checkErrors(it) }
             .map { it.body()?.string() ?: EMPTY_STRING }
     }
 
     private fun getScheduleInputStream(scheduleType: String): Single<InputStream> {
-        return scheduleApi
+        return scheduleService
             .getSchedule(scheduleType)
             .doOnSuccess { checkErrors(it) }
             .map { it.body()?.byteStream() }
