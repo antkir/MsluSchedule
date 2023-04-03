@@ -32,6 +32,15 @@ open class CurrentDate @Inject constructor() {
     private val week: Int
         get() = date.get(weekField)
 
+    private val academicYearStartDate: LocalDate
+        get() {
+            var date = LocalDate.of(academicYear, Month.SEPTEMBER, 1)
+            if (date.dayOfWeek == DayOfWeek.SUNDAY) {
+                date = date.plusDays(1)
+            }
+            return date
+        }
+
     /**
      * Get academic week for the current date.
      * Zero-based numbering is used, i.e. first week of September returns 0.
@@ -40,10 +49,7 @@ open class CurrentDate @Inject constructor() {
      */
     val academicWeek: Int
         get() {
-            var septemberDate = LocalDate.of(academicYear, Month.SEPTEMBER, 1)
-            if (septemberDate.dayOfWeek == DayOfWeek.SUNDAY) {
-                septemberDate = septemberDate.plusDays(1)
-            }
+            val septemberDate = academicYearStartDate
             val septemberWeek = septemberDate.get(weekField)
 
             return when (month >= Month.AUGUST.value) {
