@@ -1,5 +1,8 @@
 package by.ntnk.msluschedule.utils
 
+import java.net.ConnectException
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 import java.util.AbstractMap
 
 const val EMPTY_STRING = ""
@@ -35,3 +38,12 @@ class InvalidYearException : Exception()
 
 class HttpStatusException(message: String, statusCode: Int, url: String) :
     org.jsoup.HttpStatusException(message, statusCode, url)
+
+object Utils {
+    fun isNetworkException(t: Throwable): Boolean {
+        return t is ConnectException ||
+            t is HttpStatusException ||
+            t is SocketTimeoutException ||
+            t is UnknownHostException
+    }
+}

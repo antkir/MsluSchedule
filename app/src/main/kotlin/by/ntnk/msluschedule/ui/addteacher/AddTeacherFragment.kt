@@ -15,6 +15,7 @@ import by.ntnk.msluschedule.mvp.views.MvpDialogFragment
 import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.ui.adapters.ScheduleFilterAdapter
 import by.ntnk.msluschedule.utils.DEFAULT
+import by.ntnk.msluschedule.utils.Utils
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.Lazy
 import dagger.android.support.AndroidSupportInjection
@@ -100,10 +101,7 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
                     populateTeachersView(scheduleFilter)
                 }
             },
-            onError = { throwable ->
-                Timber.i(throwable)
-                showError(throwable)
-            }
+            onError = { throwable -> showError(throwable) }
         )
         disposables += presenter.teacherKeyObservable.subscribeBy(
             onNext = { key ->
@@ -155,6 +153,11 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
     }
 
     private fun showError(t: Throwable) {
+        if (Utils.isNetworkException(t)) {
+            Timber.i(t)
+        } else {
+            Timber.e(t)
+        }
         dismiss()
         listener.onError(t)
     }

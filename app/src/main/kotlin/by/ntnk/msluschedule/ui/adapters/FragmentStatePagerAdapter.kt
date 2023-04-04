@@ -34,7 +34,7 @@ import timber.log.Timber
  * This class differs from the original one in that it:
  *  - is converted to Kotlin.
  *  - does not save [Fragment] states.
- *  - in [restoreState] removes fragments that does not belong to this adapter from the passed [FragmentManager].
+ *  - in [restoreState] removes fragments that do not belong to this adapter from the passed [FragmentManager].
  *  - has a new method [getFragment].
  *
  * This version of the pager is more useful when there are a large number

@@ -275,7 +275,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
             isEmptyScheduleDaysVisible = false
             binding.textNoLessons.visibility = View.VISIBLE
 
-            // workaround the edge case, when the button is pressed during
+            // workaround the edge case when the button is pressed during
             // the hiding animation and won't show again
             binding.recyclerViewDays.smoothScrollBy(0, -1)
 
@@ -340,11 +340,9 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         }
     }
 
-    override fun showError(t: Throwable, shouldSetupViews: Boolean) {
+    override fun showError(t: Throwable) {
         if (weekId == INVALID_VALUE) return
-        if (shouldSetupViews) {
-            presenter.getSchedule(weekId, shouldUpdateAdapter = true)
-        }
+
         val baseFABMain = requireActivity().findViewById<FloatingActionButton>(R.id.fab_base)
         val snackbar = Snackbar.make(requireView(), AndroidUtils.getErrorMessageResId(t), 5000)
             .setAnchorView(baseFABMain)
@@ -354,7 +352,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
                     layoutManagerSavedState = binding.recyclerViewDays.layoutManager?.onSaveInstanceState()
                     presenter.updateSchedule(weekId)
                 } else {
-                    showError(t, shouldSetupViews = false)
+                    showError(t)
                 }
             }
         ViewCompat.setOnApplyWindowInsetsListener(snackbar.view) { _, insets -> insets }

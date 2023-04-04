@@ -16,12 +16,11 @@
 
 package by.ntnk.msluschedule.network.api.original
 
-import by.ntnk.msluschedule.utils.EMPTY_STRING
+import by.ntnk.msluschedule.utils.DEFAULT
 import okhttp3.Cookie
 import okhttp3.CookieJar
 import okhttp3.HttpUrl
 import okhttp3.internal.Util
-import timber.log.Timber
 import java.net.HttpCookie
 
 /* Simplified JavaNetCookieJar from OkHttp package with local threads support */
@@ -32,7 +31,6 @@ class LocalCookieJar : CookieJar {
     }
 
     fun removeCookie() {
-        Timber.d("Removed cookie from thread: %s", Thread.currentThread().name)
         localThreadCookie.remove()
     }
 
@@ -40,7 +38,6 @@ class LocalCookieJar : CookieJar {
         if (localThreadCookie.get() == null) {
             for (cookie in cookies) {
                 if (cookie.name().equals("JSESSIONID", ignoreCase = true)) {
-                    Timber.i("Saving cookie: %s - %s", cookie.name(), cookie.value())
                     localThreadCookie.set(cookie.toString())
                 }
             }
@@ -48,12 +45,10 @@ class LocalCookieJar : CookieJar {
     }
 
     override fun loadForRequest(url: HttpUrl): List<Cookie> {
-        Timber.d("Cookie thread: %s", Thread.currentThread().name)
         var cookies: List<Cookie>? = null
         val cookieHandler = localThreadCookie.get()
         if (cookieHandler != null) {
             if (cookieHandler.isNotEmpty()) {
-                Timber.i("Getting cookie: %s", cookieHandler)
                 cookies = decodeHeaderAsJavaNetCookies(url, cookieHandler)
             }
         }
@@ -82,11 +77,11 @@ class LocalCookieJar : CookieJar {
             var value = if (equalsSign < pairEnd) {
                 Util.trimSubstring(header, equalsSign + 1, pairEnd)
             } else {
-                EMPTY_STRING
+                String.DEFAULT
             }
 
             // If the value is "quoted", drop the quotes.
-            if (value.startsWith("\"") && value.endsWith("\"")) {
+            if (value.startsWith("\"") && value.endsWith("\"") && value.length >= 2) {
                 value = value.substring(1, value.length - 1)
             }
 

@@ -18,6 +18,7 @@ import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.ui.adapters.ScheduleFilterAdapter
 import by.ntnk.msluschedule.ui.customviews.AutoCompleteTextView
 import by.ntnk.msluschedule.utils.DEFAULT
+import by.ntnk.msluschedule.utils.Utils
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.Lazy
 import dagger.android.support.AndroidSupportInjection
@@ -152,10 +153,7 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
                     populateFacultiesView(scheduleFilter)
                 }
             },
-            onError = { throwable ->
-                Timber.i(throwable)
-                showError(throwable)
-            }
+            onError = { throwable -> showError(throwable) }
         )
 
         disposables += presenter.facultyKeyObservable.subscribeBy(
@@ -177,10 +175,7 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
                     }
                 }
             },
-            onError = { throwable ->
-                Timber.i(throwable)
-                showError(throwable)
-            }
+            onError = { throwable -> showError(throwable) }
         )
 
         disposables += presenter.courseKeyObservable.subscribeBy(
@@ -202,10 +197,7 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
                     }
                 }
             },
-            onError = { throwable ->
-                Timber.i(throwable)
-                showError(throwable)
-            }
+            onError = { throwable -> showError(throwable) }
         )
 
         disposables += presenter.groupKeyObservable.subscribeBy(
@@ -238,6 +230,11 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
     }
 
     private fun showError(t: Throwable) {
+        if (Utils.isNetworkException(t)) {
+            Timber.i(t)
+        } else {
+            Timber.e(t)
+        }
         dismiss()
         listener.onError(t)
     }

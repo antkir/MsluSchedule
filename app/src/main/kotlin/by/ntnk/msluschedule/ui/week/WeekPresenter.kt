@@ -11,6 +11,7 @@ import by.ntnk.msluschedule.utils.CurrentDate
 import by.ntnk.msluschedule.utils.ScheduleType
 import by.ntnk.msluschedule.utils.SchedulerProvider
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
+import by.ntnk.msluschedule.utils.Utils
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
@@ -46,9 +47,14 @@ class WeekPresenter @Inject constructor(
                         getNotesStatus(weekday.weekdayId)
                     }
                 },
-                onError = {
-                    Timber.i(it)
-                    view?.showError(it, shouldSetupViews = true)
+                onError = { throwable ->
+                    if (Utils.isNetworkException(throwable)) {
+                        Timber.i(throwable)
+                    } else {
+                        Timber.e(throwable)
+                    }
+                    getSchedule(weekId, shouldUpdateAdapter = true)
+                    view?.showError(throwable)
                 }
             )
     }
@@ -156,9 +162,13 @@ class WeekPresenter @Inject constructor(
             .doOnSuccess { view?.showUpdateSuccessMessage() }
             .subscribeBy(
                 onSuccess = { weekdayEntities -> view?.showSchedule(weekdayEntities) },
-                onError = {
-                    Timber.i(it)
-                    view?.showError(it, shouldSetupViews = false)
+                onError = { throwable ->
+                    if (Utils.isNetworkException(throwable)) {
+                        Timber.i(throwable)
+                    } else {
+                        Timber.e(throwable)
+                    }
+                    view?.showError(throwable)
                 }
             )
     }
