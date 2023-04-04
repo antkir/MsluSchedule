@@ -1,6 +1,5 @@
 package by.ntnk.msluschedule.utils
 
-import android.animation.Animator
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
@@ -32,13 +31,6 @@ fun IntRange.random(): Int {
     } else {
         Random().nextInt((endInclusive + 1) - start) + start
     }
-}
-
-interface SimpleAnimatorListener : Animator.AnimatorListener {
-    override fun onAnimationRepeat(animation: Animator) = Unit
-    override fun onAnimationEnd(animation: Animator) = Unit
-    override fun onAnimationCancel(animation: Animator) = Unit
-    override fun onAnimationStart(animation: Animator) = Unit
 }
 
 interface SimpleTextWatcher : TextWatcher {

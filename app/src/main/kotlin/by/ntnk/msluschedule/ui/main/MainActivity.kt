@@ -1,6 +1,7 @@
 package by.ntnk.msluschedule.ui.main
 
 import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Build
@@ -40,7 +41,6 @@ import by.ntnk.msluschedule.utils.AndroidUtils
 import by.ntnk.msluschedule.utils.EMPTY_STRING
 import by.ntnk.msluschedule.utils.ScheduleType
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
-import by.ntnk.msluschedule.utils.SimpleAnimatorListener
 import by.ntnk.msluschedule.utils.SimpleDrawerListener
 import by.ntnk.msluschedule.utils.dipToPixels
 import by.ntnk.msluschedule.utils.onThemeChanged
@@ -326,6 +326,8 @@ class MainActivity :
     override fun onDestroy() {
         super.onDestroy()
         onThemeChangedDisposable.dispose()
+        binding.fam.fabGroup.animate().setListener(null)
+        binding.fam.fabTeacher.animate().setListener(null)
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
@@ -464,10 +466,10 @@ class MainActivity :
             .scaleX(0f)
             .setDuration(100)
             .setInterpolator(FastOutSlowInInterpolator())
-            .setListener(object : SimpleAnimatorListener {
+            .setListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator) {
-                    binding.fam.fabGroup.visibility = View.INVISIBLE
                     binding.fam.fabGroup.animate()?.setListener(null)
+                    binding.fam.fabGroup.visibility = View.INVISIBLE
                 }
             })
             .start()
@@ -478,10 +480,10 @@ class MainActivity :
             .setStartDelay(0)
             .setDuration(100)
             .setInterpolator(FastOutSlowInInterpolator())
-            .setListener(object : SimpleAnimatorListener {
+            .setListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator) {
-                    binding.fam.fabTeacher.visibility = View.INVISIBLE
                     binding.fam.fabTeacher.animate()?.setListener(null)
+                    binding.fam.fabTeacher.visibility = View.INVISIBLE
                 }
             })
             .start()

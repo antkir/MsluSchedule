@@ -1,6 +1,7 @@
 package by.ntnk.msluschedule.ui.weekday
 
 import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
@@ -34,7 +35,6 @@ import by.ntnk.msluschedule.ui.customviews.ItemSwipeCallback
 import by.ntnk.msluschedule.utils.AndroidUtils
 import by.ntnk.msluschedule.utils.EMPTY_STRING
 import by.ntnk.msluschedule.utils.INVALID_VALUE
-import by.ntnk.msluschedule.utils.SimpleAnimatorListener
 import by.ntnk.msluschedule.utils.SimpleTextWatcher
 import by.ntnk.msluschedule.utils.dipToPixels
 import com.google.android.material.chip.Chip
@@ -147,8 +147,8 @@ class WeekdayActivity :
             .setStartDelay(editNotelayoutAnimDelay)
             .setDuration(editNoteLayoutAnimDuration)
             .setInterpolator(FastOutSlowInInterpolator())
-            .setListener(object : SimpleAnimatorListener {
-                val alphaAnimation = AlphaAnimation(0f, 1f).apply {
+            .setListener(object : AnimatorListenerAdapter() {
+                private val alphaAnimation = AlphaAnimation(0f, 1f).apply {
                     startOffset = editNotelayoutAnimDelay
                     duration = editNoteLayoutAnimDuration
                 }
@@ -223,13 +223,13 @@ class WeekdayActivity :
                 .translationY(binding.edittextNote.height.toFloat())
                 .setDuration(editNoteLayoutAnimDuration)
                 .setInterpolator(FastOutSlowInInterpolator())
-                .setListener(object : SimpleAnimatorListener {
+                .setListener(object : AnimatorListenerAdapter() {
                     override fun onAnimationEnd(animation: Animator) {
+                        binding.layoutEditNote.animate()?.setListener(null)
+                        binding.layoutEditNote.visibility = View.INVISIBLE
+
                         binding.scrollViewChips.translationY = binding.scrollViewChips.height.toFloat()
                         binding.scrollViewChips.visibility = View.INVISIBLE
-
-                        binding.layoutEditNote.visibility = View.INVISIBLE
-                        binding.layoutEditNote.animate()?.setListener(null)
 
                         if (resetViews || adapter.getSelectedNoteId() != null) {
                             resetEditNoteLayoutViews()
@@ -361,6 +361,7 @@ class WeekdayActivity :
     override fun onDestroy() {
         super.onDestroy()
         disposables.clear()
+        binding.layoutEditNote.animate().setListener(null)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
