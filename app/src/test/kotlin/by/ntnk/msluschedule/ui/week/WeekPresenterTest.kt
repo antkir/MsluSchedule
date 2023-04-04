@@ -143,11 +143,11 @@ class WeekPresenterTest {
         whenever(databaseDataMapper.mapToTeacher(any()))
             .thenReturn(Teacher(0, "", 0))
 
+        whenever(schedulerProvider.io())
+            .thenReturn(Schedulers.trampoline())
         whenever(schedulerProvider.single())
             .thenReturn(Schedulers.trampoline())
         whenever(schedulerProvider.ui())
-            .thenReturn(Schedulers.trampoline())
-        whenever(schedulerProvider.cachedThreadPool())
             .thenReturn(Schedulers.trampoline())
 
         presenter = WeekPresenter(

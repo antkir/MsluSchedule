@@ -47,7 +47,7 @@ class AddTeacherPresenter @Inject constructor(
             )
 
         disposable = networkRepository.getTeachers()
-            .subscribeOn(schedulerProvider.single())
+            .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
                 onSuccess = { scheduleFilter -> teacherFilter.onNext(scheduleFilter) },

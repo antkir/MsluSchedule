@@ -30,13 +30,12 @@ class WeekPresenter @Inject constructor(
 ) : Presenter<WeekView>() {
 
     private val disposables: CompositeDisposable = CompositeDisposable()
-    private var scheduler = schedulerProvider.cachedThreadPool()
 
     fun getSchedule(weekId: Int, shouldUpdateAdapter: Boolean) {
         val containerInfo = sharedPreferencesRepository.getSelectedScheduleContainerInfo()
         disposables += databaseRepository.getScheduleContainer(containerInfo.id)
             .flatMap { getScheduleData(it, weekId) }
-            .subscribeOn(scheduler)
+            .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
                 onSuccess = {
@@ -58,7 +57,7 @@ class WeekPresenter @Inject constructor(
         databaseRepository.getNotesForWeekday(weekdayId)
             .toList()
             .map { notes -> notes.isNotEmpty() }
-            .subscribeOn(scheduler)
+            .subscribeOn(schedulerProvider.single())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
                 onSuccess = { isNotesListNotEmpty -> view?.updateNotesStatus(weekdayId, isNotesListNotEmpty) },
@@ -92,7 +91,7 @@ class WeekPresenter @Inject constructor(
         return databaseRepository.insertWeekdays(weekId)
             .observeOn(schedulerProvider.ui())
             .doOnComplete { view?.showInitProgressBar() }
-            .observeOn(scheduler)
+            .observeOn(schedulerProvider.io())
             .andThen(downloadSchedule(isUpdate = false, container = container, weekId = weekId))
             .observeOn(schedulerProvider.ui())
             .doOnDispose { view?.hideUpdateProgressBar() }
@@ -149,7 +148,7 @@ class WeekPresenter @Inject constructor(
                 downloadSchedule(isUpdate = true, container = scheduleContainer, weekId = weekId)
                     .flatMap { getWeekdaysWithLessons(weekId, containerInfo.type!!).toList() }
             }
-            .subscribeOn(schedulerProvider.cachedThreadPool())
+            .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
             .doOnSubscribe { view?.showUpdateProgressBar() }
             .doOnDispose { view?.hideUpdateProgressBar() }

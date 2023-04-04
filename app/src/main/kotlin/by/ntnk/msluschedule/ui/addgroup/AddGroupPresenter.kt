@@ -106,7 +106,7 @@ class AddGroupPresenter @Inject constructor(
             )
 
         disposables += networkRepository.getFaculties()
-            .subscribeOn(schedulerProvider.single())
+            .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
                 onSuccess = { scheduleFilter -> facultyFilter.onNext(scheduleFilter) },
@@ -117,7 +117,7 @@ class AddGroupPresenter @Inject constructor(
     fun getCourseScheduleFilter() {
         assert(facultyKey.hasValue())
         disposables += networkRepository.getCourses(facultyKey.value!!)
-            .subscribeOn(schedulerProvider.single())
+            .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
                 onSuccess = { scheduleFilter -> courseFilter.onNext(scheduleFilter) },
@@ -128,7 +128,7 @@ class AddGroupPresenter @Inject constructor(
     fun getGroupScheduleFilter() {
         assert(facultyKey.hasValue() && courseKey.hasValue())
         disposables += networkRepository.getGroups(facultyKey.value!!, courseKey.value!!, currentDate.academicYear)
-            .subscribeOn(schedulerProvider.single())
+            .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
                 onSuccess = { scheduleFilter -> groupFilter.onNext(scheduleFilter) },

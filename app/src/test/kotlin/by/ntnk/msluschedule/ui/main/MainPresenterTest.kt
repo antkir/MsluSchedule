@@ -75,11 +75,11 @@ class MainPresenterTest {
         whenever(databaseRepository.deleteScheduleContainer(eq(0)))
             .thenReturn(Completable.complete().doOnSubscribe { deleteScheduleContainerTest.onSubscribe(it) })
 
+        whenever(schedulerProvider.io())
+            .thenReturn(Schedulers.trampoline())
         whenever(schedulerProvider.single())
             .thenReturn(Schedulers.trampoline())
         whenever(schedulerProvider.ui())
-            .thenReturn(Schedulers.trampoline())
-        whenever(schedulerProvider.cachedThreadPool())
             .thenReturn(Schedulers.trampoline())
 
         presenter = MainPresenter(

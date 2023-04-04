@@ -34,9 +34,9 @@ class MainPresenter @Inject constructor(
                 val info = ScheduleContainerInfo(studyGroupId, studyGroup.name, ScheduleType.STUDYGROUP)
                 view?.showNewScheduleContainerLoading(info)
             }
-            .observeOn(schedulerProvider.single())
+            .observeOn(schedulerProvider.io())
             .flatMap { insertWeeksWithWeekdays(it) }
-            .subscribeOn(schedulerProvider.single())
+            .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
             .doOnError { view?.showError() }
             .subscribeBy(
@@ -58,9 +58,9 @@ class MainPresenter @Inject constructor(
                 val info = ScheduleContainerInfo(teacherId, teacher.name, ScheduleType.STUDYGROUP)
                 view?.showNewScheduleContainerLoading(info)
             }
-            .observeOn(schedulerProvider.single())
+            .observeOn(schedulerProvider.io())
             .flatMap { insertWeeksWithWeekdays(it) }
-            .subscribeOn(schedulerProvider.single())
+            .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
             .doOnError { view?.showError() }
             .subscribeBy(
@@ -88,7 +88,7 @@ class MainPresenter @Inject constructor(
 
     fun initContainerListView() {
         disposables += databaseRepository.getScheduleContainers()
-            .subscribeOn(schedulerProvider.single())
+            .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
                 onNext = { scheduleContainer ->
