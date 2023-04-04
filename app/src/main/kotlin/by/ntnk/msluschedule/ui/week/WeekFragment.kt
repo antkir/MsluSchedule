@@ -1,6 +1,7 @@
 package by.ntnk.msluschedule.ui.week
 
 import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
 import android.content.Context
@@ -38,7 +39,6 @@ import by.ntnk.msluschedule.ui.weekday.WeekdayActivity
 import by.ntnk.msluschedule.utils.AndroidUtils
 import by.ntnk.msluschedule.utils.INVALID_VALUE
 import by.ntnk.msluschedule.utils.ScheduleType
-import by.ntnk.msluschedule.utils.SimpleAnimatorListener
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.google.android.material.snackbar.Snackbar
@@ -191,6 +191,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     override fun onDestroyView() {
         super.onDestroyView()
         adapterOnClickDisposable.dispose()
+        binding.progressbarUpdate.animate().setListener(null)
         fragmentBinding = null
     }
 
@@ -290,7 +291,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         binding.progressbarUpdate.animate()
             .translationY(-binding.progressbarUpdate.height.toFloat())
             .setDuration(200)
-            .setListener(object : SimpleAnimatorListener {
+            .setListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator) {
                     binding.progressbarUpdate.animate()?.setListener(null)
                     binding.progressbarUpdate.visibility = View.INVISIBLE
