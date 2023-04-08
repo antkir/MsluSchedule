@@ -303,7 +303,7 @@ class MainActivity :
             initMainContent()
         }
 
-        binding.fam.relativeLayout.visibility = if (sharedPreferencesRepository.isMainFabShown()) View.VISIBLE else View.GONE
+        binding.fam.container.visibility = if (sharedPreferencesRepository.isMainFabShown()) View.VISIBLE else View.GONE
     }
 
     private fun isContainerListViewEmpty(): Boolean {
@@ -452,9 +452,9 @@ class MainActivity :
                 .start()
         }
 
-        binding.fam.relativeLayout.isFocusable = true
-        binding.fam.relativeLayout.isClickable = true
-        binding.fam.relativeLayout.setOnClickListener { collapseFam() }
+        binding.fam.container.isFocusable = true
+        binding.fam.container.isClickable = true
+        binding.fam.container.setOnClickListener { collapseFam() }
     }
 
     private fun collapseFam() {
@@ -494,9 +494,9 @@ class MainActivity :
             .setInterpolator(OvershootInterpolator(2f))
             .start()
 
-        binding.fam.relativeLayout.setOnClickListener(null)
-        binding.fam.relativeLayout.isClickable = false
-        binding.fam.relativeLayout.isFocusable = false
+        binding.fam.container.setOnClickListener(null)
+        binding.fam.container.isClickable = false
+        binding.fam.container.isFocusable = false
     }
 
     override fun onNewStudyGroup(studyGroup: StudyGroup) {
@@ -594,6 +594,10 @@ class MainActivity :
             .findItem(getContainerMenuViewId(info.type!!))
             .subMenu
             ?.removeItem(info.id)
+
+        if (binding.fam.container.visibility == View.INVISIBLE) {
+            binding.fam.container.visibility = View.VISIBLE
+        }
     }
 
     private fun removeWeeksContainerFragment() {
