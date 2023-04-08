@@ -14,7 +14,6 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.BehaviorSubject
-import timber.log.Timber
 import javax.inject.Inject
 
 class AddGroupPresenter @Inject constructor(
@@ -33,6 +32,8 @@ class AddGroupPresenter @Inject constructor(
     private val courseKey: BehaviorSubject<Int> = BehaviorSubject.createDefault(Int.DEFAULT)
     private val groupFilter: BehaviorSubject<ScheduleFilter> = BehaviorSubject.createDefault(ScheduleFilter.DEFAULT)
     private val groupKey: BehaviorSubject<Int> = BehaviorSubject.createDefault(Int.DEFAULT)
+    val scheduleContanersObservable: Observable<List<ScheduleContainer>>
+        get() = scheduleContaners
     val facultyFilterObservable: Observable<ScheduleFilter>
         get() = facultyFilter
     val facultyKeyObservable: Observable<Int>
@@ -97,12 +98,12 @@ class AddGroupPresenter @Inject constructor(
     }
 
     fun getFacultyScheduleFilter() {
-        databaseRepository.getScheduleContainers()
+        disposables += databaseRepository.getScheduleContainers()
             .toList()
             .subscribeOn(schedulerProvider.io())
             .subscribeBy(
                 onSuccess = { scheduleContainers -> scheduleContaners.onNext(scheduleContainers) },
-                onError = { throwable -> Timber.e(throwable) }
+                onError = { throwable -> scheduleContaners.onError(throwable) }
             )
 
         disposables += networkRepository.getFaculties()

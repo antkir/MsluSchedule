@@ -217,6 +217,10 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
                 alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = isEnabled
             }
         )
+
+        disposables += presenter.scheduleContanersObservable.subscribeBy(
+            onError = { throwable -> showError(throwable) }
+        )
     }
 
     override fun onStop() {
@@ -227,6 +231,7 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
     override fun onDestroyView() {
         super.onDestroyView()
         fragmentBinding = null
+        presenter.clearDisposables()
     }
 
     private fun showError(t: Throwable) {
@@ -281,11 +286,6 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
             data,
             isFilteringEnabled
         )
-    }
-
-    override fun dismiss() {
-        super.dismiss()
-        presenter.clearDisposables()
     }
 
     interface DialogListener {

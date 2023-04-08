@@ -10,10 +10,10 @@ import by.ntnk.msluschedule.utils.CurrentDate
 import by.ntnk.msluschedule.utils.DEFAULT
 import by.ntnk.msluschedule.utils.SchedulerProvider
 import io.reactivex.Observable
-import io.reactivex.disposables.Disposable
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.BehaviorSubject
-import timber.log.Timber
 import javax.inject.Inject
 
 class AddTeacherPresenter @Inject constructor(
@@ -23,11 +23,13 @@ class AddTeacherPresenter @Inject constructor(
     private val schedulerProvider: SchedulerProvider
 ) : Presenter<AddTeacherView>() {
 
-    private lateinit var disposable: Disposable
+    private val disposables: CompositeDisposable = CompositeDisposable()
 
     private val scheduleContaners: BehaviorSubject<List<ScheduleContainer>> = BehaviorSubject.createDefault(emptyList())
     private val teacherFilter: BehaviorSubject<ScheduleFilter> = BehaviorSubject.createDefault(ScheduleFilter.DEFAULT)
     private val teacherKey: BehaviorSubject<Int> = BehaviorSubject.createDefault(Int.DEFAULT)
+    val scheduleContanersObservable: Observable<List<ScheduleContainer>>
+        get() = scheduleContaners
     val teacherFilterObservable: Observable<ScheduleFilter>
         get() = teacherFilter
     val teacherKeyObservable: Observable<Int>
@@ -38,15 +40,15 @@ class AddTeacherPresenter @Inject constructor(
     }
 
     fun getTeacherScheduleFilter() {
-        databaseRepository.getScheduleContainers()
+        disposables += databaseRepository.getScheduleContainers()
             .toList()
             .subscribeOn(schedulerProvider.io())
             .subscribeBy(
                 onSuccess = { scheduleContainers -> scheduleContaners.onNext(scheduleContainers) },
-                onError = { throwable -> Timber.e(throwable) }
+                onError = { throwable -> scheduleContaners.onError(throwable) }
             )
 
-        disposable = networkRepository.getTeachers()
+        disposables += networkRepository.getTeachers()
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
@@ -73,5 +75,5 @@ class AddTeacherPresenter @Inject constructor(
         return Teacher(teacherKey, teacherFilter.value!!.getValue(teacherKey), currentDate.academicYear)
     }
 
-    fun clearDisposables() = disposable.dispose()
+    fun clearDisposables() = disposables.clear()
 }

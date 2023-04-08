@@ -120,6 +120,10 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
                 alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = isEnabled
             }
         )
+
+        disposables += presenter.scheduleContanersObservable.subscribeBy(
+            onError = { throwable -> showError(throwable) }
+        )
     }
 
     override fun onStop() {
@@ -130,6 +134,7 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
     override fun onDestroyView() {
         super.onDestroyView()
         fragmentBinding = null
+        presenter.clearDisposables()
     }
 
     private fun populateTeachersView(data: ScheduleFilter) {
@@ -160,11 +165,6 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
         }
         dismiss()
         listener.onError(t)
-    }
-
-    override fun dismiss() {
-        super.dismiss()
-        presenter.clearDisposables()
     }
 
     interface DialogListener {
