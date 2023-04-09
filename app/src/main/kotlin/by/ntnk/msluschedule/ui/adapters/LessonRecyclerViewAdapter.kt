@@ -198,6 +198,8 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
 
     override fun getItemViewType(position: Int): Int = data[position].viewType
 
+    fun isEmpty(): Boolean = data.size == 0
+
     private class BlankLessonView : BaseRVItemView {
         override val viewType: Int = VIEWTYPE_BLANK
 

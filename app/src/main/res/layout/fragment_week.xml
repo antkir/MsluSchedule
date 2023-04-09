@@ -21,7 +21,7 @@
                 android:saveEnabled="false" />
 
             <TextView
-                android:id="@+id/text_no_lessons"
+                android:id="@+id/text_no_classes"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@color/surface"
@@ -33,7 +33,7 @@
                 android:visibility="gone" />
 
             <com.google.android.material.progressindicator.LinearProgressIndicator
-                android:id="@+id/progressbar_update"
+                android:id="@+id/progress_indicator_update"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="top|center_horizontal"
@@ -47,7 +47,7 @@
                 tools:ignore="UnusedAttribute" />
 
             <com.google.android.material.progressindicator.CircularProgressIndicator
-                android:id="@+id/progressbar_init"
+                android:id="@+id/progress_indicator_init"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -58,7 +58,7 @@
                 tools:ignore="UnusedAttribute" />
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/button_days_visibility"
+                android:id="@+id/button_switch_no_classes_layout"
                 style="@style/Widget.MaterialComponents.Button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

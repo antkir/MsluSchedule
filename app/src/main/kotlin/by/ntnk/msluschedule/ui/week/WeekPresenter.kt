@@ -1,24 +1,20 @@
 package by.ntnk.msluschedule.ui.week
 
 import by.ntnk.msluschedule.data.Lesson
+import by.ntnk.msluschedule.data.ScheduleContainerInfo
 import by.ntnk.msluschedule.data.WeekdayWithLessons
 import by.ntnk.msluschedule.db.DatabaseDataMapper
 import by.ntnk.msluschedule.db.DatabaseRepository
-import by.ntnk.msluschedule.db.data.ScheduleContainer
 import by.ntnk.msluschedule.mvp.Presenter
 import by.ntnk.msluschedule.network.NetworkRepository
 import by.ntnk.msluschedule.utils.CurrentDate
 import by.ntnk.msluschedule.utils.ScheduleType
 import by.ntnk.msluschedule.utils.SchedulerProvider
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
-import by.ntnk.msluschedule.utils.Utils
+import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.plusAssign
-import io.reactivex.rxkotlin.subscribeBy
 import org.threeten.bp.DayOfWeek
-import timber.log.Timber
 import javax.inject.Inject
 
 class WeekPresenter @Inject constructor(
@@ -30,59 +26,18 @@ class WeekPresenter @Inject constructor(
     private val networkRepository: dagger.Lazy<NetworkRepository>
 ) : Presenter<WeekView>() {
 
-    private val disposables: CompositeDisposable = CompositeDisposable()
+    fun getScheduleContainerInfo(): ScheduleContainerInfo {
+        return sharedPreferencesRepository.getSelectedScheduleContainerInfo()
+    }
 
-    fun getSchedule(weekId: Int, shouldUpdateAdapter: Boolean) {
-        val containerInfo = sharedPreferencesRepository.getSelectedScheduleContainerInfo()
-        disposables += databaseRepository.getScheduleContainer(containerInfo.id)
-            .flatMap { getScheduleData(it, weekId) }
+    fun getSchedule(scheduleType: ScheduleType, weekId: Int): Single<List<WeekdayWithLessons<Lesson>>> {
+        return getWeekdays(scheduleType, weekId)
+            .toList()
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
-            .subscribeBy(
-                onSuccess = {
-                    if (shouldUpdateAdapter) {
-                        view?.showSchedule(it)
-                    }
-                    for (weekday in it) {
-                        getNotesStatus(weekday.weekdayId)
-                    }
-                },
-                onError = { throwable ->
-                    if (Utils.isNetworkException(throwable)) {
-                        Timber.i(throwable)
-                    } else {
-                        Timber.e(throwable)
-                    }
-                    getSchedule(weekId, shouldUpdateAdapter = true)
-                    view?.showError(throwable)
-                }
-            )
     }
 
-    private fun getNotesStatus(weekdayId: Int) {
-        databaseRepository.getNotesForWeekday(weekdayId)
-            .toList()
-            .map { notes -> notes.isNotEmpty() }
-            .subscribeOn(schedulerProvider.single())
-            .observeOn(schedulerProvider.ui())
-            .subscribeBy(
-                onSuccess = { isNotesListNotEmpty -> view?.updateNotesStatus(weekdayId, isNotesListNotEmpty) },
-                onError = { throwable -> Timber.e(throwable) }
-            )
-    }
-
-    private fun getScheduleData(container: ScheduleContainer, weekId: Int): Single<List<WeekdayWithLessons<Lesson>>> {
-        return databaseRepository.isWeekInitialized(weekId)
-            .flatMap { isInitialized ->
-                return@flatMap if (isInitialized) {
-                    getWeekdaysWithLessons(weekId, container.type).toList()
-                } else {
-                    initSchedule(container, weekId)
-                }
-            }
-    }
-
-    private fun getWeekdaysWithLessons(weekId: Int, type: ScheduleType): Observable<WeekdayWithLessons<Lesson>> {
+    private fun getWeekdays(type: ScheduleType, weekId: Int): Observable<WeekdayWithLessons<Lesson>> {
         return when (type) {
             ScheduleType.STUDYGROUP -> {
                 databaseRepository.getWeekdaysWithStudyGroupLessons(weekId)
@@ -93,84 +48,64 @@ class WeekPresenter @Inject constructor(
         }
     }
 
-    private fun initSchedule(container: ScheduleContainer, weekId: Int): Single<List<WeekdayWithLessons<Lesson>>> {
+    fun getNotesStatus(weekdayId: Int): Single<Boolean> {
+        return databaseRepository.getNotesForWeekday(weekdayId)
+            .toList()
+            .map { notes -> notes.isNotEmpty() }
+            .subscribeOn(schedulerProvider.single())
+            .observeOn(schedulerProvider.ui())
+    }
+
+    fun initSchedule(weekId: Int): Completable {
         return databaseRepository.insertWeekdays(weekId)
+            .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
-            .doOnComplete { view?.showInitProgressBar() }
-            .observeOn(schedulerProvider.io())
-            .andThen(downloadSchedule(isUpdate = false, container = container, weekId = weekId))
-            .observeOn(schedulerProvider.ui())
-            .doOnDispose { view?.hideUpdateProgressBar() }
-            .doOnEvent { _, _ -> view?.hideInitProgressBar() }
     }
 
-    private fun downloadSchedule(isUpdate: Boolean, container: ScheduleContainer, weekId: Int): Single<List<WeekdayWithLessons<Lesson>>> {
-        return when (container.type) {
-            ScheduleType.STUDYGROUP -> {
-                databaseRepository.getWeekKey(weekId)
-                    .flatMapObservable {
-                        val studyGroup = databaseDataMapper.mapToStudyGroup(container)
-                        return@flatMapObservable networkRepository.get().getSchedule(studyGroup, it)
-                    }
-                    .toList()
-                    .flatMap { weekdaysWithLessons ->
-                        return@flatMap if (isUpdate) {
-                            databaseRepository.deleteLessons(weekId, container.type)
-                                .andThen(Single.just(weekdaysWithLessons))
-                        } else {
-                            Single.just(weekdaysWithLessons)
-                        }
-                    }
-                    .flatMap { weekdaysWithLessons ->
-                        databaseRepository.insertStudyGroupSchedule(weekdaysWithLessons, weekId)
-                    }
-            }
-            ScheduleType.TEACHER -> {
-                databaseRepository.getWeekKey(weekId)
-                    .flatMapObservable {
-                        val teacher = databaseDataMapper.mapToTeacher(container)
-                        return@flatMapObservable networkRepository.get().getSchedule(teacher, it)
-                    }
-                    .toList()
-                    .flatMap { weekdaysWithLessons ->
-                        return@flatMap if (isUpdate) {
-                            databaseRepository.deleteLessons(weekId, container.type)
-                                .andThen(Single.just(weekdaysWithLessons))
-                        } else {
-                            Single.just(weekdaysWithLessons)
-                        }
-                    }
-                    .flatMap { weekdaysWithLessons ->
-                        databaseRepository.insertTeacherSchedule(weekdaysWithLessons, weekId)
-                    }
-            }
-        }
-    }
-
-    fun updateSchedule(weekId: Int) {
-        val containerInfo = sharedPreferencesRepository.getSelectedScheduleContainerInfo()
-        disposables += databaseRepository.getScheduleContainer(containerInfo.id)
+    fun updateSchedule(scheduleContainerId: Int, weekId: Int): Single<List<WeekdayWithLessons<Lesson>>> {
+        return databaseRepository.getScheduleContainer(scheduleContainerId)
             .flatMap { scheduleContainer ->
-                downloadSchedule(isUpdate = true, container = scheduleContainer, weekId = weekId)
-                    .flatMap { getWeekdaysWithLessons(weekId, containerInfo.type!!).toList() }
+                when (scheduleContainer.type) {
+                    ScheduleType.STUDYGROUP -> {
+                        databaseRepository.getWeekKey(weekId)
+                            .flatMapObservable {
+                                val studyGroup = databaseDataMapper.mapToStudyGroup(scheduleContainer)
+                                return@flatMapObservable networkRepository.get().getSchedule(studyGroup, it)
+                            }
+                            .toList()
+                            .flatMap { weekdays ->
+                                databaseRepository.deleteLessons(weekId, scheduleContainer.type)
+                                    .andThen(Single.just(weekdays))
+                            }
+                            .flatMap { weekdays ->
+                                databaseRepository.insertStudyGroupSchedule(weekdays, weekId)
+                            }
+                    }
+                    ScheduleType.TEACHER -> {
+                        databaseRepository.getWeekKey(weekId)
+                            .flatMapObservable {
+                                val teacher = databaseDataMapper.mapToTeacher(scheduleContainer)
+                                return@flatMapObservable networkRepository.get().getSchedule(teacher, it)
+                            }
+                            .toList()
+                            .flatMap { weekdays ->
+                                databaseRepository.deleteLessons(weekId, scheduleContainer.type)
+                                    .andThen(Single.just(weekdays))
+                            }
+                            .flatMap { weekdays ->
+                                databaseRepository.insertTeacherSchedule(weekdays, weekId)
+                            }
+                    }
+                }
             }
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
-            .doOnSubscribe { view?.showUpdateProgressBar() }
-            .doOnDispose { view?.hideUpdateProgressBar() }
-            .doOnEvent { _, _ -> view?.hideUpdateProgressBar() }
-            .doOnSuccess { view?.showUpdateSuccessMessage() }
-            .subscribeBy(
-                onSuccess = { weekdayEntities -> view?.showSchedule(weekdayEntities) },
-                onError = { throwable ->
-                    if (Utils.isNetworkException(throwable)) {
-                        Timber.i(throwable)
-                    } else {
-                        Timber.e(throwable)
-                    }
-                    view?.showError(throwable)
-                }
-            )
+    }
+
+    fun isWeekInitialized(weekId: Int): Single<Boolean> {
+        return databaseRepository.isWeekInitialized(weekId)
+            .subscribeOn(schedulerProvider.io())
+            .observeOn(schedulerProvider.ui())
     }
 
     fun getCurrentDayOfWeek(): Int {
@@ -180,6 +115,4 @@ class WeekPresenter @Inject constructor(
             DayOfWeek.MONDAY.value
         }
     }
-
-    fun clearDisposables() = disposables.clear()
 }
