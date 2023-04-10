@@ -9,6 +9,7 @@ import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.utils.CurrentDate
 import by.ntnk.msluschedule.utils.DEFAULT
 import by.ntnk.msluschedule.utils.SchedulerProvider
+import io.reactivex.Notification
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
@@ -25,18 +26,20 @@ class AddTeacherPresenter @Inject constructor(
 
     private val disposables: CompositeDisposable = CompositeDisposable()
 
-    private val scheduleContaners: BehaviorSubject<List<ScheduleContainer>> = BehaviorSubject.createDefault(emptyList())
-    private val teacherFilter: BehaviorSubject<ScheduleFilter> = BehaviorSubject.createDefault(ScheduleFilter.DEFAULT)
+    private val scheduleContaners: BehaviorSubject<Notification<List<ScheduleContainer>>> =
+        BehaviorSubject.createDefault(Notification.createOnNext(emptyList()))
+    private val teacherFilter: BehaviorSubject<Notification<ScheduleFilter>> =
+        BehaviorSubject.createDefault(Notification.createOnNext(ScheduleFilter.DEFAULT))
     private val teacherKey: BehaviorSubject<Int> = BehaviorSubject.createDefault(Int.DEFAULT)
-    val scheduleContanersObservable: Observable<List<ScheduleContainer>>
+    val scheduleContanersObservable: Observable<Notification<List<ScheduleContainer>>>
         get() = scheduleContaners
-    val teacherFilterObservable: Observable<ScheduleFilter>
+    val teacherFilterObservable: Observable<Notification<ScheduleFilter>>
         get() = teacherFilter
     val teacherKeyObservable: Observable<Int>
         get() = teacherKey
 
     fun isTeacherFilterDefault(): Boolean {
-        return teacherFilter.value == ScheduleFilter.DEFAULT
+        return teacherFilter.value?.value == ScheduleFilter.DEFAULT
     }
 
     fun getTeacherScheduleFilter() {
@@ -44,16 +47,18 @@ class AddTeacherPresenter @Inject constructor(
             .toList()
             .subscribeOn(schedulerProvider.io())
             .subscribeBy(
-                onSuccess = { scheduleContainers -> scheduleContaners.onNext(scheduleContainers) },
-                onError = { throwable -> scheduleContaners.onError(throwable) }
+                onSuccess = { scheduleContainers ->
+                    scheduleContaners.onNext(Notification.createOnNext(scheduleContainers))
+                },
+                onError = { throwable -> scheduleContaners.onNext(Notification.createOnError(throwable)) }
             )
 
         disposables += networkRepository.getTeachers()
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
-                onSuccess = { scheduleFilter -> teacherFilter.onNext(scheduleFilter) },
-                onError = { throwable -> teacherFilter.onError(throwable) }
+                onSuccess = { scheduleFilter -> teacherFilter.onNext(Notification.createOnNext(scheduleFilter)) },
+                onError = { throwable -> teacherFilter.onNext(Notification.createOnError(throwable)) }
             )
     }
 
@@ -63,16 +68,19 @@ class AddTeacherPresenter @Inject constructor(
 
     fun isTeacherAdded(key: Int): Boolean {
         assert(scheduleContaners.hasValue() && teacherFilter.hasValue())
-        return scheduleContaners.value
+        assert(teacherFilter.value!!.value != null)
+        return scheduleContaners.value?.value
             ?.filter { scheduleContainer -> scheduleContainer.year == currentDate.academicYear }
             ?.map { scheduleContainer -> scheduleContainer.name }
-            ?.any { teacher -> teacher == teacherFilter.value!!.getValue(key) } == true
+            ?.any { teacher -> teacher == teacherFilter.value!!.value!!.getValue(key) } == true
     }
 
     fun createSelectedTeacherObject(): Teacher {
         assert(teacherFilter.hasValue() && teacherKey.hasValue())
+        assert(teacherFilter.value!!.value != null)
         val teacherKey = teacherKey.value!!
-        return Teacher(teacherKey, teacherFilter.value!!.getValue(teacherKey), currentDate.academicYear)
+        val teacherName = teacherFilter.value!!.value!!.getValue(teacherKey)
+        return Teacher(teacherKey, teacherName, currentDate.academicYear)
     }
 
     fun clearDisposables() = disposables.clear()

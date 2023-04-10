@@ -9,6 +9,7 @@ import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.utils.CurrentDate
 import by.ntnk.msluschedule.utils.DEFAULT
 import by.ntnk.msluschedule.utils.SchedulerProvider
+import io.reactivex.Notification
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
@@ -25,30 +26,34 @@ class AddGroupPresenter @Inject constructor(
 
     private val disposables: CompositeDisposable = CompositeDisposable()
 
-    private val scheduleContaners: BehaviorSubject<List<ScheduleContainer>> = BehaviorSubject.createDefault(emptyList())
-    private val facultyFilter: BehaviorSubject<ScheduleFilter> = BehaviorSubject.createDefault(ScheduleFilter.DEFAULT)
+    private val scheduleContaners: BehaviorSubject<Notification<List<ScheduleContainer>>> =
+        BehaviorSubject.createDefault(Notification.createOnNext(emptyList()))
+    private val facultyFilter: BehaviorSubject<Notification<ScheduleFilter>> =
+        BehaviorSubject.createDefault(Notification.createOnNext(ScheduleFilter.DEFAULT))
     private val facultyKey: BehaviorSubject<Int> = BehaviorSubject.createDefault(Int.DEFAULT)
-    private val courseFilter: BehaviorSubject<ScheduleFilter> = BehaviorSubject.createDefault(ScheduleFilter.DEFAULT)
+    private val courseFilter: BehaviorSubject<Notification<ScheduleFilter>> =
+        BehaviorSubject.createDefault(Notification.createOnNext(ScheduleFilter.DEFAULT))
     private val courseKey: BehaviorSubject<Int> = BehaviorSubject.createDefault(Int.DEFAULT)
-    private val groupFilter: BehaviorSubject<ScheduleFilter> = BehaviorSubject.createDefault(ScheduleFilter.DEFAULT)
+    private val groupFilter: BehaviorSubject<Notification<ScheduleFilter>> =
+        BehaviorSubject.createDefault(Notification.createOnNext(ScheduleFilter.DEFAULT))
     private val groupKey: BehaviorSubject<Int> = BehaviorSubject.createDefault(Int.DEFAULT)
-    val scheduleContanersObservable: Observable<List<ScheduleContainer>>
+    val scheduleContanersObservable: Observable<Notification<List<ScheduleContainer>>>
         get() = scheduleContaners
-    val facultyFilterObservable: Observable<ScheduleFilter>
+    val facultyFilterObservable: Observable<Notification<ScheduleFilter>>
         get() = facultyFilter
     val facultyKeyObservable: Observable<Int>
         get() = facultyKey
-    val courseFilterObservable: Observable<ScheduleFilter>
+    val courseFilterObservable: Observable<Notification<ScheduleFilter>>
         get() = courseFilter
     val courseKeyObservable: Observable<Int>
         get() = courseKey
-    val groupFilterObservable: Observable<ScheduleFilter>
+    val groupFilterObservable: Observable<Notification<ScheduleFilter>>
         get() = groupFilter
     val groupKeyObservable: Observable<Int>
         get() = groupKey
 
     fun isFacultyFilterDefault(): Boolean {
-        return facultyFilter.value == ScheduleFilter.DEFAULT
+        return facultyFilter.value?.value == ScheduleFilter.DEFAULT
     }
 
     fun isFacultyKeyDefault(): Boolean {
@@ -56,7 +61,7 @@ class AddGroupPresenter @Inject constructor(
     }
 
     fun isCourseFilterDefault(): Boolean {
-        return courseFilter.value == ScheduleFilter.DEFAULT
+        return courseFilter.value?.value == ScheduleFilter.DEFAULT
     }
 
     fun isCourseKeyDefault(): Boolean {
@@ -64,7 +69,7 @@ class AddGroupPresenter @Inject constructor(
     }
 
     fun isGroupFilterDefault(): Boolean {
-        return groupFilter.value == ScheduleFilter.DEFAULT
+        return groupFilter.value?.value == ScheduleFilter.DEFAULT
     }
 
     fun isGroupKeyDefault(): Boolean {
@@ -74,13 +79,15 @@ class AddGroupPresenter @Inject constructor(
     fun setFacultyKeyFromPosition(position: Int) {
         assert(position >= 0)
         assert(facultyFilter.hasValue())
-        facultyKey.onNext(facultyFilter.value!!.keyAt(position))
+        assert(facultyFilter.value!!.value != null)
+        facultyKey.onNext(facultyFilter.value!!.value!!.keyAt(position))
     }
 
     fun setCourseKeyFromPosition(position: Int) {
         assert(position >= 0)
         assert(courseFilter.hasValue())
-        courseKey.onNext(courseFilter.value!!.keyAt(position))
+        assert(courseFilter.value!!.value != null)
+        courseKey.onNext(courseFilter.value!!.value!!.keyAt(position))
     }
 
     fun setGroupKey(key: Int) {
@@ -88,12 +95,12 @@ class AddGroupPresenter @Inject constructor(
     }
 
     fun resetCourses() {
-        courseFilter.onNext(ScheduleFilter.DEFAULT)
+        courseFilter.onNext(Notification.createOnNext(ScheduleFilter.DEFAULT))
         courseKey.onNext(Int.DEFAULT)
     }
 
     fun resetGroups() {
-        groupFilter.onNext(ScheduleFilter.DEFAULT)
+        groupFilter.onNext(Notification.createOnNext(ScheduleFilter.DEFAULT))
         groupKey.onNext(Int.DEFAULT)
     }
 
@@ -102,16 +109,18 @@ class AddGroupPresenter @Inject constructor(
             .toList()
             .subscribeOn(schedulerProvider.io())
             .subscribeBy(
-                onSuccess = { scheduleContainers -> scheduleContaners.onNext(scheduleContainers) },
-                onError = { throwable -> scheduleContaners.onError(throwable) }
+                onSuccess = { scheduleContainers ->
+                    scheduleContaners.onNext(Notification.createOnNext(scheduleContainers))
+                },
+                onError = { throwable -> scheduleContaners.onNext(Notification.createOnError(throwable)) }
             )
 
         disposables += networkRepository.getFaculties()
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
-                onSuccess = { scheduleFilter -> facultyFilter.onNext(scheduleFilter) },
-                onError = { throwable -> facultyFilter.onError(throwable) }
+                onSuccess = { scheduleFilter -> facultyFilter.onNext(Notification.createOnNext(scheduleFilter)) },
+                onError = { throwable -> facultyFilter.onNext(Notification.createOnError(throwable)) }
             )
     }
 
@@ -121,8 +130,8 @@ class AddGroupPresenter @Inject constructor(
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
-                onSuccess = { scheduleFilter -> courseFilter.onNext(scheduleFilter) },
-                onError = { throwable -> courseFilter.onError(throwable) }
+                onSuccess = { scheduleFilter -> courseFilter.onNext(Notification.createOnNext(scheduleFilter)) },
+                onError = { throwable -> courseFilter.onNext(Notification.createOnError(throwable)) }
             )
     }
 
@@ -132,26 +141,29 @@ class AddGroupPresenter @Inject constructor(
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
-                onSuccess = { scheduleFilter -> groupFilter.onNext(scheduleFilter) },
-                onError = { throwable -> groupFilter.onError(throwable) }
+                onSuccess = { scheduleFilter -> groupFilter.onNext(Notification.createOnNext(scheduleFilter)) },
+                onError = { throwable -> groupFilter.onNext(Notification.createOnError(throwable)) }
             )
     }
 
     fun isGroupAdded(key: Int): Boolean {
         assert(scheduleContaners.hasValue() && facultyKey.hasValue() && groupFilter.hasValue())
-        return scheduleContaners.value
+        assert(groupFilter.value!!.value != null)
+        return scheduleContaners.value?.value
             ?.filter { scheduleContainer -> scheduleContainer.year == currentDate.academicYear }
             ?.filter { scheduleContainer -> scheduleContainer.faculty == facultyKey.value }
             ?.map { scheduleContainer -> scheduleContainer.name }
-            ?.any { group -> group == groupFilter.value!!.getValue(key) } == true
+            ?.any { group -> group == groupFilter.value!!.value!!.getValue(key) } == true
     }
 
     fun createSelectedStudyGroupObject(): StudyGroup {
         assert(facultyFilter.hasValue() && facultyKey.hasValue())
         assert(courseFilter.hasValue() && courseKey.hasValue())
         assert(groupFilter.hasValue() && groupKey.hasValue())
+        assert(groupFilter.value!!.value != null)
         val groupKey = groupKey.value!!
-        return StudyGroup(groupKey, groupFilter.value!!.getValue(groupKey), facultyKey.value!!, courseKey.value!!, currentDate.academicYear)
+        val groupName = groupFilter.value!!.value!!.getValue(groupKey)
+        return StudyGroup(groupKey, groupName, facultyKey.value!!, courseKey.value!!, currentDate.academicYear)
     }
 
     fun clearDisposables() = disposables.clear()

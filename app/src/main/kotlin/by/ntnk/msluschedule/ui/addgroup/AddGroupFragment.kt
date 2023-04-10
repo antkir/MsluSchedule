@@ -148,12 +148,17 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
         }
 
         disposables += presenter.facultyFilterObservable.subscribeBy(
-            onNext = { scheduleFilter ->
-                if (scheduleFilter != ScheduleFilter.DEFAULT) {
-                    populateFacultiesView(scheduleFilter)
+            onNext = { notification ->
+                if (notification.isOnNext) {
+                    val scheduleFilter = notification.value!!
+                    if (scheduleFilter != ScheduleFilter.DEFAULT) {
+                        populateFacultiesView(scheduleFilter)
+                    }
+                } else if (notification.isOnError) {
+                    val throwable = notification.error!!
+                    showError(throwable)
                 }
-            },
-            onError = { throwable -> showError(throwable) }
+            }
         )
 
         disposables += presenter.facultyKeyObservable.subscribeBy(
@@ -168,14 +173,19 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
         )
 
         disposables += presenter.courseFilterObservable.subscribeBy(
-            onNext = { scheduleFilter ->
-                if (scheduleFilter != ScheduleFilter.DEFAULT) {
-                    if (!presenter.isFacultyKeyDefault()) {
-                        populateCoursesView(scheduleFilter)
+            onNext = { notification ->
+                if (notification.isOnNext) {
+                    val scheduleFilter = notification.value!!
+                    if (scheduleFilter != ScheduleFilter.DEFAULT) {
+                        if (!presenter.isFacultyKeyDefault()) {
+                            populateCoursesView(scheduleFilter)
+                        }
                     }
+                } else if (notification.isOnError) {
+                    val throwable = notification.error!!
+                    showError(throwable)
                 }
-            },
-            onError = { throwable -> showError(throwable) }
+            }
         )
 
         disposables += presenter.courseKeyObservable.subscribeBy(
@@ -190,14 +200,19 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
         )
 
         disposables += presenter.groupFilterObservable.subscribeBy(
-            onNext = { scheduleFilter ->
-                if (scheduleFilter != ScheduleFilter.DEFAULT) {
-                    if (!presenter.isFacultyKeyDefault() && !presenter.isCourseKeyDefault()) {
-                        populateGroupsView(scheduleFilter)
+            onNext = { notification ->
+                if (notification.isOnNext) {
+                    val scheduleFilter = notification.value!!
+                    if (scheduleFilter != ScheduleFilter.DEFAULT) {
+                        if (!presenter.isFacultyKeyDefault() && !presenter.isCourseKeyDefault()) {
+                            populateGroupsView(scheduleFilter)
+                        }
                     }
+                } else if (notification.isOnError) {
+                    val throwable = notification.error!!
+                    showError(throwable)
                 }
-            },
-            onError = { throwable -> showError(throwable) }
+            }
         )
 
         disposables += presenter.groupKeyObservable.subscribeBy(

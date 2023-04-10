@@ -96,12 +96,17 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
         }
 
         disposables += presenter.teacherFilterObservable.subscribeBy(
-            onNext = { scheduleFilter ->
-                if (scheduleFilter != ScheduleFilter.DEFAULT) {
-                    populateTeachersView(scheduleFilter)
+            onNext = { notification ->
+                if (notification.isOnNext) {
+                    val scheduleFilter = notification.value!!
+                    if (scheduleFilter != ScheduleFilter.DEFAULT) {
+                        populateTeachersView(scheduleFilter)
+                    }
+                } else if (notification.isOnError) {
+                    val throwable = notification.error!!
+                    showError(throwable)
                 }
-            },
-            onError = { throwable -> showError(throwable) }
+            }
         )
         disposables += presenter.teacherKeyObservable.subscribeBy(
             onNext = { key ->
