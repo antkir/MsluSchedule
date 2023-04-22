@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.NO_POSITION
 import by.ntnk.msluschedule.R
@@ -22,11 +23,9 @@ import by.ntnk.msluschedule.databinding.ItemDayBinding
 import by.ntnk.msluschedule.databinding.ItemDayEndBinding
 import by.ntnk.msluschedule.utils.AndroidUtils
 import by.ntnk.msluschedule.utils.BaseRVItemView
-import by.ntnk.msluschedule.utils.Days
-import by.ntnk.msluschedule.utils.EMPTY_STRING
+import by.ntnk.msluschedule.utils.DEFAULT
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
-import java.util.ArrayList
 
 const val VIEWTYPE_STUDYGROUP = 101
 const val VIEWTYPE_TEACHER = 102
@@ -44,40 +43,24 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
 
     @Throws(NullPointerException::class)
     fun initData(days: List<WeekdayWithLessons<Lesson>>) {
-        val dataWasEmpty = data.isEmpty()
-
-        val hasNotesList = ArrayList<Boolean>(7)
-        for (view in data) {
-            if (view is DayView) {
-                hasNotesList.add(view.hasNotes)
-            }
-        }
+        val oldData = ArrayList(data)
         data.clear()
 
-        var hasNotesIdx = 0
         for (day in days) {
-            val dayView = DayView(day.weekdayId, day.weekday)
-            if (hasNotesList.size == Days.num()) {
-                dayView.hasNotes = hasNotesList[hasNotesIdx]
-                hasNotesIdx++
-            }
-            data.add(dayView)
-
+            data.add(DayView(day.weekdayId, day.weekday))
             if (day.lessons.isNotEmpty()) {
-                var prevStartTime: String = EMPTY_STRING
-
+                var prevStartTime: String = String.DEFAULT
                 for (lesson in day.lessons) {
                     val lessonView: BaseRVItemView =
                         when (lesson) {
                             is StudyGroupLesson -> {
-                                val hasClassOverlap: Boolean = prevStartTime == lesson.startTime
-                                StudyGroupLessonView(lesson, hasClassOverlap)
+                                val overlapsPreviousClass: Boolean = prevStartTime == lesson.startTime
+                                StudyGroupLessonView(lesson, overlapsPreviousClass)
                             }
                             is TeacherLesson -> TeacherLessonView(lesson)
                             else -> throw NullPointerException()
                         }
                     data.add(lessonView)
-
                     prevStartTime = lesson.startTime
                 }
             } else {
@@ -86,11 +69,12 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
             data.add(DayEndView())
         }
 
-        if (dataWasEmpty) {
+        if (oldData.isEmpty()) {
             notifyItemRangeInserted(0, data.size)
         } else {
-            @Suppress("NotifyDataSetChanged")
-            notifyDataSetChanged()
+            val diffCallback = ItemDiffUtilCallback(oldData, data)
+            val diffResult = DiffUtil.calculateDiff(diffCallback)
+            diffResult.dispatchUpdatesTo(this)
         }
     }
 
@@ -111,8 +95,7 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
         for (i in 0 until data.size) {
             val view = data[i]
             if (view is DayView && view.weekdayId == weekdayId) {
-                val hadNotes = view.hasNotes
-                if (hadNotes != hasNotes) {
+                if (view.hasNotes != hasNotes) {
                     view.hasNotes = hasNotes
                     notifyItemChanged(i, hasNotes)
                 }
@@ -127,7 +110,7 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
                 StudyGroupClassViewHolder(binding).apply {
                     itemView.setOnClickListener {
                         if (adapterPosition != NO_POSITION &&
-                            (data[adapterPosition] as StudyGroupLessonView).lesson.subject != EMPTY_STRING
+                            (data[adapterPosition] as StudyGroupLessonView).lesson.subject != String.DEFAULT
                         ) {
                             onClickSubject.onNext(data[adapterPosition])
                         }
@@ -135,7 +118,7 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
 
                     itemView.setOnLongClickListener {
                         if (adapterPosition != NO_POSITION &&
-                            (data[adapterPosition] as StudyGroupLessonView).hasClassOverlap
+                            (data[adapterPosition] as StudyGroupLessonView).overlapsPreviousClass
                         ) {
                             if (itemView.context != null) {
                                 Toast.makeText(
@@ -154,7 +137,7 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
                 TeacherClassViewHolder(binding).apply {
                     itemView.setOnClickListener {
                         if (adapterPosition != NO_POSITION &&
-                            (data[adapterPosition] as TeacherLessonView).lesson.subject != EMPTY_STRING
+                            (data[adapterPosition] as TeacherLessonView).lesson.subject != String.DEFAULT
                         ) {
                             onClickSubject.onNext(data[adapterPosition])
                         }
@@ -213,7 +196,7 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
     }
 
     class DayView(val weekdayId: Int, private val weekdayTag: String) : BaseRVItemView {
-        internal var hasNotes: Boolean = false
+        var hasNotes: Boolean = false
 
         override val viewType: Int = VIEWTYPE_WEEKDAY
 
@@ -231,19 +214,19 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
         }
     }
 
-    class StudyGroupLessonView(val lesson: StudyGroupLesson, val hasClassOverlap: Boolean) : BaseRVItemView {
+    class StudyGroupLessonView(val lesson: StudyGroupLesson, val overlapsPreviousClass: Boolean) : BaseRVItemView {
         override val viewType: Int = VIEWTYPE_STUDYGROUP
 
         override fun bindViewHolder(viewHolder: RecyclerView.ViewHolder) {
             with(viewHolder as StudyGroupClassViewHolder) {
-                binding.textTimeStart.text = if (hasClassOverlap) EMPTY_STRING else lesson.startTime
-                binding.textTimeEnd.text = if (hasClassOverlap) EMPTY_STRING else lesson.endTime
+                binding.textTimeStart.text = if (overlapsPreviousClass) String.DEFAULT else lesson.startTime
+                binding.textTimeEnd.text = if (overlapsPreviousClass) String.DEFAULT else lesson.endTime
                 binding.textSubject.text = lesson.subject
                 binding.textTeacher.text = lesson.teacher
                 binding.textClassroom.text = lesson.classroom
                 binding.textClassType.text = lesson.type
 
-                if (hasClassOverlap) {
+                if (overlapsPreviousClass) {
                     binding.imageClassOverlap.visibility = View.VISIBLE
                 } else {
                     binding.imageClassOverlap.visibility = View.GONE
@@ -280,7 +263,8 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
         }
     }
 
-    private class StudyGroupClassViewHolder(val binding: ItemClassStudygroupBinding) : RecyclerView.ViewHolder(binding.root)
+    private class StudyGroupClassViewHolder(val binding: ItemClassStudygroupBinding) :
+        RecyclerView.ViewHolder(binding.root)
 
     private class TeacherClassViewHolder(val binding: ItemClassTeacherBinding) : RecyclerView.ViewHolder(binding.root)
 
@@ -292,4 +276,47 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
     private class BlankViewHolder(binding: ItemClassBlankBinding) : RecyclerView.ViewHolder(binding.root)
 
     private class DayEndViewHolder(binding: ItemDayEndBinding) : RecyclerView.ViewHolder(binding.root)
+
+    private class ItemDiffUtilCallback(
+        private val oldData: List<BaseRVItemView>,
+        private val newData: List<BaseRVItemView>
+    ) : DiffUtil.Callback() {
+
+        override fun getOldListSize(): Int {
+            return oldData.size
+        }
+
+        override fun getNewListSize(): Int {
+            return newData.size
+        }
+
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return oldData[oldItemPosition].viewType == newData[newItemPosition].viewType
+        }
+
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            val oldItemView: BaseRVItemView = oldData[oldItemPosition]
+            val newItemView: BaseRVItemView = newData[newItemPosition]
+
+            return when (oldItemView.viewType) {
+                VIEWTYPE_STUDYGROUP -> {
+                    oldItemView as StudyGroupLessonView
+                    newItemView as StudyGroupLessonView
+                    oldItemView.lesson.id == newItemView.lesson.id
+                }
+                VIEWTYPE_TEACHER -> {
+                    oldItemView as TeacherLessonView
+                    newItemView as TeacherLessonView
+                    oldItemView.lesson.id == newItemView.lesson.id
+                }
+                VIEWTYPE_WEEKDAY -> {
+                    oldItemView as DayView
+                    newItemView as DayView
+                    oldItemView.weekdayId == newItemView.weekdayId &&
+                        oldItemView.hasNotes == newItemView.hasNotes
+                }
+                else -> true
+            }
+        }
+    }
 }
