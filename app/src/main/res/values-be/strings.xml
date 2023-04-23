@@ -9,8 +9,9 @@
     <string name="saturday">Субота</string>
     <string name="sunday">Нядзеля</string>
     <string name="item_blanklesson">Няма заняткаў у гэты дзень</string>
-    <string name="snackbar_internet_unavailable">Злучэнне з інтэрнэтам недаступна, паспрабуйце пазней.</string>
+    <string name="snackbar_internet_unavailable">Няма злучэння з інтэрнэтам</string>
     <string name="messsage_schedule_update_successful">Расклад для гэтага тыдня быў абноўлены</string>
+    <string name="faculty">Факультэт</string>
     <string name="course">Курс</string>
     <string name="group">Група</string>
     <string name="teacher">Выкладчык</string>
@@ -51,7 +52,6 @@
     <string name="teacher_already_added">Выкладчык ужо быў дададзены.</string>
     <string name="button_add">Дадаць</string>
     <string name="button_cancel">Скасаваць</string>
-    <string name="faculty">Факультэт</string>
     <string name="navigation_drawer_open">Адкрыць бакавое меню</string>
     <string name="navigation_drawer_close">Закрыць бакавое меню</string>
     <string name="navigation_drawer_studygroups">Групы</string>
@@ -63,17 +63,10 @@
     <string name="view_main_image_description">Эмодзі з крыху ўсмешлівым тварам</string>
     <string name="view_main_empty_message">Дадайце новы расклад або абярыце ўжо дададзены са спісу.</string>
     <string name="action_show_today">Выбраць сённяшні дзень</string>
-    <string name="error_general">Адбылася памылка :(</string>
-    <string name="error_website_unavailable">Памылка: Немагчыма звязацца з серверам :(</string>
+    <string name="error_general">Адбылася памылка &#128542;</string>
+    <string name="error_website_unavailable">Памылка: Немагчыма звязацца з сайтам з раскладам &#128542;</string>
     <string name="snackbar_week_init_retry">Паўтарыць</string>
     <string name="text_week_no_classes">Няма заняткаў на гэтым тыдні. Удачы!</string>
-
-    <string-array name="pref_theme_entries">
-        <item>Светлая</item>
-        <item>Цёмная</item>
-        <item>Аўтаматычна</item>
-    </string-array>
-
     <string name="tutorial_welcome_title">Вітаем у `Расклад МДЛУ`</string>
     <string name="tutorial_welcome_description">Націсніце, каб працягнуць.</string>
     <string name="tutorial_navigation_view_title">Бакавое меню</string>
@@ -88,4 +81,10 @@
     <string name="fab_add_schedule_studygroup_description">Дадаць расклад групы</string>
     <string name="fab_add_schedule_teacher_description">Дадаць расклад выкладчыка</string>
     <string name="fab_edit_note">Рэдагаваць нататку</string>
+
+    <string-array name="pref_theme_entries">
+        <item>Светлая</item>
+        <item>Цёмная</item>
+        <item>Аўтаматычна</item>
+    </string-array>
 </resources>
