@@ -90,24 +90,28 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
     override fun onStart() {
         super.onStart()
 
-        if (presenter.isTeacherFilterDefault()) {
-            binding.progressindicatorTeacher.visibility = View.VISIBLE
-            presenter.getTeacherScheduleFilter()
-        }
+        disposables += presenter.scheduleContanersObservable.subscribeBy(
+            onError = { throwable -> showError(throwable) }
+        )
 
         disposables += presenter.teacherFilterObservable.subscribeBy(
-            onNext = { notification ->
-                if (notification.isOnNext) {
-                    val scheduleFilter = notification.value!!
-                    if (scheduleFilter != ScheduleFilter.DEFAULT) {
-                        populateTeachersView(scheduleFilter)
-                    }
-                } else if (notification.isOnError) {
-                    val throwable = notification.error!!
-                    showError(throwable)
+            onNext = { state ->
+                if (state.isLoading) {
+                    binding.progressindicatorTeacher.visibility = View.VISIBLE
+                } else {
+                    binding.progressindicatorTeacher.visibility = View.GONE
+                }
+
+                if (state.isData()) {
+                    onTeacherFilterChanged(state.data)
+                }
+
+                if (state.isError()) {
+                    showError(state.throwable!!)
                 }
             }
         )
+
         disposables += presenter.teacherKeyObservable.subscribeBy(
             onNext = { key ->
                 val alertDialog = dialog as AlertDialog
@@ -117,6 +121,7 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
                         binding.textinputlayoutTeacher.error = resources.getString(R.string.teacher_already_added)
                         isEnabled = false
                     } else {
+                        binding.textinputlayoutTeacher.isErrorEnabled = false
                         isEnabled = true
                     }
                 } else {
@@ -124,10 +129,6 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
                 }
                 alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = isEnabled
             }
-        )
-
-        disposables += presenter.scheduleContanersObservable.subscribeBy(
-            onError = { throwable -> showError(throwable) }
         )
     }
 
@@ -139,11 +140,9 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
     override fun onDestroyView() {
         super.onDestroyView()
         fragmentBinding = null
-        presenter.clearDisposables()
     }
 
-    private fun populateTeachersView(data: ScheduleFilter) {
-        binding.progressindicatorTeacher.visibility = View.GONE
+    private fun onTeacherFilterChanged(data: ScheduleFilter) {
         val adapter = createAdapter(data)
         adapter.filter.filter(binding.autocompletetextTeacher.text)
         with(binding.autocompletetextTeacher) {

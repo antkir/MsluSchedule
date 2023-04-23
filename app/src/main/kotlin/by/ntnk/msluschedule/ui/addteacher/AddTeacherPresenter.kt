@@ -11,39 +11,42 @@ import by.ntnk.msluschedule.utils.DEFAULT
 import by.ntnk.msluschedule.utils.SchedulerProvider
 import io.reactivex.Notification
 import io.reactivex.Observable
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.BehaviorSubject
 import javax.inject.Inject
 
+data class ScheduleFilterUiState(
+    val isLoading: Boolean = false,
+    val data: ScheduleFilter = ScheduleFilter.DEFAULT,
+    val throwable: Throwable? = null
+) {
+    fun isData(): Boolean = data != ScheduleFilter.DEFAULT
+    fun isError(): Boolean = throwable != null
+}
+
 class AddTeacherPresenter @Inject constructor(
-    private val databaseRepository: DatabaseRepository,
+    databaseRepository: DatabaseRepository,
     private val networkRepository: NetworkRepository,
     private val currentDate: CurrentDate,
     private val schedulerProvider: SchedulerProvider
 ) : Presenter<AddTeacherView>() {
 
-    private val disposables: CompositeDisposable = CompositeDisposable()
-
     private val scheduleContaners: BehaviorSubject<Notification<List<ScheduleContainer>>> =
         BehaviorSubject.createDefault(Notification.createOnNext(emptyList()))
-    private val teacherFilter: BehaviorSubject<Notification<ScheduleFilter>> =
-        BehaviorSubject.createDefault(Notification.createOnNext(ScheduleFilter.DEFAULT))
-    private val teacherKey: BehaviorSubject<Int> = BehaviorSubject.createDefault(Int.DEFAULT)
     val scheduleContanersObservable: Observable<Notification<List<ScheduleContainer>>>
         get() = scheduleContaners
-    val teacherFilterObservable: Observable<Notification<ScheduleFilter>>
+
+    private val teacherFilter: BehaviorSubject<ScheduleFilterUiState> =
+        BehaviorSubject.createDefault(ScheduleFilterUiState(isLoading = true))
+    val teacherFilterObservable: Observable<ScheduleFilterUiState>
         get() = teacherFilter
+
+    private val teacherKey: BehaviorSubject<Int> = BehaviorSubject.createDefault(Int.DEFAULT)
     val teacherKeyObservable: Observable<Int>
         get() = teacherKey
 
-    fun isTeacherFilterDefault(): Boolean {
-        return teacherFilter.value?.value == ScheduleFilter.DEFAULT
-    }
-
-    fun getTeacherScheduleFilter() {
-        disposables += databaseRepository.getScheduleContainers()
+    init {
+        databaseRepository.getScheduleContainers()
             .toList()
             .subscribeOn(schedulerProvider.io())
             .subscribeBy(
@@ -53,12 +56,17 @@ class AddTeacherPresenter @Inject constructor(
                 onError = { throwable -> scheduleContaners.onNext(Notification.createOnError(throwable)) }
             )
 
-        disposables += networkRepository.getTeachers()
+        getTeacherScheduleFilter()
+    }
+
+    private fun getTeacherScheduleFilter() {
+        teacherFilter.onNext(ScheduleFilterUiState(isLoading = true))
+        networkRepository.getTeachers()
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
-                onSuccess = { scheduleFilter -> teacherFilter.onNext(Notification.createOnNext(scheduleFilter)) },
-                onError = { throwable -> teacherFilter.onNext(Notification.createOnError(throwable)) }
+                onSuccess = { scheduleFilter -> teacherFilter.onNext(ScheduleFilterUiState(data = scheduleFilter)) },
+                onError = { throwable -> teacherFilter.onNext(ScheduleFilterUiState(throwable = throwable)) }
             )
     }
 
@@ -68,20 +76,18 @@ class AddTeacherPresenter @Inject constructor(
 
     fun isTeacherAdded(key: Int): Boolean {
         assert(scheduleContaners.hasValue() && teacherFilter.hasValue())
-        assert(teacherFilter.value!!.value != null)
+        assert(!teacherFilter.value!!.isError() && teacherFilter.value!!.isData())
         return scheduleContaners.value?.value
             ?.filter { scheduleContainer -> scheduleContainer.year == currentDate.academicYear }
             ?.map { scheduleContainer -> scheduleContainer.name }
-            ?.any { teacher -> teacher == teacherFilter.value!!.value!!.getValue(key) } == true
+            ?.any { teacher -> teacher == teacherFilter.value!!.data.getValue(key) } == true
     }
 
     fun createSelectedTeacherObject(): Teacher {
         assert(teacherFilter.hasValue() && teacherKey.hasValue())
-        assert(teacherFilter.value!!.value != null)
+        assert(!teacherFilter.value!!.isError() && teacherFilter.value!!.isData())
         val teacherKey = teacherKey.value!!
-        val teacherName = teacherFilter.value!!.value!!.getValue(teacherKey)
+        val teacherName = teacherFilter.value!!.data.getValue(teacherKey)
         return Teacher(teacherKey, teacherName, currentDate.academicYear)
     }
-
-    fun clearDisposables() = disposables.clear()
 }
