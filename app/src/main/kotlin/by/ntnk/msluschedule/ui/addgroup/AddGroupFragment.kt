@@ -81,17 +81,13 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
             keyListener = null
             setEnabledFocusable(false)
             setOnItemClickListener { _, _, position, _ ->
-                presenter.clearDisposables()
-
-                binding.progressindicatorCourse.visibility = View.VISIBLE
-                binding.autocompletetextCourse.text.clear()
-                binding.autocompletetextCourse.setEnabledFocusable(false)
-                presenter.resetCourses()
-
-                binding.progressindicatorGroup.visibility = View.GONE
                 binding.autocompletetextGroup.text.clear()
                 binding.autocompletetextGroup.setEnabledFocusable(false)
                 presenter.resetGroups()
+
+                binding.autocompletetextCourse.text.clear()
+                binding.autocompletetextCourse.setEnabledFocusable(false)
+                presenter.resetCourses()
 
                 presenter.setFacultyKeyFromPosition(position)
             }
@@ -105,9 +101,6 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
             keyListener = null
             setEnabledFocusable(false)
             setOnItemClickListener { _, _, position, _ ->
-                presenter.clearDisposables()
-
-                binding.progressindicatorGroup.visibility = View.VISIBLE
                 binding.autocompletetextGroup.text.clear()
                 binding.autocompletetextGroup.setEnabledFocusable(false)
                 presenter.resetGroups()
@@ -142,21 +135,24 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
     override fun onStart() {
         super.onStart()
 
-        if (presenter.isFacultyFilterDefault()) {
-            binding.progressindicatorFaculty.visibility = View.VISIBLE
-            presenter.getFacultyScheduleFilter()
-        }
+        disposables += presenter.scheduleContanersObservable.subscribeBy(
+            onError = { throwable -> showError(throwable) }
+        )
 
         disposables += presenter.facultyFilterObservable.subscribeBy(
-            onNext = { notification ->
-                if (notification.isOnNext) {
-                    val scheduleFilter = notification.value!!
-                    if (scheduleFilter != ScheduleFilter.DEFAULT) {
-                        populateFacultiesView(scheduleFilter)
-                    }
-                } else if (notification.isOnError) {
-                    val throwable = notification.error!!
-                    showError(throwable)
+            onNext = { state ->
+                if (state.isLoading) {
+                    binding.progressindicatorFaculty.visibility = View.VISIBLE
+                } else {
+                    binding.progressindicatorFaculty.visibility = View.GONE
+                }
+
+                if (state.isData()) {
+                    onFacultyFilterChanged(state.data)
+                }
+
+                if (state.isError()) {
+                    showError(state.throwable!!)
                 }
             }
         )
@@ -164,26 +160,27 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
         disposables += presenter.facultyKeyObservable.subscribeBy(
             onNext = { key ->
                 if (key != Int.DEFAULT) {
-                    if (presenter.isCourseFilterDefault()) {
-                        binding.progressindicatorCourse.visibility = View.VISIBLE
-                        presenter.getCourseScheduleFilter()
+                    if (presenter.isCourseFilterUiStateDefault()) {
+                        presenter.downloadCourseFilter()
                     }
                 }
             }
         )
 
         disposables += presenter.courseFilterObservable.subscribeBy(
-            onNext = { notification ->
-                if (notification.isOnNext) {
-                    val scheduleFilter = notification.value!!
-                    if (scheduleFilter != ScheduleFilter.DEFAULT) {
-                        if (!presenter.isFacultyKeyDefault()) {
-                            populateCoursesView(scheduleFilter)
-                        }
-                    }
-                } else if (notification.isOnError) {
-                    val throwable = notification.error!!
-                    showError(throwable)
+            onNext = { state ->
+                if (state.isLoading) {
+                    binding.progressindicatorCourse.visibility = View.VISIBLE
+                } else {
+                    binding.progressindicatorCourse.visibility = View.GONE
+                }
+
+                if (state.isData()) {
+                    onCourseFilterChanged(state.data)
+                }
+
+                if (state.isError()) {
+                    showError(state.throwable!!)
                 }
             }
         )
@@ -191,26 +188,27 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
         disposables += presenter.courseKeyObservable.subscribeBy(
             onNext = { key ->
                 if (key != Int.DEFAULT) {
-                    if (presenter.isGroupFilterDefault()) {
-                        binding.progressindicatorGroup.visibility = View.VISIBLE
-                        presenter.getGroupScheduleFilter()
+                    if (presenter.isGroupFilterUiStateDefault()) {
+                        presenter.downloadGroupFilter()
                     }
                 }
             }
         )
 
         disposables += presenter.groupFilterObservable.subscribeBy(
-            onNext = { notification ->
-                if (notification.isOnNext) {
-                    val scheduleFilter = notification.value!!
-                    if (scheduleFilter != ScheduleFilter.DEFAULT) {
-                        if (!presenter.isFacultyKeyDefault() && !presenter.isCourseKeyDefault()) {
-                            populateGroupsView(scheduleFilter)
-                        }
-                    }
-                } else if (notification.isOnError) {
-                    val throwable = notification.error!!
-                    showError(throwable)
+            onNext = { state ->
+                if (state.isLoading) {
+                    binding.progressindicatorGroup.visibility = View.VISIBLE
+                } else {
+                    binding.progressindicatorGroup.visibility = View.GONE
+                }
+
+                if (state.isData()) {
+                    onGroupFilterChanged(state.data)
+                }
+
+                if (state.isError()) {
+                    showError(state.throwable!!)
                 }
             }
         )
@@ -224,6 +222,7 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
                         binding.textinputlayoutGroup.error = resources.getString(R.string.group_already_added)
                         isEnabled = false
                     } else {
+                        binding.textinputlayoutGroup.isErrorEnabled = false
                         isEnabled = true
                     }
                 } else {
@@ -231,10 +230,6 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
                 }
                 alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = isEnabled
             }
-        )
-
-        disposables += presenter.scheduleContanersObservable.subscribeBy(
-            onError = { throwable -> showError(throwable) }
         )
     }
 
@@ -246,7 +241,6 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
     override fun onDestroyView() {
         super.onDestroyView()
         fragmentBinding = null
-        presenter.clearDisposables()
     }
 
     private fun showError(t: Throwable) {
@@ -259,8 +253,7 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
         listener.onError(t)
     }
 
-    private fun populateFacultiesView(data: ScheduleFilter) {
-        binding.progressindicatorFaculty.visibility = View.GONE
+    private fun onFacultyFilterChanged(data: ScheduleFilter) {
         val adapter = createAdapter(data, isFilteringEnabled = false)
         with(binding.autocompletetextFaculty) {
             setEnabledFocusable(true)
@@ -269,8 +262,7 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
         }
     }
 
-    private fun populateCoursesView(data: ScheduleFilter) {
-        binding.progressindicatorCourse.visibility = View.GONE
+    private fun onCourseFilterChanged(data: ScheduleFilter) {
         val adapter = createAdapter(data, isFilteringEnabled = false)
         with(binding.autocompletetextCourse) {
             setEnabledFocusable(true)
@@ -279,8 +271,7 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
         }
     }
 
-    private fun populateGroupsView(data: ScheduleFilter) {
-        binding.progressindicatorGroup.visibility = View.GONE
+    private fun onGroupFilterChanged(data: ScheduleFilter) {
         val adapter = createAdapter(data, isFilteringEnabled = true)
         adapter.filter.filter(binding.autocompletetextGroup.text)
         with(binding.autocompletetextGroup) {
