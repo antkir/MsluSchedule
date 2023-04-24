@@ -3,6 +3,7 @@ package by.ntnk.msluschedule.di.modules
 import android.annotation.SuppressLint
 import by.ntnk.msluschedule.ui.addgroup.AddGroupFragment
 import by.ntnk.msluschedule.ui.addteacher.AddTeacherFragment
+import by.ntnk.msluschedule.ui.deleteschedule.DeleteScheduleFragment
 import by.ntnk.msluschedule.ui.lessoninfo.LessonInfoActivity
 import by.ntnk.msluschedule.ui.main.MainActivity
 import by.ntnk.msluschedule.ui.settings.SettingsActivity
@@ -42,4 +43,7 @@ abstract class ContributorsModule {
 
     @ContributesAndroidInjector
     abstract fun contributeSettingsFragment(): SettingsActivity.SettingsFragment
+
+    @ContributesAndroidInjector
+    abstract fun contributeDeleteScheduleFragment(): DeleteScheduleFragment
 }
