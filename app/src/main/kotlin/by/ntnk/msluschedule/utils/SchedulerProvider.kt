@@ -16,6 +16,6 @@ class SchedulerProvider @Inject constructor() {
     fun single(): Scheduler = Schedulers.single()
 
     private companion object {
-        val uiScheduler: Scheduler = AndroidSchedulers.from(Looper.getMainLooper(), true)
+        val uiScheduler: Scheduler by lazy { AndroidSchedulers.from(Looper.getMainLooper(), true) }
     }
 }
