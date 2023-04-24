@@ -9,13 +9,13 @@ import javax.inject.Inject
 
 @PerApp
 class SchedulerProvider @Inject constructor() {
-    fun ui(): Scheduler = SchedulerProvider.ui()
+    fun ui(): Scheduler = uiScheduler
 
     fun io(): Scheduler = Schedulers.io()
 
     fun single(): Scheduler = Schedulers.single()
 
-    companion object {
-        fun ui(): Scheduler = AndroidSchedulers.from(Looper.getMainLooper(), true)
+    private companion object {
+        val uiScheduler: Scheduler = AndroidSchedulers.from(Looper.getMainLooper(), true)
     }
 }
