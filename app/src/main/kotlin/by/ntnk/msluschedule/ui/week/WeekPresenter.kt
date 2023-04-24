@@ -11,11 +11,48 @@ import by.ntnk.msluschedule.utils.CurrentDate
 import by.ntnk.msluschedule.utils.ScheduleType
 import by.ntnk.msluschedule.utils.SchedulerProvider
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
-import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
+import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.subjects.BehaviorSubject
 import org.threeten.bp.DayOfWeek
 import javax.inject.Inject
+
+data class ScheduleUiState(
+    val isCheckingWeekStatus: Boolean = false,
+    val isInitializingWeek: Boolean = false,
+    val isWeekInitializedNoData: Boolean = false,
+    val isProcessingFirstUpdate: Boolean = false,
+    val isWeekInitialized: Boolean = false,
+    val data: List<WeekdayWithLessons<Lesson>> = emptyList(),
+    val throwable: Throwable? = null,
+    val isFirstUpdateError: Boolean = false
+) {
+    fun isData(): Boolean = data.isNotEmpty()
+    fun isError(): Boolean = throwable != null
+}
+
+data class ScheduleUpdateEvent(
+    val isLoading: Boolean = false,
+    private var isUpdateSuccessful: Boolean = false,
+    private var throwable: Throwable? = null
+) {
+    val timestamp: Long = System.nanoTime()
+
+    fun isEvent(): Boolean = isUpdateSuccessful
+
+    fun consumeEvent() {
+        isUpdateSuccessful = false
+    }
+
+    fun isError(): Boolean = throwable != null
+
+    fun consumeError(): Throwable {
+        val throwableCopy = throwable!!
+        throwable = null
+        return throwableCopy
+    }
+}
 
 class WeekPresenter @Inject constructor(
     private val currentDate: CurrentDate,
@@ -26,25 +63,40 @@ class WeekPresenter @Inject constructor(
     private val networkRepository: dagger.Lazy<NetworkRepository>
 ) : Presenter<WeekView>() {
 
+    private val scheduleUiState: BehaviorSubject<ScheduleUiState> = BehaviorSubject.createDefault(ScheduleUiState())
+    val scheduleUiStateObservable: Observable<ScheduleUiState>
+        get() = scheduleUiState
+
+    private val scheduleUpdateEvent: BehaviorSubject<ScheduleUpdateEvent> =
+        BehaviorSubject.createDefault(ScheduleUpdateEvent())
+    val scheduleUpdateEventObservable: Observable<ScheduleUpdateEvent>
+        get() = scheduleUpdateEvent
+
     fun getScheduleContainerInfo(): ScheduleContainerInfo {
         return sharedPreferencesRepository.getSelectedScheduleContainerInfo()
     }
 
-    fun getSchedule(scheduleType: ScheduleType, weekId: Int): Single<List<WeekdayWithLessons<Lesson>>> {
-        return getWeekdays(scheduleType, weekId)
+    fun getSchedule(scheduleType: ScheduleType, weekId: Int) {
+        getWeekdays(scheduleType, weekId)
             .toList()
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
+            .subscribeBy(
+                onSuccess = { weekdays ->
+                    val state = ScheduleUiState(data = weekdays)
+                    scheduleUiState.onNext(state)
+                },
+                onError = { throwable ->
+                    val state = ScheduleUiState(throwable = throwable)
+                    scheduleUiState.onNext(state)
+                }
+            )
     }
 
     private fun getWeekdays(type: ScheduleType, weekId: Int): Observable<WeekdayWithLessons<Lesson>> {
         return when (type) {
-            ScheduleType.STUDYGROUP -> {
-                databaseRepository.getWeekdaysWithStudyGroupLessons(weekId)
-            }
-            ScheduleType.TEACHER -> {
-                databaseRepository.getWeekdaysWithTeacherLessons(weekId)
-            }
+            ScheduleType.STUDYGROUP -> databaseRepository.getWeekdaysWithStudyGroupLessons(weekId)
+            ScheduleType.TEACHER -> databaseRepository.getWeekdaysWithTeacherLessons(weekId)
         }
     }
 
@@ -56,14 +108,29 @@ class WeekPresenter @Inject constructor(
             .observeOn(schedulerProvider.ui())
     }
 
-    fun initSchedule(weekId: Int): Completable {
-        return databaseRepository.insertWeekdays(weekId)
+    private fun initializeWeek(weekId: Int) {
+        scheduleUiState.onNext(ScheduleUiState(isInitializingWeek = true))
+        databaseRepository.insertWeekdays(weekId)
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
+            .subscribeBy(
+                onComplete = { scheduleUiState.onNext(ScheduleUiState(isWeekInitializedNoData = true)) },
+                onError = { throwable -> scheduleUiState.onNext(ScheduleUiState(throwable = throwable)) }
+            )
     }
 
-    fun updateSchedule(scheduleContainerId: Int, weekId: Int): Single<List<WeekdayWithLessons<Lesson>>> {
-        return databaseRepository.getScheduleContainer(scheduleContainerId)
+    fun updateSchedule(scheduleContainerId: Int, weekId: Int, isFirstUpdate: Boolean = false) {
+        assert(scheduleUpdateEvent.hasValue())
+        if (scheduleUpdateEvent.value!! != ScheduleUpdateEvent()) {
+            return
+        }
+
+        if (isFirstUpdate) {
+            scheduleUiState.onNext(ScheduleUiState(isProcessingFirstUpdate = true))
+        } else {
+            scheduleUpdateEvent.onNext(ScheduleUpdateEvent(isLoading = true))
+        }
+        databaseRepository.getScheduleContainer(scheduleContainerId)
             .flatMap { scheduleContainer ->
                 when (scheduleContainer.type) {
                     ScheduleType.STUDYGROUP -> {
@@ -77,9 +144,7 @@ class WeekPresenter @Inject constructor(
                                 databaseRepository.deleteLessons(weekId, scheduleContainer.type)
                                     .andThen(Single.just(weekdays))
                             }
-                            .flatMap { weekdays ->
-                                databaseRepository.insertStudyGroupSchedule(weekdays, weekId)
-                            }
+                            .flatMap { weekdays -> databaseRepository.insertStudyGroupSchedule(weekdays, weekId) }
                     }
                     ScheduleType.TEACHER -> {
                         databaseRepository.getWeekKey(weekId)
@@ -92,20 +157,49 @@ class WeekPresenter @Inject constructor(
                                 databaseRepository.deleteLessons(weekId, scheduleContainer.type)
                                     .andThen(Single.just(weekdays))
                             }
-                            .flatMap { weekdays ->
-                                databaseRepository.insertTeacherSchedule(weekdays, weekId)
-                            }
+                            .flatMap { weekdays -> databaseRepository.insertTeacherSchedule(weekdays, weekId) }
                     }
                 }
             }
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
+            .subscribeBy(
+                onSuccess = { weekdays ->
+                    val state = ScheduleUiState(data = weekdays)
+                    scheduleUiState.onNext(state)
+
+                    if (!isFirstUpdate) {
+                        val event = ScheduleUpdateEvent(isUpdateSuccessful = true)
+                        scheduleUpdateEvent.onNext(event)
+                    }
+                },
+                onError = { throwable ->
+                    if (isFirstUpdate) {
+                        val state = ScheduleUiState(throwable = throwable, isFirstUpdateError = true)
+                        scheduleUiState.onNext(state)
+                    } else {
+                        val updateState = ScheduleUpdateEvent(throwable = throwable)
+                        scheduleUpdateEvent.onNext(updateState)
+                    }
+                }
+            )
     }
 
-    fun isWeekInitialized(weekId: Int): Single<Boolean> {
-        return databaseRepository.isWeekInitialized(weekId)
+    fun checkWeekInitialized(weekId: Int) {
+        scheduleUiState.onNext(ScheduleUiState(isCheckingWeekStatus = true))
+        databaseRepository.isWeekInitialized(weekId)
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
+            .subscribeBy(
+                onSuccess = { isInitialized ->
+                    if (isInitialized) {
+                        scheduleUiState.onNext(ScheduleUiState(isWeekInitialized = true))
+                    } else {
+                        initializeWeek(weekId)
+                    }
+                },
+                onError = { throwable -> scheduleUiState.onNext(ScheduleUiState(throwable = throwable)) }
+            )
     }
 
     fun getCurrentDayOfWeek(): Int {

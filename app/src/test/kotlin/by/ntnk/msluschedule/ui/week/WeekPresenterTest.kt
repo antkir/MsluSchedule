@@ -16,6 +16,7 @@ import by.ntnk.msluschedule.db.data.ScheduleContainer
 import by.ntnk.msluschedule.network.NetworkRepository
 import by.ntnk.msluschedule.network.api.original.NetworkRepository as NetworkRepositoryOriginal
 import by.ntnk.msluschedule.utils.CurrentDate
+import by.ntnk.msluschedule.utils.DEFAULT
 import by.ntnk.msluschedule.utils.ScheduleType
 import by.ntnk.msluschedule.utils.SchedulerProvider
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
@@ -27,7 +28,6 @@ import io.reactivex.schedulers.Schedulers
 import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyInt
-import org.mockito.ArgumentMatchers.eq
 import org.mockito.Mock
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
@@ -63,6 +63,7 @@ class WeekPresenterTest {
 
     private lateinit var presenter: WeekPresenter
 
+    private val isWeekInitializedTest = TestObserver.create<Boolean>()
     private val getScheduleContainerTest = TestObserver.create<ScheduleContainer>()
     private val getWeekKeyTest = TestObserver.create<Int>()
     private val deleteLessonsForWeekTest = TestObserver.create<Void>()
@@ -70,8 +71,8 @@ class WeekPresenterTest {
     private val getWeekdayWithTeacherLessonsForWeekTest = TestObserver.create<WeekdayWithLessons<Lesson>>()
     private val insertStudyGroupScheduleTest = TestObserver.create<List<WeekdayWithStudyGroupLessons>>()
     private val insertTeacherScheduleTest = TestObserver.create<List<WeekdayWithTeacherLessons>>()
-    private val getStudyGroupScheduleTest = TestObserver.create<List<WeekdayWithStudyGroupLessons>>()
-    private val getTeacherScheduleTest = TestObserver.create<List<WeekdayWithTeacherLessons>>()
+    private val downloadStudyGroupScheduleTest = TestObserver.create<List<WeekdayWithStudyGroupLessons>>()
+    private val downloadTeacherScheduleTest = TestObserver.create<List<WeekdayWithTeacherLessons>>()
     private val insertWeekdaysTest = TestObserver.create<Int>()
     private val getNotesForWeekdayTest = TestObserver.create<Int>()
 
@@ -82,66 +83,71 @@ class WeekPresenterTest {
 
         whenever(networkRepositoryLazy.get()).thenReturn(mock(NetworkRepositoryOriginal::class.java))
         whenever(sharedPreferencesRepository.getSelectedScheduleContainerInfo())
-            .thenReturn(ScheduleContainerInfo(0, "", ScheduleType.STUDYGROUP))
+            .thenReturn(ScheduleContainerInfo(id = 0, value = String.DEFAULT, ScheduleType.STUDYGROUP))
+        whenever(databaseRepository.isWeekInitialized(anyInt()))
+            .thenReturn(
+                Single.just(true)
+                    .doOnSubscribe { disposable -> isWeekInitializedTest.onSubscribe(disposable) }
+            )
         whenever(databaseRepository.getScheduleContainer(anyInt()))
             .thenReturn(
-                Single.just(ScheduleContainer(0, "", ScheduleType.STUDYGROUP, 0))
-                    .doOnSubscribe { getScheduleContainerTest.onSubscribe(it) }
+                Single.just(ScheduleContainer(key = 0, name = String.DEFAULT, ScheduleType.STUDYGROUP, year = 0))
+                    .doOnSubscribe { disposable -> getScheduleContainerTest.onSubscribe(disposable) }
             )
         whenever(databaseRepository.getWeekKey(anyInt()))
             .thenReturn(
                 Single.just(0)
-                    .doOnSubscribe { getWeekKeyTest.onSubscribe(it) }
+                    .doOnSubscribe { disposable -> getWeekKeyTest.onSubscribe(disposable) }
             )
         whenever(databaseRepository.deleteLessons(anyInt(), any()))
             .thenReturn(
                 Completable.complete()
-                    .doOnSubscribe { deleteLessonsForWeekTest.onSubscribe(it) }
+                    .doOnSubscribe { disposable -> deleteLessonsForWeekTest.onSubscribe(disposable) }
             )
         whenever(databaseRepository.getWeekdaysWithStudyGroupLessons(anyInt()))
             .thenReturn(
-                Observable.just(WeekdayWithStudyGroupLessons("") as WeekdayWithLessons<Lesson>)
-                    .doOnSubscribe { getWeekdayWithStudyGroupLessonsForWeekTest.onSubscribe(it) }
+                Observable.just(WeekdayWithStudyGroupLessons(weekday = String.DEFAULT) as WeekdayWithLessons<Lesson>)
+                    .doOnSubscribe { disposable -> getWeekdayWithStudyGroupLessonsForWeekTest.onSubscribe(disposable) }
             )
         whenever(databaseRepository.getWeekdaysWithTeacherLessons(anyInt()))
             .thenReturn(
-                Observable.just(WeekdayWithTeacherLessons("") as WeekdayWithLessons<Lesson>)
-                    .doOnSubscribe { getWeekdayWithTeacherLessonsForWeekTest.onSubscribe(it) }
+                Observable.just(WeekdayWithTeacherLessons(weekday = String.DEFAULT) as WeekdayWithLessons<Lesson>)
+                    .doOnSubscribe { disposable -> getWeekdayWithTeacherLessonsForWeekTest.onSubscribe(disposable) }
             )
         whenever(databaseRepository.insertStudyGroupSchedule(any(), anyInt()))
             .thenReturn(
-                Single.just(listOf(WeekdayWithStudyGroupLessons("")))
-                    .doOnSubscribe { insertStudyGroupScheduleTest.onSubscribe(it) }
+                Single.just(listOf(WeekdayWithStudyGroupLessons(weekday = String.DEFAULT)))
+                    .doOnSubscribe { disposable -> insertStudyGroupScheduleTest.onSubscribe(disposable) }
             )
         whenever(databaseRepository.insertTeacherSchedule(any(), anyInt()))
             .thenReturn(
-                Single.just(listOf(WeekdayWithTeacherLessons("")))
-                    .doOnSubscribe { insertTeacherScheduleTest.onSubscribe(it) }
+                Single.just(listOf(WeekdayWithTeacherLessons(weekday = String.DEFAULT)))
+                    .doOnSubscribe { disposable -> insertTeacherScheduleTest.onSubscribe(disposable) }
             )
         whenever(databaseRepository.insertWeekdays(anyInt()))
             .thenReturn(
                 Completable.complete()
-                    .doOnSubscribe { insertWeekdaysTest.onSubscribe(it) }
+                    .doOnSubscribe { disposable -> insertWeekdaysTest.onSubscribe(disposable) }
             )
         whenever(databaseRepository.getNotesForWeekday(anyInt()))
             .thenReturn(
-                Observable.fromIterable(List(1) { return@List Note(0, "", "") })
-                    .doOnSubscribe { getNotesForWeekdayTest.onSubscribe(it) }
+                Observable.just(Note(id = 0, text = String.DEFAULT, subject = String.DEFAULT))
+                    .doOnSubscribe { disposable -> getNotesForWeekdayTest.onSubscribe(disposable) }
             )
         whenever(networkRepository.getSchedule(any<StudyGroup>(), anyInt()))
             .thenReturn(
-                Observable.just(WeekdayWithStudyGroupLessons(""))
-                    .doOnSubscribe { getStudyGroupScheduleTest.onSubscribe(it) }
+                Observable.just(WeekdayWithStudyGroupLessons(weekday = String.DEFAULT))
+                    .doOnSubscribe { disposable -> downloadStudyGroupScheduleTest.onSubscribe(disposable) }
             )
         whenever(networkRepository.getSchedule(any<Teacher>(), anyInt()))
             .thenReturn(
-                Observable.just(WeekdayWithTeacherLessons(""))
-                    .doOnSubscribe { getTeacherScheduleTest.onSubscribe(it) }
+                Observable.just(WeekdayWithTeacherLessons(weekday = String.DEFAULT))
+                    .doOnSubscribe { disposable -> downloadTeacherScheduleTest.onSubscribe(disposable) }
             )
         whenever(databaseDataMapper.mapToStudyGroup(any()))
-            .thenReturn(StudyGroup(0, "", 0, 0, 0))
+            .thenReturn(StudyGroup(key = 0, name = String.DEFAULT, faculty = 0, course = 0, year = 0))
         whenever(databaseDataMapper.mapToTeacher(any()))
-            .thenReturn(Teacher(0, "", 0))
+            .thenReturn(Teacher(key = 0, name = String.DEFAULT, year = 0))
 
         whenever(schedulerProvider.io())
             .thenReturn(Schedulers.trampoline())
@@ -162,103 +168,254 @@ class WeekPresenterTest {
     }
 
     @Test
-    fun `initial getSchedule for StudyGroup`() {
+    fun `first checkWeekInitialized call for StudyGroup`() {
         // given
         val weekId = 0
-        val isWeekInitializedTest = TestObserver.create<Boolean>()
         whenever(databaseRepository.isWeekInitialized(anyInt()))
             .thenReturn(
                 Single.just(false)
                     .doOnSubscribe { isWeekInitializedTest.onSubscribe(it) }
             )
+        val scheduleUiStateObserver = presenter.scheduleUiStateObservable.test()
         // when
-        presenter.getSchedule(weekId, true)
+        presenter.checkWeekInitialized(weekId)
         // then
-        getScheduleContainerTest.assertSubscribed()
         isWeekInitializedTest.assertSubscribed()
         insertWeekdaysTest.assertSubscribed()
-        getWeekKeyTest.assertSubscribed()
-        getStudyGroupScheduleTest.assertSubscribed()
-        insertStudyGroupScheduleTest.assertSubscribed()
-        getNotesForWeekdayTest.assertSubscribed()
-
-        verify(sharedPreferencesRepository).getSelectedScheduleContainerInfo()
-        verify(databaseDataMapper).mapToStudyGroup(any())
-        verify(view).showInitProgressBar()
-        verify(view).hideInitProgressBar()
-        verify(view).showSchedule(any())
+        scheduleUiStateObserver.assertSubscribed()
+        scheduleUiStateObserver.assertNoErrors()
+        scheduleUiStateObserver.assertValues(
+            ScheduleUiState(),
+            ScheduleUiState(isCheckingWeekStatus = true),
+            ScheduleUiState(isInitializingWeek = true),
+            ScheduleUiState(isWeekInitializedNoData = true)
+        )
     }
 
     @Test
-    fun `initial getSchedule for StudyGroup with error`() {
+    fun `first checkWeekInitialized call for StudyGroup with error`() {
         // given
         val weekId = 0
-        val isWeekInitializedTest = TestObserver.create<Boolean>()
+        val throwableObject = NullPointerException()
         whenever(databaseRepository.isWeekInitialized(anyInt()))
             .thenReturn(
                 Single.just(false)
-                    .doOnSubscribe { isWeekInitializedTest.onSubscribe(it) }
+                    .doOnSubscribe { disposable -> isWeekInitializedTest.onSubscribe(disposable) }
             )
-        whenever(networkRepository.getSchedule(any<StudyGroup>(), anyInt()))
-            .thenReturn(Observable.error(NullPointerException()))
+        whenever(databaseRepository.insertWeekdays(anyInt()))
+            .thenReturn(
+                Completable.error(throwableObject)
+                    .doOnSubscribe { disposable -> insertWeekdaysTest.onSubscribe(disposable) }
+                    .doOnError { throwable -> insertWeekdaysTest.onError(throwable) }
+            )
+        val scheduleUiStateObserver = presenter.scheduleUiStateObservable.test()
         // when
-        presenter.getSchedule(weekId, true)
+        presenter.checkWeekInitialized(weekId)
         // then
-        getScheduleContainerTest.assertSubscribed()
         isWeekInitializedTest.assertSubscribed()
         insertWeekdaysTest.assertSubscribed()
-        getWeekKeyTest.assertSubscribed()
-        getStudyGroupScheduleTest.assertNotSubscribed()
-        insertStudyGroupScheduleTest.assertNotSubscribed()
-        getNotesForWeekdayTest.assertNotSubscribed()
-
-        verify(sharedPreferencesRepository).getSelectedScheduleContainerInfo()
-        verify(databaseDataMapper).mapToStudyGroup(any())
-        verify(view).showInitProgressBar()
-        verify(view).hideInitProgressBar()
-        verify(view).showError(any(), eq(true))
+        insertWeekdaysTest.assertError(throwableObject)
+        scheduleUiStateObserver.assertSubscribed()
+        scheduleUiStateObserver.assertNoErrors()
+        scheduleUiStateObserver.assertValues(
+            ScheduleUiState(),
+            ScheduleUiState(isCheckingWeekStatus = true),
+            ScheduleUiState(isInitializingWeek = true),
+            ScheduleUiState(throwable = throwableObject)
+        )
     }
 
     @Test
-    fun `updateSchedule for StudyGroup`() {
+    fun `checkWeekInitialized call for StudyGroup with initialized week`() {
         // given
         val weekId = 0
+        val scheduleUiStateObserver = presenter.scheduleUiStateObservable.test()
         // when
-        presenter.updateSchedule(weekId)
+        presenter.checkWeekInitialized(weekId)
         // then
-        getScheduleContainerTest.assertSubscribed()
-        deleteLessonsForWeekTest.assertSubscribed()
-        getWeekKeyTest.assertSubscribed()
-        getStudyGroupScheduleTest.assertSubscribed()
-        insertStudyGroupScheduleTest.assertSubscribed()
+        isWeekInitializedTest.assertSubscribed()
+        insertWeekdaysTest.assertNotSubscribed()
+        scheduleUiStateObserver.assertSubscribed()
+        scheduleUiStateObserver.assertNoErrors()
+        scheduleUiStateObserver.assertValues(
+            ScheduleUiState(),
+            ScheduleUiState(isCheckingWeekStatus = true),
+            ScheduleUiState(isWeekInitialized = true)
+        )
+    }
+
+    @Test
+    fun `getSchedule call for StudyGroup`() {
+        // given
+        val weekId = 0
+        val scheduleUiStateObserver = presenter.scheduleUiStateObservable.test()
+        // when
+        presenter.getSchedule(ScheduleType.STUDYGROUP, weekId)
+        // then
         getWeekdayWithStudyGroupLessonsForWeekTest.assertSubscribed()
-
-        verify(sharedPreferencesRepository).getSelectedScheduleContainerInfo()
-        verify(view).showUpdateProgressBar()
-        verify(view).hideUpdateProgressBar()
-        verify(view).showUpdateSuccessMessage()
-        verify(view).showSchedule(any())
+        scheduleUiStateObserver.assertSubscribed()
+        scheduleUiStateObserver.assertNoErrors()
+        scheduleUiStateObserver.assertValues(
+            ScheduleUiState(),
+            ScheduleUiState(data = listOf(WeekdayWithStudyGroupLessons(weekday = String.DEFAULT)))
+        )
     }
 
     @Test
-    fun `updateSchedule for StudyGroup with error`() {
+    fun `getSchedule call for StudyGroup with error`() {
         // given
         val weekId = 0
-        whenever(networkRepository.getSchedule(any<StudyGroup>(), anyInt()))
-            .thenReturn(Observable.error(NullPointerException()))
+        val throwableObject = NullPointerException()
+        whenever(databaseRepository.getWeekdaysWithStudyGroupLessons(anyInt()))
+            .thenReturn(
+                Observable.error<WeekdayWithLessons<Lesson>>(throwableObject)
+                    .doOnSubscribe { disposable -> getWeekdayWithStudyGroupLessonsForWeekTest.onSubscribe(disposable) }
+                    .doOnError { throwable -> getWeekdayWithStudyGroupLessonsForWeekTest.onError(throwable) }
+            )
+        val scheduleUiStateObserver = presenter.scheduleUiStateObservable.test()
         // when
-        presenter.updateSchedule(weekId)
+        presenter.getSchedule(ScheduleType.STUDYGROUP, weekId)
+        // then
+        getWeekdayWithStudyGroupLessonsForWeekTest.assertSubscribed()
+        getWeekdayWithStudyGroupLessonsForWeekTest.assertError(throwableObject)
+        scheduleUiStateObserver.assertSubscribed()
+        scheduleUiStateObserver.assertNoErrors()
+        scheduleUiStateObserver.assertValues(
+            ScheduleUiState(),
+            ScheduleUiState(throwable = throwableObject)
+        )
+    }
+
+    @Test
+    fun `first updateSchedule call for StudyGroup`() {
+        // given
+        val schedulerContainerId = 0
+        val weekId = 0
+        val scheduleUiStateObserver = presenter.scheduleUiStateObservable.test()
+        val scheduleUpdateEventObserver = presenter.scheduleUpdateEventObservable.test()
+        // when
+        presenter.updateSchedule(schedulerContainerId, weekId, isFirstUpdate = true)
         // then
         getScheduleContainerTest.assertSubscribed()
         getWeekKeyTest.assertSubscribed()
-        deleteLessonsForWeekTest.assertNotSubscribed()
-        getStudyGroupScheduleTest.assertNotSubscribed()
-        insertStudyGroupScheduleTest.assertNotSubscribed()
-        getWeekdayWithStudyGroupLessonsForWeekTest.assertNotSubscribed()
+        verify(databaseDataMapper).mapToStudyGroup(any())
+        downloadStudyGroupScheduleTest.assertSubscribed()
+        deleteLessonsForWeekTest.assertSubscribed()
+        insertStudyGroupScheduleTest.assertSubscribed()
+        scheduleUiStateObserver.assertSubscribed()
+        scheduleUiStateObserver.assertNoErrors()
+        scheduleUiStateObserver.assertValues(
+            ScheduleUiState(),
+            ScheduleUiState(isProcessingFirstUpdate = true),
+            ScheduleUiState(data = listOf(WeekdayWithStudyGroupLessons(weekday = String.DEFAULT)))
+        )
+        scheduleUpdateEventObserver.assertSubscribed()
+        scheduleUpdateEventObserver.assertNoErrors()
+        scheduleUpdateEventObserver.assertValues(
+            ScheduleUpdateEvent()
+        )
+    }
 
-        verify(sharedPreferencesRepository).getSelectedScheduleContainerInfo()
-        verify(view).showUpdateProgressBar()
-        verify(view).hideUpdateProgressBar()
-        verify(view).showError(any(), eq(false))
+    @Test
+    fun `first updateSchedule call for StudyGroup with network error`() {
+        // given
+        val schedulerContainerId = 0
+        val weekId = 0
+        val throwableObject = NullPointerException()
+        whenever(networkRepository.getSchedule(any<StudyGroup>(), anyInt()))
+            .thenReturn(
+                Observable.error<WeekdayWithStudyGroupLessons>(throwableObject)
+                    .doOnSubscribe { disposable -> downloadStudyGroupScheduleTest.onSubscribe(disposable) }
+                    .doOnError { throwable -> downloadStudyGroupScheduleTest.onError(throwable) }
+            )
+        val scheduleUiStateObserver = presenter.scheduleUiStateObservable.test()
+        val scheduleUpdateEventObserver = presenter.scheduleUpdateEventObservable.test()
+        // when
+        presenter.updateSchedule(schedulerContainerId, weekId, isFirstUpdate = true)
+        // then
+        getScheduleContainerTest.assertSubscribed()
+        getWeekKeyTest.assertSubscribed()
+        verify(databaseDataMapper).mapToStudyGroup(any())
+        downloadStudyGroupScheduleTest.assertSubscribed()
+        downloadStudyGroupScheduleTest.assertError(throwableObject)
+        scheduleUiStateObserver.assertSubscribed()
+        scheduleUiStateObserver.assertNoErrors()
+        scheduleUiStateObserver.assertValues(
+            ScheduleUiState(),
+            ScheduleUiState(isProcessingFirstUpdate = true),
+            ScheduleUiState(throwable = throwableObject, isFirstUpdateError = true)
+        )
+        scheduleUpdateEventObserver.assertSubscribed()
+        scheduleUpdateEventObserver.assertNoErrors()
+        scheduleUpdateEventObserver.assertValues(
+            ScheduleUpdateEvent()
+        )
+    }
+
+    @Test
+    fun `updateSchedule call for StudyGroup`() {
+        // given
+        val schedulerContainerId = 0
+        val weekId = 0
+        val scheduleUiStateObserver = presenter.scheduleUiStateObservable.test()
+        val scheduleUpdateEventObserver = presenter.scheduleUpdateEventObservable.test()
+        // when
+        presenter.updateSchedule(schedulerContainerId, weekId)
+        // then
+        getScheduleContainerTest.assertSubscribed()
+        getWeekKeyTest.assertSubscribed()
+        verify(databaseDataMapper).mapToStudyGroup(any())
+        downloadStudyGroupScheduleTest.assertSubscribed()
+        deleteLessonsForWeekTest.assertSubscribed()
+        insertStudyGroupScheduleTest.assertSubscribed()
+        scheduleUiStateObserver.assertSubscribed()
+        scheduleUiStateObserver.assertNoErrors()
+        scheduleUiStateObserver.assertValues(
+            ScheduleUiState(),
+            ScheduleUiState(data = listOf(WeekdayWithStudyGroupLessons(weekday = String.DEFAULT)))
+        )
+        scheduleUpdateEventObserver.assertSubscribed()
+        scheduleUpdateEventObserver.assertNoErrors()
+        scheduleUpdateEventObserver.assertValues(
+            ScheduleUpdateEvent(),
+            ScheduleUpdateEvent(isLoading = true),
+            ScheduleUpdateEvent(isUpdateSuccessful = true)
+        )
+    }
+
+    @Test
+    fun `updateSchedule call for StudyGroup with network error`() {
+        // given
+        val schedulerContainerId = 0
+        val weekId = 0
+        val throwableObject = NullPointerException()
+        whenever(networkRepository.getSchedule(any<StudyGroup>(), anyInt()))
+            .thenReturn(
+                Observable.error<WeekdayWithStudyGroupLessons>(throwableObject)
+                    .doOnSubscribe { disposable -> downloadStudyGroupScheduleTest.onSubscribe(disposable) }
+                    .doOnError { throwable -> downloadStudyGroupScheduleTest.onError(throwable) }
+            )
+        val scheduleUiStateObserver = presenter.scheduleUiStateObservable.test()
+        val scheduleUpdateEventObserver = presenter.scheduleUpdateEventObservable.test()
+        // when
+        presenter.updateSchedule(schedulerContainerId, weekId)
+        // then
+        getScheduleContainerTest.assertSubscribed()
+        getWeekKeyTest.assertSubscribed()
+        verify(databaseDataMapper).mapToStudyGroup(any())
+        downloadStudyGroupScheduleTest.assertSubscribed()
+        downloadStudyGroupScheduleTest.assertError(throwableObject)
+        scheduleUiStateObserver.assertSubscribed()
+        scheduleUiStateObserver.assertNoErrors()
+        scheduleUiStateObserver.assertValues(
+            ScheduleUiState()
+        )
+        scheduleUpdateEventObserver.assertSubscribed()
+        scheduleUpdateEventObserver.assertNoErrors()
+        scheduleUpdateEventObserver.assertValues(
+            ScheduleUpdateEvent(),
+            ScheduleUpdateEvent(isLoading = true),
+            ScheduleUpdateEvent(throwable = throwableObject)
+        )
     }
 }
