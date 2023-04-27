@@ -106,7 +106,8 @@ class NoteRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() 
             }
         }
 
-        val diffResult = DiffUtil.calculateDiff(DiffUtilCallback(olditemViews, itemViews))
+        val callback = DiffUtilCallback(olditemViews, itemViews)
+        val diffResult = DiffUtil.calculateDiff(callback)
         diffResult.dispatchUpdatesTo(this)
     }
 
@@ -250,27 +251,36 @@ class NoteRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() 
         override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
             val oldItemView = oldData[oldItemPosition]
             val newItemView = newData[newItemPosition]
-            val isSameNoteItemView = oldItemView is NoteItemView &&
-                newItemView is NoteItemView &&
-                oldItemView.note.id == newItemView.note.id
-            val isSameSubjectItemView = oldItemView is SubjectItemView &&
-                newItemView is SubjectItemView &&
-                oldItemView.subject == newItemView.subject
-            return isSameNoteItemView || isSameSubjectItemView
+            return if (oldItemView.viewType == newItemView.viewType) {
+                when (oldItemView.viewType) {
+                    ItemViewType.SUBJECT -> {
+                        oldItemView as SubjectItemView
+                        newItemView as SubjectItemView
+                        oldItemView.subject == newItemView.subject
+                    }
+                    ItemViewType.NOTE -> {
+                        oldItemView as NoteItemView
+                        newItemView as NoteItemView
+                        oldItemView.note.id == newItemView.note.id
+                    }
+                }
+            } else {
+                false
+            }
         }
 
         override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
             val oldItemView = oldData[oldItemPosition]
             val newItemView = newData[newItemPosition]
-            val isSameContentNoteItemView = oldItemView is NoteItemView &&
-                newItemView is NoteItemView &&
-                oldItemView.note.id == newItemView.note.id &&
-                oldItemView.note.text == newItemView.note.text &&
-                oldItemView.note.subject == newItemView.note.subject
-            val isSameContentSubjectItemView = oldItemView is SubjectItemView &&
-                newItemView is SubjectItemView &&
-                oldItemView.subject == newItemView.subject
-            return isSameContentNoteItemView || isSameContentSubjectItemView
+            return when (oldItemView.viewType) {
+                ItemViewType.NOTE -> {
+                    oldItemView as NoteItemView
+                    newItemView as NoteItemView
+                    oldItemView.note.text == newItemView.note.text &&
+                        oldItemView.note.subject == newItemView.note.subject
+                }
+                else -> true
+            }
         }
     }
 }

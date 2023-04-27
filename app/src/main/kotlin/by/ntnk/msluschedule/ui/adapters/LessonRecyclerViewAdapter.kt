@@ -49,7 +49,6 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
     val onClickObservable: Observable<BaseItemView>
         get() = onClickSubject
 
-    @Throws(NullPointerException::class)
     fun onNewData(days: List<WeekdayWithLessons<Lesson>>) {
         val oldItemViews = ArrayList(itemViews)
         itemViews.clear()
@@ -63,10 +62,10 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
                         when (classDesciptor) {
                             is StudyGroupLesson -> {
                                 val overlapsPreviousClass: Boolean = prevStartTime == classDesciptor.startTime
-                                StudyGroupClassItemView(classDesciptor, overlapsPreviousClass)
+                                StudyGroupClassItemView(classDesciptor, day.weekdayId, overlapsPreviousClass)
                             }
-                            is TeacherLesson -> TeacherClassItemView(classDesciptor)
-                            else -> throw NullPointerException()
+                            is TeacherLesson -> TeacherClassItemView(classDesciptor, day.weekdayId)
+                            else -> throw RuntimeException("Illegal class type!")
                         }
                     itemViews.add(classItemView)
                     prevStartTime = classDesciptor.startTime
@@ -80,7 +79,8 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
         if (oldItemViews.isEmpty()) {
             notifyItemRangeInserted(0, itemViews.size)
         } else {
-            val diffResult = DiffUtil.calculateDiff(DiffUtilCallback(oldItemViews, itemViews))
+            val callback = DiffUtilCallback(oldItemViews, itemViews)
+            val diffResult = DiffUtil.calculateDiff(callback)
             diffResult.dispatchUpdatesTo(this)
         }
     }
@@ -223,6 +223,7 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
 
     class StudyGroupClassItemView(
         val classDesciptor: StudyGroupLesson,
+        val weekdayId: Int,
         val overlapsPreviousClass: Boolean
     ) : BaseItemView {
         override val viewType: ItemViewType = ItemViewType.STUDYGROUPCLASS
@@ -251,7 +252,7 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
         }
     }
 
-    class TeacherClassItemView(val classDesciptor: TeacherLesson) : BaseItemView {
+    class TeacherClassItemView(val classDesciptor: TeacherLesson, val weekdayId: Int) : BaseItemView {
         override val viewType: ItemViewType = ItemViewType.TEACHERCLASS
 
         override fun bindViewHolder(viewHolder: RecyclerView.ViewHolder) {
@@ -301,29 +302,61 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
         }
 
         override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            return oldData[oldItemPosition].viewType == newData[newItemPosition].viewType
+            val oldItemView: BaseItemView = oldData[oldItemPosition]
+            val newItemView: BaseItemView = newData[newItemPosition]
+            return if (oldItemView.viewType == newItemView.viewType) {
+                when (oldItemView.viewType) {
+                    ItemViewType.STUDYGROUPCLASS -> {
+                        oldItemView as StudyGroupClassItemView
+                        newItemView as StudyGroupClassItemView
+                        oldItemView.weekdayId == newItemView.weekdayId &&
+                            oldItemView.classDesciptor.startTime == newItemView.classDesciptor.startTime &&
+                            oldItemView.classDesciptor.endTime == newItemView.classDesciptor.endTime
+                    }
+                    ItemViewType.TEACHERCLASS -> {
+                        oldItemView as TeacherClassItemView
+                        newItemView as TeacherClassItemView
+                        oldItemView.weekdayId == newItemView.weekdayId &&
+                            oldItemView.classDesciptor.startTime == newItemView.classDesciptor.startTime &&
+                            oldItemView.classDesciptor.endTime == newItemView.classDesciptor.endTime
+                    }
+                    ItemViewType.DAY -> {
+                        oldItemView as DayItemView
+                        newItemView as DayItemView
+                        oldItemView.weekdayId == newItemView.weekdayId
+                    }
+                    else -> true
+                }
+            } else {
+                false
+            }
         }
 
         override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
             val oldItemView: BaseItemView = oldData[oldItemPosition]
             val newItemView: BaseItemView = newData[newItemPosition]
-
             return when (oldItemView.viewType) {
                 ItemViewType.STUDYGROUPCLASS -> {
                     oldItemView as StudyGroupClassItemView
                     newItemView as StudyGroupClassItemView
-                    oldItemView.classDesciptor.id == newItemView.classDesciptor.id
+                    oldItemView.classDesciptor.subject == newItemView.classDesciptor.subject &&
+                        oldItemView.classDesciptor.type == newItemView.classDesciptor.type &&
+                        oldItemView.classDesciptor.classroom == newItemView.classDesciptor.classroom &&
+                        oldItemView.classDesciptor.teacher == newItemView.classDesciptor.teacher
                 }
                 ItemViewType.TEACHERCLASS -> {
                     oldItemView as TeacherClassItemView
                     newItemView as TeacherClassItemView
-                    oldItemView.classDesciptor.id == newItemView.classDesciptor.id
+                    oldItemView.classDesciptor.subject == newItemView.classDesciptor.subject &&
+                        oldItemView.classDesciptor.type == newItemView.classDesciptor.type &&
+                        oldItemView.classDesciptor.classroom == newItemView.classDesciptor.classroom &&
+                        oldItemView.classDesciptor.faculty == newItemView.classDesciptor.faculty &&
+                        oldItemView.classDesciptor.groups == newItemView.classDesciptor.groups
                 }
                 ItemViewType.DAY -> {
                     oldItemView as DayItemView
                     newItemView as DayItemView
-                    oldItemView.weekdayId == newItemView.weekdayId &&
-                        oldItemView.hasNotes == newItemView.hasNotes
+                    oldItemView.hasNotes == newItemView.hasNotes
                 }
                 else -> true
             }
