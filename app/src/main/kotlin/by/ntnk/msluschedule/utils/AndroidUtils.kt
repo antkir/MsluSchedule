@@ -10,7 +10,6 @@ import android.util.TypedValue
 import android.view.View
 import androidx.core.view.ViewCompat
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.recyclerview.widget.RecyclerView
 import by.ntnk.msluschedule.R
 import com.google.android.material.snackbar.Snackbar
 import io.reactivex.subjects.PublishSubject
@@ -44,11 +43,6 @@ interface SimpleDrawerListener : DrawerLayout.DrawerListener {
     override fun onDrawerOpened(drawerView: View) = Unit
     override fun onDrawerClosed(drawerView: View) = Unit
     override fun onDrawerStateChanged(newState: Int) = Unit
-}
-
-interface BaseRVItemView {
-    val viewType: Int
-    fun bindViewHolder(viewHolder: RecyclerView.ViewHolder)
 }
 
 object AndroidUtils {

@@ -32,9 +32,6 @@ import by.ntnk.msluschedule.data.WeekdayWithLessons
 import by.ntnk.msluschedule.databinding.FragmentWeekBinding
 import by.ntnk.msluschedule.mvp.views.MvpFragment
 import by.ntnk.msluschedule.ui.adapters.LessonRecyclerViewAdapter
-import by.ntnk.msluschedule.ui.adapters.VIEWTYPE_STUDYGROUP
-import by.ntnk.msluschedule.ui.adapters.VIEWTYPE_TEACHER
-import by.ntnk.msluschedule.ui.adapters.VIEWTYPE_WEEKDAY
 import by.ntnk.msluschedule.ui.lessoninfo.LessonInfoActivity
 import by.ntnk.msluschedule.ui.weekday.WeekdayActivity
 import by.ntnk.msluschedule.utils.AndroidUtils
@@ -96,7 +93,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        initRecyclerView()
+        initializeRecyclerView()
 
         binding.swipeRefreshLayout.setOnRefreshListener {
             binding.swipeRefreshLayout.isRefreshing = false
@@ -149,7 +146,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         )
     }
 
-    private fun initRecyclerView() {
+    private fun initializeRecyclerView() {
         binding.recyclerViewDays.apply {
             layoutManager = LinearLayoutManager(activity)
             setHasFixedSize(true)
@@ -162,18 +159,19 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         adapterOnClickDisposable = adapter.onClickObservable.subscribeBy(
             onNext = { itemView ->
                 when (itemView.viewType) {
-                    VIEWTYPE_WEEKDAY -> {
-                        val weekdayId = (itemView as LessonRecyclerViewAdapter.DayView).weekdayId
+                    LessonRecyclerViewAdapter.ItemViewType.DAY -> {
+                        val weekdayId = (itemView as LessonRecyclerViewAdapter.DayItemView).weekdayId
                         WeekdayActivity.startActivity(requireContext(), weekdayId)
                     }
-                    VIEWTYPE_STUDYGROUP -> {
-                        val classId = (itemView as LessonRecyclerViewAdapter.StudyGroupLessonView).lesson.id
+                    LessonRecyclerViewAdapter.ItemViewType.STUDYGROUPCLASS -> {
+                        val classId = (itemView as LessonRecyclerViewAdapter.StudyGroupClassItemView).classDesciptor.id
                         LessonInfoActivity.startActivity(requireContext(), classId, ScheduleType.STUDYGROUP, weekId)
                     }
-                    VIEWTYPE_TEACHER -> {
-                        val classId = (itemView as LessonRecyclerViewAdapter.TeacherLessonView).lesson.id
+                    LessonRecyclerViewAdapter.ItemViewType.TEACHERCLASS -> {
+                        val classId = (itemView as LessonRecyclerViewAdapter.TeacherClassItemView).classDesciptor.id
                         LessonInfoActivity.startActivity(requireContext(), classId, ScheduleType.TEACHER, weekId)
                     }
+                    else -> {}
                 }
             },
             onError = { throwable -> Timber.e(throwable) }
@@ -340,7 +338,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         }
 
         val adapter = binding.recyclerViewDays.adapter as LessonRecyclerViewAdapter
-        adapter.initData(data)
+        adapter.onNewData(data)
 
         val layoutManager = binding.recyclerViewDays.layoutManager as LinearLayoutManager
         layoutManager.onRestoreInstanceState(layoutManagerSavedState)
@@ -426,10 +424,10 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     }
 
     private fun showSuccessfulUpdateToast() {
-        Handler(Looper.getMainLooper()).postDelayed(ToastRunnable(context), 250)
+        Handler(Looper.getMainLooper()).postDelayed(ScheduleUpdateNotificationRunnable(context), 250)
     }
 
-    private class ToastRunnable(context: Context?) : Runnable {
+    private class ScheduleUpdateNotificationRunnable(context: Context?) : Runnable {
         private val contextWeakRef: WeakReference<Context?> = WeakReference(context)
 
         override fun run() {
