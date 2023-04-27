@@ -17,8 +17,7 @@ import by.ntnk.msluschedule.databinding.ActivityLessoninfoStudygroupBinding
 import by.ntnk.msluschedule.databinding.ActivityLessoninfoTeacherBinding
 import by.ntnk.msluschedule.mvp.views.MvpActivity
 import by.ntnk.msluschedule.utils.AndroidUtils
-import by.ntnk.msluschedule.utils.EMPTY_STRING
-import by.ntnk.msluschedule.utils.INVALID_VALUE
+import by.ntnk.msluschedule.utils.DEFAULT
 import by.ntnk.msluschedule.utils.ScheduleType
 import by.ntnk.msluschedule.utils.ScheduleTypeConverter
 import dagger.Lazy
@@ -26,6 +25,10 @@ import dagger.android.AndroidInjection
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasAndroidInjector
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.plusAssign
+import io.reactivex.rxkotlin.subscribeBy
+import timber.log.Timber
 import javax.inject.Inject
 
 class LessonInfoActivity :
@@ -33,9 +36,10 @@ class LessonInfoActivity :
     LessonInfoView,
     HasAndroidInjector {
 
-    private var lessonId: Int = INVALID_VALUE
-    private var weekId: Int = INVALID_VALUE
+    private var classId: Int = Int.DEFAULT
+    private var weekId: Int = Int.DEFAULT
     private var scheduleType: ScheduleType? = null
+    private val disposables: CompositeDisposable = CompositeDisposable()
 
     private lateinit var bindingStudyGroup: ActivityLessoninfoStudygroupBinding
     private lateinit var bindingTeacher: ActivityLessoninfoTeacherBinding
@@ -56,12 +60,13 @@ class LessonInfoActivity :
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
+
         bindingStudyGroup = ActivityLessoninfoStudygroupBinding.inflate(layoutInflater)
         bindingTeacher = ActivityLessoninfoTeacherBinding.inflate(layoutInflater)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        lessonId = intent?.getIntExtra(ARG_LESSON_ID, INVALID_VALUE) ?: INVALID_VALUE
-        weekId = intent?.getIntExtra(ARG_WEEK_ID, INVALID_VALUE) ?: INVALID_VALUE
+        classId = intent?.getIntExtra(ARG_CLASS_ID, Int.DEFAULT) ?: Int.DEFAULT
+        weekId = intent?.getIntExtra(ARG_WEEK_ID, Int.DEFAULT) ?: Int.DEFAULT
         scheduleType = ScheduleTypeConverter.stringToScheduleType(intent?.getStringExtra(ARG_SCHEDULE_TYPE))
 
         when (scheduleType) {
@@ -81,68 +86,93 @@ class LessonInfoActivity :
 
     override fun onStart() {
         super.onStart()
-        if (scheduleType == null || lessonId <= 0 || weekId <= 0) {
+
+        if (scheduleType == null || classId <= 0 || weekId <= 0) {
             NavUtils.navigateUpFromSameTask(this)
             return
         }
-        presenter.getLesson(lessonId, scheduleType!!, weekId)
+
+        disposables += presenter.classUiStateObservable
+            .subscribeBy(
+                onNext = { classUiState ->
+                    if (classUiState == ClassUiState()) {
+                        presenter.getClassDescriptor(classId, scheduleType!!, weekId)
+                    }
+
+                    if (classUiState.isData()) {
+                        if (classUiState.groupClassDescriptor != null) {
+                            onClassDataReceived(classUiState.groupClassDescriptor, classUiState.weekdays)
+                        }
+
+                        if (classUiState.teacherClassDescriptor != null) {
+                            onClassDataReceived(classUiState.teacherClassDescriptor, classUiState.weekdays)
+                        }
+                    }
+
+                    if (classUiState.isError()) {
+                        Timber.e(classUiState.throwable)
+                        NavUtils.navigateUpFromSameTask(this)
+                    }
+                }
+            )
     }
 
-    override fun showInfo(lesson: StudyGroupLesson, weekdaysWithLesson: List<String>) {
-        setFieldText(lesson.subject, bindingStudyGroup.textviewSubject, bindingStudyGroup.imageviewSubject)
-        setFieldText(lesson.type, bindingStudyGroup.textviewClassType, bindingStudyGroup.imageviewClassType)
-        setFieldText(lesson.teacher, bindingStudyGroup.textviewTeacher, bindingStudyGroup.imageviewTeacher)
-        setFieldText(lesson.classroom, bindingStudyGroup.textviewClassroom, bindingStudyGroup.imageviewClassroom)
-        setFieldText(
-            "${lesson.startTime} - ${lesson.endTime}",
-            bindingStudyGroup.textviewTime,
-            bindingStudyGroup.imageviewTime
-        )
+    override fun onStop() {
+        super.onStop()
+        disposables.clear()
+    }
 
-        var weekdays: String = EMPTY_STRING
-        for (weekday in weekdaysWithLesson) {
-            weekdays += ", ${AndroidUtils.getWeekdayFromTag(weekday, applicationContext)}"
+    private fun onClassDataReceived(classDescriptor: StudyGroupLesson, weekdays: List<String>) {
+        setFieldText(classDescriptor.subject, bindingStudyGroup.textviewSubject, bindingStudyGroup.imageviewSubject)
+        setFieldText(classDescriptor.type, bindingStudyGroup.textviewClassType, bindingStudyGroup.imageviewClassType)
+        setFieldText(classDescriptor.teacher, bindingStudyGroup.textviewTeacher, bindingStudyGroup.imageviewTeacher)
+        val classroom = classDescriptor.classroom
+        setFieldText(classroom, bindingStudyGroup.textviewClassroom, bindingStudyGroup.imageviewClassroom)
+        val time = "${classDescriptor.startTime} - ${classDescriptor.endTime}"
+        setFieldText(time, bindingStudyGroup.textviewTime, bindingStudyGroup.imageviewTime)
+
+        var weekdaysText: String = String.DEFAULT
+        for (weekday in weekdays) {
+            weekdaysText += ", ${AndroidUtils.getWeekdayFromTag(weekday, applicationContext)}"
         }
-        weekdays = weekdays.drop(2)
-        bindingStudyGroup.textviewWeekdays.text = weekdays
+        weekdaysText = weekdaysText.drop(2)
+        bindingStudyGroup.textviewWeekdays.text = weekdaysText
     }
 
-    override fun showInfo(lesson: TeacherLesson, weekdaysWithLesson: List<String>) {
-        setFieldText(lesson.subject, bindingTeacher.textviewSubject, bindingTeacher.imageviewSubject)
-        setFieldText(lesson.classroom, bindingTeacher.textviewClassroom, bindingTeacher.imageviewClassroom)
-        setFieldText(
-            "${lesson.startTime} - ${lesson.endTime}",
-            bindingTeacher.textviewTime,
-            bindingTeacher.imageviewTime
-        )
-        setFieldText(lesson.type, bindingTeacher.textviewClassType, imageView = null)
-        val faculties = lesson.faculty.replace(", ", "\n")
+    private fun onClassDataReceived(classDescriptor: TeacherLesson, weekdays: List<String>) {
+        setFieldText(classDescriptor.subject, bindingTeacher.textviewSubject, bindingTeacher.imageviewSubject)
+        setFieldText(classDescriptor.classroom, bindingTeacher.textviewClassroom, bindingTeacher.imageviewClassroom)
+        val time = "${classDescriptor.startTime} - ${classDescriptor.endTime}"
+        setFieldText(time, bindingTeacher.textviewTime, bindingTeacher.imageviewTime)
+        setFieldText(classDescriptor.type, bindingTeacher.textviewClassType, imageView = null)
+        val faculties = classDescriptor.faculty.replace(", ", "\n")
         setFieldText(faculties, bindingTeacher.textviewFaculties, imageView = null)
-        val groups = lesson.groups.replace(", ", "\n")
+        val groups = classDescriptor.groups.replace(", ", "\n")
         setFieldText(groups, bindingTeacher.textviewGroups, imageView = null)
 
-        if (lesson.type == EMPTY_STRING && lesson.faculty == EMPTY_STRING && lesson.groups == EMPTY_STRING) {
+        if (classDescriptor.type == String.DEFAULT &&
+            classDescriptor.faculty == String.DEFAULT &&
+            classDescriptor.groups == String.DEFAULT
+        ) {
             bindingTeacher.imageviewGroups.visibility = View.GONE
         }
 
-        var weekdays: String = EMPTY_STRING
-        for (weekday in weekdaysWithLesson) {
-            weekdays += ", ${AndroidUtils.getWeekdayFromTag(weekday, applicationContext)}"
+        var weekdaysText: String = String.DEFAULT
+        for (weekday in weekdays) {
+            weekdaysText += ", ${AndroidUtils.getWeekdayFromTag(weekday, applicationContext)}"
         }
-        weekdays = weekdays.drop(2)
-        bindingTeacher.textviewWeekdays.text = weekdays
+        weekdaysText = weekdaysText.drop(2)
+        bindingTeacher.textviewWeekdays.text = weekdaysText
     }
 
     private fun setFieldText(text: String, textView: TextView, imageView: ImageView?) {
-        if (text != EMPTY_STRING) {
+        if (text != String.DEFAULT) {
             textView.text = text
         } else {
             textView.visibility = View.GONE
             imageView?.visibility = View.GONE
         }
     }
-
-    override fun destroyView() = NavUtils.navigateUpFromSameTask(this)
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
@@ -153,13 +183,13 @@ class LessonInfoActivity :
     }
 
     companion object {
-        private const val ARG_LESSON_ID = "lessonId"
+        private const val ARG_CLASS_ID = "classId"
         private const val ARG_WEEK_ID = "weekId"
         private const val ARG_SCHEDULE_TYPE = "scheduleType"
 
         fun startActivity(context: Context, lessonId: Int, scheduleType: ScheduleType, weekId: Int) {
             val intent = Intent(context, LessonInfoActivity::class.java).apply {
-                putExtra(ARG_LESSON_ID, lessonId)
+                putExtra(ARG_CLASS_ID, lessonId)
                 putExtra(ARG_WEEK_ID, weekId)
                 putExtra(ARG_SCHEDULE_TYPE, ScheduleTypeConverter.scheduleTypeToString(scheduleType))
             }

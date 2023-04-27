@@ -1,54 +1,83 @@
 package by.ntnk.msluschedule.ui.lessoninfo
 
+import by.ntnk.msluschedule.data.StudyGroupLesson
+import by.ntnk.msluschedule.data.TeacherLesson
 import by.ntnk.msluschedule.db.DatabaseRepository
 import by.ntnk.msluschedule.mvp.Presenter
 import by.ntnk.msluschedule.utils.ScheduleType
 import by.ntnk.msluschedule.utils.SchedulerProvider
+import io.reactivex.Observable
 import io.reactivex.rxkotlin.subscribeBy
-import timber.log.Timber
+import io.reactivex.subjects.BehaviorSubject
 import javax.inject.Inject
+
+data class ClassUiState(
+    val groupClassDescriptor: StudyGroupLesson? = null,
+    val teacherClassDescriptor: TeacherLesson? = null,
+    val weekdays: List<String> = emptyList(),
+    val throwable: Throwable? = null
+) {
+    fun isData(): Boolean = weekdays.isNotEmpty()
+    fun isError(): Boolean = throwable != null
+}
 
 class LessonInfoPresenter @Inject constructor(
     private val databaseRepository: DatabaseRepository,
     private val schedulerProvider: SchedulerProvider
 ) : Presenter<LessonInfoView>() {
 
-    fun getLesson(lessonId: Int, scheduleType: ScheduleType, weekId: Int) {
+    private val classUiState: BehaviorSubject<ClassUiState> = BehaviorSubject.createDefault(ClassUiState())
+    val classUiStateObservable: Observable<ClassUiState>
+        get() = classUiState
+
+    fun getClassDescriptor(classId: Int, scheduleType: ScheduleType, weekId: Int) {
         when (scheduleType) {
             ScheduleType.STUDYGROUP -> {
-                databaseRepository.getStudyGroupLesson(lessonId)
-                    .flatMap { lesson ->
-                        databaseRepository.getWeekdaysWithStudyGroupClassBySubject(weekId, lesson)
-                            .map { Pair(lesson, it) }
+                databaseRepository.getStudyGroupLesson(classId)
+                    .flatMap { classDescriptor ->
+                        databaseRepository.getWeekdaysWithStudyGroupClassBySubject(weekId, classDescriptor)
+                            .map { weekdays -> Pair(classDescriptor, weekdays) }
                             .toMaybe()
                     }
                     .subscribeOn(schedulerProvider.io())
                     .observeOn(schedulerProvider.ui())
                     .subscribeBy(
-                        onSuccess = { view?.showInfo(it.first, it.second) },
-                        onError = { throwable ->
-                            Timber.e(throwable)
-                            view?.destroyView()
+                        onSuccess = { (classDescriptor, weekdays) ->
+                            val state = ClassUiState(groupClassDescriptor = classDescriptor, weekdays = weekdays)
+                            classUiState.onNext(state)
                         },
-                        onComplete = { view?.destroyView() }
+                        onError = { throwable ->
+                            val state = ClassUiState(throwable = throwable)
+                            classUiState.onNext(state)
+                        },
+                        onComplete = {
+                            val state = ClassUiState(throwable = IllegalArgumentException("Illegal class id!"))
+                            classUiState.onNext(state)
+                        }
                     )
             }
             ScheduleType.TEACHER -> {
-                databaseRepository.getTeacherLesson(lessonId)
-                    .flatMap { lesson ->
-                        databaseRepository.getWeekdaysWithTeacherClassByGroups(weekId, lesson.groups)
-                            .map { Pair(lesson, it) }
+                databaseRepository.getTeacherLesson(classId)
+                    .flatMap { classDescriptor ->
+                        databaseRepository.getWeekdaysWithTeacherClassByGroups(weekId, classDescriptor.groups)
+                            .map { weekdays -> Pair(classDescriptor, weekdays) }
                             .toMaybe()
                     }
                     .subscribeOn(schedulerProvider.io())
                     .observeOn(schedulerProvider.ui())
                     .subscribeBy(
-                        onSuccess = { view?.showInfo(it.first, it.second) },
-                        onError = { throwable ->
-                            Timber.e(throwable)
-                            view?.destroyView()
+                        onSuccess = { (classDescriptor, weekdays) ->
+                            val state = ClassUiState(teacherClassDescriptor = classDescriptor, weekdays = weekdays)
+                            classUiState.onNext(state)
                         },
-                        onComplete = { view?.destroyView() }
+                        onError = { throwable ->
+                            val state = ClassUiState(throwable = throwable)
+                            classUiState.onNext(state)
+                        },
+                        onComplete = {
+                            val state = ClassUiState(throwable = IllegalArgumentException("Illegal class id!"))
+                            classUiState.onNext(state)
+                        }
                     )
             }
         }
