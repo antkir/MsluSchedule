@@ -31,37 +31,40 @@ class DatabaseRepository @Inject constructor(
     fun insertStudyGroup(studyGroup: StudyGroup): Single<Int> {
         return Single.just(studyGroup)
             .map { ScheduleContainer(it.key, it.name, ScheduleType.STUDYGROUP, it.year, it.faculty, it.course) }
-            .flatMap { appDatabase.scheduleContainerDao.insert(it) }
-            .map { it.toInt() }
+            .flatMap { scheduleContainer -> appDatabase.scheduleContainerDao.insert(scheduleContainer) }
+            .map { id -> id.toInt() }
     }
 
     fun insertTeacher(teacher: Teacher): Single<Int> {
         return Single.just(teacher)
             .map { ScheduleContainer(teacher.key, teacher.name, ScheduleType.TEACHER, teacher.year) }
-            .flatMap { appDatabase.scheduleContainerDao.insert(it) }
-            .map { it.toInt() }
+            .flatMap { scheduleContainer -> appDatabase.scheduleContainerDao.insert(scheduleContainer) }
+            .map { id -> id.toInt() }
     }
 
-    fun deleteScheduleContainer(id: Int): Completable = appDatabase.scheduleContainerDao.delete(id)
+    fun deleteScheduleContainer(id: Int): Completable {
+        return appDatabase.scheduleContainerDao.delete(id)
+    }
 
     fun getScheduleContainers(): Observable<ScheduleContainer> {
         return appDatabase.scheduleContainerDao.getScheduleContainers()
             .flatMapObservable { Observable.fromIterable(it) }
     }
 
-    fun getScheduleContainer(id: Int): Single<ScheduleContainer> =
-        appDatabase.scheduleContainerDao.getScheduleContainer(id)
+    fun getScheduleContainer(id: Int): Single<ScheduleContainer> {
+        return appDatabase.scheduleContainerDao.getScheduleContainer(id)
+    }
 
     fun insertWeekdays(weekId: Int): Completable {
         return Single.just(databaseDataMapper.createWeekdayList(weekId))
-            .flatMapCompletable { appDatabase.weekdayDao.insert(it).ignoreElement() }
+            .flatMapCompletable { weekdays -> appDatabase.weekdayDao.insert(weekdays).ignoreElement() }
     }
 
     fun insertWeeksGetIds(data: ScheduleFilter, containerId: Int): Observable<Int> {
         return Single.just(databaseDataMapper.map(data, containerId))
-            .flatMap { appDatabase.weekDao.insert(it) }
+            .flatMap { weeks -> appDatabase.weekDao.insert(weeks) }
             .flatMapObservable { Observable.fromIterable(it) }
-            .map { it.toInt() }
+            .map { id -> id.toInt() }
     }
 
     fun getWeeks(containerId: Int): Observable<Week> {
@@ -69,7 +72,10 @@ class DatabaseRepository @Inject constructor(
             .flatMapObservable { Observable.fromIterable(it) }
     }
 
-    fun getWeekKey(id: Int): Single<Int> = appDatabase.weekDao.getWeek(id).map { it.key }
+    fun getWeekKey(id: Int): Single<Int> {
+        return appDatabase.weekDao.getWeek(id)
+            .map { week -> week.key }
+    }
 
     fun isWeekInitialized(weekId: Int): Single<Boolean> {
         return appDatabase.weekdayDao.getWeekdays(weekId)
@@ -90,12 +96,12 @@ class DatabaseRepository @Inject constructor(
 
     fun getWeekdayWithStudyGroupLessons(weekdayId: Int): Single<WeekdayWithLessons<Lesson>> {
         return appDatabase.studyGroupLessonDao.getWeekdayWithLessons(weekdayId)
-            .map { databaseDataMapper.map(it) }
+            .map { weekday -> databaseDataMapper.map(weekday) }
     }
 
     fun getWeekdayWithTeacherLessons(weekdayId: Int): Single<WeekdayWithLessons<Lesson>> {
         return appDatabase.teacherLessonDao.getWeekdayWithLessons(weekdayId)
-            .map { databaseDataMapper.map(it) }
+            .map { weekday -> databaseDataMapper.map(weekday) }
     }
 
     fun insertStudyGroupSchedule(
@@ -105,28 +111,29 @@ class DatabaseRepository @Inject constructor(
         return appDatabase.weekdayDao.getWeekdays(weekId)
             .flatMapObservable { Observable.fromIterable(it) }
             .flatMapSingle { weekday ->
-                val weekdayWithLessons = weekdays.firstOrNull { it.weekday == weekday.value }
-                val lessons = weekdayWithLessons?.lessons ?: emptyList()
-                return@flatMapSingle insertStudyGroupLessons(lessons, weekday.id)
-                    .flatMap { Single.just(WeekdayWithStudyGroupLessons(weekday.id, weekday.value, it)) }
+                val classes = weekdays.firstOrNull { it.weekday == weekday.value }?.lessons ?: emptyList()
+                insertStudyGroupClasses(classes, weekday.id)
+                    .flatMap { insertedClasses ->
+                        Single.just(WeekdayWithStudyGroupLessons(weekday.id, weekday.value, insertedClasses))
+                    }
             }
             .toList()
     }
 
-    private fun insertStudyGroupLessons(
-        lessons: List<StudyGroupLesson>,
+    private fun insertStudyGroupClasses(
+        classes: List<StudyGroupLesson>,
         weekdayId: Int
     ): Single<List<StudyGroupLesson>> {
-        return Observable.fromIterable(lessons)
-            .map { lesson -> DbStudyGroupLesson(lesson, weekdayId) }
+        return Observable.fromIterable(classes)
+            .map { classDescriptor -> DbStudyGroupLesson(classDescriptor, weekdayId) }
             .toList()
-            .flatMap { dbLessons ->
-                appDatabase.studyGroupLessonDao.insert(dbLessons)
+            .flatMap { dbClasses ->
+                appDatabase.studyGroupLessonDao.insert(dbClasses)
                     .flatMapObservable { ids ->
                         for (i in ids.indices) {
-                            lessons[i].id = ids[i].toInt()
+                            classes[i].id = ids[i].toInt()
                         }
-                        return@flatMapObservable Observable.fromIterable(lessons)
+                        Observable.fromIterable(classes)
                     }
                     .toList()
             }
@@ -139,25 +146,24 @@ class DatabaseRepository @Inject constructor(
         return appDatabase.weekdayDao.getWeekdays(weekId)
             .flatMapObservable { Observable.fromIterable(it) }
             .flatMapSingle { weekday ->
-                val weekdayWithLessons = weekdays.firstOrNull { it.weekday == weekday.value }
-                val lessons = weekdayWithLessons?.lessons ?: emptyList()
-                return@flatMapSingle insertTeacherLessons(lessons, weekday.id)
-                    .flatMap { Single.just(WeekdayWithTeacherLessons(weekday.id, weekday.value, it)) }
+                val classes = weekdays.firstOrNull { it.weekday == weekday.value }?.lessons ?: emptyList()
+                insertTeacherClasses(classes, weekday.id)
+                    .flatMap { Single.just(WeekdayWithTeacherLessons(weekday.id, weekday.value, classes)) }
             }
             .toList()
     }
 
-    private fun insertTeacherLessons(lessons: List<TeacherLesson>, weekdayId: Int): Single<List<TeacherLesson>> {
-        return Observable.fromIterable(lessons)
-            .map { lesson -> DbTeacherLesson(lesson, weekdayId) }
+    private fun insertTeacherClasses(classes: List<TeacherLesson>, weekdayId: Int): Single<List<TeacherLesson>> {
+        return Observable.fromIterable(classes)
+            .map { classDesciptor -> DbTeacherLesson(classDesciptor, weekdayId) }
             .toList()
-            .flatMap { dbLessons ->
-                appDatabase.teacherLessonDao.insert(dbLessons)
+            .flatMap { dbClasses ->
+                appDatabase.teacherLessonDao.insert(dbClasses)
                     .flatMapObservable { ids ->
                         for (i in ids.indices) {
-                            lessons[i].id = ids[i].toInt()
+                            classes[i].id = ids[i].toInt()
                         }
-                        return@flatMapObservable Observable.fromIterable(lessons)
+                        Observable.fromIterable(classes)
                     }
                     .toList()
             }
@@ -188,11 +194,9 @@ class DatabaseRepository @Inject constructor(
         return appDatabase.weekdayDao.getWeekdays(weekId)
             .flatMapObservable { Observable.fromIterable(it) }
             .flatMapMaybe { weekday ->
-                return@flatMapMaybe appDatabase.studyGroupLessonDao.getClassesBySubject(
-                    weekday.id,
-                    classDescriptor.subject,
-                    classDescriptor.type
-                )
+                val subject = classDescriptor.subject
+                val type = classDescriptor.type
+                appDatabase.studyGroupLessonDao.getClassesBySubject(weekday.id, subject, type)
                     .filter { it.isNotEmpty() }
                     .map { weekday.value }
             }
@@ -203,7 +207,7 @@ class DatabaseRepository @Inject constructor(
         return appDatabase.weekdayDao.getWeekdays(weekId)
             .flatMapObservable { Observable.fromIterable(it) }
             .flatMapMaybe { weekday ->
-                return@flatMapMaybe appDatabase.teacherLessonDao.getClassesByGroups(weekday.id, groups)
+                appDatabase.teacherLessonDao.getClassesByGroups(weekday.id, groups)
                     .filter { it.isNotEmpty() }
                     .map { weekday.value }
             }
@@ -231,7 +235,7 @@ class DatabaseRepository @Inject constructor(
     fun insertNote(note: Note, weekdayId: Int): Single<Int> {
         return Single.just(DbNote(note.text, note.subject, weekdayId))
             .flatMap { appDatabase.noteDao.insert(it) }
-            .map { it.toInt() }
+            .map { id -> id.toInt() }
     }
 
     fun updateNote(note: Note, weekdayId: Int): Completable {
@@ -239,5 +243,7 @@ class DatabaseRepository @Inject constructor(
             .flatMapCompletable { appDatabase.noteDao.update(it) }
     }
 
-    fun deleteNote(id: Int): Completable = appDatabase.noteDao.delete(id)
+    fun deleteNote(id: Int): Completable {
+        return appDatabase.noteDao.delete(id)
+    }
 }
