@@ -26,5 +26,5 @@ interface TeacherLessonDao : BaseDao<DbTeacherLesson> {
     fun getLesson(id: Int): Maybe<DbTeacherLesson>
 
     @Query("SELECT * FROM DbTeacherLesson WHERE weekdayId=:weekdayId AND groups=:groups")
-    fun getLessons(weekdayId: Int, groups: String): Single<List<DbTeacherLesson>>
+    fun getClassesByGroups(weekdayId: Int, groups: String): Single<List<DbTeacherLesson>>
 }
