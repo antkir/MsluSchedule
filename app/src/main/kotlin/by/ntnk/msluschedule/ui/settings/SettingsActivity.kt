@@ -14,6 +14,7 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.app.NavUtils
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.ListFragment
@@ -60,7 +61,7 @@ class SettingsActivity : AppCompatActivity(), HasAndroidInjector {
     override fun onOptionsItemSelected(menuItem: MenuItem): Boolean {
         when (menuItem.itemId) {
             android.R.id.home -> {
-                onBackPressedDispatcher.onBackPressed()
+                NavUtils.navigateUpFromSameTask(this)
                 return true
             }
         }
@@ -161,7 +162,11 @@ class SettingsActivity : AppCompatActivity(), HasAndroidInjector {
         class SettingsLibrariesFragment : ListFragment(), AdapterView.OnItemClickListener {
             private lateinit var libraryUrls: Array<String>
 
-            override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+            override fun onCreateView(
+                inflater: LayoutInflater,
+                container: ViewGroup?,
+                savedInstanceState: Bundle?
+            ): View? {
                 return inflater.inflate(R.layout.fragment_libraries, container, false)
             }
 
