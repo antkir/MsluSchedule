@@ -12,41 +12,51 @@ import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.data.Lesson
 import by.ntnk.msluschedule.data.Note
 import by.ntnk.msluschedule.databinding.ItemNoteBinding
-import by.ntnk.msluschedule.databinding.ItemNoteHeaderBinding
-import by.ntnk.msluschedule.utils.BaseRVItemView
-import by.ntnk.msluschedule.utils.EMPTY_STRING
+import by.ntnk.msluschedule.databinding.ItemSubjectBinding
+import by.ntnk.msluschedule.utils.DEFAULT
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import java.util.Random
 
-const val VIEWTYPE_NOTE = 201
-const val VIEWTYPE_NOTE_HEADER = 202
-
 class NoteRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    private val data = mutableListOf<BaseRVItemView>()
+    enum class ItemViewType {
+        NOTE,
+        SUBJECT;
+
+        fun toInt(): Int = ordinal
+    }
+
+    interface BaseItemView {
+        val viewType: ItemViewType
+        fun bindViewHolder(viewHolder: RecyclerView.ViewHolder)
+    }
+
+    private val itemViews = mutableListOf<BaseItemView>()
     private val colors = mutableListOf<Int>()
-    private val sortedLesssons = mutableListOf<Lesson>()
-    private val sortedNotes: LinkedHashMap<String, MutableList<NoteView>> = LinkedHashMap()
+    private val sortedClasses = mutableListOf<Lesson>()
+    private val sortedNotes: LinkedHashMap<String, MutableList<NoteItemView>> = LinkedHashMap()
     private val usedColors = SparseBooleanArray()
     private val onLongClickSubject = PublishSubject.create<Note>()
-    private var selectedNote: NoteView? = null
-    private lateinit var otherNotesHeader: String
+    private var selectedNoteItemView: NoteItemView? = null
 
     val onLongClickObservable: Observable<Note>
         get() = onLongClickSubject
 
-    fun initData(notes: List<Note>, lessons: List<Lesson>, resources: Resources) {
+    fun onNewData(notes: List<Note>, classes: List<Lesson>, resources: Resources) {
         initNoteColors(resources)
-        otherNotesHeader = resources.getString(R.string.textview_other_notes_header)
 
         sortedNotes.clear()
-        sortedLesssons.clear()
+        sortedClasses.clear()
         usedColors.clear()
 
-        for (lesson in lessons) {
-            sortedLesssons.add(lesson)
-            val subjectKey = if (lesson.type != EMPTY_STRING) "${lesson.subject}, ${lesson.type}" else lesson.subject
+        for (classDescriptor in classes) {
+            sortedClasses.add(classDescriptor)
+            val subjectKey = if (classDescriptor.type != String.DEFAULT) {
+                "${classDescriptor.subject}, ${classDescriptor.type}"
+            } else {
+                classDescriptor.subject
+            }
             sortedNotes[subjectKey] = mutableListOf()
         }
 
@@ -54,10 +64,10 @@ class NoteRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() 
             if (sortedNotes[note.subject] == null) {
                 sortedNotes[note.subject] = mutableListOf()
             }
-            sortedNotes[note.subject]!!.add(NoteView(note, getViewColor()))
+            sortedNotes[note.subject]!!.add(NoteItemView(note, getViewColor()))
         }
 
-        updateData()
+        onDataChanged()
     }
 
     private fun initNoteColors(resources: Resources) {
@@ -69,30 +79,34 @@ class NoteRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() 
         resColors.recycle()
     }
 
-    private fun updateData() {
-        val oldData: List<BaseRVItemView> = ArrayList(data)
-        data.clear()
+    private fun onDataChanged() {
+        val olditemViews = ArrayList(itemViews)
+        itemViews.clear()
+
         for ((subject, notes) in sortedNotes) {
             if (notes.isNotEmpty()) {
-                val header = if (subject == EMPTY_STRING) otherNotesHeader else subject
-                val filteredLessons = sortedLesssons
-                    .filter {
-                        val subjectKey = if (it.type != EMPTY_STRING) "${it.subject}, ${it.type}" else it.subject
-                        return@filter subjectKey == header
+                val filteredClasses = sortedClasses
+                    .filter { classDescriptor ->
+                        val subjectKey = if (classDescriptor.type != String.DEFAULT) {
+                            "${classDescriptor.subject}, ${classDescriptor.type}"
+                        } else {
+                            classDescriptor.subject
+                        }
+                        return@filter subjectKey == subject
                     }
-                var time = EMPTY_STRING
-                for (lesson in filteredLessons) {
-                    time = time.plus(lesson.startTime + " / ")
+                var time = String.DEFAULT
+                for (classDescriptor in filteredClasses) {
+                    time = time.plus(classDescriptor.startTime + " / ")
                 }
                 if (time.endsWith(" / ")) {
                     time = time.dropLast(3)
                 }
-                data.add(NoteHeaderView(header, time))
-                data.addAll(notes)
+                itemViews.add(SubjectItemView(subject, time))
+                itemViews.addAll(notes)
             }
         }
 
-        val diffResult = DiffUtil.calculateDiff(DiffUtilCallback(oldData, data))
+        val diffResult = DiffUtil.calculateDiff(DiffUtilCallback(olditemViews, itemViews))
         diffResult.dispatchUpdatesTo(this)
     }
 
@@ -114,9 +128,9 @@ class NoteRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() 
             sortedNotes[note.subject] = mutableListOf()
         }
 
-        sortedNotes[note.subject]!!.add(NoteView(note, getViewColor()))
+        sortedNotes[note.subject]!!.add(NoteItemView(note, getViewColor()))
 
-        updateData()
+        onDataChanged()
     }
 
     fun restoreNote(note: Note, color: Int, position: Int) {
@@ -124,57 +138,57 @@ class NoteRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() 
             sortedNotes[note.subject] = mutableListOf()
         }
 
-        sortedNotes[note.subject]!!.add(position, NoteView(note, color))
+        sortedNotes[note.subject]!!.add(position, NoteItemView(note, color))
 
-        updateData()
+        onDataChanged()
     }
 
     fun updateSelectedNote(updatedNote: Note) {
         if (sortedNotes[updatedNote.subject] == null) {
             sortedNotes[updatedNote.subject] = mutableListOf()
         }
-        val oldNoteIdx: Int = sortedNotes[selectedNote!!.note.subject]!!.indexOf(selectedNote!!)
-        if (selectedNote!!.note.subject == updatedNote.subject) {
-            val oldNoteView = sortedNotes[updatedNote.subject]!![oldNoteIdx]
-            sortedNotes[updatedNote.subject]!![oldNoteIdx] = NoteView(updatedNote, oldNoteView.color)
+        val oldNoteIdx: Int = sortedNotes[selectedNoteItemView!!.note.subject]!!.indexOf(selectedNoteItemView!!)
+        if (selectedNoteItemView!!.note.subject == updatedNote.subject) {
+            val oldNoteItemView = sortedNotes[updatedNote.subject]!![oldNoteIdx]
+            sortedNotes[updatedNote.subject]!![oldNoteIdx] = NoteItemView(updatedNote, oldNoteItemView.color)
         } else {
-            sortedNotes[selectedNote!!.note.subject]!!.removeAt(oldNoteIdx)
-            sortedNotes[updatedNote.subject]!!.add(NoteView(updatedNote, getViewColor()))
+            sortedNotes[selectedNoteItemView!!.note.subject]!!.removeAt(oldNoteIdx)
+            sortedNotes[updatedNote.subject]!!.add(NoteItemView(updatedNote, getViewColor()))
         }
 
         deselectNote()
 
-        updateData()
+        onDataChanged()
     }
 
-    fun getSelectedNoteId(): Int? = selectedNote?.note?.id
+    fun getSelectedNoteId(): Int? = selectedNoteItemView?.note?.id
 
     fun removeNote(position: Int): Triple<Note, Int, Int> {
-        val noteView = data[position] as NoteView
-        val noteViewIdx = sortedNotes[noteView.note.subject]!!.indexOf(noteView)
-        sortedNotes[noteView.note.subject]!!.remove(noteView)
-        updateData()
-        return Triple(noteView.note, noteView.color, noteViewIdx)
+        val noteItemView = itemViews[position] as NoteItemView
+        val noteItemViewIdx = sortedNotes[noteItemView.note.subject]!!.indexOf(noteItemView)
+        sortedNotes[noteItemView.note.subject]!!.remove(noteItemView)
+        onDataChanged()
+        return Triple(noteItemView.note, noteItemView.color, noteItemViewIdx)
     }
 
     fun deselectNote() {
-        selectedNote = null
+        selectedNoteItemView = null
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
-            VIEWTYPE_NOTE_HEADER -> {
-                val binding = ItemNoteHeaderBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-                NoteHeaderViewHolder(binding)
+            ItemViewType.SUBJECT.toInt() -> {
+                val binding = ItemSubjectBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                SubjectViewHolder(binding)
             }
             else -> {
                 val binding = ItemNoteBinding.inflate(LayoutInflater.from(parent.context), parent, false)
                 NoteViewHolder(binding).apply {
                     itemView.setOnLongClickListener {
                         if (adapterPosition != NO_POSITION) {
-                            val noteView = data[adapterPosition] as NoteView
-                            selectedNote = noteView
-                            onLongClickSubject.onNext(noteView.note)
+                            val noteItemView = itemViews[adapterPosition] as NoteItemView
+                            selectedNoteItemView = noteItemView
+                            onLongClickSubject.onNext(noteItemView.note)
                         }
                         return@setOnLongClickListener true
                     }
@@ -184,19 +198,24 @@ class NoteRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() 
     }
 
     override fun onBindViewHolder(viewHolder: RecyclerView.ViewHolder, position: Int) {
-        data[position].bindViewHolder(viewHolder)
+        itemViews[position].bindViewHolder(viewHolder)
     }
 
-    override fun getItemCount(): Int = data.size
+    override fun getItemCount(): Int = itemViews.size
 
-    override fun getItemViewType(position: Int): Int = data[position].viewType
+    override fun getItemViewType(position: Int): Int = itemViews[position].viewType.toInt()
 
-    class NoteHeaderView(val header: String, private val startTime: String?) : BaseRVItemView {
-        override val viewType: Int = VIEWTYPE_NOTE_HEADER
+    class SubjectItemView(val subject: String, private val startTime: String?) : BaseItemView {
+        override val viewType: ItemViewType = ItemViewType.SUBJECT
 
         override fun bindViewHolder(viewHolder: RecyclerView.ViewHolder) {
-            with(viewHolder as NoteHeaderViewHolder) {
-                binding.textSubject.text = header
+            with(viewHolder as SubjectViewHolder) {
+                if (subject != String.DEFAULT) {
+                    binding.textSubject.text = subject
+                } else {
+                    binding.textSubject.text =
+                        binding.textSubject.context.getString(R.string.textview_other_notes_header)
+                }
                 if (startTime != null) {
                     binding.textTime.text = startTime
                 }
@@ -204,8 +223,8 @@ class NoteRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() 
         }
     }
 
-    class NoteView(val note: Note, val color: Int) : BaseRVItemView {
-        override val viewType: Int = VIEWTYPE_NOTE
+    class NoteItemView(val note: Note, val color: Int) : BaseItemView {
+        override val viewType: ItemViewType = ItemViewType.NOTE
 
         override fun bindViewHolder(viewHolder: RecyclerView.ViewHolder) {
             with(viewHolder as NoteViewHolder) {
@@ -217,11 +236,11 @@ class NoteRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() 
 
     private class NoteViewHolder(val binding: ItemNoteBinding) : RecyclerView.ViewHolder(binding.root)
 
-    private class NoteHeaderViewHolder(val binding: ItemNoteHeaderBinding) : RecyclerView.ViewHolder(binding.root)
+    private class SubjectViewHolder(val binding: ItemSubjectBinding) : RecyclerView.ViewHolder(binding.root)
 
     private class DiffUtilCallback(
-        private val oldData: List<BaseRVItemView>,
-        private val newData: List<BaseRVItemView>
+        private val oldData: List<BaseItemView>,
+        private val newData: List<BaseItemView>
     ) : DiffUtil.Callback() {
 
         override fun getOldListSize(): Int = oldData.size
@@ -229,23 +248,29 @@ class NoteRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() 
         override fun getNewListSize(): Int = newData.size
 
         override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            val oldItem = oldData[oldItemPosition]
-            val newItem = newData[newItemPosition]
-            val isSameNoteView = oldItem is NoteView && newItem is NoteView && oldItem.note.id == newItem.note.id
-            val isSameNoteHeaderView = oldItem is NoteHeaderView && newItem is NoteHeaderView && oldItem.header == newItem.header
-            return isSameNoteView || isSameNoteHeaderView
+            val oldItemView = oldData[oldItemPosition]
+            val newItemView = newData[newItemPosition]
+            val isSameNoteItemView = oldItemView is NoteItemView &&
+                newItemView is NoteItemView &&
+                oldItemView.note.id == newItemView.note.id
+            val isSameSubjectItemView = oldItemView is SubjectItemView &&
+                newItemView is SubjectItemView &&
+                oldItemView.subject == newItemView.subject
+            return isSameNoteItemView || isSameSubjectItemView
         }
 
         override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            val oldItem = oldData[oldItemPosition]
-            val newItem = newData[newItemPosition]
-            val isSameContentNoteView = oldItem is NoteView &&
-                newItem is NoteView &&
-                oldItem.note.id == newItem.note.id &&
-                oldItem.note.text == newItem.note.text &&
-                oldItem.note.subject == newItem.note.subject
-            val isSameContentNoteHeaderView = oldItem is NoteHeaderView && newItem is NoteHeaderView && oldItem.header == newItem.header
-            return isSameContentNoteView || isSameContentNoteHeaderView
+            val oldItemView = oldData[oldItemPosition]
+            val newItemView = newData[newItemPosition]
+            val isSameContentNoteItemView = oldItemView is NoteItemView &&
+                newItemView is NoteItemView &&
+                oldItemView.note.id == newItemView.note.id &&
+                oldItemView.note.text == newItemView.note.text &&
+                oldItemView.note.subject == newItemView.note.subject
+            val isSameContentSubjectItemView = oldItemView is SubjectItemView &&
+                newItemView is SubjectItemView &&
+                oldItemView.subject == newItemView.subject
+            return isSameContentNoteItemView || isSameContentSubjectItemView
         }
     }
 }
