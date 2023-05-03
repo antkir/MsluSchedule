@@ -13,4 +13,7 @@ interface NoteDao : BaseDao<DbNote> {
 
     @Query("DELETE FROM DbNote WHERE id=:id")
     fun delete(id: Int): Completable
+
+    @Query("SELECT EXISTS(SELECT * FROM DbNote WHERE weekdayId=:weekdayId)")
+    fun checkWeekdayHasNotes(weekdayId: Int): Single<Boolean>
 }

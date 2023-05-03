@@ -100,10 +100,8 @@ class WeekPresenter @Inject constructor(
         }
     }
 
-    fun getNotesStatus(weekdayId: Int): Single<Boolean> {
-        return databaseRepository.getNotesForWeekday(weekdayId)
-            .toList()
-            .map { notes -> notes.isNotEmpty() }
+    fun hasNotes(weekdayId: Int): Single<Boolean> {
+        return databaseRepository.checkWeekdayHasNotes(weekdayId)
             .subscribeOn(schedulerProvider.single())
             .observeOn(schedulerProvider.ui())
     }

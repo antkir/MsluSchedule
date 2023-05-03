@@ -267,7 +267,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     }
 
     private fun setNotesStatus(weekdayId: Int) {
-        disposables += presenter.getNotesStatus(weekdayId)
+        disposables += presenter.hasNotes(weekdayId)
             .subscribeBy(
                 onSuccess = { hasNotes ->
                     val adapter = binding.recyclerViewDays.adapter as LessonRecyclerViewAdapter
