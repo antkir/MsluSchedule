@@ -5,7 +5,7 @@ import by.ntnk.msluschedule.data.TeacherLesson
 import by.ntnk.msluschedule.data.WeekdayWithStudyGroupLessons
 import by.ntnk.msluschedule.data.WeekdayWithTeacherLessons
 import by.ntnk.msluschedule.utils.Days
-import by.ntnk.msluschedule.utils.EMPTY_STRING
+import by.ntnk.msluschedule.utils.DEFAULT
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
 import io.reactivex.Observable
 import org.apache.poi.hssf.usermodel.HSSFFont
@@ -18,6 +18,7 @@ import java.io.InputStream
 import javax.inject.Inject
 
 class XlsParser @Inject constructor(private val sharedPreferencesRepository: SharedPreferencesRepository) {
+
     fun parseStudyGroupXls(xlsStream: InputStream): Observable<WeekdayWithStudyGroupLessons> {
         val poifsFileSystem = POIFSFileSystem(xlsStream)
         val hssfWorkbook = HSSFWorkbook(poifsFileSystem)
@@ -45,7 +46,7 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
         lateinit var teacher: String
         lateinit var classroom: String
 
-        var prevTime: Pair<String, String> = Pair(EMPTY_STRING, EMPTY_STRING)
+        var prevTime: Pair<String, String> = Pair(String.DEFAULT, String.DEFAULT)
         var isPreviousLessonPhysEd = false
 
         for (cell in cells) {
@@ -59,15 +60,15 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
                 }
                 1 -> {
                     val pair = getLessonTimePair(cell.stringCellValue)
-                    startTime = if (pair.first != EMPTY_STRING) pair.first else prevTime.first
-                    endTime = if (pair.second != EMPTY_STRING) pair.second else prevTime.second
+                    startTime = if (pair.first != String.DEFAULT) pair.first else prevTime.first
+                    endTime = if (pair.second != String.DEFAULT) pair.second else prevTime.second
 
                     prevTime = Pair(startTime, endTime)
                 }
                 2 -> {
-                    subject = EMPTY_STRING
-                    type = EMPTY_STRING
-                    teacher = EMPTY_STRING
+                    subject = String.DEFAULT
+                    type = String.DEFAULT
+                    teacher = String.DEFAULT
 
                     val richTextString = cell.richStringCellValue as HSSFRichTextString
                     val valueString = richTextString.string
@@ -75,8 +76,8 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
 
                     if (richTextString.numFormattingRuns() == 0) {
                         subject = valueString.trim()
-                        type = EMPTY_STRING
-                        teacher = EMPTY_STRING
+                        type = String.DEFAULT
+                        teacher = String.DEFAULT
                     }
 
                     for (i in 0 until richTextString.numFormattingRuns()) {
@@ -97,7 +98,7 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
                     }
                 }
                 3 -> {
-                    classroom = cell.stringCellValue.replace(" ", EMPTY_STRING)
+                    classroom = cell.stringCellValue.replace(" ", String.DEFAULT)
 
                     if (startTime.isNotEmpty() || subject.isNotEmpty()) {
                         val lesson = StudyGroupLesson(subject, type, teacher, classroom, startTime, endTime)
@@ -144,7 +145,7 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
             val values = value.split("-".toRegex())
             Pair(values[0].trim(), values[1].trim())
         } else {
-            Pair(EMPTY_STRING, EMPTY_STRING)
+            Pair(String.DEFAULT, String.DEFAULT)
         }
     }
 
@@ -155,13 +156,13 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
                     val values = value.split("\n".toRegex())
                     Pair(values[0].substringAfter(',').trim(), values[1].trim())
                 } else {
-                    Pair(EMPTY_STRING, value.trim())
+                    Pair(String.DEFAULT, value.trim())
                 }
             } else {
-                Pair(value.substringAfter(',').trim(), EMPTY_STRING)
+                Pair(value.substringAfter(',').trim(), String.DEFAULT)
             }
         } else {
-            Pair(EMPTY_STRING, EMPTY_STRING)
+            Pair(String.DEFAULT, String.DEFAULT)
         }
     }
 
@@ -182,7 +183,7 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
         hssfRows: List<Row>,
         getWorkbookFontAt: (Short) -> HSSFFont
     ): List<WeekdayWithTeacherLessons> {
-        val weekdaysWithLessons: List<WeekdayWithTeacherLessons> = listOf(
+        val weekdaysWithLessons = listOf(
             WeekdayWithTeacherLessons(Days.MONDAY),
             WeekdayWithTeacherLessons(Days.TUESDAY),
             WeekdayWithTeacherLessons(Days.WEDNESDAY),
@@ -191,8 +192,8 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
             WeekdayWithTeacherLessons(Days.SATURDAY),
             WeekdayWithTeacherLessons(Days.SUNDAY)
         )
-        var startTime = EMPTY_STRING
-        var endTime = EMPTY_STRING
+        var startTime = String.DEFAULT
+        var endTime = String.DEFAULT
 
         for (rowIndex in hssfRows.indices) {
             for (columnIndex in 0 until hssfRows[rowIndex].lastCellNum) {
@@ -232,10 +233,10 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
         if (richTextString.numFormattingRuns() == 0) {
             return TeacherLesson(
                 subject = valueString.trim(),
-                faculty = EMPTY_STRING,
-                groups = EMPTY_STRING,
-                type = EMPTY_STRING,
-                classroom = EMPTY_STRING,
+                faculty = String.DEFAULT,
+                groups = String.DEFAULT,
+                type = String.DEFAULT,
+                classroom = String.DEFAULT,
                 startTime,
                 endTime
             )
@@ -254,7 +255,7 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
                 val groupsFacultiesClassroom = valueString.substring(0, startIdx).trim()
 
                 val groupsFaculties = with(groupsFacultiesClassroom.substringBeforeLast(')')) {
-                    return@with if (groupsFacultiesClassroom.contains(')')) "$this)" else EMPTY_STRING
+                    if (groupsFacultiesClassroom.contains(')')) "$this)" else String.DEFAULT
                 }
 
                 val splitIdx = findOpeningParenthesisIndex(groupsFaculties)
@@ -267,7 +268,7 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
                         .dropLast(1)
                         .trim()
                 } else {
-                    EMPTY_STRING
+                    String.DEFAULT
                 }
 
                 val classroom = groupsFacultiesClassroom
@@ -282,7 +283,7 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
     }
 
     private fun findOpeningParenthesisIndex(str: String): Int {
-        if (str != EMPTY_STRING) {
+        if (str != String.DEFAULT) {
             var closingParenthesisCnt = 0
             var openingParenthesisCnt = 0
             for (chIdx in str.indices) {
@@ -315,5 +316,5 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
         hssfRows
             .map { it.elementAt(columnIndex) }
             .slice(rowIndex until hssfRows.size)
-            .any { it.stringCellValue != EMPTY_STRING }
+            .any { it.stringCellValue != String.DEFAULT }
 }
