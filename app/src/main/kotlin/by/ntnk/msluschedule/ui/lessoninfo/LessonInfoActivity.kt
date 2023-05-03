@@ -88,6 +88,7 @@ class LessonInfoActivity :
         super.onStart()
 
         if (scheduleType == null || classId <= 0 || weekId <= 0) {
+            Timber.e(IllegalArgumentException())
             NavUtils.navigateUpFromSameTask(this)
             return
         }
