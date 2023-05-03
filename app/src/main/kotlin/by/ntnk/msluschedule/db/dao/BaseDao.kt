@@ -8,10 +8,10 @@ import io.reactivex.Completable
 import io.reactivex.Single
 
 interface BaseDao<in T> {
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(entity: T): Single<Long>
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(entity: List<T>): Single<List<Long>>
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
