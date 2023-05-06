@@ -25,6 +25,7 @@ import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.NO_POSITION
 import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.data.Lesson
 import by.ntnk.msluschedule.data.Note
@@ -111,6 +112,13 @@ class WeekdayActivity :
 
         val adapter = binding.recyclerviewNotes.adapter as NoteRecyclerViewAdapter
         adapter.initializeNoteColors(resources)
+        adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                if (itemCount == 1 && positionStart != NO_POSITION) {
+                    binding.recyclerviewNotes.smoothScrollToPosition(positionStart)
+                }
+            }
+        })
 
         binding.fabAddNote.setOnClickListener { showNoteEditLayout() }
         binding.buttonSaveNote.setOnClickListener { onSaveNoteClick() }
