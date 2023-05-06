@@ -4,8 +4,6 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
-import android.text.Editable
-import android.text.TextWatcher
 import android.util.TypedValue
 import android.view.View
 import androidx.core.view.ViewCompat
@@ -30,12 +28,6 @@ fun IntRange.random(): Int {
     } else {
         Random().nextInt((endInclusive + 1) - start) + start
     }
-}
-
-interface SimpleTextWatcher : TextWatcher {
-    override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) = Unit
-    override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) = Unit
-    override fun afterTextChanged(s: Editable) = Unit
 }
 
 interface SimpleDrawerListener : DrawerLayout.DrawerListener {

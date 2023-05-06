@@ -25,6 +25,7 @@
             android:text="@string/textview_zeronotes"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
             android:textColor="@color/tertiary_text"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -32,10 +33,10 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerview_notes"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:paddingTop="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:saveEnabled="false"
+            android:scrollbars="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"

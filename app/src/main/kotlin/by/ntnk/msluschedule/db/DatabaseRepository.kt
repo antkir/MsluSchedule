@@ -226,12 +226,13 @@ class DatabaseRepository @Inject constructor(
             }
     }
 
-    fun getNotesForWeekday(weekdayId: Int): Single<List<Note>> {
+    fun getNotesForWeekday(weekdayId: Int): Observable<List<Note>> {
         return appDatabase.noteDao.getNotesForWeekday(weekdayId)
             .flatMap {
                 Observable.fromIterable(it)
                     .map { note -> Note(note.id, note.text, note.subject) }
                     .toList()
+                    .toObservable()
             }
 
     }

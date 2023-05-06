@@ -1,14 +1,39 @@
 package by.ntnk.msluschedule.ui.weekday
 
+import by.ntnk.msluschedule.data.Lesson
 import by.ntnk.msluschedule.data.Note
+import by.ntnk.msluschedule.data.WeekdayWithLessons
 import by.ntnk.msluschedule.db.DatabaseRepository
 import by.ntnk.msluschedule.mvp.Presenter
 import by.ntnk.msluschedule.utils.ScheduleType
 import by.ntnk.msluschedule.utils.SchedulerProvider
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
+import io.reactivex.Observable
+import io.reactivex.Single
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.subjects.BehaviorSubject
 import timber.log.Timber
 import javax.inject.Inject
+
+data class WeekdayUiState(
+    val isLoading: Boolean = false,
+    val data: WeekdayWithLessons<Lesson>? = null,
+    val throwable: Throwable? = null
+) {
+    fun isData(): Boolean = data != null
+    fun isError(): Boolean = throwable != null
+}
+
+data class NotesUiState(
+    val isLoading: Boolean = false,
+    val data: List<Note>? = null,
+    val throwable: Throwable? = null
+) {
+    fun isData(): Boolean = data != null
+    fun isError(): Boolean = throwable != null
+}
 
 class WeekdayPresenter @Inject constructor(
     private val databaseRepository: DatabaseRepository,
@@ -16,21 +41,39 @@ class WeekdayPresenter @Inject constructor(
     private val schedulerProvider: SchedulerProvider
 ) : Presenter<WeekdayView>() {
 
-    fun initWeekdayView(weekdayId: Int) {
-        val weekdayWithLessons = when (sharedPreferencesRepository.getSelectedScheduleContainerInfo().type) {
-            ScheduleType.STUDYGROUP -> databaseRepository.getWeekdayWithStudyGroupLessons(weekdayId)
-            ScheduleType.TEACHER -> databaseRepository.getWeekdayWithTeacherLessons(weekdayId)
-            else -> throw NullPointerException()
-        }
+    private val weekdayUiState: BehaviorSubject<WeekdayUiState> = BehaviorSubject.createDefault(WeekdayUiState())
+    val weekdayUiStateObservable: Observable<WeekdayUiState>
+        get() = weekdayUiState
 
-        databaseRepository.getNotesForWeekday(weekdayId)
-            .toList()
-            .zipWith(weekdayWithLessons) { notes, weekday -> Pair(weekday, notes) }
+    private val notesUiState: BehaviorSubject<NotesUiState> = BehaviorSubject.createDefault(NotesUiState())
+    val notesUiStateObservable: Observable<NotesUiState>
+        get() = notesUiState
+
+    private val disposables: CompositeDisposable = CompositeDisposable()
+
+    fun getWeekday(id: Int) {
+        weekdayUiState.onNext(WeekdayUiState(isLoading = true))
+        when (sharedPreferencesRepository.getSelectedScheduleContainerInfo().type) {
+            ScheduleType.STUDYGROUP -> databaseRepository.getWeekdayWithStudyGroupLessons(id)
+            ScheduleType.TEACHER -> databaseRepository.getWeekdayWithTeacherLessons(id)
+            else -> Single.error(NullPointerException())
+        }
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
-                onSuccess = { view?.initView(it.first, it.second) },
-                onError = { throwable -> Timber.e(throwable) }
+                onSuccess = { weekday -> weekdayUiState.onNext(WeekdayUiState(data = weekday)) },
+                onError = { throwable -> weekdayUiState.onNext(WeekdayUiState(throwable = throwable)) }
+            )
+    }
+
+    fun observeNotes(weekday: WeekdayWithLessons<Lesson>) {
+        notesUiState.onNext(NotesUiState(isLoading = true))
+        disposables += databaseRepository.getNotesForWeekday(weekday.weekdayId)
+            .subscribeOn(schedulerProvider.io())
+            .observeOn(schedulerProvider.ui())
+            .subscribeBy(
+                onNext = { notes -> notesUiState.onNext(NotesUiState(data = notes)) },
+                onError = { throwable -> notesUiState.onNext(NotesUiState(throwable = throwable)) }
             )
     }
 
@@ -39,7 +82,6 @@ class WeekdayPresenter @Inject constructor(
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
-                onSuccess = { id -> view?.addNote(Note(id, note.text, note.subject)) },
                 onError = { throwable -> Timber.e(throwable) }
             )
     }
@@ -62,13 +104,17 @@ class WeekdayPresenter @Inject constructor(
             )
     }
 
-    fun restoreNote(note: Note, weekdayId: Int, color: Int, position: Int) {
-        databaseRepository.insertNote(note, weekdayId)
-            .subscribeOn(schedulerProvider.io())
-            .observeOn(schedulerProvider.ui())
-            .subscribeBy(
-                onSuccess = { id -> view?.restoreNote(Note(id, note.text, note.subject), color, position) },
-                onError = { throwable -> Timber.e(throwable) }
-            )
+    fun isNotesUiStateDefault(): Boolean {
+        return notesUiState.value == NotesUiState()
+    }
+
+    fun getWeekdayData(): WeekdayWithLessons<Lesson> {
+        assert(weekdayUiState.hasValue())
+        assert(weekdayUiState.value!!.isData())
+        return weekdayUiState.value!!.data!!
+    }
+
+    fun destroy() {
+        disposables.clear()
     }
 }
