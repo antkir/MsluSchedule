@@ -237,7 +237,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         if (isCurrentWeek) {
             if (layoutManagerSavedState == null) {
                 val index = adapter.getWeekdayViewIndex(presenter.getCurrentDayOfWeek())
-                layoutManager.scrollToPosition(index)
+                layoutManager.scrollToPositionWithOffset(index, 0)
             }
             activity?.findViewById<CircularProgressIndicator>(R.id.progressbar)?.visibility = View.GONE
             parentFragment?.view?.findViewById<ViewPager>(R.id.viewpager_weeks)?.visibility = View.VISIBLE
