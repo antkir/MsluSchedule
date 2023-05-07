@@ -339,7 +339,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         } else {
             if (isCurrentWeek && hadNoClasses && adapter.hasClasses()) {
                 val index = adapter.getWeekdayViewIndex(presenter.getCurrentDayOfWeek())
-                layoutManager.scrollToPosition(index)
+                layoutManager.scrollToPositionWithOffset(index, 0)
             }
         }
 
