@@ -18,7 +18,6 @@ import by.ntnk.msluschedule.di.PerApp
 import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.utils.ScheduleType
 import io.reactivex.Completable
-import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.Single
 import javax.inject.Inject
@@ -169,12 +168,12 @@ class DatabaseRepository @Inject constructor(
             }
     }
 
-    fun getStudyGroupLesson(id: Int): Maybe<StudyGroupLesson> {
+    fun getStudyGroupLesson(id: Int): Single<StudyGroupLesson> {
         return appDatabase.studyGroupLessonDao.getLesson(id)
             .map { StudyGroupLesson(it.subject, it.type, it.teacher, it.classroom, it.startTime, it.endTime, it.id) }
     }
 
-    fun getTeacherLesson(id: Int): Maybe<TeacherLesson> {
+    fun getTeacherLesson(id: Int): Single<TeacherLesson> {
         return appDatabase.teacherLessonDao.getLesson(id)
             .map {
                 TeacherLesson(

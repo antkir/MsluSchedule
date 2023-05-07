@@ -37,7 +37,6 @@ class LessonInfoPresenter @Inject constructor(
                     .flatMap { classDescriptor ->
                         databaseRepository.getWeekdaysWithStudyGroupClassBySubject(weekId, classDescriptor)
                             .map { weekdays -> Pair(classDescriptor, weekdays) }
-                            .toMaybe()
                     }
                     .subscribeOn(schedulerProvider.io())
                     .observeOn(schedulerProvider.ui())
@@ -49,10 +48,6 @@ class LessonInfoPresenter @Inject constructor(
                         onError = { throwable ->
                             val state = ClassUiState(throwable = throwable)
                             classUiState.onNext(state)
-                        },
-                        onComplete = {
-                            val state = ClassUiState(throwable = IllegalArgumentException("Illegal class id!"))
-                            classUiState.onNext(state)
                         }
                     )
             }
@@ -61,7 +56,6 @@ class LessonInfoPresenter @Inject constructor(
                     .flatMap { classDescriptor ->
                         databaseRepository.getWeekdaysWithTeacherClassByGroups(weekId, classDescriptor.groups)
                             .map { weekdays -> Pair(classDescriptor, weekdays) }
-                            .toMaybe()
                     }
                     .subscribeOn(schedulerProvider.io())
                     .observeOn(schedulerProvider.ui())
@@ -72,10 +66,6 @@ class LessonInfoPresenter @Inject constructor(
                         },
                         onError = { throwable ->
                             val state = ClassUiState(throwable = throwable)
-                            classUiState.onNext(state)
-                        },
-                        onComplete = {
-                            val state = ClassUiState(throwable = IllegalArgumentException("Illegal class id!"))
                             classUiState.onNext(state)
                         }
                     )

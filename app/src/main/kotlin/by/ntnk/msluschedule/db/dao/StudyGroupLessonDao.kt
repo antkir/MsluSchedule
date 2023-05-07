@@ -6,7 +6,6 @@ import androidx.room.Transaction
 import by.ntnk.msluschedule.db.data.DbStudyGroupLesson
 import by.ntnk.msluschedule.db.data.DbWeekdayWithStudyGroupLessons
 import io.reactivex.Completable
-import io.reactivex.Maybe
 import io.reactivex.Single
 
 @Dao
@@ -23,7 +22,7 @@ interface StudyGroupLessonDao : BaseDao<DbStudyGroupLesson> {
     fun getWeekdayWithLessons(id: Int): Single<DbWeekdayWithStudyGroupLessons>
 
     @Query("SELECT * FROM DbStudyGroupLesson WHERE id=:id")
-    fun getLesson(id: Int): Maybe<DbStudyGroupLesson>
+    fun getLesson(id: Int): Single<DbStudyGroupLesson>
 
     @Query("SELECT * FROM DbStudyGroupLesson WHERE weekdayId=:weekdayId AND subject=:subject AND type=:type")
     fun getClassesBySubject(weekdayId: Int, subject: String, type: String): Single<List<DbStudyGroupLesson>>
