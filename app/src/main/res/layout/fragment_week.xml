@@ -15,7 +15,7 @@
             android:layout_height="match_parent">
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recycler_view_days"
+                android:id="@+id/recyclerview_days"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:saveEnabled="false" />

@@ -54,7 +54,7 @@ import javax.inject.Inject
 
 class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
 
-    private var isNoClassesDaysLayoutHidden: Boolean = true
+    private var isNoClassesViewVisible: Boolean = true
     private var weekId: Int = Int.DEFAULT
     private var isCurrentWeek: Boolean = false
     private var recyclerViewSavedState: Parcelable? = null
@@ -137,7 +137,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     }
 
     private fun initializeRecyclerView() {
-        binding.recyclerViewDays.apply {
+        binding.recyclerviewDays.apply {
             layoutManager = LinearLayoutManager(activity)
             setHasFixedSize(true)
             adapter = LessonRecyclerViewAdapter()
@@ -153,14 +153,17 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
                         val weekdayId = (itemView as LessonRecyclerViewAdapter.DayItemView).weekdayId
                         WeekdayActivity.startActivity(requireContext(), weekdayId)
                     }
+
                     LessonRecyclerViewAdapter.ItemViewType.STUDYGROUPCLASS -> {
                         val classId = (itemView as LessonRecyclerViewAdapter.StudyGroupClassItemView).classDesciptor.id
                         LessonInfoActivity.startActivity(requireContext(), classId, ScheduleType.STUDYGROUP, weekId)
                     }
+
                     LessonRecyclerViewAdapter.ItemViewType.TEACHERCLASS -> {
                         val classId = (itemView as LessonRecyclerViewAdapter.TeacherClassItemView).classDesciptor.id
                         LessonInfoActivity.startActivity(requireContext(), classId, ScheduleType.TEACHER, weekId)
                     }
+
                     else -> {}
                 }
             },
@@ -197,7 +200,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
                     }
 
                     if (scheduleUiState.isData()) {
-                        onScheduleDataChanged(scheduleUiState.data)
+                        onScheduleData(scheduleUiState.data)
                         for (weekday in scheduleUiState.data) {
                             setNotesStatus(weekday.weekdayId)
                         }
@@ -260,7 +263,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         disposables += presenter.hasNotes(weekdayId)
             .subscribeBy(
                 onSuccess = { hasNotes ->
-                    val adapter = binding.recyclerViewDays.adapter as LessonRecyclerViewAdapter
+                    val adapter = binding.recyclerviewDays.adapter as LessonRecyclerViewAdapter
                     adapter.updateWeekdayNotesStatus(weekdayId, hasNotes)
                 },
                 onError = { throwable -> Timber.e(throwable) }
@@ -274,7 +277,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        val state = binding.recyclerViewDays.layoutManager?.onSaveInstanceState()
+        val state = binding.recyclerviewDays.layoutManager?.onSaveInstanceState()
         outState.putParcelable(ARG_RECYCLER_VIEW_SAVED_STATE, state)
     }
 
@@ -283,19 +286,19 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         adapterOnClickDisposable.dispose()
         binding.progressIndicatorUpdate.animate().setListener(null)
         binding.swipeRefreshLayout.setOnRefreshListener(null)
-        binding.recyclerViewDays.clearOnScrollListeners()
+        binding.recyclerviewDays.clearOnScrollListeners()
         fragmentBinding = null
     }
 
     fun highlightToday() {
         if (binding.textNoClasses.visibility != View.VISIBLE) {
-            val adapter = binding.recyclerViewDays.adapter as LessonRecyclerViewAdapter
+            val adapter = binding.recyclerviewDays.adapter as LessonRecyclerViewAdapter
             val index = adapter.getWeekdayViewIndex(presenter.getCurrentDayOfWeek())
             val smoothScroller = object : LinearSmoothScroller(requireContext()) {
                 override fun getVerticalSnapPreference() = SNAP_TO_START
             }
             smoothScroller.targetPosition = index
-            binding.recyclerViewDays.layoutManager?.startSmoothScroll(smoothScroller)
+            binding.recyclerviewDays.layoutManager?.startSmoothScroll(smoothScroller)
             val fromColor = ContextCompat.getColor(requireContext(), R.color.surface)
             val toColor = ContextCompat.getColor(requireContext(), R.color.item_highlight)
             val highlightAnimation = ValueAnimator.ofObject(ArgbEvaluator(), fromColor, toColor)
@@ -303,36 +306,36 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
             highlightAnimation.repeatMode = ValueAnimator.REVERSE
             highlightAnimation.repeatCount = 1
             highlightAnimation.addUpdateListener { animator ->
-                val view: View? = binding.recyclerViewDays.layoutManager?.findViewByPosition(index)
+                val view: View? = binding.recyclerviewDays.layoutManager?.findViewByPosition(index)
                 view?.setBackgroundColor(animator.animatedValue as Int)
             }
             highlightAnimation.start()
         }
     }
 
-    private fun onScheduleDataChanged(data: List<WeekdayWithLessons<Lesson>>) {
+    private fun onScheduleData(data: List<WeekdayWithLessons<Lesson>>) {
         if (data.sumOf { weekday -> weekday.lessons.size } == 0) {
             binding.buttonSwitchNoClassesLayout.visibility = View.VISIBLE
-            if (isNoClassesDaysLayoutHidden) {
+            if (isNoClassesViewVisible) {
                 binding.textNoClasses.visibility = View.VISIBLE
             } else {
                 binding.textNoClasses.visibility = View.GONE
             }
-            binding.recyclerViewDays.clearOnScrollListeners()
-            binding.recyclerViewDays.addOnScrollListener(recyclerViewScrollListener)
+            binding.recyclerviewDays.clearOnScrollListeners()
+            binding.recyclerviewDays.addOnScrollListener(recyclerViewScrollListener)
             binding.buttonSwitchNoClassesLayout.setOnClickListener { onSwitchNoClassesLayoutButtonClickListener() }
         } else {
             binding.buttonSwitchNoClassesLayout.visibility = View.GONE
             binding.textNoClasses.visibility = View.GONE
-            binding.recyclerViewDays.clearOnScrollListeners()
+            binding.recyclerviewDays.clearOnScrollListeners()
         }
 
-        val adapter = binding.recyclerViewDays.adapter as LessonRecyclerViewAdapter
+        val adapter = binding.recyclerviewDays.adapter as LessonRecyclerViewAdapter
         val hadNoClasses = !adapter.hasClasses()
 
         adapter.onNewData(data)
 
-        val layoutManager = binding.recyclerViewDays.layoutManager as LinearLayoutManager
+        val layoutManager = binding.recyclerviewDays.layoutManager as LinearLayoutManager
         if (recyclerViewSavedState != null) {
             layoutManager.onRestoreInstanceState(recyclerViewSavedState)
             recyclerViewSavedState = null
@@ -371,27 +374,27 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         }
 
     private fun onSwitchNoClassesLayoutButtonClickListener() {
-        if (isNoClassesDaysLayoutHidden) {
-            isNoClassesDaysLayoutHidden = false
+        if (isNoClassesViewVisible) {
+            isNoClassesViewVisible = false
 
             binding.textNoClasses.visibility = View.GONE
             binding.buttonSwitchNoClassesLayout.text = requireContext().getString(R.string.button_week_hide_weekdays)
         } else {
-            isNoClassesDaysLayoutHidden = true
+            isNoClassesViewVisible = true
 
             binding.textNoClasses.visibility = View.VISIBLE
             binding.buttonSwitchNoClassesLayout.text = requireContext().getString(R.string.button_week_show_weekdays)
 
             // workaround the edge case when the button is pressed during
             // the hiding animation and won't show again
-            binding.recyclerViewDays.suppressLayout(true)
-            binding.recyclerViewDays.suppressLayout(false)
-            binding.recyclerViewDays.scrollBy(0, -1)
+            binding.recyclerviewDays.suppressLayout(true)
+            binding.recyclerviewDays.suppressLayout(false)
+            binding.recyclerviewDays.scrollBy(0, -1)
         }
     }
 
     private fun hideUpdateProgressIndicator() {
-        binding.recyclerViewDays.animate()
+        binding.recyclerviewDays.animate()
             .translationY(0f)
             .setDuration(200)
             .start()
@@ -409,7 +412,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
 
     private fun showUpdateProgressIndicator() {
         binding.progressIndicatorUpdate.visibility = View.VISIBLE
-        binding.recyclerViewDays.animate()
+        binding.recyclerviewDays.animate()
             .translationY(binding.progressIndicatorUpdate.height.toFloat())
             .setDuration(200)
             .start()
