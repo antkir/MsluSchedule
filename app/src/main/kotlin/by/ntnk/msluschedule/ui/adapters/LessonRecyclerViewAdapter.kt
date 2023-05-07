@@ -188,7 +188,14 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
 
     override fun getItemViewType(position: Int): Int = itemViews[position].viewType.toInt()
 
-    fun isEmpty(): Boolean = itemViews.size == 0
+    fun hasClasses(): Boolean {
+        for (itemView in itemViews) {
+            if (itemView is StudyGroupClassItemView || itemView is TeacherClassItemView) {
+                return true
+            }
+        }
+        return false
+    }
 
     private class BlankDayItemView : BaseItemView {
         override val viewType: ItemViewType = ItemViewType.BLANKDAY

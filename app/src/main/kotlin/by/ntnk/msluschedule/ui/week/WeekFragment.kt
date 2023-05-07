@@ -57,7 +57,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     private var isNoClassesDaysLayoutHidden: Boolean = true
     private var weekId: Int = Int.DEFAULT
     private var isCurrentWeek: Boolean = false
-    private var layoutManagerSavedState: Parcelable? = null
+    private var recyclerViewSavedState: Parcelable? = null
     private lateinit var adapterOnClickDisposable: Disposable
     private val disposables: CompositeDisposable = CompositeDisposable()
     private lateinit var scheduleContainerInfo: ScheduleContainerInfo
@@ -83,7 +83,6 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         val id = arguments?.getInt(ARG_WEEK_ID)
         weekId = id!!
         isCurrentWeek = arguments?.getBoolean(ARG_IS_CURRENT_WEEK) == true
-        layoutManagerSavedState = savedInstanceState?.getParcelable(ARG_LAYOUT_MANAGER_SAVED_STATE)
         scheduleContainerInfo = presenter.getScheduleContainerInfo()
     }
 
@@ -99,13 +98,6 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
             binding.swipeRefreshLayout.isRefreshing = false
 
             if (AndroidUtils.isNetworkAccessible(requireContext().applicationContext)) {
-                val adapter = binding.recyclerViewDays.adapter as LessonRecyclerViewAdapter
-                layoutManagerSavedState =
-                    if (!adapter.isEmpty() || !isNoClassesDaysLayoutHidden) {
-                        binding.recyclerViewDays.layoutManager?.onSaveInstanceState()
-                    } else {
-                        null
-                    }
                 presenter.updateSchedule(scheduleContainerInfo.id, weekId)
             } else {
                 val baseFABMain = requireActivity().findViewById<FloatingActionButton>(R.id.fab_base)
@@ -123,13 +115,6 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
                     when (menuItem.itemId) {
                         R.id.item_week_update -> {
                             if (AndroidUtils.isNetworkAccessible(requireContext().applicationContext)) {
-                                val adapter = binding.recyclerViewDays.adapter as LessonRecyclerViewAdapter
-                                layoutManagerSavedState =
-                                    if (!adapter.isEmpty() || !isNoClassesDaysLayoutHidden) {
-                                        binding.recyclerViewDays.layoutManager?.onSaveInstanceState()
-                                    } else {
-                                        null
-                                    }
                                 presenter.updateSchedule(scheduleContainerInfo.id, weekId)
                             } else {
                                 val baseFABMain = requireActivity().findViewById<FloatingActionButton>(R.id.fab_base)
@@ -144,6 +129,11 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
             viewLifecycleOwner,
             Lifecycle.State.RESUMED
         )
+    }
+
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
+        recyclerViewSavedState = savedInstanceState?.getParcelable(ARG_RECYCLER_VIEW_SAVED_STATE)
     }
 
     private fun initializeRecyclerView() {
@@ -284,8 +274,8 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        layoutManagerSavedState = binding.recyclerViewDays.layoutManager?.onSaveInstanceState()
-        outState.putParcelable(ARG_LAYOUT_MANAGER_SAVED_STATE, layoutManagerSavedState)
+        val state = binding.recyclerViewDays.layoutManager?.onSaveInstanceState()
+        outState.putParcelable(ARG_RECYCLER_VIEW_SAVED_STATE, state)
     }
 
     override fun onDestroyView() {
@@ -338,15 +328,22 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         }
 
         val adapter = binding.recyclerViewDays.adapter as LessonRecyclerViewAdapter
+        val hadNoClasses = !adapter.hasClasses()
+
         adapter.onNewData(data)
 
         val layoutManager = binding.recyclerViewDays.layoutManager as LinearLayoutManager
-        layoutManager.onRestoreInstanceState(layoutManagerSavedState)
-        if (isCurrentWeek) {
-            if (layoutManagerSavedState == null) {
+        if (recyclerViewSavedState != null) {
+            layoutManager.onRestoreInstanceState(recyclerViewSavedState)
+            recyclerViewSavedState = null
+        } else {
+            if (isCurrentWeek && hadNoClasses && adapter.hasClasses()) {
                 val index = adapter.getWeekdayViewIndex(presenter.getCurrentDayOfWeek())
                 layoutManager.scrollToPosition(index)
             }
+        }
+
+        if (isCurrentWeek) {
             activity?.findViewById<CircularProgressIndicator>(R.id.progressbar)?.visibility = View.GONE
             parentFragment?.view?.findViewById<ViewPager>(R.id.viewpager_weeks)?.visibility = View.VISIBLE
         }
@@ -450,13 +447,6 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
             snackbar.setAction(R.string.snackbar_week_init_retry) {
                 context ?: return@setAction
                 if (AndroidUtils.isNetworkAccessible(requireContext().applicationContext)) {
-                    val adapter = binding.recyclerViewDays.adapter as LessonRecyclerViewAdapter
-                    layoutManagerSavedState =
-                        if (!adapter.isEmpty() || !isNoClassesDaysLayoutHidden) {
-                            binding.recyclerViewDays.layoutManager?.onSaveInstanceState()
-                        } else {
-                            null
-                        }
                     presenter.updateSchedule(scheduleContainerInfo.id, weekId)
                 } else {
                     AndroidUtils.showSnackbarNetworkInaccessible(baseFABMain)
@@ -478,9 +468,9 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     }
 
     companion object {
-        private const val ARG_LAYOUT_MANAGER_SAVED_STATE = "argLayoutManagerSavedState"
         private const val ARG_WEEK_ID = "weekID"
         private const val ARG_IS_CURRENT_WEEK = "isCurrentWeek"
+        private const val ARG_RECYCLER_VIEW_SAVED_STATE = "argRecyclerViewSavedState"
 
         fun newInstance(weekId: Int, isCurrentWeek: Boolean): WeekFragment {
             return WeekFragment().apply {

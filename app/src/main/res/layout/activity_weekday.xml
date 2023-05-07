@@ -35,7 +35,6 @@
             android:id="@+id/recyclerview_notes"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:saveEnabled="false"
             android:scrollbars="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

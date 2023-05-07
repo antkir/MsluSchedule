@@ -7,7 +7,6 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
-import android.os.Parcelable
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewTreeObserver
@@ -58,7 +57,6 @@ class WeekdayActivity :
     HasAndroidInjector {
 
     private var weekdayId: Int = Int.DEFAULT
-    private var layoutManagerSavedState: Parcelable? = null
     private lateinit var adapterOnClickDisposable: Disposable
     private val disposables: CompositeDisposable = CompositeDisposable()
 
@@ -99,7 +97,6 @@ class WeekdayActivity :
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         weekdayId = intent?.getIntExtra(ARG_WEEKDAY_ID, Int.DEFAULT) ?: Int.DEFAULT
-        layoutManagerSavedState = savedInstanceState?.getParcelable(ARG_LAYOUT_MANAGER_SAVED_STATE)
 
         binding.recyclerviewNotes.apply {
             layoutManager = LinearLayoutManager(this@WeekdayActivity)
@@ -111,6 +108,7 @@ class WeekdayActivity :
         }
 
         val adapter = binding.recyclerviewNotes.adapter as NoteRecyclerViewAdapter
+        adapter.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
         adapter.initializeNoteColors(resources)
         adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
@@ -423,14 +421,6 @@ class WeekdayActivity :
         }
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putParcelable(
-            ARG_LAYOUT_MANAGER_SAVED_STATE,
-            binding.recyclerviewNotes.layoutManager?.onSaveInstanceState()
-        )
-    }
-
     override fun onDestroy() {
         super.onDestroy()
         adapterOnClickDisposable.dispose()
@@ -486,13 +476,10 @@ class WeekdayActivity :
         } else {
             binding.textZeroNotes.visibility = View.GONE
         }
-        binding.recyclerviewNotes.layoutManager?.onRestoreInstanceState(layoutManagerSavedState)
-        layoutManagerSavedState = null
     }
 
     companion object {
         private const val ARG_WEEKDAY_ID = "weekdayId"
-        private const val ARG_LAYOUT_MANAGER_SAVED_STATE = "argLayoutManagerSavedState"
 
         fun startActivity(context: Context, weekdayId: Int) {
             val intent = Intent(context, WeekdayActivity::class.java).apply {
