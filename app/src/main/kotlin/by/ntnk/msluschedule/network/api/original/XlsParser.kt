@@ -210,11 +210,6 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
                     if (hssfCell.stringCellValue.isNotEmpty()) {
                         val classDescriptor = parseCellToTeacherClass(hssfCell, startTime, endTime, getWorkbookFontAt)
                         weekday.add(classDescriptor)
-                    } else if (weekday.isNotEmpty() &&
-                        dayHasMoreClasses(hssfRows, rowIndex, columnIndex)
-                    ) {
-                        val classDescriptor = TeacherLesson(startTime, endTime)
-                        weekday.add(classDescriptor)
                     }
                 }
             }
@@ -314,10 +309,4 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
         substringLengths.add(richTextString.length() - prev)
         return substringLengths
     }
-
-    private fun dayHasMoreClasses(hssfRows: List<Row>, rowIndex: Int, columnIndex: Int) =
-        hssfRows
-            .map { it.elementAt(columnIndex) }
-            .slice(rowIndex until hssfRows.size)
-            .any { it.stringCellValue != String.DEFAULT }
 }
