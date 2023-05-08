@@ -148,7 +148,7 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
                 }
 
                 if (state.isData()) {
-                    onFacultyFilterChanged(state.data)
+                    onFacultyFilterChanged(state.data!!)
                 }
 
                 if (state.isError()) {
@@ -176,7 +176,7 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
                 }
 
                 if (state.isData()) {
-                    onCourseFilterChanged(state.data)
+                    onCourseFilterChanged(state.data!!)
                 }
 
                 if (state.isError()) {
@@ -204,7 +204,7 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
                 }
 
                 if (state.isData()) {
-                    onGroupFilterChanged(state.data)
+                    onGroupFilterChanged(state.data!!)
                 }
 
                 if (state.isError()) {

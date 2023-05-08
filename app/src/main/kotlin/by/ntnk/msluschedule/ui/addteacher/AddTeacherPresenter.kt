@@ -17,10 +17,10 @@ import javax.inject.Inject
 
 data class ScheduleFilterUiState(
     val isLoading: Boolean = false,
-    val data: ScheduleFilter = ScheduleFilter.DEFAULT,
+    val data: ScheduleFilter? = null,
     val throwable: Throwable? = null
 ) {
-    fun isData(): Boolean = data != ScheduleFilter.DEFAULT
+    fun isData(): Boolean = data != null
     fun isError(): Boolean = throwable != null
 }
 
@@ -80,14 +80,14 @@ class AddTeacherPresenter @Inject constructor(
         return scheduleContaners.value?.value
             ?.filter { scheduleContainer -> scheduleContainer.year == currentDate.academicYear }
             ?.map { scheduleContainer -> scheduleContainer.name }
-            ?.any { teacher -> teacher == teacherFilter.value!!.data.getValue(key) } == true
+            ?.any { teacher -> teacher == teacherFilter.value!!.data!!.getValue(key) } == true
     }
 
     fun createSelectedTeacherObject(): Teacher {
         assert(teacherFilter.hasValue() && teacherKey.hasValue())
         assert(!teacherFilter.value!!.isError() && teacherFilter.value!!.isData())
         val teacherKey = teacherKey.value!!
-        val teacherName = teacherFilter.value!!.data.getValue(teacherKey)
+        val teacherName = teacherFilter.value!!.data!!.getValue(teacherKey)
         return Teacher(teacherKey, teacherName, currentDate.academicYear)
     }
 }

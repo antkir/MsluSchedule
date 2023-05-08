@@ -103,7 +103,7 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
                 }
 
                 if (state.isData()) {
-                    onTeacherFilterChanged(state.data)
+                    onTeacherFilterChanged(state.data!!)
                 }
 
                 if (state.isError()) {

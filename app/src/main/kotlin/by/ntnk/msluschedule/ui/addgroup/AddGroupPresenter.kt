@@ -19,10 +19,10 @@ import javax.inject.Inject
 
 data class ScheduleFilterUiState(
     val isLoading: Boolean = false,
-    val data: ScheduleFilter = ScheduleFilter.DEFAULT,
+    val data: ScheduleFilter? = null,
     val throwable: Throwable? = null
 ) {
-    fun isData(): Boolean = data != ScheduleFilter.DEFAULT
+    fun isData(): Boolean = data != null
     fun isError(): Boolean = throwable != null
 }
 
@@ -98,14 +98,14 @@ class AddGroupPresenter @Inject constructor(
         assert(position >= 0)
         assert(facultyFilter.hasValue())
         assert(!facultyFilter.value!!.isError() && facultyFilter.value!!.isData())
-        facultyKey.onNext(facultyFilter.value!!.data.keyAt(position))
+        facultyKey.onNext(facultyFilter.value!!.data!!.keyAt(position))
     }
 
     fun setCourseKeyFromPosition(position: Int) {
         assert(position >= 0)
         assert(courseFilter.hasValue())
         assert(!courseFilter.value!!.isError() && courseFilter.value!!.isData())
-        courseKey.onNext(courseFilter.value!!.data.keyAt(position))
+        courseKey.onNext(courseFilter.value!!.data!!.keyAt(position))
     }
 
     fun setGroupKey(key: Int) {
@@ -167,7 +167,7 @@ class AddGroupPresenter @Inject constructor(
             ?.filter { scheduleContainer -> scheduleContainer.year == currentDate.academicYear }
             ?.filter { scheduleContainer -> scheduleContainer.faculty == facultyKey.value }
             ?.map { scheduleContainer -> scheduleContainer.name }
-            ?.any { group -> group == groupFilter.value!!.data.getValue(key) } == true
+            ?.any { group -> group == groupFilter.value!!.data!!.getValue(key) } == true
     }
 
     fun createSelectedStudyGroupObject(): StudyGroup {
@@ -176,7 +176,7 @@ class AddGroupPresenter @Inject constructor(
         assert(groupFilter.hasValue() && groupKey.hasValue())
         assert(!groupFilter.value!!.isError() && groupFilter.value!!.isData())
         val groupKey = groupKey.value!!
-        val groupName = groupFilter.value!!.data.getValue(groupKey)
+        val groupName = groupFilter.value!!.data!!.getValue(groupKey)
         return StudyGroup(groupKey, groupName, facultyKey.value!!, courseKey.value!!, currentDate.academicYear)
     }
 }
