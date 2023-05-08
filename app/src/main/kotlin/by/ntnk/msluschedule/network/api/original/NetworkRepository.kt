@@ -10,7 +10,7 @@ import by.ntnk.msluschedule.network.api.original.data.JsonBody
 import by.ntnk.msluschedule.network.api.original.data.RequestData
 import by.ntnk.msluschedule.network.api.original.data.RequestInfo
 import by.ntnk.msluschedule.network.data.ScheduleFilter
-import by.ntnk.msluschedule.utils.EMPTY_STRING
+import by.ntnk.msluschedule.utils.DEFAULT
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
 import io.reactivex.Completable
 import io.reactivex.Observable
@@ -28,28 +28,29 @@ class NetworkRepository @Inject constructor(
     private val scheduleService: ScheduleService,
     private val xlsParser: XlsParser
 ) : NetworkRepository {
+
     override fun getFaculties(): Single<ScheduleFilter> {
         return wrapRequest {
-            getDataFromHtmlRequest(NetworkHelper.groupSchedule, networkHelper.facultyRequestInfo)
+            getDataFromHtmlRequest(NetworkHelper.GROUP_SCHEDULE, NetworkHelper.FACULTY_REQUEST_INFO)
         }
     }
 
     override fun getCourses(facultyKey: Int): Single<ScheduleFilter> {
         return wrapRequest {
-            getDataFromHtmlRequest(NetworkHelper.groupSchedule, networkHelper.courseRequestInfo)
+            getDataFromHtmlRequest(NetworkHelper.GROUP_SCHEDULE, NetworkHelper.COURSE_REQUEST_INFO)
         }
     }
 
     override fun getGroups(facultyKey: Int, courseKey: Int, yearKey: Int): Single<ScheduleFilter> {
         val requestDataList = networkHelper.getStudyGroupsFilterDataList(facultyKey, courseKey, yearKey)
         return wrapRequest {
-            getDataFromJsonRequest(networkHelper.groupRequestInfo, NetworkHelper.groupSchedule, requestDataList)
+            getDataFromJsonRequest(NetworkHelper.GROUP_REQUEST_INFO, NetworkHelper.GROUP_SCHEDULE, requestDataList)
         }
     }
 
     override fun getTeachers(): Single<ScheduleFilter> {
         return wrapRequest {
-            getDataFromHtmlRequest(NetworkHelper.teacherSchedule, networkHelper.teacherRequestInfo)
+            getDataFromHtmlRequest(NetworkHelper.TEACHER_SCHEDULE, NetworkHelper.TEACHER_REQUEST_INFO)
         }
     }
 
@@ -57,9 +58,9 @@ class NetworkRepository @Inject constructor(
         val requestDataList = networkHelper.getYearsFilterDataList()
         return wrapRequest {
             getDataFromJsonRequest(
-                networkHelper.weekRequestInfo,
+                NetworkHelper.WEEK_REQUEST_INFO,
                 // Weeks are equal for groups and teachers, so we can use either request
-                NetworkHelper.teacherSchedule,
+                NetworkHelper.TEACHER_SCHEDULE,
                 requestDataList
             )
         }
@@ -67,14 +68,14 @@ class NetworkRepository @Inject constructor(
 
     override fun getSchedule(studyGroup: StudyGroup, weekKey: Int): Observable<WeekdayWithStudyGroupLessons> {
         val requestDataList = networkHelper.getStudyGroupRequestDataList(studyGroup, weekKey)
-        return wrapRequest { getScheduleData(NetworkHelper.groupSchedule, requestDataList) }
-            .flatMapObservable { xlsParser.parseStudyGroupXls(it) }
+        return wrapRequest { getScheduleData(NetworkHelper.GROUP_SCHEDULE, requestDataList) }
+            .flatMapObservable { xlsStream -> xlsParser.parseStudyGroupXls(xlsStream) }
     }
 
     override fun getSchedule(teacher: Teacher, weekKey: Int): Observable<WeekdayWithTeacherLessons> {
         val requestDataList = networkHelper.getTeacherRequestDataList(teacher, weekKey)
-        return wrapRequest { getScheduleData(NetworkHelper.teacherSchedule, requestDataList) }
-            .flatMapObservable { xlsParser.parseTeacherXls(it) }
+        return wrapRequest { getScheduleData(NetworkHelper.TEACHER_SCHEDULE, requestDataList) }
+            .flatMapObservable { xlsStream -> xlsParser.parseTeacherXls(xlsStream) }
     }
 
     /*
@@ -97,14 +98,14 @@ class NetworkRepository @Inject constructor(
     ): Single<ScheduleFilter> {
         return Observable
             .fromIterable(requestDataList)
-            .flatMapSingle { changeScheduleFilter(scheduleType, it) }
+            .flatMapSingle { requestData -> changeScheduleFilter(scheduleType, requestData) }
             .lastOrError()
-            .flatMap { networkHelper.parseDataFromJsonResponse(requestInfo, it) }
+            .flatMap { jsonResponse -> networkHelper.parseDataFromJsonResponse(requestInfo, jsonResponse) }
     }
 
     private fun getDataFromHtmlRequest(scheduleType: String, scheduleFilter: RequestInfo): Single<ScheduleFilter> {
         return getHtmlBody(scheduleType)
-            .flatMap { networkHelper.parseDataFromHtmlBody(scheduleFilter, it) }
+            .flatMap { htmlBody -> networkHelper.parseDataFromHtmlBody(scheduleFilter, htmlBody) }
     }
 
     private fun getScheduleData(
@@ -112,11 +113,11 @@ class NetworkRepository @Inject constructor(
         requestDataList: List<RequestData>
     ): Single<InputStream> {
         return Observable.fromIterable(requestDataList)
-            .flatMapSingle { changeScheduleFilter(requestedScheduleType, it) }
+            .flatMapSingle { requestData -> changeScheduleFilter(requestedScheduleType, requestData) }
             .flatMapCompletable {
                 return@flatMapCompletable if (sharedPreferencesRepository.isFullSubjectNameUsed()) {
                     val filterData = networkHelper.getSubjectLengthFilterData(isFullSubjectName = true)
-                    changeScheduleFilter(NetworkHelper.groupSchedule, filterData).ignoreElement()
+                    changeScheduleFilter(NetworkHelper.GROUP_SCHEDULE, filterData).ignoreElement()
                 } else {
                     Completable.complete()
                 }
@@ -127,7 +128,7 @@ class NetworkRepository @Inject constructor(
     private fun initSession(): Completable {
         return scheduleService
             .initSession()
-            .doOnSuccess { checkErrors(it) }
+            .doOnSuccess { response -> checkErrors(response) }
             .ignoreElement()
     }
 
@@ -142,22 +143,22 @@ class NetworkRepository @Inject constructor(
                 formIds.second,
                 requestData.selectedValue
             )
-            .doOnSuccess { checkErrors(it) }
-            .map { it.body() }
+            .doOnSuccess { response -> checkErrors(response) }
+            .map { response -> response.body() }
     }
 
     private fun getHtmlBody(scheduleType: String): Single<String> {
         return scheduleService
             .getHtmlBody(scheduleType)
-            .doOnSuccess { checkErrors(it) }
-            .map { it.body()?.string() ?: EMPTY_STRING }
+            .doOnSuccess { response -> checkErrors(response) }
+            .map { response -> response.body()?.string() ?: String.DEFAULT }
     }
 
     private fun getScheduleInputStream(scheduleType: String): Single<InputStream> {
         return scheduleService
             .getSchedule(scheduleType)
-            .doOnSuccess { checkErrors(it) }
-            .map { it.body()?.byteStream() }
+            .doOnSuccess { response -> checkErrors(response) }
+            .map { response -> response.body()?.byteStream() }
     }
 
     @Throws(HttpStatusException::class)
