@@ -6,6 +6,7 @@ import android.net.NetworkCapabilities
 import android.os.Build
 import android.util.TypedValue
 import android.view.View
+import androidx.collection.SparseArrayCompat
 import androidx.core.view.ViewCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import by.ntnk.msluschedule.R
@@ -14,6 +15,7 @@ import io.reactivex.subjects.PublishSubject
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
+import java.util.Objects
 import java.util.Random
 import java.util.concurrent.ThreadLocalRandom
 
@@ -28,6 +30,44 @@ fun IntRange.random(): Int {
     } else {
         Random().nextInt((endInclusive + 1) - start) + start
     }
+}
+
+/**
+ * Compares the contents of this [SparseArrayCompat] to the specified [SparseArrayCompat].
+ *
+ * For backwards compatibility reasons, [Object.equals] cannot be implemented,
+ * so this serves as a manually invoked alternative.
+ */
+fun SparseArrayCompat<*>.contentEquals(other: SparseArrayCompat<*>?): Boolean {
+    if (other == null) return false
+
+    if (size() != other.size()) return false
+    for (index in 0 until size()) {
+        val key = keyAt(index)
+        if (valueAt(index) != other[key]) {
+            return false
+        }
+    }
+
+    return true
+}
+
+/**
+ * Returns a hash code value for the contents of this [SparseArrayCompat], combining the
+ * [Objects.hashCode] result of all its keys and values.
+ *
+ * For backwards compatibility, [Object.hashCode] cannot be implemented, so this serves
+ * as a manually invoked alternative.
+ */
+fun SparseArrayCompat<*>.contentHashCode(): Int {
+    var hash = 0
+    for (index in 0 until size()) {
+        val key = keyAt(index)
+        val value = valueAt(index)
+        hash = 31 * hash + Objects.hashCode(key)
+        hash = 31 * hash + Objects.hashCode(value)
+    }
+    return hash
 }
 
 interface SimpleDrawerListener : DrawerLayout.DrawerListener {

@@ -2,6 +2,8 @@ package by.ntnk.msluschedule.network.data
 
 import androidx.collection.SparseArrayCompat
 import by.ntnk.msluschedule.utils.DEFAULT
+import by.ntnk.msluschedule.utils.contentEquals
+import by.ntnk.msluschedule.utils.contentHashCode
 
 data class ScheduleFilter(private val data: SparseArrayCompat<String>) {
 
@@ -20,18 +22,12 @@ data class ScheduleFilter(private val data: SparseArrayCompat<String>) {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+        if (other !is ScheduleFilter) return false
 
-        other as ScheduleFilter
-        if (data.size() != other.data.size()) return false
-        for (i in 0 until size) {
-            if (data.get(i) != other.data.get(i)) return false
-        }
+        if (!data.contentEquals(other.data)) return false
 
         return true
     }
 
-    override fun hashCode(): Int = arrayOf(data).contentHashCode()
-
-    override fun toString(): String = data.toString()
+    override fun hashCode(): Int = data.contentHashCode()
 }
