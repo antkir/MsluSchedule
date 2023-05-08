@@ -147,7 +147,9 @@ class DatabaseRepository @Inject constructor(
             .flatMapSingle { weekday ->
                 val classes = weekdays.firstOrNull { it.weekday == weekday.value }?.lessons ?: emptyList()
                 insertTeacherClasses(classes, weekday.id)
-                    .flatMap { Single.just(WeekdayWithTeacherLessons(weekday.id, weekday.value, classes)) }
+                    .flatMap { insertedClasses ->
+                        Single.just(WeekdayWithTeacherLessons(weekday.id, weekday.value, insertedClasses))
+                    }
             }
             .toList()
     }
