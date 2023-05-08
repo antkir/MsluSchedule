@@ -386,7 +386,7 @@ class WeekdayActivity :
                     if (notesUiState.isData()) {
                         val notes = notesUiState.data!!
                         val weekday = presenter.getWeekdayData()
-                        onNotesData(notes, weekday.lessons)
+                        onNotesData(notes, weekday.classes)
                     }
 
                     if (notesUiState.isError()) {
@@ -439,7 +439,7 @@ class WeekdayActivity :
     private fun onWeekdayData(weekday: WeekdayWithLessons<Lesson>) {
         supportActionBar?.title = AndroidUtils.getWeekdayFromTag(weekday.weekday, applicationContext)
 
-        val subjects = weekday.lessons
+        val subjects = weekday.classes
             .map { classDescriptor ->
                 if (classDescriptor.type != String.DEFAULT) {
                     "${classDescriptor.subject}, ${classDescriptor.type}"

@@ -5,5 +5,5 @@ import by.ntnk.msluschedule.utils.DEFAULT
 data class WeekdayWithStudyGroupLessons(
     override val weekdayId: Int = Int.DEFAULT,
     override val weekday: String,
-    override val lessons: MutableList<StudyGroupLesson> = mutableListOf()
+    override val classes: MutableList<StudyGroupLesson> = mutableListOf()
 ) : WeekdayWithLessons<StudyGroupLesson>

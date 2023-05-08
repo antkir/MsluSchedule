@@ -111,10 +111,10 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
                                 isPreviousClassPhysEd = true
                             } else if (!(isPreviousClassPhysEd && subject.isBlank())) {
                                 isPreviousClassPhysEd = false
-                                weekdayDescriptor.lessons.add(classDescriptor)
+                                weekdayDescriptor.classes.add(classDescriptor)
                             }
                         } else {
-                            weekdayDescriptor.lessons.add(classDescriptor)
+                            weekdayDescriptor.classes.add(classDescriptor)
                         }
                     }
                 }
@@ -125,10 +125,10 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
 
         // Remove blank classes, if they are the last ones in the list
         for (weekday in weekdays) {
-            val lastIndex = weekday.lessons.lastIndex
-            for (i in weekday.lessons.indices) {
-                if (weekday.lessons[lastIndex - i].subject.isBlank()) {
-                    weekday.lessons.removeAt(lastIndex - i)
+            val lastIndex = weekday.classes.lastIndex
+            for (i in weekday.classes.indices) {
+                if (weekday.classes[lastIndex - i].subject.isBlank()) {
+                    weekday.classes.removeAt(lastIndex - i)
                 } else {
                     break
                 }
@@ -206,7 +206,7 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
                     startTime = values.first
                     endTime = values.second
                 } else if (hssfCell.columnIndex in 2..7) {
-                    val weekday = weekdays[hssfCell.columnIndex - 2].lessons
+                    val weekday = weekdays[hssfCell.columnIndex - 2].classes
                     if (hssfCell.stringCellValue.isNotEmpty()) {
                         val classDescriptor = parseCellToTeacherClass(hssfCell, startTime, endTime, getWorkbookFontAt)
                         weekday.add(classDescriptor)

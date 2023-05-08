@@ -55,9 +55,9 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
 
         for (day in days) {
             itemViews.add(DayItemView(day.weekdayId, day.weekday))
-            if (day.lessons.isNotEmpty()) {
+            if (day.classes.isNotEmpty()) {
                 var prevStartTime: String = String.DEFAULT
-                for (classDesciptor in day.lessons) {
+                for (classDesciptor in day.classes) {
                     val classItemView: BaseItemView =
                         when (classDesciptor) {
                             is StudyGroupLesson -> {

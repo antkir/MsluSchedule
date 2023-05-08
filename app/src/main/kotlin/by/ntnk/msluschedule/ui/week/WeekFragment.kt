@@ -314,7 +314,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     }
 
     private fun onScheduleData(data: List<WeekdayWithLessons<Lesson>>) {
-        if (data.sumOf { weekday -> weekday.lessons.size } == 0) {
+        if (data.sumOf { weekday -> weekday.classes.size } == 0) {
             binding.buttonSwitchNoClassesLayout.visibility = View.VISIBLE
             if (isNoClassesViewVisible) {
                 binding.textNoClasses.visibility = View.VISIBLE
