@@ -1,5 +1,6 @@
 package by.ntnk.msluschedule.utils
 
+import org.jsoup.HttpStatusException
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
@@ -35,9 +36,6 @@ fun Boolean.toInt() = if (this) 1 else 0
 typealias ImmutableEntry = AbstractMap.SimpleImmutableEntry<Int, String>
 
 class InvalidYearException : Exception()
-
-class HttpStatusException(message: String, statusCode: Int, url: String) :
-    org.jsoup.HttpStatusException(message, statusCode, url)
 
 object Utils {
     fun isNetworkException(t: Throwable): Boolean {

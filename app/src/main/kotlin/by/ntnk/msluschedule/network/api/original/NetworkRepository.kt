@@ -11,11 +11,11 @@ import by.ntnk.msluschedule.network.api.original.data.RequestData
 import by.ntnk.msluschedule.network.api.original.data.RequestInfo
 import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.utils.EMPTY_STRING
-import by.ntnk.msluschedule.utils.HttpStatusException
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
+import org.jsoup.HttpStatusException
 import retrofit2.Response
 import java.io.InputStream
 import javax.inject.Inject
