@@ -18,6 +18,7 @@ import java.io.InputStream
 import javax.inject.Inject
 
 class XlsParser @Inject constructor(private val sharedPreferencesRepository: SharedPreferencesRepository) {
+
     fun parseStudyGroupXls(xlsStream: InputStream): Observable<WeekdayWithStudyGroupLessons> {
         val poifsFileSystem = POIFSFileSystem(xlsStream)
         val hssfWorkbook = HSSFWorkbook(poifsFileSystem)
@@ -206,11 +207,6 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
                     if (hssfCell.stringCellValue.isNotEmpty()) {
                         val lessonEntity = parseCellToTeacherLesson(hssfCell, startTime, endTime, getWorkbookFontAt)
                         weekdayWithLessons.add(lessonEntity)
-                    } else if (weekdayWithLessons.isNotEmpty() &&
-                        dayHasMoreLessons(hssfRows, rowIndex, columnIndex)
-                    ) {
-                        val lessonEntity = TeacherLesson(startTime, endTime)
-                        weekdayWithLessons.add(lessonEntity)
                     }
                 }
             }
@@ -310,10 +306,4 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
         substringLengths.add(richTextString.length() - prev)
         return substringLengths
     }
-
-    private fun dayHasMoreLessons(hssfRows: List<Row>, rowIndex: Int, columnIndex: Int) =
-        hssfRows
-            .map { it.elementAt(columnIndex) }
-            .slice(rowIndex until hssfRows.size)
-            .any { it.stringCellValue != EMPTY_STRING }
 }
