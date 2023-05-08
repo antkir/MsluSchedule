@@ -131,7 +131,7 @@ class WeekPresenterTest {
             )
         whenever(databaseRepository.getNotesForWeekday(anyInt()))
             .thenReturn(
-                Observable.just(Note(id = 0, text = String.DEFAULT, subject = String.DEFAULT))
+                Observable.just(listOf(Note(id = 0, text = String.DEFAULT, subject = String.DEFAULT)))
                     .doOnSubscribe { disposable -> getNotesForWeekdayTest.onSubscribe(disposable) }
             )
         whenever(networkRepository.getSchedule(any<StudyGroup>(), anyInt()))
