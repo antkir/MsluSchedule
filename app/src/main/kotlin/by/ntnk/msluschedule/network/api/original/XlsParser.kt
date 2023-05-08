@@ -37,8 +37,8 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
         cells: List<Cell>,
         getWorkbookFontAt: (Short) -> HSSFFont
     ): List<WeekdayWithStudyGroupLessons> {
-        val weekdaysWithLessons = ArrayList<WeekdayWithStudyGroupLessons>(Days.num())
-        lateinit var weekday: WeekdayWithStudyGroupLessons
+        val weekdays = ArrayList<WeekdayWithStudyGroupLessons>(Days.num())
+        lateinit var weekdayDescriptor: WeekdayWithStudyGroupLessons
         lateinit var startTime: String
         lateinit var endTime: String
         lateinit var subject: String
@@ -47,24 +47,26 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
         lateinit var classroom: String
 
         var prevTime: Pair<String, String> = Pair(String.DEFAULT, String.DEFAULT)
-        var isPreviousLessonPhysEd = false
+        var isPreviousClassPhysEd = false
 
         for (cell in cells) {
             when (cell.columnIndex) {
                 0 -> {
                     if (cell.stringCellValue.isNotEmpty()) {
                         val weekdayValue = cell.stringCellValue
-                        weekday = WeekdayWithStudyGroupLessons(weekdayValue)
-                        weekdaysWithLessons.add(weekday)
+                        weekdayDescriptor = WeekdayWithStudyGroupLessons(weekdayValue)
+                        weekdays.add(weekdayDescriptor)
                     }
                 }
+
                 1 -> {
-                    val pair = getLessonTimePair(cell.stringCellValue)
-                    startTime = if (pair.first != String.DEFAULT) pair.first else prevTime.first
-                    endTime = if (pair.second != String.DEFAULT) pair.second else prevTime.second
+                    val time = getClassTimePair(cell.stringCellValue)
+                    startTime = if (time.first != String.DEFAULT) time.first else prevTime.first
+                    endTime = if (time.second != String.DEFAULT) time.second else prevTime.second
 
                     prevTime = Pair(startTime, endTime)
                 }
+
                 2 -> {
                     subject = String.DEFAULT
                     type = String.DEFAULT
@@ -89,58 +91,60 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
                             val nextStartIdx = substringLengths[i]
                             val typeTeacherString = valueString.substring(nextStartIdx, richTextString.length()).trim()
                             val hasNewline = valueString.contains("\n")
-                            val (lessonType, lessonTeacher) = getTypeTeacherPair(typeTeacherString, hasNewline)
+                            val (classType, classTeacher) = getTypeTeacherPair(typeTeacherString, hasNewline)
 
                             subject = valueString.substring(0, nextStartIdx).trim()
-                            type = lessonType
-                            teacher = lessonTeacher
+                            type = classType
+                            teacher = classTeacher
                         }
                     }
                 }
+
                 3 -> {
                     classroom = cell.stringCellValue.replace(" ", String.DEFAULT)
 
                     if (startTime.isNotEmpty() || subject.isNotEmpty()) {
-                        val lesson = StudyGroupLesson(subject, type, teacher, classroom, startTime, endTime)
+                        val classDescriptor = StudyGroupLesson(subject, type, teacher, classroom, startTime, endTime)
                         if (sharedPreferencesRepository.isPhysEdClassHidden()) {
                             if (subject.contains("физ", ignoreCase = true) &&
                                 subject.contains("культура", ignoreCase = true)
                             ) {
-                                isPreviousLessonPhysEd = true
-                            } else if (!(isPreviousLessonPhysEd && subject.isBlank())) {
-                                isPreviousLessonPhysEd = false
-                                weekday.lessons.add(lesson)
+                                isPreviousClassPhysEd = true
+                            } else if (!(isPreviousClassPhysEd && subject.isBlank())) {
+                                isPreviousClassPhysEd = false
+                                weekdayDescriptor.lessons.add(classDescriptor)
                             }
                         } else {
-                            weekday.lessons.add(lesson)
+                            weekdayDescriptor.lessons.add(classDescriptor)
                         }
                     }
                 }
+
                 else -> Unit
             }
         }
 
-        // Remove empty lessons, if they are the last ones in the list
-        for (weekdayWithLessons in weekdaysWithLessons) {
-            val size = weekdayWithLessons.lessons.size
-            for (i in weekdayWithLessons.lessons.indices) {
-                if (weekdayWithLessons.lessons[size - 1 - i].subject.isBlank()) {
-                    weekdayWithLessons.lessons.removeAt(size - 1 - i)
+        // Remove blank classes, if they are the last ones in the list
+        for (weekday in weekdays) {
+            val lastIndex = weekday.lessons.lastIndex
+            for (i in weekday.lessons.indices) {
+                if (weekday.lessons[lastIndex - i].subject.isBlank()) {
+                    weekday.lessons.removeAt(lastIndex - i)
                 } else {
                     break
                 }
             }
         }
 
-        if (weekdaysWithLessons.firstOrNull { it.weekday == Days.SUNDAY } == null) {
-            weekday = WeekdayWithStudyGroupLessons(Days.SUNDAY)
-            weekdaysWithLessons.add(weekday)
+        if (weekdays.firstOrNull { it.weekday == Days.SUNDAY } == null) {
+            weekdayDescriptor = WeekdayWithStudyGroupLessons(Days.SUNDAY)
+            weekdays.add(weekdayDescriptor)
         }
 
-        return weekdaysWithLessons
+        return weekdays
     }
 
-    private fun getLessonTimePair(value: String): Pair<String, String> {
+    private fun getClassTimePair(value: String): Pair<String, String> {
         return if (value.isNotEmpty()) {
             val values = value.split("-".toRegex())
             Pair(values[0].trim(), values[1].trim())
@@ -183,7 +187,7 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
         hssfRows: List<Row>,
         getWorkbookFontAt: (Short) -> HSSFFont
     ): List<WeekdayWithTeacherLessons> {
-        val weekdaysWithLessons = listOf(
+        val weekdays = listOf(
             WeekdayWithTeacherLessons(Days.MONDAY),
             WeekdayWithTeacherLessons(Days.TUESDAY),
             WeekdayWithTeacherLessons(Days.WEDNESDAY),
@@ -199,28 +203,28 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
             for (columnIndex in 0 until hssfRows[rowIndex].lastCellNum) {
                 val hssfCell = hssfRows[rowIndex].getCell(columnIndex)
                 if (hssfCell.columnIndex == 1 && hssfCell.stringCellValue.isNotEmpty()) {
-                    val values = getLessonTimePair(hssfCell.stringCellValue)
+                    val values = getClassTimePair(hssfCell.stringCellValue)
                     startTime = values.first
                     endTime = values.second
                 } else if (hssfCell.columnIndex in 2..7) {
-                    val weekdayWithLessons = weekdaysWithLessons[hssfCell.columnIndex - 2].lessons
+                    val weekday = weekdays[hssfCell.columnIndex - 2].lessons
                     if (hssfCell.stringCellValue.isNotEmpty()) {
-                        val lessonEntity = parseCellToTeacherLesson(hssfCell, startTime, endTime, getWorkbookFontAt)
-                        weekdayWithLessons.add(lessonEntity)
-                    } else if (weekdayWithLessons.isNotEmpty() &&
-                        dayHasMoreLessons(hssfRows, rowIndex, columnIndex)
+                        val classDescriptor = parseCellToTeacherClass(hssfCell, startTime, endTime, getWorkbookFontAt)
+                        weekday.add(classDescriptor)
+                    } else if (weekday.isNotEmpty() &&
+                        dayHasMoreClasses(hssfRows, rowIndex, columnIndex)
                     ) {
-                        val lessonEntity = TeacherLesson(startTime, endTime)
-                        weekdayWithLessons.add(lessonEntity)
+                        val classDescriptor = TeacherLesson(startTime, endTime)
+                        weekday.add(classDescriptor)
                     }
                 }
             }
         }
 
-        return weekdaysWithLessons
+        return weekdays
     }
 
-    private fun parseCellToTeacherLesson(
+    private fun parseCellToTeacherClass(
         cell: Cell,
         startTime: String,
         endTime: String,
@@ -250,7 +254,7 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
             if (font.bold) {
                 val nextStartIdx = startIdx + substringLengths[i]
                 val subject = valueString.substring(startIdx, nextStartIdx).trim()
-                val lessonType = valueString.substring(nextStartIdx, richTextString.length()).trim()
+                val classType = valueString.substring(nextStartIdx, richTextString.length()).trim()
 
                 val groupsFacultiesClassroom = valueString.substring(0, startIdx).trim()
 
@@ -275,7 +279,7 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
                     .substringAfterLast(')')
                     .filter { it != ' ' }
 
-                return TeacherLesson(subject, faculties, groups, lessonType, classroom, startTime, endTime)
+                return TeacherLesson(subject, faculties, groups, classType, classroom, startTime, endTime)
             }
         }
 
@@ -312,7 +316,7 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
         return substringLengths
     }
 
-    private fun dayHasMoreLessons(hssfRows: List<Row>, rowIndex: Int, columnIndex: Int) =
+    private fun dayHasMoreClasses(hssfRows: List<Row>, rowIndex: Int, columnIndex: Int) =
         hssfRows
             .map { it.elementAt(columnIndex) }
             .slice(rowIndex until hssfRows.size)
