@@ -30,7 +30,7 @@ class XlsParserTest {
     @Test
     fun `Check if saturday lessons for a studygroup schedule are parsed correctly`() {
         // given
-        val weekdayWithStudyGroupLessons = WeekdayWithStudyGroupLessons(Days.SATURDAY)
+        val weekdayWithStudyGroupLessons = WeekdayWithStudyGroupLessons(weekday = Days.SATURDAY)
         val lesson1 = StudyGroupLesson(
             subject = "СОРО",
             type = "",
@@ -71,7 +71,7 @@ class XlsParserTest {
     @Test
     fun `Check if saturday lessons for a teacher schedule are parsed correctly`() {
         // given
-        val weekdayWithTeacherLessons = WeekdayWithTeacherLessons(Days.SATURDAY)
+        val weekdayWithTeacherLessons = WeekdayWithTeacherLessons(weekday = Days.SATURDAY)
         val lesson1 = TeacherLesson(
             subject = "ПППТР",
             faculty = "Англ.яз., Нем.яз., ФРЯ (исп.), ФРЯ (фр.)",
@@ -125,7 +125,7 @@ class XlsParserTest {
     @Test
     fun `Check if lessons with incomplete data for a studygroup schedule for 2020 are parsed correctly`() {
         // given
-        val fridayWithStudyGroupLessons = WeekdayWithStudyGroupLessons(Days.FRIDAY)
+        val fridayWithStudyGroupLessons = WeekdayWithStudyGroupLessons(weekday = Days.FRIDAY)
         val fridayLesson1 = StudyGroupLesson(
             subject = "Физ. культура, ЛК\nпреп. Пронский А.",
             type = "",
@@ -163,7 +163,7 @@ class XlsParserTest {
         fridayWithStudyGroupLessons.lessons.add(fridayLesson3)
         fridayWithStudyGroupLessons.lessons.add(fridayLesson4)
 
-        val saturdayWithStudyGroupLessons = WeekdayWithStudyGroupLessons(Days.SATURDAY)
+        val saturdayWithStudyGroupLessons = WeekdayWithStudyGroupLessons(weekday = Days.SATURDAY)
         val saturdayLesson1 = StudyGroupLesson(
             subject = "Практ. фонетика (1 ин. яз.)",
             type = "ПЗ",
@@ -205,7 +205,7 @@ class XlsParserTest {
     @Test
     fun `Check if lesson with multiple parentheses for a teacher schedule is parsed correctly`() {
         // given
-        val wednesdayWithTeacherLessons = WeekdayWithTeacherLessons(Days.WEDNESDAY)
+        val wednesdayWithTeacherLessons = WeekdayWithTeacherLessons(weekday = Days.WEDNESDAY)
 
         val wednesdayLesson1 = TeacherLesson(
             subject = "Психология",
@@ -232,7 +232,7 @@ class XlsParserTest {
     @Test
     fun `Check if lessons with the same start time are parsed correctly`() {
         // given
-        val tuesdayWithStudyGroupLessons = WeekdayWithStudyGroupLessons(Days.TUESDAY)
+        val tuesdayWithStudyGroupLessons = WeekdayWithStudyGroupLessons(weekday = Days.TUESDAY)
 
         val lesson1 = StudyGroupLesson(
             subject = "Просодия речи",

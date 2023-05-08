@@ -53,8 +53,7 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
             when (cell.columnIndex) {
                 0 -> {
                     if (cell.stringCellValue.isNotEmpty()) {
-                        val weekdayValue = cell.stringCellValue
-                        weekdayDescriptor = WeekdayWithStudyGroupLessons(weekdayValue)
+                        weekdayDescriptor = WeekdayWithStudyGroupLessons(weekday = cell.stringCellValue)
                         weekdays.add(weekdayDescriptor)
                     }
                 }
@@ -137,7 +136,7 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
         }
 
         if (weekdays.firstOrNull { it.weekday == Days.SUNDAY } == null) {
-            weekdayDescriptor = WeekdayWithStudyGroupLessons(Days.SUNDAY)
+            weekdayDescriptor = WeekdayWithStudyGroupLessons(weekday = Days.SUNDAY)
             weekdays.add(weekdayDescriptor)
         }
 
@@ -188,13 +187,13 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
         getWorkbookFontAt: (Short) -> HSSFFont
     ): List<WeekdayWithTeacherLessons> {
         val weekdays = listOf(
-            WeekdayWithTeacherLessons(Days.MONDAY),
-            WeekdayWithTeacherLessons(Days.TUESDAY),
-            WeekdayWithTeacherLessons(Days.WEDNESDAY),
-            WeekdayWithTeacherLessons(Days.THURSDAY),
-            WeekdayWithTeacherLessons(Days.FRIDAY),
-            WeekdayWithTeacherLessons(Days.SATURDAY),
-            WeekdayWithTeacherLessons(Days.SUNDAY)
+            WeekdayWithTeacherLessons(weekday = Days.MONDAY),
+            WeekdayWithTeacherLessons(weekday = Days.TUESDAY),
+            WeekdayWithTeacherLessons(weekday = Days.WEDNESDAY),
+            WeekdayWithTeacherLessons(weekday = Days.THURSDAY),
+            WeekdayWithTeacherLessons(weekday = Days.FRIDAY),
+            WeekdayWithTeacherLessons(weekday = Days.SATURDAY),
+            WeekdayWithTeacherLessons(weekday = Days.SUNDAY)
         )
         var startTime = String.DEFAULT
         var endTime = String.DEFAULT
