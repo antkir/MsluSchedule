@@ -64,6 +64,7 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
                                 val overlapsPreviousClass: Boolean = prevStartTime == classDesciptor.startTime
                                 StudyGroupClassItemView(classDesciptor, day.weekdayId, overlapsPreviousClass)
                             }
+
                             is TeacherLesson -> TeacherClassItemView(classDesciptor, day.weekdayId)
                             else -> throw RuntimeException("Illegal class type!")
                         }
@@ -116,55 +117,62 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
                 val binding = ItemClassStudygroupBinding.inflate(LayoutInflater.from(parent.context), parent, false)
                 StudyGroupClassViewHolder(binding).apply {
                     itemView.setOnClickListener {
-                        if (adapterPosition != NO_POSITION &&
-                            (itemViews[adapterPosition] as StudyGroupClassItemView).classDesciptor.subject != String.DEFAULT
-                        ) {
-                            onClickSubject.onNext(itemViews[adapterPosition])
+                        if (bindingAdapterPosition != NO_POSITION) {
+                            val item = itemViews[bindingAdapterPosition] as StudyGroupClassItemView
+                            if (item.classDesciptor.subject != String.DEFAULT) {
+                                onClickSubject.onNext(item)
+                            }
                         }
                     }
 
-                    itemView.setOnLongClickListener {
-                        if (adapterPosition != NO_POSITION &&
-                            (itemViews[adapterPosition] as StudyGroupClassItemView).overlapsPreviousClass
-                        ) {
-                            if (itemView.context != null) {
-                                Toast.makeText(
-                                    itemView.context,
-                                    itemView.context.resources.getString(R.string.class_same_time_description),
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                    itemView.setOnLongClickListener { view ->
+                        if (bindingAdapterPosition != NO_POSITION) {
+                            val item = itemViews[bindingAdapterPosition] as StudyGroupClassItemView
+                            if (item.overlapsPreviousClass) {
+                                if (view.context != null) {
+                                    Toast.makeText(
+                                        view.context,
+                                        view.context.resources.getString(R.string.class_same_time_description),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
                             }
                         }
                         return@setOnLongClickListener true
                     }
                 }
             }
+
             ItemViewType.TEACHERCLASS.toInt() -> {
                 val binding = ItemClassTeacherBinding.inflate(LayoutInflater.from(parent.context), parent, false)
                 TeacherClassViewHolder(binding).apply {
                     itemView.setOnClickListener {
-                        if (adapterPosition != NO_POSITION &&
-                            (itemViews[adapterPosition] as TeacherClassItemView).classDesciptor.subject != String.DEFAULT
-                        ) {
-                            onClickSubject.onNext(itemViews[adapterPosition])
+                        if (bindingAdapterPosition != NO_POSITION) {
+                            val item = itemViews[bindingAdapterPosition] as TeacherClassItemView
+                            if (item.classDesciptor.subject != String.DEFAULT) {
+                                onClickSubject.onNext(item)
+                            }
                         }
                     }
                 }
             }
+
             ItemViewType.DAY.toInt() -> {
                 val binding = ItemDayBinding.inflate(LayoutInflater.from(parent.context), parent, false)
                 DayViewHolder(binding).apply {
                     itemView.setOnClickListener {
-                        if (adapterPosition != NO_POSITION) {
-                            onClickSubject.onNext(itemViews[adapterPosition])
+                        if (bindingAdapterPosition != NO_POSITION) {
+                            onClickSubject.onNext(itemViews[bindingAdapterPosition])
                         }
                     }
                 }
             }
+
             ItemViewType.DAYEND.toInt() -> {
                 val binding = ItemDayEndBinding.inflate(LayoutInflater.from(parent.context), parent, false)
                 DayEndViewHolder(binding)
             }
+
             else -> {
                 val binding = ItemClassBlankBinding.inflate(LayoutInflater.from(parent.context), parent, false)
                 BlankDayViewHolder(binding)
@@ -180,6 +188,7 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
                 viewHolder.itemView.setBackgroundColor(surfaceColor)
                 viewHolder.itemView.setOnClickListener { onClickSubject.onNext(itemViews[position]) }
             }
+
             else -> Unit
         }
     }
@@ -320,6 +329,7 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
                             oldItemView.classDesciptor.startTime == newItemView.classDesciptor.startTime &&
                             oldItemView.classDesciptor.endTime == newItemView.classDesciptor.endTime
                     }
+
                     ItemViewType.TEACHERCLASS -> {
                         oldItemView as TeacherClassItemView
                         newItemView as TeacherClassItemView
@@ -327,11 +337,13 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
                             oldItemView.classDesciptor.startTime == newItemView.classDesciptor.startTime &&
                             oldItemView.classDesciptor.endTime == newItemView.classDesciptor.endTime
                     }
+
                     ItemViewType.DAY -> {
                         oldItemView as DayItemView
                         newItemView as DayItemView
                         oldItemView.weekdayId == newItemView.weekdayId
                     }
+
                     else -> true
                 }
             } else {
@@ -351,6 +363,7 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
                         oldItemView.classDesciptor.classroom == newItemView.classDesciptor.classroom &&
                         oldItemView.classDesciptor.teacher == newItemView.classDesciptor.teacher
                 }
+
                 ItemViewType.TEACHERCLASS -> {
                     oldItemView as TeacherClassItemView
                     newItemView as TeacherClassItemView
@@ -360,11 +373,13 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
                         oldItemView.classDesciptor.faculty == newItemView.classDesciptor.faculty &&
                         oldItemView.classDesciptor.groups == newItemView.classDesciptor.groups
                 }
+
                 ItemViewType.DAY -> {
                     oldItemView as DayItemView
                     newItemView as DayItemView
                     oldItemView.hasNotes == newItemView.hasNotes
                 }
+
                 else -> true
             }
         }

@@ -141,14 +141,15 @@ class NoteRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() 
                 val binding = ItemSubjectBinding.inflate(LayoutInflater.from(parent.context), parent, false)
                 SubjectViewHolder(binding)
             }
+
             else -> {
                 val binding = ItemNoteBinding.inflate(LayoutInflater.from(parent.context), parent, false)
                 NoteViewHolder(binding).apply {
                     itemView.setOnLongClickListener {
-                        if (adapterPosition != NO_POSITION) {
-                            val noteItemView = itemViews[adapterPosition] as NoteItemView
-                            selectedNoteId = noteItemView.note.id
-                            onLongClickSubject.onNext(noteItemView.note)
+                        if (bindingAdapterPosition != NO_POSITION) {
+                            val item = itemViews[bindingAdapterPosition] as NoteItemView
+                            selectedNoteId = item.note.id
+                            onLongClickSubject.onNext(item.note)
                         }
                         return@setOnLongClickListener true
                     }
@@ -219,6 +220,7 @@ class NoteRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() 
                         newItemView as SubjectItemView
                         oldItemView.subject == newItemView.subject
                     }
+
                     ItemViewType.NOTE -> {
                         oldItemView as NoteItemView
                         newItemView as NoteItemView
@@ -240,6 +242,7 @@ class NoteRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() 
                     oldItemView.note.text == newItemView.note.text &&
                         oldItemView.note.subject == newItemView.note.subject
                 }
+
                 else -> true
             }
         }

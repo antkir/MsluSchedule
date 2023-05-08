@@ -302,7 +302,7 @@ class WeekdayActivity :
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val adapter = binding.recyclerviewNotes.adapter as NoteRecyclerViewAdapter
-                val note = adapter.getNoteFromPosition(viewHolder.adapterPosition)
+                val note = adapter.getNoteFromPosition(viewHolder.bindingAdapterPosition)
                 presenter.deleteNote(note.id)
 
                 val noteDeleted = resources.getString(R.string.snackbar_note_deleted)
