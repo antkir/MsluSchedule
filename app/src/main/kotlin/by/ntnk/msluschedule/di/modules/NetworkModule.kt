@@ -4,6 +4,7 @@ import by.ntnk.msluschedule.BuildConfig
 import by.ntnk.msluschedule.di.PerApp
 import by.ntnk.msluschedule.network.NetworkRepository
 import by.ntnk.msluschedule.network.api.original.LocalCookieJar
+import by.ntnk.msluschedule.network.api.original.dns.MsluDns
 import by.ntnk.msluschedule.network.api.original.NetworkRepository as NetworkRepositoryOriginal
 import by.ntnk.msluschedule.network.api.original.ScheduleService as ScheduleServiceOriginal
 import dagger.Module
@@ -14,7 +15,9 @@ import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
 import timber.log.Timber
+import java.io.File
 import java.util.concurrent.TimeUnit
+import javax.inject.Named
 
 @Module
 class NetworkModule {
@@ -41,12 +44,22 @@ class NetworkModule {
     @Provides
     @PerApp
     fun provideOkHttpClient(
+        @Named("cache") cacheDir: File,
         httpLoggingInterceptor: HttpLoggingInterceptor,
         localCookieJar: LocalCookieJar
     ): OkHttpClient {
+        // DNS name server setup is not correct for raspisanie.mslu.by and can return a local IP address.
+        // Check which IP address is cached by Android and query correct name server if it's a local IP.
+        val dns = MsluDns.Builder()
+            .url("ns1.mslu.by")
+            .cacheDir(cacheDir)
+            .includeIPv6(false)
+            .build()
+
         return OkHttpClient().newBuilder()
             .addNetworkInterceptor(httpLoggingInterceptor)
             .cookieJar(localCookieJar)
+            .dns(dns)
             .connectTimeout(2, TimeUnit.MINUTES)
             .readTimeout(2, TimeUnit.MINUTES)
             .writeTimeout(2, TimeUnit.MINUTES)
