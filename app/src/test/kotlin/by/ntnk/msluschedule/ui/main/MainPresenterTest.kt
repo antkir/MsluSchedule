@@ -6,7 +6,6 @@ import by.ntnk.msluschedule.data.StudyGroup
 import by.ntnk.msluschedule.data.Teacher
 import by.ntnk.msluschedule.db.DatabaseRepository
 import by.ntnk.msluschedule.network.NetworkRepository
-import by.ntnk.msluschedule.network.api.original.NetworkRepository as NetworkRepositoryOriginal
 import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.utils.CurrentDate
 import by.ntnk.msluschedule.utils.SchedulerProvider
@@ -20,7 +19,6 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentMatchers.eq
 import org.mockito.Mock
-import org.mockito.Mockito
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import org.mockito.MockitoAnnotations
@@ -36,10 +34,7 @@ class MainPresenterTest {
     private lateinit var databaseRepository: DatabaseRepository
 
     @Mock
-    private lateinit var networkRepositoryLazy: dagger.Lazy<NetworkRepository>
-
-    private val networkRepository: NetworkRepository
-        get() = networkRepositoryLazy.get()
+    private lateinit var networkRepository: NetworkRepository
 
     @Mock
     private lateinit var sharedPreferencesRepository: SharedPreferencesRepository
@@ -63,7 +58,6 @@ class MainPresenterTest {
         Timber.plant(TestTree())
         MockitoAnnotations.openMocks(this)
 
-        whenever(networkRepositoryLazy.get()).thenReturn(Mockito.mock(NetworkRepositoryOriginal::class.java))
         whenever(networkRepository.getWeeks())
             .thenReturn(Single.just(ScheduleFilter()).doOnSubscribe { getWeeksTest.onSubscribe(it) })
         whenever(databaseRepository.insertStudyGroup(any()))
@@ -85,7 +79,7 @@ class MainPresenterTest {
         presenter = MainPresenter(
             currentDate,
             databaseRepository,
-            networkRepositoryLazy,
+            networkRepository,
             sharedPreferencesRepository,
             schedulerProvider
         )

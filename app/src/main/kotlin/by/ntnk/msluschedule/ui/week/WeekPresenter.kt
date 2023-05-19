@@ -60,7 +60,7 @@ class WeekPresenter @Inject constructor(
     private val databaseDataMapper: DatabaseDataMapper,
     private val sharedPreferencesRepository: SharedPreferencesRepository,
     private val schedulerProvider: SchedulerProvider,
-    private val networkRepository: dagger.Lazy<NetworkRepository>
+    private val networkRepository: NetworkRepository
 ) : Presenter<WeekView>() {
 
     private val scheduleUiState: BehaviorSubject<ScheduleUiState> = BehaviorSubject.createDefault(ScheduleUiState())
@@ -135,7 +135,7 @@ class WeekPresenter @Inject constructor(
                         databaseRepository.getWeekKey(weekId)
                             .flatMapObservable {
                                 val studyGroup = databaseDataMapper.mapToStudyGroup(scheduleContainer)
-                                return@flatMapObservable networkRepository.get().getSchedule(studyGroup, it)
+                                return@flatMapObservable networkRepository.getSchedule(studyGroup, it)
                             }
                             .toList()
                             .flatMap { weekdays ->
@@ -148,7 +148,7 @@ class WeekPresenter @Inject constructor(
                         databaseRepository.getWeekKey(weekId)
                             .flatMapObservable {
                                 val teacher = databaseDataMapper.mapToTeacher(scheduleContainer)
-                                return@flatMapObservable networkRepository.get().getSchedule(teacher, it)
+                                return@flatMapObservable networkRepository.getSchedule(teacher, it)
                             }
                             .toList()
                             .flatMap { weekdays ->

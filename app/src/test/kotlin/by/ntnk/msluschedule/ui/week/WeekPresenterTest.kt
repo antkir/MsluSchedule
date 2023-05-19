@@ -14,7 +14,6 @@ import by.ntnk.msluschedule.db.DatabaseDataMapper
 import by.ntnk.msluschedule.db.DatabaseRepository
 import by.ntnk.msluschedule.db.data.ScheduleContainer
 import by.ntnk.msluschedule.network.NetworkRepository
-import by.ntnk.msluschedule.network.api.original.NetworkRepository as NetworkRepositoryOriginal
 import by.ntnk.msluschedule.utils.CurrentDate
 import by.ntnk.msluschedule.utils.DEFAULT
 import by.ntnk.msluschedule.utils.ScheduleType
@@ -29,7 +28,6 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.Mock
-import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 import org.mockito.MockitoAnnotations
 import timber.log.Timber
@@ -47,10 +45,7 @@ class WeekPresenterTest {
     private lateinit var databaseDataMapper: DatabaseDataMapper
 
     @Mock
-    private lateinit var networkRepositoryLazy: dagger.Lazy<NetworkRepository>
-
-    private val networkRepository: NetworkRepository
-        get() = networkRepositoryLazy.get()
+    private lateinit var networkRepository: NetworkRepository
 
     @Mock
     private lateinit var sharedPreferencesRepository: SharedPreferencesRepository
@@ -81,7 +76,6 @@ class WeekPresenterTest {
         Timber.plant(TestTree())
         MockitoAnnotations.openMocks(this)
 
-        whenever(networkRepositoryLazy.get()).thenReturn(mock(NetworkRepositoryOriginal::class.java))
         whenever(sharedPreferencesRepository.getSelectedScheduleContainerInfo())
             .thenReturn(ScheduleContainerInfo(id = 0, value = String.DEFAULT, ScheduleType.STUDYGROUP))
         whenever(databaseRepository.isWeekInitialized(anyInt()))
@@ -162,7 +156,7 @@ class WeekPresenterTest {
             databaseDataMapper,
             sharedPreferencesRepository,
             schedulerProvider,
-            networkRepositoryLazy
+            networkRepository
         )
         presenter.bindView(view)
     }

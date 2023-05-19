@@ -20,7 +20,7 @@ import javax.inject.Inject
 class MainPresenter @Inject constructor(
     private val currentDate: CurrentDate,
     private val databaseRepository: DatabaseRepository,
-    private val networkRepository: dagger.Lazy<NetworkRepository>,
+    private val networkRepository: NetworkRepository,
     private val sharedPreferencesRepository: SharedPreferencesRepository,
     private val schedulerProvider: SchedulerProvider
 ) : Presenter<MainView>() {
@@ -76,7 +76,7 @@ class MainPresenter @Inject constructor(
     }
 
     private fun insertWeeksWithWeekdays(containerId: Int): Single<Int> {
-        return networkRepository.get().getWeeks()
+        return networkRepository.getWeeks()
             .flatMapObservable { databaseRepository.insertWeeksGetIds(it, containerId) }
             .ignoreElements()
             .doOnError {
