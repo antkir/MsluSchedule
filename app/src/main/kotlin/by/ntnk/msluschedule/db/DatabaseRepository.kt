@@ -6,6 +6,7 @@ import by.ntnk.msluschedule.data.StudyGroup
 import by.ntnk.msluschedule.data.StudyGroupLesson
 import by.ntnk.msluschedule.data.Teacher
 import by.ntnk.msluschedule.data.TeacherLesson
+import by.ntnk.msluschedule.data.Week
 import by.ntnk.msluschedule.data.WeekdayWithLessons
 import by.ntnk.msluschedule.data.WeekdayWithStudyGroupLessons
 import by.ntnk.msluschedule.data.WeekdayWithTeacherLessons
@@ -13,7 +14,6 @@ import by.ntnk.msluschedule.db.data.DbNote
 import by.ntnk.msluschedule.db.data.DbStudyGroupLesson
 import by.ntnk.msluschedule.db.data.DbTeacherLesson
 import by.ntnk.msluschedule.db.data.ScheduleContainer
-import by.ntnk.msluschedule.db.data.Week
 import by.ntnk.msluschedule.di.PerApp
 import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.utils.ScheduleType
@@ -69,6 +69,7 @@ class DatabaseRepository @Inject constructor(
     fun getWeeks(containerId: Int): Observable<Week> {
         return appDatabase.weekDao.getWeeks(containerId)
             .flatMapObservable { Observable.fromIterable(it) }
+            .map { dbWeek -> Week(dbWeek.id, dbWeek.value) }
     }
 
     fun getWeekKey(id: Int): Single<Int> {

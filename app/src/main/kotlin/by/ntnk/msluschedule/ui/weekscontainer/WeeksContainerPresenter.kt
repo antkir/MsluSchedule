@@ -1,7 +1,7 @@
 package by.ntnk.msluschedule.ui.weekscontainer
 
+import by.ntnk.msluschedule.data.Week
 import by.ntnk.msluschedule.db.DatabaseRepository
-import by.ntnk.msluschedule.db.data.Week
 import by.ntnk.msluschedule.mvp.Presenter
 import by.ntnk.msluschedule.utils.CurrentDate
 import by.ntnk.msluschedule.utils.SchedulerProvider
@@ -26,10 +26,7 @@ class WeeksContainerPresenter @Inject constructor(
         disposables += databaseRepository.getWeeks(containerInfo.id)
             .toList()
             .map { weeks ->
-                val currentAcademicWeekIndex = when {
-                    currentDate.academicWeek < 0 -> 0
-                    else -> currentDate.academicWeek
-                }
+                val currentAcademicWeekIndex = maxOf(currentDate.academicWeek, 0)
                 val filteredWeeks = mutableListOf<Week>()
                 for (i in currentAcademicWeekIndex - SIDE_WEEKS_NUM..currentAcademicWeekIndex + SIDE_WEEKS_NUM) {
                     if (i in weeks.indices) {

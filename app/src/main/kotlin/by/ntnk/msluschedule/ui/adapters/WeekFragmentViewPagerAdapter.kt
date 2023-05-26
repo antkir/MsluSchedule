@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.os.Parcelable
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import by.ntnk.msluschedule.db.data.Week
+import by.ntnk.msluschedule.data.Week
 import by.ntnk.msluschedule.ui.week.WeekFragment
 import by.ntnk.msluschedule.utils.DEFAULT
 

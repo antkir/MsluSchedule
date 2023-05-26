@@ -16,8 +16,8 @@ import androidx.core.view.ViewCompat
 import androidx.lifecycle.Lifecycle
 import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.data.ScheduleContainerInfo
+import by.ntnk.msluschedule.data.Week
 import by.ntnk.msluschedule.databinding.FragmentWeekscontainerBinding
-import by.ntnk.msluschedule.db.data.Week
 import by.ntnk.msluschedule.mvp.views.MvpFragment
 import by.ntnk.msluschedule.ui.adapters.WeekFragmentViewPagerAdapter
 import by.ntnk.msluschedule.ui.deleteschedule.DeleteScheduleFragment
