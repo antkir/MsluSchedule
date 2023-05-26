@@ -459,7 +459,7 @@ class MainActivity :
                 .commit()
         } else {
             weeksContainerFragment as WeeksContainerFragment
-            weeksContainerFragment.swapTabs()
+            weeksContainerFragment.swapData()
         }
 
         binding.content.imageSmile.visibility = View.GONE

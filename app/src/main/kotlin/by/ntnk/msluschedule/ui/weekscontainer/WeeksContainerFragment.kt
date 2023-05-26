@@ -17,33 +17,26 @@ import androidx.lifecycle.Lifecycle
 import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.data.ScheduleContainerInfo
 import by.ntnk.msluschedule.databinding.FragmentWeekscontainerBinding
+import by.ntnk.msluschedule.db.data.Week
 import by.ntnk.msluschedule.mvp.views.MvpFragment
 import by.ntnk.msluschedule.ui.adapters.WeekFragmentViewPagerAdapter
 import by.ntnk.msluschedule.ui.deleteschedule.DeleteScheduleFragment
-import by.ntnk.msluschedule.utils.INVALID_VALUE
-import by.ntnk.msluschedule.utils.ImmutableEntry
+import by.ntnk.msluschedule.ui.weekscontainer.WeeksContainerPresenter.Companion.CENTRAL_VIEW_POSITION
+import by.ntnk.msluschedule.utils.DEFAULT
 import dagger.Lazy
 import dagger.android.support.AndroidSupportInjection
 import java.util.Locale
 import javax.inject.Inject
-
-private const val SELECTED_TAB_POSITION = "tab_position"
-private const val DELETE_SCHEDULE_FRAGMENT = "DeleteScheduleFragment"
 
 class WeeksContainerFragment :
     MvpFragment<WeeksContainerPresenter, WeeksContainerView>(),
     WeeksContainerView,
     DeleteScheduleFragment.DialogListener {
 
-    private var savedCurrentPosition = INVALID_VALUE
-    private var currentWeekItemIndex = INVALID_VALUE
-    private lateinit var listener: OnScheduleContainerDeletedListener
-
     private var fragmentBinding: FragmentWeekscontainerBinding? = null
     private val binding get() = fragmentBinding!!
-
-    private val adapter: WeekFragmentViewPagerAdapter?
-        get() = binding.viewpagerWeeks.adapter as WeekFragmentViewPagerAdapter?
+    private lateinit var listener: OnScheduleContainerDeletedListener
+    private var restoredAdapterPosition = Int.DEFAULT
 
     override val view: WeeksContainerView
         get() = this
@@ -63,23 +56,13 @@ class WeeksContainerFragment :
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        savedCurrentPosition = savedInstanceState?.getInt(SELECTED_TAB_POSITION) ?: INVALID_VALUE
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         fragmentBinding = FragmentWeekscontainerBinding.inflate(inflater, container, false)
         return binding.root
     }
 
-    @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        binding.tabLayoutWeeks.setOnTouchListener { _, _ -> true }
-        binding.tabLayoutWeeks.setupWithViewPager(binding.viewpagerWeeks)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            binding.tabLayoutWeeks.layoutDirection = View.LAYOUT_DIRECTION_LTR
-        }
+        setupTabLayout()
 
         requireActivity().addMenuProvider(
             object : MenuProvider {
@@ -90,13 +73,18 @@ class WeeksContainerFragment :
                 override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                     when (menuItem.itemId) {
                         R.id.item_weekscontainer_today -> {
-                            binding.viewpagerWeeks.currentItem = currentWeekItemIndex
-                            adapter?.getFragment(currentWeekItemIndex)?.highlightToday()
+                            val adapter = binding.viewpagerWeeks.adapter as WeekFragmentViewPagerAdapter
+                            binding.viewpagerWeeks.currentItem = adapter.currentWeekPosition
+                            adapter.getFragment(adapter.currentWeekPosition)?.highlightToday()
                             return true
                         }
+
                         R.id.item_weekscontainer_delete -> {
                             val deleteScheduleFragment = DeleteScheduleFragment()
-                            deleteScheduleFragment.show(childFragmentManager, DELETE_SCHEDULE_FRAGMENT)
+                            deleteScheduleFragment.show(
+                                childFragmentManager,
+                                DeleteScheduleFragment.DELETE_SCHEDULE_FRAGMENT
+                            )
                             return true
                         }
                     }
@@ -108,16 +96,28 @@ class WeeksContainerFragment :
         )
     }
 
+    @SuppressLint("ClickableViewAccessibility")
+    private fun setupTabLayout() {
+        binding.tabLayoutWeeks.setupWithViewPager(binding.viewpagerWeeks)
+        binding.tabLayoutWeeks.setOnTouchListener { _, _ -> true }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            binding.tabLayoutWeeks.layoutDirection = View.LAYOUT_DIRECTION_LTR
+        }
+    }
+
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
+        restoredAdapterPosition = savedInstanceState?.getInt(SELECTED_TAB_POSITION) ?: Int.DEFAULT
+    }
+
     override fun onStart() {
         super.onStart()
-        val isRTL = TextUtilsCompat.getLayoutDirectionFromLocale(Locale.getDefault()) == ViewCompat.LAYOUT_DIRECTION_RTL
-        presenter.initWeeksAdapter(isRTL)
+        presenter.getWeeks()
     }
 
     override fun onStop() {
         super.onStop()
         presenter.clearDisposables()
-        savedCurrentPosition = binding.tabLayoutWeeks.selectedTabPosition
     }
 
     override fun onDestroyView() {
@@ -125,31 +125,48 @@ class WeeksContainerFragment :
         fragmentBinding = null
     }
 
-    override fun initWeeksAdapter(weekIds: List<ImmutableEntry>, currentWeekItemIndex: Int) {
-        this.currentWeekItemIndex = currentWeekItemIndex
+    override fun onData(weeks: List<Week>, currentAcademicWeekIndex: Int) {
+        val isRTL = isLayoutRTL()
+        val arrangedWeeks = if (isRTL) weeks.reversed() else weeks
+        val currentWeekPosition = if (isRTL) {
+            arrangedWeeks.lastIndex - minOf(currentAcademicWeekIndex, CENTRAL_VIEW_POSITION)
+        } else {
+            minOf(currentAcademicWeekIndex, CENTRAL_VIEW_POSITION)
+        }
 
         with(binding.viewpagerWeeks) {
-            offscreenPageLimit = weekIds.size - 1
+            offscreenPageLimit = arrangedWeeks.size - 1
+
+            var isNewData = false
+            // Initialize adapter here because otherwise TabLayout does not properly scroll to the
+            // restored adapter position after calling setCurrentItem function.
             if (adapter == null) {
-                adapter = WeekFragmentViewPagerAdapter(childFragmentManager, weekIds, currentWeekItemIndex)
-                if (savedCurrentPosition == INVALID_VALUE) {
-                    savedCurrentPosition = currentWeekItemIndex
-                }
-            } else {
-                val adapter = adapter as WeekFragmentViewPagerAdapter
-                val haveDataChanged = adapter.swapData(weekIds, currentWeekItemIndex)
-                if (haveDataChanged || savedCurrentPosition == INVALID_VALUE) {
-                    savedCurrentPosition = currentWeekItemIndex
-                }
+                isNewData = true
+                val weekAdapter = WeekFragmentViewPagerAdapter(childFragmentManager)
+                // Set initial data here so adapter's state is restored properly when setAdapter is called in ViewPager.
+                weekAdapter.setData(arrangedWeeks, currentWeekPosition)
+                adapter = weekAdapter
             }
-            setCurrentItem(savedCurrentPosition, false)
+
+            val adapter = adapter as WeekFragmentViewPagerAdapter
+            isNewData = adapter.onData(arrangedWeeks, currentWeekPosition) || isNewData
+
+            if (restoredAdapterPosition != Int.DEFAULT) {
+                setCurrentItem(restoredAdapterPosition, false)
+                restoredAdapterPosition = Int.DEFAULT
+            } else if (isNewData) {
+                setCurrentItem(currentWeekPosition, false)
+            }
         }
     }
 
-    fun swapTabs() {
-        savedCurrentPosition = INVALID_VALUE
-        val isRTL = TextUtilsCompat.getLayoutDirectionFromLocale(Locale.getDefault()) == ViewCompat.LAYOUT_DIRECTION_RTL
-        presenter.initWeeksAdapter(isRTL)
+    fun swapData() {
+        presenter.getWeeks()
+    }
+
+    private fun isLayoutRTL(): Boolean {
+        val layoutDirection = TextUtilsCompat.getLayoutDirectionFromLocale(Locale.getDefault())
+        return layoutDirection == ViewCompat.LAYOUT_DIRECTION_RTL
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -157,13 +174,19 @@ class WeeksContainerFragment :
         outState.putInt(SELECTED_TAB_POSITION, binding.tabLayoutWeeks.selectedTabPosition)
     }
 
-    override fun onDeleteScheduleContainerClick() = presenter.deleteSelectedScheduleContainer()
+    override fun onDeleteScheduleContainerClick() {
+        presenter.deleteSelectedScheduleContainer()
+    }
 
-    override fun removeScheduleContainerFromView(info: ScheduleContainerInfo) {
+    override fun onDeleteScheduleContainer(info: ScheduleContainerInfo) {
         listener.onScheduleContainerDeleted(info)
     }
 
     interface OnScheduleContainerDeletedListener {
         fun onScheduleContainerDeleted(info: ScheduleContainerInfo)
+    }
+
+    companion object {
+        private const val SELECTED_TAB_POSITION = "selectedTabPosition"
     }
 }

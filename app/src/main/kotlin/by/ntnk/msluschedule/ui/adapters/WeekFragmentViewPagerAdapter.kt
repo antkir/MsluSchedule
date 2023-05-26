@@ -4,21 +4,25 @@ import android.os.Bundle
 import android.os.Parcelable
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import by.ntnk.msluschedule.db.data.Week
 import by.ntnk.msluschedule.ui.week.WeekFragment
-import by.ntnk.msluschedule.utils.ImmutableEntry
+import by.ntnk.msluschedule.utils.DEFAULT
 
-private const val ARG_WEEK_ID = "weekId"
+class WeekFragmentViewPagerAdapter(fragmentManager: FragmentManager) : FragmentStatePagerAdapter(fragmentManager) {
 
-class WeekFragmentViewPagerAdapter(
-    fragmentManager: FragmentManager,
-    private var fragmentsInfo: List<ImmutableEntry>,
-    private var currentWeekIndex: Int
-) : FragmentStatePagerAdapter(fragmentManager) {
+    private var weeks = listOf<Week>()
 
-    fun swapData(fragmentsInfo: List<ImmutableEntry>, currentWeekIndex: Int): Boolean {
-        if (this.fragmentsInfo != fragmentsInfo) {
-            this.fragmentsInfo = fragmentsInfo
-            this.currentWeekIndex = currentWeekIndex
+    var currentWeekPosition = Int.DEFAULT
+        private set
+
+    fun setData(weeks: List<Week>, currentWeekPosition: Int) {
+        this.weeks = weeks
+        this.currentWeekPosition = currentWeekPosition
+    }
+
+    fun onData(weeks: List<Week>, currentWeekPosition: Int): Boolean {
+        if (this.weeks != weeks) {
+            setData(weeks, currentWeekPosition)
             notifyDataSetChanged()
             return true
         }
@@ -30,33 +34,38 @@ class WeekFragmentViewPagerAdapter(
     }
 
     override fun getItem(position: Int): Fragment {
-        val weekId = fragmentsInfo[position].key
-        return WeekFragment.newInstance(weekId, isCurrentWeek = position == currentWeekIndex)
+        val weekId = weeks[position].id
+        val isCurrentWeek = position == currentWeekPosition
+        return WeekFragment.newInstance(weekId, isCurrentWeek)
     }
 
-    override fun getItemPosition(any: Any) = POSITION_NONE
+    override fun getItemPosition(any: Any): Int {
+        return POSITION_NONE
+    }
 
-    override fun getCount(): Int = fragmentsInfo.size
+    override fun getCount(): Int {
+        return weeks.size
+    }
 
-    override fun getPageTitle(position: Int): CharSequence? = fragmentsInfo[position].value
+    override fun getPageTitle(position: Int): CharSequence {
+        return weeks[position].value
+    }
 
     override fun restoreState(state: Parcelable?, loader: ClassLoader?) {
         state as Bundle?
-        var s = state
-        val isIndexValid = currentWeekIndex >= 0 && fragmentsInfo.size > currentWeekIndex
-        if (isIndexValid && state?.getInt(ARG_WEEK_ID) != fragmentsInfo[currentWeekIndex].key) {
-            s = null
+        val isValidIndex = currentWeekPosition in weeks.indices
+        if (isValidIndex && state?.getInt(ARG_CURRENT_WEEK_ID) == weeks[currentWeekPosition].id) {
+            super.restoreState(state, loader)
         }
-        super.restoreState(s, loader)
     }
 
-    override fun saveState(): Parcelable? {
-        var superState = super.saveState() as Bundle?
-        val isIndexValid = currentWeekIndex >= 0 && fragmentsInfo.size > currentWeekIndex
-        if (isIndexValid) {
-            superState = superState ?: Bundle()
-            superState.putInt(ARG_WEEK_ID, fragmentsInfo[currentWeekIndex].key)
-        }
-        return superState
+    override fun saveState(): Parcelable {
+        val state = super.saveState() as? Bundle ?: Bundle()
+        state.putInt(ARG_CURRENT_WEEK_ID, weeks[currentWeekPosition].id)
+        return state
+    }
+
+    companion object {
+        private const val ARG_CURRENT_WEEK_ID = "currentWeekId"
     }
 }

@@ -1,9 +1,9 @@
 package by.ntnk.msluschedule.ui.weekscontainer
 
 import by.ntnk.msluschedule.db.DatabaseRepository
+import by.ntnk.msluschedule.db.data.Week
 import by.ntnk.msluschedule.mvp.Presenter
 import by.ntnk.msluschedule.utils.CurrentDate
-import by.ntnk.msluschedule.utils.ImmutableEntry
 import by.ntnk.msluschedule.utils.SchedulerProvider
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
 import io.reactivex.disposables.CompositeDisposable
@@ -21,30 +21,27 @@ class WeeksContainerPresenter @Inject constructor(
 
     private val disposables: CompositeDisposable = CompositeDisposable()
 
-    fun initWeeksAdapter(isRTL: Boolean) {
+    fun getWeeks() {
         val containerInfo = sharedPreferencesRepository.getSelectedScheduleContainerInfo()
         disposables += databaseRepository.getWeeks(containerInfo.id)
             .toList()
             .map { weeks ->
-                val index = when {
+                val currentAcademicWeekIndex = when {
                     currentDate.academicWeek < 0 -> 0
                     else -> currentDate.academicWeek
                 }
-                val weekIds = mutableListOf<ImmutableEntry>()
-                for (j in index - 2..index + 2) {
-                    if (j in weeks.indices) {
-                        weekIds.add(ImmutableEntry(weeks[j].id, weeks[j].value))
+                val filteredWeeks = mutableListOf<Week>()
+                for (i in currentAcademicWeekIndex - SIDE_WEEKS_NUM..currentAcademicWeekIndex + SIDE_WEEKS_NUM) {
+                    if (i in weeks.indices) {
+                        filteredWeeks.add(weeks[i])
                     }
                 }
-                if (isRTL) weekIds.reverse()
-                var currentItemIndex = if (index < 2) index else 2
-                if (isRTL) currentItemIndex = weekIds.size - 1 - currentItemIndex
-                return@map Pair(weekIds, currentItemIndex)
+                Pair(filteredWeeks, currentAcademicWeekIndex)
             }
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
-                onSuccess = { view?.initWeeksAdapter(it.first, it.second) },
+                onSuccess = { (weeks, currentAcademicWeekIndex) -> view?.onData(weeks, currentAcademicWeekIndex) },
                 onError = { throwable -> Timber.e(throwable) }
             )
     }
@@ -57,11 +54,19 @@ class WeeksContainerPresenter @Inject constructor(
             .subscribeBy(
                 onComplete = {
                     sharedPreferencesRepository.selectEmptyScheduleContainer()
-                    view?.removeScheduleContainerFromView(containerInfo)
+                    view?.onDeleteScheduleContainer(containerInfo)
                 },
                 onError = { throwable -> Timber.e(throwable) }
             )
     }
 
-    fun clearDisposables() = disposables.clear()
+    fun clearDisposables() {
+        disposables.clear()
+    }
+
+    companion object {
+        private const val WEEKS_NUM = 5
+        private const val SIDE_WEEKS_NUM = WEEKS_NUM / 2
+        const val CENTRAL_VIEW_POSITION = WEEKS_NUM / 2
+    }
 }

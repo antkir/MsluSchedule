@@ -91,4 +91,8 @@ class DeleteScheduleFragment : DialogFragment() {
     interface DialogListener {
         fun onDeleteScheduleContainerClick()
     }
+
+    companion object {
+        const val DELETE_SCHEDULE_FRAGMENT = "DeleteScheduleFragment"
+    }
 }
