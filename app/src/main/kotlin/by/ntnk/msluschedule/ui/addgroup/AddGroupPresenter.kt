@@ -9,7 +9,6 @@ import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.utils.CurrentDate
 import by.ntnk.msluschedule.utils.DEFAULT
 import by.ntnk.msluschedule.utils.SchedulerProvider
-import io.reactivex.Notification
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
@@ -33,9 +32,8 @@ class AddGroupPresenter @Inject constructor(
     private val schedulerProvider: SchedulerProvider
 ) : Presenter<AddGroupView>() {
 
-    private val scheduleContaners: BehaviorSubject<Notification<List<ScheduleContainer>>> =
-        BehaviorSubject.createDefault(Notification.createOnNext(emptyList()))
-    val scheduleContanersObservable: Observable<Notification<List<ScheduleContainer>>>
+    private val scheduleContaners: BehaviorSubject<List<ScheduleContainer>> = BehaviorSubject.createDefault(emptyList())
+    val scheduleContanersObservable: Observable<List<ScheduleContainer>>
         get() = scheduleContaners
 
     private val facultyFilter: BehaviorSubject<ScheduleFilterUiState> =
@@ -72,11 +70,10 @@ class AddGroupPresenter @Inject constructor(
         databaseRepository.getScheduleContainers()
             .toList()
             .subscribeOn(schedulerProvider.io())
+            .observeOn(schedulerProvider.ui())
             .subscribeBy(
-                onSuccess = { scheduleContainers ->
-                    scheduleContaners.onNext(Notification.createOnNext(scheduleContainers))
-                },
-                onError = { throwable -> scheduleContaners.onNext(Notification.createOnError(throwable)) }
+                onSuccess = { scheduleContainers -> scheduleContaners.onNext(scheduleContainers) },
+                onError = { throwable -> scheduleContaners.onError(throwable) }
             )
 
         downloadFacultyFilter()
@@ -163,7 +160,7 @@ class AddGroupPresenter @Inject constructor(
     fun isGroupAdded(key: Int): Boolean {
         assert(scheduleContaners.hasValue() && facultyKey.hasValue() && groupFilter.hasValue())
         assert(!groupFilter.value!!.isError() && groupFilter.value!!.isData())
-        return scheduleContaners.value?.value
+        return scheduleContaners.value
             ?.filter { scheduleContainer -> scheduleContainer.year == currentDate.academicYear }
             ?.filter { scheduleContainer -> scheduleContainer.faculty == facultyKey.value }
             ?.map { scheduleContainer -> scheduleContainer.name }

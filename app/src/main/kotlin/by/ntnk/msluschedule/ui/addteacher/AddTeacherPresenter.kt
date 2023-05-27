@@ -9,7 +9,6 @@ import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.utils.CurrentDate
 import by.ntnk.msluschedule.utils.DEFAULT
 import by.ntnk.msluschedule.utils.SchedulerProvider
-import io.reactivex.Notification
 import io.reactivex.Observable
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.BehaviorSubject
@@ -31,9 +30,8 @@ class AddTeacherPresenter @Inject constructor(
     private val schedulerProvider: SchedulerProvider
 ) : Presenter<AddTeacherView>() {
 
-    private val scheduleContaners: BehaviorSubject<Notification<List<ScheduleContainer>>> =
-        BehaviorSubject.createDefault(Notification.createOnNext(emptyList()))
-    val scheduleContanersObservable: Observable<Notification<List<ScheduleContainer>>>
+    private val scheduleContaners: BehaviorSubject<List<ScheduleContainer>> = BehaviorSubject.createDefault(emptyList())
+    val scheduleContanersObservable: Observable<List<ScheduleContainer>>
         get() = scheduleContaners
 
     private val teacherFilter: BehaviorSubject<ScheduleFilterUiState> =
@@ -49,11 +47,10 @@ class AddTeacherPresenter @Inject constructor(
         databaseRepository.getScheduleContainers()
             .toList()
             .subscribeOn(schedulerProvider.io())
+            .observeOn(schedulerProvider.ui())
             .subscribeBy(
-                onSuccess = { scheduleContainers ->
-                    scheduleContaners.onNext(Notification.createOnNext(scheduleContainers))
-                },
-                onError = { throwable -> scheduleContaners.onNext(Notification.createOnError(throwable)) }
+                onSuccess = { scheduleContainers -> scheduleContaners.onNext(scheduleContainers) },
+                onError = { throwable -> scheduleContaners.onError(throwable) }
             )
 
         getTeacherScheduleFilter()
@@ -77,7 +74,7 @@ class AddTeacherPresenter @Inject constructor(
     fun isTeacherAdded(key: Int): Boolean {
         assert(scheduleContaners.hasValue() && teacherFilter.hasValue())
         assert(!teacherFilter.value!!.isError() && teacherFilter.value!!.isData())
-        return scheduleContaners.value?.value
+        return scheduleContaners.value
             ?.filter { scheduleContainer -> scheduleContainer.year == currentDate.academicYear }
             ?.map { scheduleContainer -> scheduleContainer.name }
             ?.any { teacher -> teacher == teacherFilter.value!!.data!!.getValue(key) } == true
