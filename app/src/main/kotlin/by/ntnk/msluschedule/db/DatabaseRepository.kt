@@ -36,7 +36,7 @@ class DatabaseRepository @Inject constructor(
 
     fun insertTeacher(teacher: Teacher): Single<Int> {
         return Single.just(teacher)
-            .map { ScheduleContainer(teacher.key, teacher.name, ScheduleType.TEACHER, teacher.year) }
+            .map { ScheduleContainer(it.key, it.name, ScheduleType.TEACHER, it.year) }
             .flatMap { scheduleContainer -> appDatabase.scheduleContainerDao.insert(scheduleContainer) }
             .map { id -> id.toInt() }
     }
@@ -236,6 +236,7 @@ class DatabaseRepository @Inject constructor(
                 when (scheduleType) {
                     ScheduleType.STUDYGROUP -> appDatabase.studyGroupLessonDao.delete(weekdayId)
                     ScheduleType.TEACHER -> appDatabase.teacherLessonDao.delete(weekdayId)
+                    else -> Completable.complete()
                 }
             }
     }

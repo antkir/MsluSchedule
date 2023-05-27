@@ -5,8 +5,8 @@ import by.ntnk.msluschedule.mvp.View
 
 interface MainView : View {
     fun initMainContent()
-    fun addScheduleContainerMenuItem(scheduleContainerInfo: ScheduleContainerInfo)
-    fun checkScheduleContainerMenuItem(scheduleContainerInfo: ScheduleContainerInfo)
-    fun showNewScheduleContainerLoading(scheduleContainerInfo: ScheduleContainerInfo)
+    fun addScheduleContainerMenuItem(scheduleContainer: ScheduleContainerInfo)
+    fun checkScheduleContainerMenuItem(scheduleContainer: ScheduleContainerInfo)
+    fun showNewScheduleContainerLoading(scheduleContainer: ScheduleContainerInfo)
     fun showError()
 }

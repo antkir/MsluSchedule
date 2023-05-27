@@ -38,7 +38,7 @@ class LessonInfoActivity :
 
     private var classId: Int = Int.DEFAULT
     private var weekId: Int = Int.DEFAULT
-    private var scheduleType: ScheduleType? = null
+    private var scheduleType: ScheduleType = ScheduleType.DEFAULT
     private val disposables: CompositeDisposable = CompositeDisposable()
 
     private lateinit var bindingStudyGroup: ActivityLessoninfoStudygroupBinding
@@ -67,7 +67,8 @@ class LessonInfoActivity :
 
         classId = intent?.getIntExtra(ARG_CLASS_ID, Int.DEFAULT) ?: Int.DEFAULT
         weekId = intent?.getIntExtra(ARG_WEEK_ID, Int.DEFAULT) ?: Int.DEFAULT
-        scheduleType = ScheduleTypeConverter.stringToScheduleType(intent?.getStringExtra(ARG_SCHEDULE_TYPE))
+        val scheduleTypeString = intent?.getStringExtra(ARG_SCHEDULE_TYPE) ?: String.DEFAULT
+        scheduleType = ScheduleTypeConverter.stringToScheduleType(scheduleTypeString)
 
         when (scheduleType) {
             ScheduleType.STUDYGROUP -> setContentView(bindingStudyGroup.root)
@@ -87,7 +88,7 @@ class LessonInfoActivity :
     override fun onStart() {
         super.onStart()
 
-        if (scheduleType == null || classId <= 0 || weekId <= 0) {
+        if (scheduleType == ScheduleType.DEFAULT || classId <= 0 || weekId <= 0) {
             Timber.e(IllegalArgumentException())
             NavUtils.navigateUpFromSameTask(this)
             return
@@ -97,7 +98,7 @@ class LessonInfoActivity :
             .subscribeBy(
                 onNext = { classUiState ->
                     if (classUiState == ClassUiState()) {
-                        presenter.getClassDescriptor(classId, scheduleType!!, weekId)
+                        presenter.getClassDescriptor(classId, scheduleType, weekId)
                     }
 
                     if (classUiState.isData()) {

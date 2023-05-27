@@ -76,7 +76,7 @@ class WeekPresenterTest {
         Timber.plant(TestTree())
         MockitoAnnotations.openMocks(this)
 
-        whenever(sharedPreferencesRepository.getSelectedScheduleContainerInfo())
+        whenever(sharedPreferencesRepository.getSelectedScheduleContainer())
             .thenReturn(ScheduleContainerInfo(id = 0, value = String.DEFAULT, ScheduleType.STUDYGROUP))
         whenever(databaseRepository.isWeekInitialized(anyInt()))
             .thenReturn(

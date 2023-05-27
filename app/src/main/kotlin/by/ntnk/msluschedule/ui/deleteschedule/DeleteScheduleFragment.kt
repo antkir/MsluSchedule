@@ -93,6 +93,6 @@ class DeleteScheduleFragment : DialogFragment() {
     }
 
     companion object {
-        const val DELETE_SCHEDULE_FRAGMENT = "DeleteScheduleFragment"
+        const val FRAGMENT_TAG = "DeleteScheduleFragment"
     }
 }

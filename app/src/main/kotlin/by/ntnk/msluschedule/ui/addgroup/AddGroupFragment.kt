@@ -298,4 +298,8 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
         fun onNewStudyGroup(studyGroup: StudyGroup)
         fun onError(t: Throwable)
     }
+
+    companion object {
+        const val FRAGMENT_TAG = "AddGroupFragment"
+    }
 }

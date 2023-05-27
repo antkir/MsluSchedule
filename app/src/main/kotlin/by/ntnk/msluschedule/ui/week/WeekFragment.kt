@@ -60,7 +60,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     private var restoredRecyclerViewState: Parcelable? = null
     private lateinit var adapterOnClickDisposable: Disposable
     private val disposables: CompositeDisposable = CompositeDisposable()
-    private lateinit var scheduleContainerInfo: ScheduleContainerInfo
+    private lateinit var scheduleContainer: ScheduleContainerInfo
 
     private var fragmentBinding: FragmentWeekBinding? = null
     private val binding get() = fragmentBinding!!
@@ -83,7 +83,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         val id = arguments?.getInt(ARG_WEEK_ID)
         weekId = id!!
         isCurrentWeek = arguments?.getBoolean(ARG_IS_CURRENT_WEEK) == true
-        scheduleContainerInfo = presenter.getScheduleContainerInfo()
+        scheduleContainer = presenter.getScheduleContainer()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -98,7 +98,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
             binding.swipeRefreshLayout.isRefreshing = false
 
             if (AndroidUtils.isNetworkAccessible(requireContext().applicationContext)) {
-                presenter.updateSchedule(scheduleContainerInfo.id, weekId)
+                presenter.updateSchedule(scheduleContainer.id, weekId)
             } else {
                 val baseFABMain = requireActivity().findViewById<FloatingActionButton>(R.id.fab_base)
                 AndroidUtils.showSnackbarNetworkInaccessible(baseFABMain)
@@ -115,7 +115,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
                     when (menuItem.itemId) {
                         R.id.item_week_update -> {
                             if (AndroidUtils.isNetworkAccessible(requireContext().applicationContext)) {
-                                presenter.updateSchedule(scheduleContainerInfo.id, weekId)
+                                presenter.updateSchedule(scheduleContainer.id, weekId)
                             } else {
                                 val baseFABMain = requireActivity().findViewById<FloatingActionButton>(R.id.fab_base)
                                 AndroidUtils.showSnackbarNetworkInaccessible(baseFABMain)
@@ -192,11 +192,11 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
                     }
 
                     if (scheduleUiState.isWeekInitializedNoData) {
-                        presenter.updateSchedule(scheduleContainerInfo.id, weekId, isFirstUpdate = true)
+                        presenter.updateSchedule(scheduleContainer.id, weekId, isFirstUpdate = true)
                     }
 
                     if (scheduleUiState.isWeekInitialized) {
-                        presenter.getSchedule(scheduleContainerInfo.type!!, weekId)
+                        presenter.getSchedule(scheduleContainer.type, weekId)
                     }
 
                     if (scheduleUiState.isData()) {
@@ -209,7 +209,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
                     if (scheduleUiState.isError()) {
                         val throwable = scheduleUiState.throwable!!
                         if (scheduleUiState.isFirstUpdateError) {
-                            presenter.getSchedule(scheduleContainerInfo.type!!, weekId)
+                            presenter.getSchedule(scheduleContainer.type, weekId)
                             if (Utils.isNetworkException(throwable)) {
                                 Timber.i(throwable)
                                 showError(throwable, isNetworkError = true)
@@ -450,7 +450,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
             snackbar.setAction(R.string.snackbar_week_init_retry) {
                 context ?: return@setAction
                 if (AndroidUtils.isNetworkAccessible(requireContext().applicationContext)) {
-                    presenter.updateSchedule(scheduleContainerInfo.id, weekId)
+                    presenter.updateSchedule(scheduleContainer.id, weekId)
                 } else {
                     AndroidUtils.showSnackbarNetworkInaccessible(baseFABMain)
                 }
@@ -473,7 +473,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     companion object {
         private const val ARG_WEEK_ID = "weekID"
         private const val ARG_IS_CURRENT_WEEK = "isCurrentWeek"
-        private const val ARG_RECYCLER_VIEW_SAVED_STATE = "argRecyclerViewSavedState"
+        private const val ARG_RECYCLER_VIEW_SAVED_STATE = "recyclerViewSavedState"
 
         fun newInstance(weekId: Int, isCurrentWeek: Boolean): WeekFragment {
             return WeekFragment().apply {

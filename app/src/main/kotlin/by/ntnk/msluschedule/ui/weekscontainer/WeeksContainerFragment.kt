@@ -81,10 +81,7 @@ class WeeksContainerFragment :
 
                         R.id.item_weekscontainer_delete -> {
                             val deleteScheduleFragment = DeleteScheduleFragment()
-                            deleteScheduleFragment.show(
-                                childFragmentManager,
-                                DeleteScheduleFragment.DELETE_SCHEDULE_FRAGMENT
-                            )
+                            deleteScheduleFragment.show(childFragmentManager, DeleteScheduleFragment.FRAGMENT_TAG)
                             return true
                         }
                     }
@@ -183,7 +180,7 @@ class WeeksContainerFragment :
     }
 
     interface OnScheduleContainerDeletedListener {
-        fun onScheduleContainerDeleted(info: ScheduleContainerInfo)
+        fun onScheduleContainerDeleted(scheduleContainer: ScheduleContainerInfo)
     }
 
     companion object {

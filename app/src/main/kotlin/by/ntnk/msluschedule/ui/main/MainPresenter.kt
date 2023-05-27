@@ -31,8 +31,8 @@ class MainPresenter @Inject constructor(
         databaseRepository.insertStudyGroup(studyGroup)
             .observeOn(schedulerProvider.ui())
             .doOnSuccess { studyGroupId ->
-                val info = ScheduleContainerInfo(studyGroupId, studyGroup.name, ScheduleType.STUDYGROUP)
-                view?.showNewScheduleContainerLoading(info)
+                val scheduleContainer = ScheduleContainerInfo(studyGroupId, studyGroup.name, ScheduleType.STUDYGROUP)
+                view?.showNewScheduleContainerLoading(scheduleContainer)
             }
             .observeOn(schedulerProvider.io())
             .flatMap { insertWeeksWithWeekdays(it) }
@@ -41,11 +41,12 @@ class MainPresenter @Inject constructor(
             .doOnError { view?.showError() }
             .subscribeBy(
                 onSuccess = { studyGroupId ->
-                    val info = ScheduleContainerInfo(studyGroupId, studyGroup.name, ScheduleType.STUDYGROUP)
-                    sharedPreferencesRepository.putSelectedScheduleContainer(info)
+                    val scheduleContainer =
+                        ScheduleContainerInfo(studyGroupId, studyGroup.name, ScheduleType.STUDYGROUP)
+                    sharedPreferencesRepository.putSelectedScheduleContainer(scheduleContainer)
                     view?.initMainContent()
-                    view?.addScheduleContainerMenuItem(info)
-                    view?.checkScheduleContainerMenuItem(info)
+                    view?.addScheduleContainerMenuItem(scheduleContainer)
+                    view?.checkScheduleContainerMenuItem(scheduleContainer)
                 },
                 onError = { throwable -> Timber.e(throwable) }
             )
@@ -55,8 +56,8 @@ class MainPresenter @Inject constructor(
         databaseRepository.insertTeacher(teacher)
             .observeOn(schedulerProvider.ui())
             .doOnSuccess { teacherId ->
-                val info = ScheduleContainerInfo(teacherId, teacher.name, ScheduleType.STUDYGROUP)
-                view?.showNewScheduleContainerLoading(info)
+                val scheduleContainer = ScheduleContainerInfo(teacherId, teacher.name, ScheduleType.TEACHER)
+                view?.showNewScheduleContainerLoading(scheduleContainer)
             }
             .observeOn(schedulerProvider.io())
             .flatMap { insertWeeksWithWeekdays(it) }
@@ -65,11 +66,11 @@ class MainPresenter @Inject constructor(
             .doOnError { view?.showError() }
             .subscribeBy(
                 onSuccess = { teacherId ->
-                    val info = ScheduleContainerInfo(teacherId, teacher.name, ScheduleType.TEACHER)
-                    sharedPreferencesRepository.putSelectedScheduleContainer(info)
+                    val scheduleContainer = ScheduleContainerInfo(teacherId, teacher.name, ScheduleType.TEACHER)
+                    sharedPreferencesRepository.putSelectedScheduleContainer(scheduleContainer)
                     view?.initMainContent()
-                    view?.addScheduleContainerMenuItem(info)
-                    view?.checkScheduleContainerMenuItem(info)
+                    view?.addScheduleContainerMenuItem(scheduleContainer)
+                    view?.checkScheduleContainerMenuItem(scheduleContainer)
                 },
                 onError = { throwable -> Timber.e(throwable) }
             )
@@ -91,24 +92,27 @@ class MainPresenter @Inject constructor(
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
-                onNext = { scheduleContainer ->
-                    val name = if (scheduleContainer.year != currentDate.academicYear) {
-                        "(${scheduleContainer.year}) ${scheduleContainer.name}"
+                onNext = { dbScheduleContainer ->
+                    val name = if (dbScheduleContainer.year != currentDate.academicYear) {
+                        "(${dbScheduleContainer.year}) ${dbScheduleContainer.name}"
                     } else {
-                        scheduleContainer.name
+                        dbScheduleContainer.name
                     }
-                    val info = ScheduleContainerInfo(scheduleContainer.id, name, scheduleContainer.type)
-                    view?.addScheduleContainerMenuItem(info)
+                    val scheduleContainer =
+                        ScheduleContainerInfo(dbScheduleContainer.id, name, dbScheduleContainer.type)
+                    view?.addScheduleContainerMenuItem(scheduleContainer)
                 },
                 onError = { throwable -> Timber.e(throwable) },
                 onComplete = {
-                    val info = sharedPreferencesRepository.getSelectedScheduleContainerInfo()
-                    view?.checkScheduleContainerMenuItem(info)
+                    val scheduleContainer = sharedPreferencesRepository.getSelectedScheduleContainer()
+                    view?.checkScheduleContainerMenuItem(scheduleContainer)
                 }
             )
     }
 
-    fun isSelectedContainerNull() = sharedPreferencesRepository.getSelectedScheduleContainerInfo().type == null
+    fun isSelectedContainerDefault(): Boolean {
+        return sharedPreferencesRepository.getSelectedScheduleContainer().type == ScheduleType.DEFAULT
+    }
 
     fun clearDisposables() = disposables.clear()
 }

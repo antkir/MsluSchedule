@@ -70,6 +70,7 @@ class LessonInfoPresenter @Inject constructor(
                         }
                     )
             }
+            else -> {}
         }
     }
 }

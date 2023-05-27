@@ -17,6 +17,7 @@ import android.view.animation.OvershootInterpolator
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.text.TextUtilsCompat
 import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
@@ -41,7 +42,7 @@ import by.ntnk.msluschedule.ui.main.onboarding.SimpleCircle
 import by.ntnk.msluschedule.ui.settings.SettingsActivity
 import by.ntnk.msluschedule.ui.weekscontainer.WeeksContainerFragment
 import by.ntnk.msluschedule.utils.AndroidUtils
-import by.ntnk.msluschedule.utils.EMPTY_STRING
+import by.ntnk.msluschedule.utils.DEFAULT
 import by.ntnk.msluschedule.utils.ScheduleType
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
 import by.ntnk.msluschedule.utils.SimpleDrawerListener
@@ -61,10 +62,6 @@ import io.reactivex.disposables.Disposable
 import java.lang.ref.WeakReference
 import java.util.Locale
 import javax.inject.Inject
-
-private const val ADD_GROUP_FRAGMENT_TAG = "AddGroupFragment"
-private const val ADD_TEACHER_FRAGMENT_TAG = "AddTeacherFragment"
-private const val ARG_ACTIONBAR_TITLE = "ActionBarTitle"
 
 class MainActivity :
     MvpActivity<MainPresenter, MainView>(),
@@ -194,12 +191,12 @@ class MainActivity :
         }
 
         binding.fam.fabGroup.setOnClickListener {
-            AddGroupFragment().show(supportFragmentManager, ADD_GROUP_FRAGMENT_TAG)
+            AddGroupFragment().show(supportFragmentManager, AddGroupFragment.FRAGMENT_TAG)
             if (isFamOpen) collapseFam()
         }
 
         binding.fam.fabTeacher.setOnClickListener {
-            AddTeacherFragment().show(supportFragmentManager, ADD_TEACHER_FRAGMENT_TAG)
+            AddTeacherFragment().show(supportFragmentManager, AddTeacherFragment.FRAGMENT_TAG)
             if (isFamOpen) collapseFam()
         }
 
@@ -353,7 +350,7 @@ class MainActivity :
             presenter.initContainerListView()
         }
 
-        if (presenter.isSelectedContainerNull()) {
+        if (presenter.isSelectedContainerDefault()) {
             binding.content.imageSmile.visibility = View.VISIBLE
             binding.content.textHint.visibility = View.VISIBLE
         } else {
@@ -368,7 +365,7 @@ class MainActivity :
         for (type in ScheduleType.values()) {
             val subMenuSize = binding.navView.menu
                 .findItem(getContainerMenuViewId(type))
-                .subMenu
+                ?.subMenu
                 ?.size() ?: 0
             size += subMenuSize
         }
@@ -388,18 +385,20 @@ class MainActivity :
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        // Handle navigation view item clicks here.
         if (!item.isChecked) {
-            val subMenu = binding.navView.menu
-                .findItem(getContainerMenuViewId(ScheduleType.STUDYGROUP))
-                .subMenu
-            if (subMenu != null) {
-                val isStudyGroupItem = subMenu.findItem(item.itemId) != null
-                val type = if (isStudyGroupItem) ScheduleType.STUDYGROUP else ScheduleType.TEACHER
-                supportActionBar?.title = item.title
-                sharedPreferencesRepository.putSelectedScheduleContainer(item.itemId, item.title.toString(), type)
-                isUpdatingWeeksContainer = true
-                binding.drawerLayout.closeDrawer(GravityCompat.START)
+            for (scheduleType in ScheduleType.values()) {
+                val menuItem = binding.navView.menu
+                    .findItem(getContainerMenuViewId(scheduleType))
+                    ?.subMenu
+                    ?.findItem(item.itemId)
+
+                if (menuItem != null) {
+                    supportActionBar?.title = item.title
+                    val scheduleContainer = ScheduleContainerInfo(item.itemId, item.title.toString(), scheduleType)
+                    sharedPreferencesRepository.putSelectedScheduleContainer(scheduleContainer)
+                    isUpdatingWeeksContainer = true
+                    binding.drawerLayout.closeDrawer(GravityCompat.START)
+                }
             }
         }
         return true
@@ -565,7 +564,8 @@ class MainActivity :
     }
 
     override fun onError(t: Throwable) {
-        val snackbar = Snackbar.make(binding.content.constraintLayout, AndroidUtils.getErrorMessageResId(t), Snackbar.LENGTH_LONG)
+        val snackbar =
+            Snackbar.make(binding.content.constraintLayout, AndroidUtils.getErrorMessageResId(t), Snackbar.LENGTH_LONG)
         snackbar.anchorView = binding.fam.fabBase
         ViewCompat.setOnApplyWindowInsetsListener(snackbar.view) { _, insets -> insets }
         snackbar.show()
@@ -584,41 +584,40 @@ class MainActivity :
         binding.content.progressbar.visibility = View.GONE
     }
 
-    override fun addScheduleContainerMenuItem(scheduleContainerInfo: ScheduleContainerInfo) {
+    override fun addScheduleContainerMenuItem(scheduleContainer: ScheduleContainerInfo) {
         val subMenu = binding.navView.menu
-            .findItem(getContainerMenuViewId(scheduleContainerInfo.type!!))
-            .subMenu
-        val menuItem = subMenu?.add(Menu.NONE, scheduleContainerInfo.id, Menu.NONE, scheduleContainerInfo.value)
+            .findItem(getContainerMenuViewId(scheduleContainer.type))
+            ?.subMenu
+        val menuItem = subMenu?.add(Menu.NONE, scheduleContainer.id, Menu.NONE, scheduleContainer.value)
         menuItem?.isCheckable = true
     }
 
     private fun getContainerMenuViewId(scheduleType: ScheduleType): Int {
         return when (scheduleType) {
             ScheduleType.STUDYGROUP -> R.id.group_submenu
-            else -> R.id.teacher_submenu
+            ScheduleType.TEACHER -> R.id.teacher_submenu
+            else -> ResourcesCompat.ID_NULL
         }
     }
 
-    override fun checkScheduleContainerMenuItem(scheduleContainerInfo: ScheduleContainerInfo) {
-        supportActionBar?.title = scheduleContainerInfo.value
-        if (scheduleContainerInfo.type != null) {
-            val subMenu = binding.navView.menu
-                .findItem(getContainerMenuViewId(scheduleContainerInfo.type))
-                .subMenu
-            if (subMenu != null) {
-                for (i in 0 until subMenu.size()) {
-                    val item = subMenu.getItem(i)
-                    if (scheduleContainerInfo.id == item.itemId) {
-                        binding.navView.setCheckedItem(item.itemId)
-                        break
-                    }
+    override fun checkScheduleContainerMenuItem(scheduleContainer: ScheduleContainerInfo) {
+        supportActionBar?.title = scheduleContainer.value
+        val subMenu = binding.navView.menu
+            .findItem(getContainerMenuViewId(scheduleContainer.type))
+            ?.subMenu
+        if (subMenu != null) {
+            for (i in 0 until subMenu.size()) {
+                val item = subMenu.getItem(i)
+                if (scheduleContainer.id == item.itemId) {
+                    binding.navView.setCheckedItem(item.itemId)
+                    break
                 }
             }
         }
     }
 
-    override fun showNewScheduleContainerLoading(scheduleContainerInfo: ScheduleContainerInfo) {
-        supportActionBar?.title = scheduleContainerInfo.value
+    override fun showNewScheduleContainerLoading(scheduleContainer: ScheduleContainerInfo) {
+        supportActionBar?.title = scheduleContainer.value
         removeWeeksContainerFragment()
 
         binding.content.progressbar.visibility = View.VISIBLE
@@ -627,7 +626,7 @@ class MainActivity :
     }
 
     override fun showError() {
-        supportActionBar?.title = EMPTY_STRING
+        supportActionBar?.title = String.DEFAULT
         removeWeeksContainerFragment()
 
         binding.content.progressbar.visibility = View.GONE
@@ -640,17 +639,17 @@ class MainActivity :
         snackbar.show()
     }
 
-    override fun onScheduleContainerDeleted(info: ScheduleContainerInfo) {
-        supportActionBar?.title = EMPTY_STRING
+    override fun onScheduleContainerDeleted(scheduleContainer: ScheduleContainerInfo) {
+        supportActionBar?.title = String.DEFAULT
         removeWeeksContainerFragment()
 
         binding.content.imageSmile.visibility = View.VISIBLE
         binding.content.textHint.visibility = View.VISIBLE
 
         binding.navView.menu
-            .findItem(getContainerMenuViewId(info.type!!))
-            .subMenu
-            ?.removeItem(info.id)
+            .findItem(getContainerMenuViewId(scheduleContainer.type))
+            ?.subMenu
+            ?.removeItem(scheduleContainer.id)
 
         if (binding.fam.container.visibility == View.INVISIBLE) {
             binding.fam.container.visibility = View.VISIBLE
@@ -665,5 +664,9 @@ class MainActivity :
                 .remove(fragment)
                 .commit()
         }
+    }
+
+    private companion object {
+        const val ARG_ACTIONBAR_TITLE = "ActionBarTitle"
     }
 }

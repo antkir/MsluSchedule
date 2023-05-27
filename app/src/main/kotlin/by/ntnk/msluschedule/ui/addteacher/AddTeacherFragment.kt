@@ -175,4 +175,8 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
         fun onNewTeacher(teacher: Teacher)
         fun onError(t: Throwable)
     }
+
+    companion object {
+        const val FRAGMENT_TAG = "AddTeacherFragment"
+    }
 }

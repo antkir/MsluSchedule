@@ -72,8 +72,8 @@ class WeekPresenter @Inject constructor(
     val scheduleUpdateEventObservable: Observable<ScheduleUpdateEvent>
         get() = scheduleUpdateEvent
 
-    fun getScheduleContainerInfo(): ScheduleContainerInfo {
-        return sharedPreferencesRepository.getSelectedScheduleContainerInfo()
+    fun getScheduleContainer(): ScheduleContainerInfo {
+        return sharedPreferencesRepository.getSelectedScheduleContainer()
     }
 
     fun getSchedule(scheduleType: ScheduleType, weekId: Int) {
@@ -97,6 +97,7 @@ class WeekPresenter @Inject constructor(
         return when (type) {
             ScheduleType.STUDYGROUP -> databaseRepository.getWeekdaysWithStudyGroupLessons(weekId)
             ScheduleType.TEACHER -> databaseRepository.getWeekdaysWithTeacherLessons(weekId)
+            else -> Observable.error(IllegalArgumentException())
         }
     }
 
@@ -157,6 +158,7 @@ class WeekPresenter @Inject constructor(
                             }
                             .flatMap { weekdays -> databaseRepository.insertTeacherSchedule(weekdays, weekId) }
                     }
+                    else -> Single.error(IllegalArgumentException())
                 }
             }
             .subscribeOn(schedulerProvider.io())

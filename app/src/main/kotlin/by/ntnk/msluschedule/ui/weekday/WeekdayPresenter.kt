@@ -53,7 +53,7 @@ class WeekdayPresenter @Inject constructor(
 
     fun getWeekday(id: Int) {
         weekdayUiState.onNext(WeekdayUiState(isLoading = true))
-        when (sharedPreferencesRepository.getSelectedScheduleContainerInfo().type) {
+        when (sharedPreferencesRepository.getSelectedScheduleContainer().type) {
             ScheduleType.STUDYGROUP -> databaseRepository.getWeekdayWithStudyGroupLessons(id)
             ScheduleType.TEACHER -> databaseRepository.getWeekdayWithTeacherLessons(id)
             else -> Single.error(NullPointerException())
