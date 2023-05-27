@@ -4,7 +4,7 @@ import by.ntnk.msluschedule.TestTree
 import by.ntnk.msluschedule.any
 import by.ntnk.msluschedule.data.Lesson
 import by.ntnk.msluschedule.data.Note
-import by.ntnk.msluschedule.data.ScheduleContainerInfo
+import by.ntnk.msluschedule.data.ScheduleContainer
 import by.ntnk.msluschedule.data.StudyGroup
 import by.ntnk.msluschedule.data.Teacher
 import by.ntnk.msluschedule.data.WeekdayWithLessons
@@ -12,7 +12,7 @@ import by.ntnk.msluschedule.data.WeekdayWithStudyGroupLessons
 import by.ntnk.msluschedule.data.WeekdayWithTeacherLessons
 import by.ntnk.msluschedule.db.DatabaseDataMapper
 import by.ntnk.msluschedule.db.DatabaseRepository
-import by.ntnk.msluschedule.db.data.ScheduleContainer
+import by.ntnk.msluschedule.db.data.ScheduleContainer as DbScheduleContainer
 import by.ntnk.msluschedule.network.NetworkRepository
 import by.ntnk.msluschedule.utils.CurrentDate
 import by.ntnk.msluschedule.utils.DEFAULT
@@ -77,7 +77,7 @@ class WeekPresenterTest {
         MockitoAnnotations.openMocks(this)
 
         whenever(sharedPreferencesRepository.getSelectedScheduleContainer())
-            .thenReturn(ScheduleContainerInfo(id = 0, value = String.DEFAULT, ScheduleType.STUDYGROUP))
+            .thenReturn(ScheduleContainer(id = 0, value = String.DEFAULT, ScheduleType.STUDYGROUP))
         whenever(databaseRepository.isWeekInitialized(anyInt()))
             .thenReturn(
                 Single.just(true)
@@ -85,7 +85,7 @@ class WeekPresenterTest {
             )
         whenever(databaseRepository.getScheduleContainer(anyInt()))
             .thenReturn(
-                Single.just(ScheduleContainer(key = 0, name = String.DEFAULT, ScheduleType.STUDYGROUP, year = 0))
+                Single.just(DbScheduleContainer(key = 0, name = String.DEFAULT, ScheduleType.STUDYGROUP, year = 0))
                     .doOnSubscribe { disposable -> getScheduleContainerTest.onSubscribe(disposable) }
             )
         whenever(databaseRepository.getWeekKey(anyInt()))

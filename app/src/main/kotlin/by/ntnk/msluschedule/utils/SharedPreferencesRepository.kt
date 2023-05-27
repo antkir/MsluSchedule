@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatDelegate
 import by.ntnk.msluschedule.R
-import by.ntnk.msluschedule.data.ScheduleContainerInfo
+import by.ntnk.msluschedule.data.ScheduleContainer
 import by.ntnk.msluschedule.di.PerApp
 import javax.inject.Inject
 
@@ -17,15 +17,15 @@ class SharedPreferencesRepository @Inject constructor(
         get() = sharedPreferences.getBoolean(KEY_FIRST_APP_LAUNCH, true)
         set(value) = sharedPreferences.edit().putBoolean(KEY_FIRST_APP_LAUNCH, value).apply()
 
-    fun getSelectedScheduleContainer(): ScheduleContainerInfo {
+    fun getSelectedScheduleContainer(): ScheduleContainer {
         val id = sharedPreferences.getInt(KEY_SCHEDULECONTAINER_ID, 0)
         val value = sharedPreferences.getString(KEY_SCHEDULECONTAINER_VALUE, null) ?: String.DEFAULT
         val typeString = sharedPreferences.getString(KEY_SCHEDULECONTAINER_TYPE, null) ?: String.DEFAULT
         val type = ScheduleTypeConverter.stringToScheduleType(typeString)
-        return ScheduleContainerInfo(id, value, type)
+        return ScheduleContainer(id, value, type)
     }
 
-    fun putSelectedScheduleContainer(scheduleContainer: ScheduleContainerInfo) {
+    fun putSelectedScheduleContainer(scheduleContainer: ScheduleContainer) {
         sharedPreferences.edit()
             .putInt(KEY_SCHEDULECONTAINER_ID, scheduleContainer.id)
             .putString(KEY_SCHEDULECONTAINER_VALUE, scheduleContainer.value)

@@ -15,7 +15,7 @@ import androidx.core.view.MenuProvider
 import androidx.core.view.ViewCompat
 import androidx.lifecycle.Lifecycle
 import by.ntnk.msluschedule.R
-import by.ntnk.msluschedule.data.ScheduleContainerInfo
+import by.ntnk.msluschedule.data.ScheduleContainer
 import by.ntnk.msluschedule.data.Week
 import by.ntnk.msluschedule.databinding.FragmentWeekscontainerBinding
 import by.ntnk.msluschedule.mvp.views.MvpFragment
@@ -175,12 +175,12 @@ class WeeksContainerFragment :
         presenter.deleteSelectedScheduleContainer()
     }
 
-    override fun onDeleteScheduleContainer(info: ScheduleContainerInfo) {
+    override fun onDeleteScheduleContainer(info: ScheduleContainer) {
         listener.onScheduleContainerDeleted(info)
     }
 
     interface OnScheduleContainerDeletedListener {
-        fun onScheduleContainerDeleted(scheduleContainer: ScheduleContainerInfo)
+        fun onScheduleContainerDeleted(scheduleContainer: ScheduleContainer)
     }
 
     companion object {

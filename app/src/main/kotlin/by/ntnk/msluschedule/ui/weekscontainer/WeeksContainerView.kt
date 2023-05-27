@@ -1,10 +1,10 @@
 package by.ntnk.msluschedule.ui.weekscontainer
 
-import by.ntnk.msluschedule.data.ScheduleContainerInfo
+import by.ntnk.msluschedule.data.ScheduleContainer
 import by.ntnk.msluschedule.data.Week
 import by.ntnk.msluschedule.mvp.View
 
 interface WeeksContainerView : View {
     fun onData(weeks: List<Week>, currentAcademicWeekIndex: Int)
-    fun onDeleteScheduleContainer(info: ScheduleContainerInfo)
+    fun onDeleteScheduleContainer(info: ScheduleContainer)
 }

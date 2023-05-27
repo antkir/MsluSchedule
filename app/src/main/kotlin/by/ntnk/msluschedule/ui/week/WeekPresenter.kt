@@ -1,7 +1,7 @@
 package by.ntnk.msluschedule.ui.week
 
 import by.ntnk.msluschedule.data.Lesson
-import by.ntnk.msluschedule.data.ScheduleContainerInfo
+import by.ntnk.msluschedule.data.ScheduleContainer
 import by.ntnk.msluschedule.data.WeekdayWithLessons
 import by.ntnk.msluschedule.db.DatabaseDataMapper
 import by.ntnk.msluschedule.db.DatabaseRepository
@@ -72,7 +72,7 @@ class WeekPresenter @Inject constructor(
     val scheduleUpdateEventObservable: Observable<ScheduleUpdateEvent>
         get() = scheduleUpdateEvent
 
-    fun getScheduleContainer(): ScheduleContainerInfo {
+    fun getScheduleContainer(): ScheduleContainer {
         return sharedPreferencesRepository.getSelectedScheduleContainer()
     }
 

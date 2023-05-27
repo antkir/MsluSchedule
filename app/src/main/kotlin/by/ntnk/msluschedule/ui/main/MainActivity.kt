@@ -29,7 +29,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.viewpager.widget.ViewPager
 import by.ntnk.msluschedule.R
-import by.ntnk.msluschedule.data.ScheduleContainerInfo
+import by.ntnk.msluschedule.data.ScheduleContainer
 import by.ntnk.msluschedule.data.StudyGroup
 import by.ntnk.msluschedule.data.Teacher
 import by.ntnk.msluschedule.databinding.ActivityMainBinding
@@ -394,7 +394,7 @@ class MainActivity :
 
                 if (menuItem != null) {
                     binding.toolbar.title = item.title
-                    val scheduleContainer = ScheduleContainerInfo(item.itemId, item.title.toString(), scheduleType)
+                    val scheduleContainer = ScheduleContainer(item.itemId, item.title.toString(), scheduleType)
                     sharedPreferencesRepository.putSelectedScheduleContainer(scheduleContainer)
                     isUpdatingWeeksContainer = true
                     binding.drawerLayout.closeDrawer(GravityCompat.START)
@@ -584,7 +584,7 @@ class MainActivity :
         binding.content.progressbar.visibility = View.GONE
     }
 
-    override fun addScheduleContainerMenuItem(scheduleContainer: ScheduleContainerInfo) {
+    override fun addScheduleContainerMenuItem(scheduleContainer: ScheduleContainer) {
         val subMenu = binding.navView.menu
             .findItem(getContainerMenuViewId(scheduleContainer.type))
             ?.subMenu
@@ -600,7 +600,7 @@ class MainActivity :
         }
     }
 
-    override fun checkScheduleContainerMenuItem(scheduleContainer: ScheduleContainerInfo) {
+    override fun checkScheduleContainerMenuItem(scheduleContainer: ScheduleContainer) {
         binding.toolbar.title = scheduleContainer.value
         val subMenu = binding.navView.menu
             .findItem(getContainerMenuViewId(scheduleContainer.type))
@@ -616,7 +616,7 @@ class MainActivity :
         }
     }
 
-    override fun showNewScheduleContainerLoading(scheduleContainer: ScheduleContainerInfo) {
+    override fun showNewScheduleContainerLoading(scheduleContainer: ScheduleContainer) {
         binding.toolbar.title = scheduleContainer.value
         removeWeeksContainerFragment()
 
@@ -639,7 +639,7 @@ class MainActivity :
         snackbar.show()
     }
 
-    override fun onScheduleContainerDeleted(scheduleContainer: ScheduleContainerInfo) {
+    override fun onScheduleContainerDeleted(scheduleContainer: ScheduleContainer) {
         binding.toolbar.title = String.DEFAULT
         removeWeeksContainerFragment()
 

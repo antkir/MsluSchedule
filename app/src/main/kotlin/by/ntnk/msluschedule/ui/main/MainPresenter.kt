@@ -1,6 +1,6 @@
 package by.ntnk.msluschedule.ui.main
 
-import by.ntnk.msluschedule.data.ScheduleContainerInfo
+import by.ntnk.msluschedule.data.ScheduleContainer
 import by.ntnk.msluschedule.data.StudyGroup
 import by.ntnk.msluschedule.data.Teacher
 import by.ntnk.msluschedule.db.DatabaseRepository
@@ -31,7 +31,7 @@ class MainPresenter @Inject constructor(
         databaseRepository.insertStudyGroup(studyGroup)
             .observeOn(schedulerProvider.ui())
             .doOnSuccess { studyGroupId ->
-                val scheduleContainer = ScheduleContainerInfo(studyGroupId, studyGroup.name, ScheduleType.STUDYGROUP)
+                val scheduleContainer = ScheduleContainer(studyGroupId, studyGroup.name, ScheduleType.STUDYGROUP)
                 view?.showNewScheduleContainerLoading(scheduleContainer)
             }
             .observeOn(schedulerProvider.io())
@@ -42,7 +42,7 @@ class MainPresenter @Inject constructor(
             .subscribeBy(
                 onSuccess = { studyGroupId ->
                     val scheduleContainer =
-                        ScheduleContainerInfo(studyGroupId, studyGroup.name, ScheduleType.STUDYGROUP)
+                        ScheduleContainer(studyGroupId, studyGroup.name, ScheduleType.STUDYGROUP)
                     sharedPreferencesRepository.putSelectedScheduleContainer(scheduleContainer)
                     view?.initMainContent()
                     view?.addScheduleContainerMenuItem(scheduleContainer)
@@ -56,7 +56,7 @@ class MainPresenter @Inject constructor(
         databaseRepository.insertTeacher(teacher)
             .observeOn(schedulerProvider.ui())
             .doOnSuccess { teacherId ->
-                val scheduleContainer = ScheduleContainerInfo(teacherId, teacher.name, ScheduleType.TEACHER)
+                val scheduleContainer = ScheduleContainer(teacherId, teacher.name, ScheduleType.TEACHER)
                 view?.showNewScheduleContainerLoading(scheduleContainer)
             }
             .observeOn(schedulerProvider.io())
@@ -66,7 +66,7 @@ class MainPresenter @Inject constructor(
             .doOnError { view?.showError() }
             .subscribeBy(
                 onSuccess = { teacherId ->
-                    val scheduleContainer = ScheduleContainerInfo(teacherId, teacher.name, ScheduleType.TEACHER)
+                    val scheduleContainer = ScheduleContainer(teacherId, teacher.name, ScheduleType.TEACHER)
                     sharedPreferencesRepository.putSelectedScheduleContainer(scheduleContainer)
                     view?.initMainContent()
                     view?.addScheduleContainerMenuItem(scheduleContainer)
@@ -98,8 +98,7 @@ class MainPresenter @Inject constructor(
                     } else {
                         dbScheduleContainer.name
                     }
-                    val scheduleContainer =
-                        ScheduleContainerInfo(dbScheduleContainer.id, name, dbScheduleContainer.type)
+                    val scheduleContainer = ScheduleContainer(dbScheduleContainer.id, name, dbScheduleContainer.type)
                     view?.addScheduleContainerMenuItem(scheduleContainer)
                 },
                 onError = { throwable -> Timber.e(throwable) },

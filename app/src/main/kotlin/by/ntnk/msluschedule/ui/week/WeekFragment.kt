@@ -27,7 +27,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
 import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.data.Lesson
-import by.ntnk.msluschedule.data.ScheduleContainerInfo
+import by.ntnk.msluschedule.data.ScheduleContainer
 import by.ntnk.msluschedule.data.WeekdayWithLessons
 import by.ntnk.msluschedule.databinding.FragmentWeekBinding
 import by.ntnk.msluschedule.mvp.views.MvpFragment
@@ -60,7 +60,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     private var restoredRecyclerViewState: Parcelable? = null
     private lateinit var adapterOnClickDisposable: Disposable
     private val disposables: CompositeDisposable = CompositeDisposable()
-    private lateinit var scheduleContainer: ScheduleContainerInfo
+    private lateinit var scheduleContainer: ScheduleContainer
 
     private var fragmentBinding: FragmentWeekBinding? = null
     private val binding get() = fragmentBinding!!
