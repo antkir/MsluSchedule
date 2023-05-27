@@ -200,7 +200,7 @@ class MainActivity :
             if (isFamOpen) collapseFam()
         }
 
-        supportActionBar?.title = savedInstanceState?.getString(ARG_ACTIONBAR_TITLE)
+        binding.toolbar.title = savedInstanceState?.getString(ARG_TOOLBAR_TITLE)
 
         onThemeChangedDisposable = onThemeChanged
             .filter { it }
@@ -393,7 +393,7 @@ class MainActivity :
                     ?.findItem(item.itemId)
 
                 if (menuItem != null) {
-                    supportActionBar?.title = item.title
+                    binding.toolbar.title = item.title
                     val scheduleContainer = ScheduleContainerInfo(item.itemId, item.title.toString(), scheduleType)
                     sharedPreferencesRepository.putSelectedScheduleContainer(scheduleContainer)
                     isUpdatingWeeksContainer = true
@@ -467,7 +467,7 @@ class MainActivity :
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putString(ARG_ACTIONBAR_TITLE, supportActionBar?.title.toString())
+        outState.putString(ARG_TOOLBAR_TITLE, binding.toolbar.title.toString())
     }
 
     private fun expandFam() {
@@ -601,7 +601,7 @@ class MainActivity :
     }
 
     override fun checkScheduleContainerMenuItem(scheduleContainer: ScheduleContainerInfo) {
-        supportActionBar?.title = scheduleContainer.value
+        binding.toolbar.title = scheduleContainer.value
         val subMenu = binding.navView.menu
             .findItem(getContainerMenuViewId(scheduleContainer.type))
             ?.subMenu
@@ -617,7 +617,7 @@ class MainActivity :
     }
 
     override fun showNewScheduleContainerLoading(scheduleContainer: ScheduleContainerInfo) {
-        supportActionBar?.title = scheduleContainer.value
+        binding.toolbar.title = scheduleContainer.value
         removeWeeksContainerFragment()
 
         binding.content.progressbar.visibility = View.VISIBLE
@@ -626,7 +626,7 @@ class MainActivity :
     }
 
     override fun showError() {
-        supportActionBar?.title = String.DEFAULT
+        binding.toolbar.title = String.DEFAULT
         removeWeeksContainerFragment()
 
         binding.content.progressbar.visibility = View.GONE
@@ -640,7 +640,7 @@ class MainActivity :
     }
 
     override fun onScheduleContainerDeleted(scheduleContainer: ScheduleContainerInfo) {
-        supportActionBar?.title = String.DEFAULT
+        binding.toolbar.title = String.DEFAULT
         removeWeeksContainerFragment()
 
         binding.content.imageSmile.visibility = View.VISIBLE
@@ -667,6 +667,6 @@ class MainActivity :
     }
 
     private companion object {
-        const val ARG_ACTIONBAR_TITLE = "ActionBarTitle"
+        const val ARG_TOOLBAR_TITLE = "toolbarTitle"
     }
 }
