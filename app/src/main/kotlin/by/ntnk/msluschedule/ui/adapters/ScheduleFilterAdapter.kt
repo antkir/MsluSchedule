@@ -72,7 +72,7 @@ class ScheduleFilterAdapter(
     private inner class DataFilter : Filter() {
         override fun performFiltering(constraint: CharSequence?): FilterResults {
             val filterResults = FilterResults()
-            if (constraint == null || constraint.isEmpty()) {
+            if (constraint.isNullOrEmpty()) {
                 filterResults.values = unfilteredData
                 filterResults.count = unfilteredData.size
             } else {
@@ -91,7 +91,6 @@ class ScheduleFilterAdapter(
             return filterResults
         }
 
-        @Suppress("UNCHECKED_CAST")
         override fun publishResults(constraint: CharSequence?, results: FilterResults) {
             filteredData = results.values as ScheduleFilter
             if (results.count > 0) {

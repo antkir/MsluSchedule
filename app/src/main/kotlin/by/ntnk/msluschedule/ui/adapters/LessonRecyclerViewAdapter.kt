@@ -66,7 +66,7 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
                             }
 
                             is TeacherLesson -> TeacherClassItemView(classDesciptor, day.weekdayId)
-                            else -> throw RuntimeException("Illegal class type!")
+                            else -> throw IllegalStateException("Illegal class type!")
                         }
                     itemViews.add(classItemView)
                     prevStartTime = classDesciptor.startTime

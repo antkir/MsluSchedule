@@ -9,8 +9,6 @@ class TestTree : Timber.Tree() {
     }
 }
 
-@Suppress("unchecked_cast")
-fun <T> any(): T {
-    Mockito.any<T>()
-    return null as T
+inline fun <reified T> any(): T {
+    return Mockito.any(T::class.java)
 }

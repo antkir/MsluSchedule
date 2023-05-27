@@ -109,7 +109,7 @@ class WeekdayActivity :
 
         val adapter = binding.recyclerviewNotes.adapter as NoteRecyclerViewAdapter
         adapter.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
-        adapter.initializeNoteColors(resources)
+        adapter.setupNoteColors(resources)
         adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
                 if (itemCount == 1 && positionStart != NO_POSITION) {

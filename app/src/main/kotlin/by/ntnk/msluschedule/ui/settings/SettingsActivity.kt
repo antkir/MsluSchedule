@@ -91,12 +91,12 @@ class SettingsActivity : AppCompatActivity(), HasAndroidInjector {
             super.onCreate(savedInstanceState)
 
             val themePreference = findPreference<ListPreference>(getString(R.string.key_theme))!!
-            val values = arrayOf(
+            val themeValues = arrayOf(
                 AppCompatDelegate.MODE_NIGHT_NO.toString(),
                 AppCompatDelegate.MODE_NIGHT_YES.toString(),
                 AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM.toString()
             )
-            themePreference.entryValues = values
+            themePreference.entryValues = themeValues
             themePreference.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { preference, value ->
                 preference as ListPreference
                 value as String

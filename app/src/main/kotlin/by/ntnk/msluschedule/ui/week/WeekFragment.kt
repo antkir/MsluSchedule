@@ -57,7 +57,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     private var isNoClassesViewVisible: Boolean = true
     private var weekId: Int = Int.DEFAULT
     private var isCurrentWeek: Boolean = false
-    private var recyclerViewSavedState: Parcelable? = null
+    private var restoredRecyclerViewState: Parcelable? = null
     private lateinit var adapterOnClickDisposable: Disposable
     private val disposables: CompositeDisposable = CompositeDisposable()
     private lateinit var scheduleContainerInfo: ScheduleContainerInfo
@@ -92,7 +92,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        initializeRecyclerView()
+        setupRecyclerView()
 
         binding.swipeRefreshLayout.setOnRefreshListener {
             binding.swipeRefreshLayout.isRefreshing = false
@@ -133,10 +133,10 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
 
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
         super.onViewStateRestored(savedInstanceState)
-        recyclerViewSavedState = savedInstanceState?.getParcelable(ARG_RECYCLER_VIEW_SAVED_STATE)
+        restoredRecyclerViewState = savedInstanceState?.getParcelable(ARG_RECYCLER_VIEW_SAVED_STATE)
     }
 
-    private fun initializeRecyclerView() {
+    private fun setupRecyclerView() {
         binding.recyclerviewDays.apply {
             layoutManager = LinearLayoutManager(activity)
             setHasFixedSize(true)
@@ -336,9 +336,9 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         adapter.onNewData(data)
 
         val layoutManager = binding.recyclerviewDays.layoutManager as LinearLayoutManager
-        if (recyclerViewSavedState != null) {
-            layoutManager.onRestoreInstanceState(recyclerViewSavedState)
-            recyclerViewSavedState = null
+        if (restoredRecyclerViewState != null) {
+            layoutManager.onRestoreInstanceState(restoredRecyclerViewState)
+            restoredRecyclerViewState = null
         } else {
             if (isCurrentWeek && hadNoClasses && adapter.hasClasses()) {
                 val index = adapter.getWeekdayViewIndex(presenter.getCurrentDayOfWeek())

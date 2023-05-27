@@ -39,7 +39,7 @@ class NoteRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() 
     val onLongClickObservable: Observable<Note>
         get() = onLongClickSubject
 
-    fun initializeNoteColors(resources: Resources) {
+    fun setupNoteColors(resources: Resources) {
         colors.clear()
         val resColors = resources.obtainTypedArray(R.array.note_colors)
         for (i in 0 until resColors.length()) {
@@ -105,7 +105,7 @@ class NoteRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() 
         var time = String.DEFAULT
         for ((index, classDescriptor) in filteredClasses.withIndex()) {
             time += classDescriptor.startTime
-            if (index < filteredClasses.size - 1) {
+            if (index < filteredClasses.lastIndex) {
                 time += " / "
             }
         }
