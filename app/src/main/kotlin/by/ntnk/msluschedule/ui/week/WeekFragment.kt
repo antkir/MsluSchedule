@@ -96,7 +96,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
             binding.swipeRefreshLayout.isRefreshing = false
 
             if (AndroidUtils.isNetworkAccessible(requireContext().applicationContext)) {
-                presenter.updateSchedule(scheduleContainer.id, weekId)
+                presenter.updateSchedule(scheduleContainer, weekId)
             } else {
                 val baseFABMain = requireActivity().findViewById<FloatingActionButton>(R.id.fab_base)
                 AndroidUtils.showSnackbarNetworkInaccessible(baseFABMain)
@@ -113,7 +113,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
                     when (menuItem.itemId) {
                         R.id.item_week_update -> {
                             if (AndroidUtils.isNetworkAccessible(requireContext().applicationContext)) {
-                                presenter.updateSchedule(scheduleContainer.id, weekId)
+                                presenter.updateSchedule(scheduleContainer, weekId)
                             } else {
                                 val baseFABMain = requireActivity().findViewById<FloatingActionButton>(R.id.fab_base)
                                 AndroidUtils.showSnackbarNetworkInaccessible(baseFABMain)
@@ -190,7 +190,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
                     }
 
                     if (scheduleUiState.isWeekInitializedNoData) {
-                        presenter.updateSchedule(scheduleContainer.id, weekId, isFirstUpdate = true)
+                        presenter.updateSchedule(scheduleContainer, weekId, isFirstUpdate = true)
                     }
 
                     if (scheduleUiState.isWeekInitialized) {
@@ -453,7 +453,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
             snackbar.setAction(R.string.snackbar_week_init_retry) {
                 context ?: return@setAction
                 if (AndroidUtils.isNetworkAccessible(requireContext().applicationContext)) {
-                    presenter.updateSchedule(scheduleContainer.id, weekId)
+                    presenter.updateSchedule(scheduleContainer, weekId)
                 } else {
                     AndroidUtils.showSnackbarNetworkInaccessible(baseFABMain)
                 }

@@ -18,11 +18,12 @@ class SharedPreferencesRepository @Inject constructor(
         set(value) = sharedPreferences.edit().putBoolean(KEY_FIRST_APP_LAUNCH, value).apply()
 
     fun getSelectedScheduleContainer(): ScheduleContainer {
-        val id = sharedPreferences.getInt(KEY_SCHEDULECONTAINER_ID, 0)
+        val id = sharedPreferences.getInt(KEY_SCHEDULECONTAINER_ID, Int.DEFAULT)
         val value = sharedPreferences.getString(KEY_SCHEDULECONTAINER_VALUE, null) ?: String.DEFAULT
         val typeString = sharedPreferences.getString(KEY_SCHEDULECONTAINER_TYPE, null) ?: String.DEFAULT
         val type = ScheduleTypeConverter.stringToScheduleType(typeString)
-        return ScheduleContainer(id, value, type)
+        val year = sharedPreferences.getInt(KEY_SCHEDULECONTAINER_YEAR, Int.DEFAULT)
+        return ScheduleContainer(id, value, type, year)
     }
 
     fun putSelectedScheduleContainer(scheduleContainer: ScheduleContainer) {
@@ -30,14 +31,16 @@ class SharedPreferencesRepository @Inject constructor(
             .putInt(KEY_SCHEDULECONTAINER_ID, scheduleContainer.id)
             .putString(KEY_SCHEDULECONTAINER_VALUE, scheduleContainer.value)
             .putString(KEY_SCHEDULECONTAINER_TYPE, scheduleContainer.type.name)
+            .putInt(KEY_SCHEDULECONTAINER_YEAR, scheduleContainer.year)
             .apply()
     }
 
     fun selectEmptyScheduleContainer() {
         sharedPreferences.edit()
-            .putInt(KEY_SCHEDULECONTAINER_ID, 0)
+            .putInt(KEY_SCHEDULECONTAINER_ID, Int.DEFAULT)
             .putString(KEY_SCHEDULECONTAINER_VALUE, String.DEFAULT)
             .putString(KEY_SCHEDULECONTAINER_TYPE, ScheduleType.DEFAULT.name)
+            .putInt(KEY_SCHEDULECONTAINER_YEAR, Int.DEFAULT)
             .apply()
     }
 
@@ -63,6 +66,7 @@ class SharedPreferencesRepository @Inject constructor(
         const val KEY_SCHEDULECONTAINER_ID = "scheduleContainerId"
         const val KEY_SCHEDULECONTAINER_VALUE = "scheduleContainerValue"
         const val KEY_SCHEDULECONTAINER_TYPE = "scheduleContainerType"
+        const val KEY_SCHEDULECONTAINER_YEAR = "scheduleContainerYear"
         const val KEY_FIRST_APP_LAUNCH = "isFirstAppLaunch"
     }
 }

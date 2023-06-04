@@ -13,7 +13,7 @@ data class ScheduleContainer constructor(
     val name: String,
     val type: ScheduleType,
     val year: Int,
-    val faculty: Int = 0,
-    val course: Int = 0,
+    val faculty: Int,
+    val course: Int,
     @PrimaryKey(autoGenerate = true) val id: Int = 0
 )

@@ -3,7 +3,6 @@ package by.ntnk.msluschedule.ui.week
 import by.ntnk.msluschedule.data.Lesson
 import by.ntnk.msluschedule.data.ScheduleContainer
 import by.ntnk.msluschedule.data.WeekdayWithLessons
-import by.ntnk.msluschedule.db.DatabaseDataMapper
 import by.ntnk.msluschedule.db.DatabaseRepository
 import by.ntnk.msluschedule.mvp.Presenter
 import by.ntnk.msluschedule.network.NetworkRepository
@@ -57,7 +56,6 @@ data class ScheduleUpdateEvent(
 class WeekPresenter @Inject constructor(
     private val currentDate: CurrentDate,
     private val databaseRepository: DatabaseRepository,
-    private val databaseDataMapper: DatabaseDataMapper,
     private val sharedPreferencesRepository: SharedPreferencesRepository,
     private val schedulerProvider: SchedulerProvider,
     private val networkRepository: NetworkRepository
@@ -118,7 +116,7 @@ class WeekPresenter @Inject constructor(
             )
     }
 
-    fun updateSchedule(scheduleContainerId: Int, weekId: Int, isFirstUpdate: Boolean = false) {
+    fun updateSchedule(scheduleContainer: ScheduleContainer, weekId: Int, isFirstUpdate: Boolean = false) {
         assert(scheduleUpdateEvent.hasValue())
         if (scheduleUpdateEvent.value!! != ScheduleUpdateEvent()) {
             return
@@ -129,38 +127,12 @@ class WeekPresenter @Inject constructor(
         } else {
             scheduleUpdateEvent.onNext(ScheduleUpdateEvent(isLoading = true))
         }
-        databaseRepository.getScheduleContainer(scheduleContainerId)
-            .flatMap { scheduleContainer ->
-                when (scheduleContainer.type) {
-                    ScheduleType.STUDYGROUP -> {
-                        databaseRepository.getWeekKey(weekId)
-                            .flatMapObservable {
-                                val studyGroup = databaseDataMapper.mapToStudyGroup(scheduleContainer)
-                                return@flatMapObservable networkRepository.getSchedule(studyGroup, it)
-                            }
-                            .toList()
-                            .flatMap { weekdays ->
-                                databaseRepository.deleteLessons(weekId, scheduleContainer.type)
-                                    .andThen(Single.just(weekdays))
-                            }
-                            .flatMap { weekdays -> databaseRepository.insertStudyGroupSchedule(weekdays, weekId) }
-                    }
-                    ScheduleType.TEACHER -> {
-                        databaseRepository.getWeekKey(weekId)
-                            .flatMapObservable {
-                                val teacher = databaseDataMapper.mapToTeacher(scheduleContainer)
-                                return@flatMapObservable networkRepository.getSchedule(teacher, it)
-                            }
-                            .toList()
-                            .flatMap { weekdays ->
-                                databaseRepository.deleteLessons(weekId, scheduleContainer.type)
-                                    .andThen(Single.just(weekdays))
-                            }
-                            .flatMap { weekdays -> databaseRepository.insertTeacherSchedule(weekdays, weekId) }
-                    }
-                    else -> Single.error(IllegalArgumentException())
-                }
-            }
+
+        when (scheduleContainer.type) {
+            ScheduleType.STUDYGROUP -> updateScheduleGroup(scheduleContainer, weekId)
+            ScheduleType.TEACHER -> updateScheduleTeacher(scheduleContainer, weekId)
+            else -> Single.error(IllegalArgumentException())
+        }
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
@@ -183,6 +155,36 @@ class WeekPresenter @Inject constructor(
                     }
                 }
             )
+    }
+
+    private fun updateScheduleGroup(
+        scheduleContainer: ScheduleContainer,
+        weekId: Int
+    ): Single<List<WeekdayWithLessons<Lesson>>> {
+        return databaseRepository.getStudyGroup(scheduleContainer.id)
+            .zipWith(databaseRepository.getWeekKey(weekId)) { studyGroup, weekKey -> Pair(studyGroup, weekKey) }
+            .flatMapObservable { (studyGroup, weekKey) -> networkRepository.getSchedule(studyGroup, weekKey) }
+            .toList()
+            .flatMap { weekdays ->
+                databaseRepository.deleteLessons(weekId, scheduleContainer.type)
+                    .andThen(Single.just(weekdays))
+            }
+            .flatMap { weekdays -> databaseRepository.insertStudyGroupSchedule(weekdays, weekId) }
+    }
+
+    private fun updateScheduleTeacher(
+        scheduleContainer: ScheduleContainer,
+        weekId: Int
+    ): Single<List<WeekdayWithLessons<Lesson>>> {
+        return databaseRepository.getTeacher(scheduleContainer.id)
+            .zipWith(databaseRepository.getWeekKey(weekId)) { teacher, weekKey -> Pair(teacher, weekKey) }
+            .flatMapObservable { (teacher, weekKey) -> networkRepository.getSchedule(teacher, weekKey) }
+            .toList()
+            .flatMap { weekdays ->
+                databaseRepository.deleteLessons(weekId, scheduleContainer.type)
+                    .andThen(Single.just(weekdays))
+            }
+            .flatMap { weekdays -> databaseRepository.insertTeacherSchedule(weekdays, weekId) }
     }
 
     fun checkWeekInitialized(weekId: Int) {

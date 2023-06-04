@@ -92,9 +92,9 @@ class MainPresenterTest {
     @Test
     fun addGroup() {
         // given
-        val studyGroup = StudyGroup(key = 0, name = String.DEFAULT, year = 0, faculty = 0, course = 0)
+        val studyGroup = StudyGroup(id = 0, key = 0, value = String.DEFAULT, year = 0, faculty = 0, course = 0)
         val scheduleContainer =
-            ScheduleContainer(id = 0, studyGroup.name, ScheduleType.STUDYGROUP, studyGroup.year)
+            ScheduleContainer(studyGroup.id, studyGroup.value, ScheduleType.STUDYGROUP, studyGroup.year)
         // when
         presenter.addGroup(studyGroup)
         // then
@@ -113,9 +113,9 @@ class MainPresenterTest {
     @Test
     fun addTeacher() {
         // given
-        val teacher = Teacher(key = 0, name = String.DEFAULT, year = 0)
+        val teacher = Teacher(id = 0, key = 0, value = String.DEFAULT, year = 0)
         val scheduleContainer =
-            ScheduleContainer(id = 0, teacher.name, ScheduleType.TEACHER, teacher.year)
+            ScheduleContainer(teacher.id, teacher.value, ScheduleType.TEACHER, teacher.year)
         // when
         presenter.addTeacher(teacher)
         // then
@@ -134,7 +134,7 @@ class MainPresenterTest {
     @Test
     fun `Delete the inserted group if we aren't able to get weeks`() {
         // given
-        val studyGroup = StudyGroup(key = 0, name = String.DEFAULT, year = 0, faculty = 0, course = 0)
+        val studyGroup = StudyGroup(id = 0, key = 0, value = String.DEFAULT, year = 0, faculty = 0, course = 0)
         whenever(networkRepository.getWeeks()).thenReturn(Single.error(NullPointerException()))
         // when
         presenter.addGroup(studyGroup)
@@ -153,7 +153,7 @@ class MainPresenterTest {
     @Test
     fun `Delete the inserted teacher if we aren't able to get weeks`() {
         // given
-        val teacher = Teacher(key = 0, name = String.DEFAULT, year = 0)
+        val teacher = Teacher(id = 0, key = 0, value = String.DEFAULT, year = 0)
         whenever(networkRepository.getWeeks()).thenReturn(Single.error(NullPointerException()))
         // when
         presenter.addTeacher(teacher)

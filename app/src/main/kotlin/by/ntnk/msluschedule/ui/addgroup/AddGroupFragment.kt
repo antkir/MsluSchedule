@@ -135,7 +135,7 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
     override fun onStart() {
         super.onStart()
 
-        disposables += presenter.scheduleContanersObservable.subscribeBy(
+        disposables += presenter.storedGroupsObservable.subscribeBy(
             onError = { throwable -> showError(throwable) }
         )
 

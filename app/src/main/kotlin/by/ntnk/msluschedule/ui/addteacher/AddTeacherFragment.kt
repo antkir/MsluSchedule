@@ -90,7 +90,7 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
     override fun onStart() {
         super.onStart()
 
-        disposables += presenter.scheduleContanersObservable.subscribeBy(
+        disposables += presenter.storedTeachersObservable.subscribeBy(
             onError = { throwable -> showError(throwable) }
         )
 

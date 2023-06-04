@@ -2,10 +2,10 @@ package by.ntnk.msluschedule.ui.addteacher
 
 import by.ntnk.msluschedule.data.Teacher
 import by.ntnk.msluschedule.db.DatabaseRepository
-import by.ntnk.msluschedule.db.data.ScheduleContainer
 import by.ntnk.msluschedule.mvp.Presenter
 import by.ntnk.msluschedule.network.NetworkRepository
 import by.ntnk.msluschedule.network.data.ScheduleFilter
+import by.ntnk.msluschedule.utils.AUTO_ID
 import by.ntnk.msluschedule.utils.CurrentDate
 import by.ntnk.msluschedule.utils.DEFAULT
 import by.ntnk.msluschedule.utils.SchedulerProvider
@@ -30,9 +30,9 @@ class AddTeacherPresenter @Inject constructor(
     private val schedulerProvider: SchedulerProvider
 ) : Presenter<AddTeacherView>() {
 
-    private val scheduleContaners: BehaviorSubject<List<ScheduleContainer>> = BehaviorSubject.createDefault(emptyList())
-    val scheduleContanersObservable: Observable<List<ScheduleContainer>>
-        get() = scheduleContaners
+    private val storedTeachers: BehaviorSubject<List<Teacher>> = BehaviorSubject.createDefault(emptyList())
+    val storedTeachersObservable: Observable<List<Teacher>>
+        get() = storedTeachers
 
     private val teacherFilter: BehaviorSubject<ScheduleFilterUiState> =
         BehaviorSubject.createDefault(ScheduleFilterUiState(isLoading = true))
@@ -44,13 +44,13 @@ class AddTeacherPresenter @Inject constructor(
         get() = teacherKey
 
     init {
-        databaseRepository.getScheduleContainers()
+        databaseRepository.getTeachers()
             .toList()
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
-                onSuccess = { scheduleContainers -> scheduleContaners.onNext(scheduleContainers) },
-                onError = { throwable -> scheduleContaners.onError(throwable) }
+                onSuccess = { teachers -> storedTeachers.onNext(teachers) },
+                onError = { throwable -> storedTeachers.onError(throwable) }
             )
 
         getTeacherScheduleFilter()
@@ -72,12 +72,12 @@ class AddTeacherPresenter @Inject constructor(
     }
 
     fun isTeacherAdded(key: Int): Boolean {
-        assert(scheduleContaners.hasValue() && teacherFilter.hasValue())
+        assert(storedTeachers.hasValue() && teacherFilter.hasValue())
         assert(!teacherFilter.value!!.isError() && teacherFilter.value!!.isData())
-        return scheduleContaners.value
-            ?.filter { scheduleContainer -> scheduleContainer.year == currentDate.academicYear }
-            ?.map { scheduleContainer -> scheduleContainer.name }
-            ?.any { teacher -> teacher == teacherFilter.value!!.data!!.getValue(key) } == true
+        return storedTeachers.value
+            ?.filter { teacher -> teacher.year == currentDate.academicYear }
+            ?.map { teacher -> teacher.value }
+            ?.any { teacherName -> teacherName == teacherFilter.value!!.data!!.getValue(key) } == true
     }
 
     fun createSelectedTeacherObject(): Teacher {
@@ -85,6 +85,6 @@ class AddTeacherPresenter @Inject constructor(
         assert(!teacherFilter.value!!.isError() && teacherFilter.value!!.isData())
         val teacherKey = teacherKey.value!!
         val teacherName = teacherFilter.value!!.data!!.getValue(teacherKey)
-        return Teacher(teacherKey, teacherName, currentDate.academicYear)
+        return Teacher(AUTO_ID, teacherKey, teacherName, currentDate.academicYear)
     }
 }

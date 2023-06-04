@@ -2,6 +2,7 @@ package by.ntnk.msluschedule.db
 
 import by.ntnk.msluschedule.data.Lesson
 import by.ntnk.msluschedule.data.Note
+import by.ntnk.msluschedule.data.ScheduleContainer
 import by.ntnk.msluschedule.data.StudyGroup
 import by.ntnk.msluschedule.data.StudyGroupLesson
 import by.ntnk.msluschedule.data.Teacher
@@ -13,9 +14,10 @@ import by.ntnk.msluschedule.data.WeekdayWithTeacherLessons
 import by.ntnk.msluschedule.db.data.DbNote
 import by.ntnk.msluschedule.db.data.DbStudyGroupLesson
 import by.ntnk.msluschedule.db.data.DbTeacherLesson
-import by.ntnk.msluschedule.db.data.ScheduleContainer
+import by.ntnk.msluschedule.db.data.ScheduleContainer as DbScheduleContainer
 import by.ntnk.msluschedule.di.PerApp
 import by.ntnk.msluschedule.network.data.ScheduleFilter
+import by.ntnk.msluschedule.utils.DEFAULT
 import by.ntnk.msluschedule.utils.ScheduleType
 import io.reactivex.Completable
 import io.reactivex.Observable
@@ -29,14 +31,23 @@ class DatabaseRepository @Inject constructor(
 ) {
     fun insertStudyGroup(studyGroup: StudyGroup): Single<Int> {
         return Single.just(studyGroup)
-            .map { ScheduleContainer(it.key, it.name, ScheduleType.STUDYGROUP, it.year, it.faculty, it.course) }
+            .map { DbScheduleContainer(it.key, it.value, ScheduleType.STUDYGROUP, it.year, it.faculty, it.course) }
             .flatMap { scheduleContainer -> appDatabase.scheduleContainerDao.insert(scheduleContainer) }
             .map { id -> id.toInt() }
     }
 
     fun insertTeacher(teacher: Teacher): Single<Int> {
         return Single.just(teacher)
-            .map { ScheduleContainer(it.key, it.name, ScheduleType.TEACHER, it.year) }
+            .map {
+                DbScheduleContainer(
+                    it.key,
+                    it.value,
+                    ScheduleType.TEACHER,
+                    it.year,
+                    faculty = Int.DEFAULT,
+                    course = Int.DEFAULT
+                )
+            }
             .flatMap { scheduleContainer -> appDatabase.scheduleContainerDao.insert(scheduleContainer) }
             .map { id -> id.toInt() }
     }
@@ -48,10 +59,80 @@ class DatabaseRepository @Inject constructor(
     fun getScheduleContainers(): Observable<ScheduleContainer> {
         return appDatabase.scheduleContainerDao.getScheduleContainers()
             .flatMapObservable { Observable.fromIterable(it) }
+            .map { dbScheduleContainer ->
+                ScheduleContainer(
+                    dbScheduleContainer.id,
+                    dbScheduleContainer.name,
+                    dbScheduleContainer.type,
+                    dbScheduleContainer.year
+                )
+            }
     }
 
     fun getScheduleContainer(id: Int): Single<ScheduleContainer> {
         return appDatabase.scheduleContainerDao.getScheduleContainer(id)
+            .map { dbScheduleContainer ->
+                ScheduleContainer(
+                    dbScheduleContainer.id,
+                    dbScheduleContainer.name,
+                    dbScheduleContainer.type,
+                    dbScheduleContainer.year
+                )
+            }
+    }
+
+    fun getStudyGroups(): Observable<StudyGroup> {
+        return appDatabase.scheduleContainerDao.getScheduleContainers()
+            .flatMapObservable { Observable.fromIterable(it) }
+            .map { dbScheduleContainer ->
+                StudyGroup(
+                    dbScheduleContainer.id,
+                    dbScheduleContainer.key,
+                    dbScheduleContainer.name,
+                    dbScheduleContainer.year,
+                    dbScheduleContainer.faculty,
+                    dbScheduleContainer.course
+                )
+            }
+    }
+
+    fun getStudyGroup(id: Int): Single<StudyGroup> {
+        return appDatabase.scheduleContainerDao.getScheduleContainer(id)
+            .map { dbScheduleContainer ->
+                StudyGroup(
+                    dbScheduleContainer.id,
+                    dbScheduleContainer.key,
+                    dbScheduleContainer.name,
+                    dbScheduleContainer.year,
+                    dbScheduleContainer.faculty,
+                    dbScheduleContainer.course
+                )
+            }
+    }
+
+    fun getTeachers(): Observable<Teacher> {
+        return appDatabase.scheduleContainerDao.getScheduleContainers()
+            .flatMapObservable { Observable.fromIterable(it) }
+            .map { dbScheduleContainer ->
+                Teacher(
+                    dbScheduleContainer.id,
+                    dbScheduleContainer.key,
+                    dbScheduleContainer.name,
+                    dbScheduleContainer.year
+                )
+            }
+    }
+
+    fun getTeacher(id: Int): Single<Teacher> {
+        return appDatabase.scheduleContainerDao.getScheduleContainer(id)
+            .map { dbScheduleContainer ->
+                Teacher(
+                    dbScheduleContainer.id,
+                    dbScheduleContainer.key,
+                    dbScheduleContainer.name,
+                    dbScheduleContainer.year
+                )
+            }
     }
 
     fun insertWeekdays(weekId: Int): Completable {

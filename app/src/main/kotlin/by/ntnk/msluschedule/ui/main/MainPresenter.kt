@@ -35,7 +35,7 @@ class MainPresenter @Inject constructor(
             .subscribeBy(
                 onSuccess = { id ->
                     val scheduleContainer =
-                        ScheduleContainer(id, studyGroup.name, ScheduleType.STUDYGROUP)
+                        ScheduleContainer(id, studyGroup.value, ScheduleType.STUDYGROUP, studyGroup.year)
                     sharedPreferencesRepository.putSelectedScheduleContainer(scheduleContainer)
                     view?.changeScheduleContainer(scheduleContainer)
                     view?.addScheduleContainerMenuItem(scheduleContainer)
@@ -56,7 +56,7 @@ class MainPresenter @Inject constructor(
             .subscribeBy(
                 onSuccess = { teacherId ->
                     val scheduleContainer =
-                        ScheduleContainer(teacherId, teacher.name, ScheduleType.TEACHER)
+                        ScheduleContainer(teacherId, teacher.value, ScheduleType.TEACHER, teacher.year)
                     sharedPreferencesRepository.putSelectedScheduleContainer(scheduleContainer)
                     view?.changeScheduleContainer(scheduleContainer)
                     view?.addScheduleContainerMenuItem(scheduleContainer)
@@ -87,13 +87,11 @@ class MainPresenter @Inject constructor(
             .subscribeBy(
                 onNext = { scheduleContainer ->
                     val value = if (scheduleContainer.year != currentDate.academicYear) {
-                        "(${scheduleContainer.year}) ${scheduleContainer.name}"
+                        "(${scheduleContainer.year}) ${scheduleContainer.value}"
                     } else {
-                        scheduleContainer.name
+                        scheduleContainer.value
                     }
-                    view?.addScheduleContainerMenuItem(
-                        ScheduleContainer(scheduleContainer.id, value, scheduleContainer.type)
-                    )
+                    view?.addScheduleContainerMenuItem(scheduleContainer.copy(value = value))
                 },
                 onError = { throwable -> Timber.e(throwable) },
                 onComplete = {
@@ -109,18 +107,14 @@ class MainPresenter @Inject constructor(
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
                 onSuccess = { scheduleContainer ->
-                    sharedPreferencesRepository.putSelectedScheduleContainer(
-                        ScheduleContainer(scheduleContainer.id, scheduleContainer.name, scheduleContainer.type)
-                    )
+                    sharedPreferencesRepository.putSelectedScheduleContainer(scheduleContainer)
 
                     val value = if (scheduleContainer.year != currentDate.academicYear) {
-                        "(${scheduleContainer.year}) ${scheduleContainer.name}"
+                        "(${scheduleContainer.year}) ${scheduleContainer.value}"
                     } else {
-                        scheduleContainer.name
+                        scheduleContainer.value
                     }
-                    view?.changeScheduleContainer(
-                        ScheduleContainer(scheduleContainer.id, value, scheduleContainer.type)
-                    )
+                    view?.changeScheduleContainer(scheduleContainer.copy(value = value))
                 },
                 onError = { throwable -> Timber.e(throwable) }
             )

@@ -18,12 +18,6 @@ import javax.inject.Inject
 
 @PerApp
 class DatabaseDataMapper @Inject constructor() {
-    fun mapToStudyGroup(data: ScheduleContainer): StudyGroup =
-        StudyGroup(data.key, data.name, data.faculty, data.course, data.year)
-
-    fun mapToTeacher(data: ScheduleContainer): Teacher =
-        Teacher(data.key, data.name, data.year)
-
     fun map(data: ScheduleFilter, containerId: Int): List<Week> {
         val weeks = ArrayList<Week>(data.size)
         for (i in 0 until data.size) {

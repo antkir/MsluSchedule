@@ -10,6 +10,8 @@ const val EMPTY_STRING = ""
 
 const val INVALID_VALUE = -1
 
+const val AUTO_ID: Int = 0
+
 val Int.Companion.DEFAULT: Int
     get() = MIN_VALUE
 

@@ -2,10 +2,10 @@ package by.ntnk.msluschedule.ui.addgroup
 
 import by.ntnk.msluschedule.data.StudyGroup
 import by.ntnk.msluschedule.db.DatabaseRepository
-import by.ntnk.msluschedule.db.data.ScheduleContainer
 import by.ntnk.msluschedule.mvp.Presenter
 import by.ntnk.msluschedule.network.NetworkRepository
 import by.ntnk.msluschedule.network.data.ScheduleFilter
+import by.ntnk.msluschedule.utils.AUTO_ID
 import by.ntnk.msluschedule.utils.CurrentDate
 import by.ntnk.msluschedule.utils.DEFAULT
 import by.ntnk.msluschedule.utils.SchedulerProvider
@@ -32,9 +32,9 @@ class AddGroupPresenter @Inject constructor(
     private val schedulerProvider: SchedulerProvider
 ) : Presenter<AddGroupView>() {
 
-    private val scheduleContaners: BehaviorSubject<List<ScheduleContainer>> = BehaviorSubject.createDefault(emptyList())
-    val scheduleContanersObservable: Observable<List<ScheduleContainer>>
-        get() = scheduleContaners
+    private val storedGroups: BehaviorSubject<List<StudyGroup>> = BehaviorSubject.createDefault(emptyList())
+    val storedGroupsObservable: Observable<List<StudyGroup>>
+        get() = storedGroups
 
     private val facultyFilter: BehaviorSubject<ScheduleFilterUiState> =
         BehaviorSubject.createDefault(ScheduleFilterUiState())
@@ -67,13 +67,13 @@ class AddGroupPresenter @Inject constructor(
     private var groupFilterDisposable: Disposable = CompositeDisposable()
 
     init {
-        databaseRepository.getScheduleContainers()
+        databaseRepository.getStudyGroups()
             .toList()
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
-                onSuccess = { scheduleContainers -> scheduleContaners.onNext(scheduleContainers) },
-                onError = { throwable -> scheduleContaners.onError(throwable) }
+                onSuccess = { groups -> storedGroups.onNext(groups) },
+                onError = { throwable -> storedGroups.onError(throwable) }
             )
 
         downloadFacultyFilter()
@@ -158,13 +158,13 @@ class AddGroupPresenter @Inject constructor(
     }
 
     fun isGroupAdded(key: Int): Boolean {
-        assert(scheduleContaners.hasValue() && facultyKey.hasValue() && groupFilter.hasValue())
+        assert(storedGroups.hasValue() && facultyKey.hasValue() && groupFilter.hasValue())
         assert(!groupFilter.value!!.isError() && groupFilter.value!!.isData())
-        return scheduleContaners.value
-            ?.filter { scheduleContainer -> scheduleContainer.year == currentDate.academicYear }
-            ?.filter { scheduleContainer -> scheduleContainer.faculty == facultyKey.value }
-            ?.map { scheduleContainer -> scheduleContainer.name }
-            ?.any { group -> group == groupFilter.value!!.data!!.getValue(key) } == true
+        return storedGroups.value
+            ?.filter { group -> group.year == currentDate.academicYear }
+            ?.filter { group -> group.faculty == facultyKey.value }
+            ?.map { group -> group.value }
+            ?.any { groupName -> groupName == groupFilter.value!!.data!!.getValue(key) } == true
     }
 
     fun createSelectedStudyGroupObject(): StudyGroup {
@@ -174,6 +174,6 @@ class AddGroupPresenter @Inject constructor(
         assert(!groupFilter.value!!.isError() && groupFilter.value!!.isData())
         val groupKey = groupKey.value!!
         val groupName = groupFilter.value!!.data!!.getValue(groupKey)
-        return StudyGroup(groupKey, groupName, facultyKey.value!!, courseKey.value!!, currentDate.academicYear)
+        return StudyGroup(AUTO_ID, groupKey, groupName, currentDate.academicYear, facultyKey.value!!, courseKey.value!!)
     }
 }
