@@ -9,7 +9,7 @@
     tools:showIn="@layout/activity_main">
 
     <com.google.android.material.progressindicator.CircularProgressIndicator
-        android:id="@+id/progressbar"
+        android:id="@+id/progressindicator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"

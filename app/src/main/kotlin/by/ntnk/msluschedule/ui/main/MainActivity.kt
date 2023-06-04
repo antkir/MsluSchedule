@@ -133,8 +133,8 @@ class MainActivity :
             }
 
             ViewCompat.setOnApplyWindowInsetsListener(binding.drawerLayout) { view, insets ->
-                val layoutParams = view.layoutParams as ViewGroup.MarginLayoutParams
                 val insetsSystemBars = WindowInsetsCompat.Type.systemBars()
+                val layoutParams = view.layoutParams as ViewGroup.MarginLayoutParams
                 layoutParams.bottomMargin = insets.getInsetsIgnoringVisibility(insetsSystemBars).bottom
                 layoutParams.leftMargin = insets.getInsetsIgnoringVisibility(insetsSystemBars).left
                 layoutParams.rightMargin = insets.getInsetsIgnoringVisibility(insetsSystemBars).right
@@ -164,17 +164,12 @@ class MainActivity :
             }
 
             ViewCompat.setOnApplyWindowInsetsListener(binding.content.constraintLayout) { view, insets ->
+                val insetsSystemBars = WindowInsetsCompat.Type.systemBars()
                 val layoutParams = view.layoutParams as ViewGroup.MarginLayoutParams
                 val toolbarHeight = resources.getDimension(R.dimen.toolbar_height).toInt()
-                val insetsSystemBars = WindowInsetsCompat.Type.systemBars()
                 layoutParams.topMargin = toolbarHeight + insets.getInsetsIgnoringVisibility(insetsSystemBars).top
                 return@setOnApplyWindowInsetsListener insets
             }
-        }
-
-        binding.buttonSettings.setOnClickListener {
-            SettingsActivity.startActivity(this)
-            Handler(Looper.getMainLooper()).postDelayed(NavigationDrawerRunnable(binding.drawerLayout), 500)
         }
 
         binding.buttonSettings.setOnClickListener {
@@ -200,7 +195,7 @@ class MainActivity :
             if (isFamOpen) collapseFam()
         }
 
-        binding.toolbar.title = savedInstanceState?.getString(ARG_TOOLBAR_TITLE)
+        binding.toolbar.title = savedInstanceState?.getString(ARG_TOOLBAR_TITLE) ?: String.DEFAULT
 
         onThemeChangedDisposable = onThemeChanged
             .filter { it }
@@ -360,8 +355,9 @@ class MainActivity :
             initMainContent()
         }
 
-        binding.content.progressbar.visibility = View.GONE
-        binding.fam.container.visibility = if (sharedPreferencesRepository.isMainFabShown()) View.VISIBLE else View.GONE
+        binding.content.progressindicator.visibility = View.GONE
+        binding.fam.container.visibility =
+            if (sharedPreferencesRepository.isMainFabShown()) View.VISIBLE else View.GONE
     }
 
     private fun isContainerListViewEmpty(): Boolean {
@@ -400,7 +396,7 @@ class MainActivity :
                     pendingScheduleContainerId = item.itemId
                     binding.drawerLayout.closeDrawer(GravityCompat.START, true)
 
-                    binding.content.progressbar.visibility = View.VISIBLE
+                    binding.content.progressindicator.visibility = View.VISIBLE
                     binding.content.imageSmile.visibility = View.GONE
                     binding.content.textHint.visibility = View.GONE
                 }
@@ -551,7 +547,7 @@ class MainActivity :
         presenter.addTeacher(teacher)
     }
 
-    override fun onError(t: Throwable) {
+    override fun onDialogFragmentError(t: Throwable) {
         val snackbar =
             Snackbar.make(binding.content.constraintLayout, AndroidUtils.getErrorMessageResId(t), Snackbar.LENGTH_LONG)
         snackbar.anchorView = binding.fam.fabBase
@@ -620,7 +616,7 @@ class MainActivity :
             ?.findViewById<ViewPager>(R.id.viewpager_weeks)
         viewPagerWeeks?.alpha = 0f
 
-        binding.content.progressbar.visibility = View.VISIBLE
+        binding.content.progressindicator.visibility = View.VISIBLE
         binding.content.imageSmile.visibility = View.GONE
         binding.content.textHint.visibility = View.GONE
     }
@@ -629,7 +625,7 @@ class MainActivity :
         binding.toolbar.title = String.DEFAULT
         removeWeeksContainerFragment()
 
-        binding.content.progressbar.visibility = View.GONE
+        binding.content.progressindicator.visibility = View.GONE
         binding.content.imageSmile.visibility = View.VISIBLE
         binding.content.textHint.visibility = View.VISIBLE
 

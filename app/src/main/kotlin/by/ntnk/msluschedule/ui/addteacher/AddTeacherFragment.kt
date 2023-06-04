@@ -168,12 +168,12 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
             Timber.e(t)
         }
         dismiss()
-        listener.onError(t)
+        listener.onDialogFragmentError(t)
     }
 
     interface DialogListener {
         fun onNewTeacher(teacher: Teacher)
-        fun onError(t: Throwable)
+        fun onDialogFragmentError(t: Throwable)
     }
 
     companion object {

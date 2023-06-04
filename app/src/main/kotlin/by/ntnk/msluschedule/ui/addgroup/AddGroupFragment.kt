@@ -250,7 +250,7 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
             Timber.e(t)
         }
         dismiss()
-        listener.onError(t)
+        listener.onDialogFragmentError(t)
     }
 
     private fun onFacultyFilterChanged(data: ScheduleFilter) {
@@ -296,7 +296,7 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
 
     interface DialogListener {
         fun onNewStudyGroup(studyGroup: StudyGroup)
-        fun onError(t: Throwable)
+        fun onDialogFragmentError(t: Throwable)
     }
 
     companion object {

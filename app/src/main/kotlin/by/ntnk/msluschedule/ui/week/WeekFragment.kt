@@ -226,7 +226,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
                             scheduleUiState.isData() ||
                             scheduleUiState.isError()
                         ) {
-                            activity?.findViewById<View>(R.id.progressbar)?.visibility = View.GONE
+                            activity?.findViewById<View>(R.id.progressindicator)?.visibility = View.GONE
                             parentFragment?.view?.findViewById<ViewGroup>(R.id.viewpager_weeks)?.alpha = 1f
                         }
                     }
