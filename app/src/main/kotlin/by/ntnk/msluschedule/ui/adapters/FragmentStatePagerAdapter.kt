@@ -74,7 +74,7 @@ abstract class FragmentStatePagerAdapter(private val mFragmentManager: FragmentM
      * null if the [Fragment] for such position doesn't exist.
      */
     open fun getFragment(position: Int): Fragment? {
-        if (position >= 0 && position < mFragments.size) {
+        if (position in mFragments.indices) {
             return mFragments[position]
         }
         return null
