@@ -209,17 +209,17 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
                     if (scheduleUiState.isError()) {
                         val throwable = scheduleUiState.throwable!!
                         if (scheduleUiState.isFirstUpdateError) {
-                            presenter.getSchedule(scheduleContainer.type, weekId)
                             if (Utils.isNetworkException(throwable)) {
                                 Timber.i(throwable)
-                                showError(throwable, isNetworkError = true)
+                                showError(throwable, showRetryButton = false)
                             } else {
                                 Timber.e(throwable)
-                                showError(throwable, isNetworkError = false)
+                                showError(throwable, showRetryButton = false)
                             }
+                            presenter.getSchedule(scheduleContainer.type, weekId)
                         } else {
                             Timber.e(throwable)
-                            showError(throwable, isNetworkError = false)
+                            showError(throwable, showRetryButton = false)
                         }
                     }
                 }
@@ -246,12 +246,12 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
                         if (Utils.isNetworkException(throwable)) {
                             Timber.i(throwable)
                             if (!checkUiEventExpired(scheduleUpdateEvent.timestamp)) {
-                                showError(throwable, isNetworkError = true)
+                                showError(throwable, showRetryButton = true)
                             }
                         } else {
                             Timber.e(throwable)
                             if (!checkUiEventExpired(scheduleUpdateEvent.timestamp)) {
-                                showError(throwable, isNetworkError = false)
+                                showError(throwable, showRetryButton = false)
                             }
                         }
                     }
@@ -442,11 +442,11 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         }
     }
 
-    private fun showError(t: Throwable, isNetworkError: Boolean) {
+    private fun showError(t: Throwable, showRetryButton: Boolean) {
         val baseFABMain = requireActivity().findViewById<FloatingActionButton>(R.id.fab_base)
         val snackbar = Snackbar.make(requireView(), AndroidUtils.getErrorMessageResId(t), 5000)
             .setAnchorView(baseFABMain)
-        if (isNetworkError) {
+        if (showRetryButton) {
             snackbar.setAction(R.string.snackbar_week_init_retry) {
                 context ?: return@setAction
                 if (AndroidUtils.isNetworkAccessible(requireContext().applicationContext)) {
