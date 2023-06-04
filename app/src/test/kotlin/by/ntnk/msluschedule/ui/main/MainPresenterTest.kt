@@ -2,12 +2,15 @@ package by.ntnk.msluschedule.ui.main
 
 import by.ntnk.msluschedule.TestTree
 import by.ntnk.msluschedule.any
+import by.ntnk.msluschedule.data.ScheduleContainer
 import by.ntnk.msluschedule.data.StudyGroup
 import by.ntnk.msluschedule.data.Teacher
 import by.ntnk.msluschedule.db.DatabaseRepository
 import by.ntnk.msluschedule.network.NetworkRepository
 import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.utils.CurrentDate
+import by.ntnk.msluschedule.utils.DEFAULT
+import by.ntnk.msluschedule.utils.ScheduleType
 import by.ntnk.msluschedule.utils.SchedulerProvider
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
 import io.reactivex.Completable
@@ -89,7 +92,9 @@ class MainPresenterTest {
     @Test
     fun addGroup() {
         // given
-        val studyGroup = StudyGroup(0, "", 0, 0, 0)
+        val studyGroup = StudyGroup(key = 0, name = String.DEFAULT, year = 0, faculty = 0, course = 0)
+        val scheduleContainer =
+            ScheduleContainer(id = 0, studyGroup.name, ScheduleType.STUDYGROUP, studyGroup.year)
         // when
         presenter.addGroup(studyGroup)
         // then
@@ -102,14 +107,15 @@ class MainPresenterTest {
         verify(databaseRepository).insertStudyGroup(any())
         verify(databaseRepository).insertWeeksGetIds(any(), eq(0))
         verify(sharedPreferencesRepository).putSelectedScheduleContainer(any())
-        verify(view).initMainContent()
-        verify(view).showNewScheduleContainerLoading(any())
+        verify(view).changeScheduleContainer(scheduleContainer)
     }
 
     @Test
     fun addTeacher() {
         // given
-        val teacher = Teacher(0, "", 0)
+        val teacher = Teacher(key = 0, name = String.DEFAULT, year = 0)
+        val scheduleContainer =
+            ScheduleContainer(id = 0, teacher.name, ScheduleType.TEACHER, teacher.year)
         // when
         presenter.addTeacher(teacher)
         // then
@@ -122,14 +128,13 @@ class MainPresenterTest {
         verify(databaseRepository).insertTeacher(any())
         verify(databaseRepository).insertWeeksGetIds(any(), eq(0))
         verify(sharedPreferencesRepository).putSelectedScheduleContainer(any())
-        verify(view).initMainContent()
-        verify(view).showNewScheduleContainerLoading(any())
+        verify(view).changeScheduleContainer(scheduleContainer)
     }
 
     @Test
     fun `Delete the inserted group if we aren't able to get weeks`() {
         // given
-        val studyGroup = StudyGroup(0, "", 0, 0, 0)
+        val studyGroup = StudyGroup(key = 0, name = String.DEFAULT, year = 0, faculty = 0, course = 0)
         whenever(networkRepository.getWeeks()).thenReturn(Single.error(NullPointerException()))
         // when
         presenter.addGroup(studyGroup)
@@ -142,14 +147,13 @@ class MainPresenterTest {
         verify(networkRepository).getWeeks()
         verify(databaseRepository).deleteScheduleContainer(eq(0))
         verify(sharedPreferencesRepository, times(0)).putSelectedScheduleContainer(any())
-        verify(view).showNewScheduleContainerLoading(any())
         verify(view).showError()
     }
 
     @Test
     fun `Delete the inserted teacher if we aren't able to get weeks`() {
         // given
-        val teacher = Teacher(0, "", 0)
+        val teacher = Teacher(key = 0, name = String.DEFAULT, year = 0)
         whenever(networkRepository.getWeeks()).thenReturn(Single.error(NullPointerException()))
         // when
         presenter.addTeacher(teacher)
@@ -162,7 +166,6 @@ class MainPresenterTest {
         verify(networkRepository).getWeeks()
         verify(databaseRepository).deleteScheduleContainer(eq(0))
         verify(sharedPreferencesRepository, times(0)).putSelectedScheduleContainer(any())
-        verify(view).showNewScheduleContainerLoading(any())
         verify(view).showError()
     }
 }

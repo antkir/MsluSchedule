@@ -74,7 +74,7 @@ class MainActivity :
     WeeksContainerFragment.OnScheduleContainerDeletedListener {
 
     private var isFamOpen = false
-    private var isUpdatingWeeksContainer = false
+    private var pendingScheduleContainerId = Int.DEFAULT
     private lateinit var onThemeChangedDisposable: Disposable
 
     private lateinit var binding: ActivityMainBinding
@@ -346,6 +346,7 @@ class MainActivity :
 
     override fun onStart() {
         super.onStart()
+
         if (isContainerListViewEmpty()) {
             presenter.initContainerListView()
         }
@@ -354,9 +355,12 @@ class MainActivity :
             binding.content.imageSmile.visibility = View.VISIBLE
             binding.content.textHint.visibility = View.VISIBLE
         } else {
+            binding.content.imageSmile.visibility = View.GONE
+            binding.content.textHint.visibility = View.GONE
             initMainContent()
         }
 
+        binding.content.progressbar.visibility = View.GONE
         binding.fam.container.visibility = if (sharedPreferencesRepository.isMainFabShown()) View.VISIBLE else View.GONE
     }
 
@@ -393,11 +397,12 @@ class MainActivity :
                     ?.findItem(item.itemId)
 
                 if (menuItem != null) {
-                    binding.toolbar.title = item.title
-                    val scheduleContainer = ScheduleContainer(item.itemId, item.title.toString(), scheduleType)
-                    sharedPreferencesRepository.putSelectedScheduleContainer(scheduleContainer)
-                    isUpdatingWeeksContainer = true
-                    binding.drawerLayout.closeDrawer(GravityCompat.START)
+                    pendingScheduleContainerId = item.itemId
+                    binding.drawerLayout.closeDrawer(GravityCompat.START, true)
+
+                    binding.content.progressbar.visibility = View.VISIBLE
+                    binding.content.imageSmile.visibility = View.GONE
+                    binding.content.textHint.visibility = View.GONE
                 }
             }
         }
@@ -416,6 +421,11 @@ class MainActivity :
     }
 
     override fun onDrawerClosed(drawerView: View) {
+        if (pendingScheduleContainerId != Int.DEFAULT) {
+            presenter.changeScheduleContainer(pendingScheduleContainerId)
+            pendingScheduleContainerId = Int.DEFAULT
+        }
+
         onDrawerOpenBackPressedCallback.isEnabled = false
     }
 
@@ -433,36 +443,12 @@ class MainActivity :
             }
         }
 
-        if (isUpdatingWeeksContainer) {
-            var viewPagerWeeksContainer: ViewPager? = null
-            val weeksContainerFragment = supportFragmentManager.findFragmentById(R.id.content)
-            if (weeksContainerFragment != null) {
-                viewPagerWeeksContainer = weeksContainerFragment.view?.findViewById(R.id.viewpager_weeks)
-            }
-            viewPagerWeeksContainer?.alpha = slideOffset
-            binding.content.progressbar.visibility = View.VISIBLE
-            if (slideOffset < 0.03) {
-                isUpdatingWeeksContainer = false
-                viewPagerWeeksContainer?.visibility = View.INVISIBLE
-                viewPagerWeeksContainer?.alpha = 1f
-                swapMainContent()
-            }
+        if (pendingScheduleContainerId != Int.DEFAULT) {
+            val viewPagerWeeks = supportFragmentManager.findFragmentById(R.id.content)
+                ?.view
+                ?.findViewById<ViewPager>(R.id.viewpager_weeks)
+            viewPagerWeeks?.alpha = slideOffset
         }
-    }
-
-    private fun swapMainContent() {
-        val weeksContainerFragment = supportFragmentManager.findFragmentById(R.id.content)
-        if (weeksContainerFragment == null) {
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.content, WeeksContainerFragment())
-                .commit()
-        } else {
-            weeksContainerFragment as WeeksContainerFragment
-            weeksContainerFragment.swapData()
-        }
-
-        binding.content.imageSmile.visibility = View.GONE
-        binding.content.textHint.visibility = View.GONE
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -556,10 +542,12 @@ class MainActivity :
     }
 
     override fun onNewStudyGroup(studyGroup: StudyGroup) {
+        showNewScheduleContainerLoading()
         presenter.addGroup(studyGroup)
     }
 
     override fun onNewTeacher(teacher: Teacher) {
+        showNewScheduleContainerLoading()
         presenter.addTeacher(teacher)
     }
 
@@ -571,17 +559,27 @@ class MainActivity :
         snackbar.show()
     }
 
-    override fun initMainContent() {
+    private fun initMainContent() {
         val weeksContainerFragment = supportFragmentManager.findFragmentById(R.id.content)
         if (weeksContainerFragment == null) {
             supportFragmentManager.beginTransaction()
                 .replace(R.id.content, WeeksContainerFragment())
                 .commit()
         }
+    }
 
-        binding.content.imageSmile.visibility = View.GONE
-        binding.content.textHint.visibility = View.GONE
-        binding.content.progressbar.visibility = View.GONE
+    override fun changeScheduleContainer(scheduleContainer: ScheduleContainer) {
+        binding.toolbar.title = scheduleContainer.value
+
+        val weeksContainerFragment = supportFragmentManager.findFragmentById(R.id.content)
+        if (weeksContainerFragment == null) {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.content, WeeksContainerFragment())
+                .commit()
+        } else {
+            weeksContainerFragment as WeeksContainerFragment
+            weeksContainerFragment.swapData()
+        }
     }
 
     override fun addScheduleContainerMenuItem(scheduleContainer: ScheduleContainer) {
@@ -600,7 +598,7 @@ class MainActivity :
         }
     }
 
-    override fun checkScheduleContainerMenuItem(scheduleContainer: ScheduleContainer) {
+    override fun selectScheduleContainerMenuItem(scheduleContainer: ScheduleContainer) {
         binding.toolbar.title = scheduleContainer.value
         val subMenu = binding.navView.menu
             .findItem(getContainerMenuViewId(scheduleContainer.type))
@@ -616,9 +614,11 @@ class MainActivity :
         }
     }
 
-    override fun showNewScheduleContainerLoading(scheduleContainer: ScheduleContainer) {
-        binding.toolbar.title = scheduleContainer.value
-        removeWeeksContainerFragment()
+    private fun showNewScheduleContainerLoading() {
+        val viewPagerWeeks = supportFragmentManager.findFragmentById(R.id.content)
+            ?.view
+            ?.findViewById<ViewPager>(R.id.viewpager_weeks)
+        viewPagerWeeks?.alpha = 0f
 
         binding.content.progressbar.visibility = View.VISIBLE
         binding.content.imageSmile.visibility = View.GONE

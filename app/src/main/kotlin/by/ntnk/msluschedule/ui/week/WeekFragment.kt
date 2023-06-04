@@ -24,7 +24,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
-import androidx.viewpager.widget.ViewPager
 import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.data.Lesson
 import by.ntnk.msluschedule.data.ScheduleContainer
@@ -39,7 +38,6 @@ import by.ntnk.msluschedule.utils.DEFAULT
 import by.ntnk.msluschedule.utils.ScheduleType
 import by.ntnk.msluschedule.utils.Utils
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.google.android.material.snackbar.Snackbar
 import dagger.Lazy
 import dagger.android.support.AndroidSupportInjection
@@ -222,6 +220,16 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
                             showError(throwable, showRetryButton = false)
                         }
                     }
+
+                    if (isCurrentWeek) {
+                        if (scheduleUiState.isInitializingWeek ||
+                            scheduleUiState.isData() ||
+                            scheduleUiState.isError()
+                        ) {
+                            activity?.findViewById<View>(R.id.progressbar)?.visibility = View.GONE
+                            parentFragment?.view?.findViewById<ViewGroup>(R.id.viewpager_weeks)?.alpha = 1f
+                        }
+                    }
                 }
             )
 
@@ -344,11 +352,6 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
                 val index = adapter.getWeekdayViewIndex(presenter.getCurrentDayOfWeek())
                 layoutManager.scrollToPositionWithOffset(index, 0)
             }
-        }
-
-        if (isCurrentWeek) {
-            activity?.findViewById<CircularProgressIndicator>(R.id.progressbar)?.visibility = View.GONE
-            parentFragment?.view?.findViewById<ViewPager>(R.id.viewpager_weeks)?.visibility = View.VISIBLE
         }
     }
 
