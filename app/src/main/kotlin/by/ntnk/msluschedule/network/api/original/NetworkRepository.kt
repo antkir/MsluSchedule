@@ -115,9 +115,10 @@ class NetworkRepository @Inject constructor(
         return Observable.fromIterable(requestDataList)
             .flatMapSingle { requestData -> changeScheduleFilter(requestedScheduleType, requestData) }
             .flatMapCompletable {
-                return@flatMapCompletable if (sharedPreferencesRepository.isFullSubjectNameUsed()) {
+                if (sharedPreferencesRepository.isFullSubjectNameUsed()) {
                     val filterData = networkHelper.getSubjectLengthFilterData(isFullSubjectName = true)
-                    changeScheduleFilter(NetworkHelper.GROUP_SCHEDULE, filterData).ignoreElement()
+                    changeScheduleFilter(NetworkHelper.GROUP_SCHEDULE, filterData)
+                        .ignoreElement()
                 } else {
                     Completable.complete()
                 }
