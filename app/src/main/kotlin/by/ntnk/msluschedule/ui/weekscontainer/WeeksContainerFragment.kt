@@ -123,12 +123,13 @@ class WeeksContainerFragment :
     }
 
     override fun onData(weeks: List<Week>, currentAcademicWeekIndex: Int) {
-        val isRTL = isLayoutRTL()
-        val arrangedWeeks = if (isRTL) weeks.reversed() else weeks
-        val currentWeekPosition = if (isRTL) {
-            arrangedWeeks.lastIndex - minOf(currentAcademicWeekIndex, CENTRAL_VIEW_POSITION)
+        val layoutDirection = TextUtilsCompat.getLayoutDirectionFromLocale(Locale.getDefault())
+        val isLTR = layoutDirection == ViewCompat.LAYOUT_DIRECTION_LTR
+        val arrangedWeeks = if (isLTR) weeks else weeks.reversed()
+        val currentWeekPosition = if (isLTR) {
+            minOf(currentAcademicWeekIndex, CENTRAL_VIEW_POSITION, arrangedWeeks.lastIndex)
         } else {
-            minOf(currentAcademicWeekIndex, CENTRAL_VIEW_POSITION)
+            arrangedWeeks.lastIndex - minOf(currentAcademicWeekIndex, CENTRAL_VIEW_POSITION, arrangedWeeks.lastIndex)
         }
 
         with(binding.viewpagerWeeks) {
@@ -159,11 +160,6 @@ class WeeksContainerFragment :
 
     fun swapData() {
         presenter.getWeeks()
-    }
-
-    private fun isLayoutRTL(): Boolean {
-        val layoutDirection = TextUtilsCompat.getLayoutDirectionFromLocale(Locale.getDefault())
-        return layoutDirection == ViewCompat.LAYOUT_DIRECTION_RTL
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
