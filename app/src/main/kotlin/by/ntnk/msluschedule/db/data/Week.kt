@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import by.ntnk.msluschedule.utils.AUTO_ID
 
 @Entity(
     foreignKeys = [
@@ -20,5 +21,5 @@ data class Week constructor(
     val key: Int,
     val value: String,
     val containerId: Int,
-    @PrimaryKey(autoGenerate = true) val id: Int = 0
+    @PrimaryKey(autoGenerate = true) val id: Int = AUTO_ID
 )

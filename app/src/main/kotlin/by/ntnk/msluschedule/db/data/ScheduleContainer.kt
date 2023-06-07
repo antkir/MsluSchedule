@@ -3,6 +3,7 @@ package by.ntnk.msluschedule.db.data
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
+import by.ntnk.msluschedule.utils.AUTO_ID
 import by.ntnk.msluschedule.utils.ScheduleType
 import by.ntnk.msluschedule.utils.ScheduleTypeConverter
 
@@ -15,5 +16,5 @@ data class ScheduleContainer constructor(
     val year: Int,
     val faculty: Int,
     val course: Int,
-    @PrimaryKey(autoGenerate = true) val id: Int = 0
+    @PrimaryKey(autoGenerate = true) val id: Int = AUTO_ID
 )

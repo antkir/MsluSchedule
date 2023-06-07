@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import by.ntnk.msluschedule.utils.AUTO_ID
 
 @Entity(
     foreignKeys = [
@@ -20,5 +21,5 @@ data class DbNote constructor(
     val text: String,
     val subject: String,
     val weekdayId: Int,
-    @PrimaryKey(autoGenerate = true) val id: Int = 0
+    @PrimaryKey(autoGenerate = true) val id: Int = AUTO_ID
 )

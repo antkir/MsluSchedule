@@ -6,6 +6,7 @@ import androidx.room.Ignore
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import by.ntnk.msluschedule.data.StudyGroupLesson
+import by.ntnk.msluschedule.utils.AUTO_ID
 
 @Entity(
     foreignKeys = [
@@ -26,7 +27,7 @@ data class DbStudyGroupLesson constructor(
     val startTime: String,
     val endTime: String,
     val weekdayId: Int,
-    @PrimaryKey(autoGenerate = true) val id: Int = 0
+    @PrimaryKey(autoGenerate = true) val id: Int = AUTO_ID
 ) {
     @Ignore
     constructor(lesson: StudyGroupLesson, weekdayId: Int) : this(
