@@ -26,7 +26,7 @@ class WeeksContainerPresenter @Inject constructor(
         disposables += databaseRepository.getWeeks(scheduleContainer.id)
             .toList()
             .map { weeks ->
-                val currentAcademicWeekIndex = maxOf(currentDate.academicWeek, 0)
+                val currentAcademicWeekIndex = minOf(weeks.lastIndex, maxOf(currentDate.academicWeek, 0))
                 val filteredWeeks = mutableListOf<Week>()
                 for (i in currentAcademicWeekIndex - SIDE_WEEKS_NUM..currentAcademicWeekIndex + SIDE_WEEKS_NUM) {
                     if (i in weeks.indices) {

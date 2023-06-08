@@ -127,9 +127,9 @@ class WeeksContainerFragment :
         val isLTR = layoutDirection == ViewCompat.LAYOUT_DIRECTION_LTR
         val arrangedWeeks = if (isLTR) weeks else weeks.reversed()
         val currentWeekPosition = if (isLTR) {
-            minOf(currentAcademicWeekIndex, CENTRAL_VIEW_POSITION, arrangedWeeks.lastIndex)
+            minOf(currentAcademicWeekIndex, CENTRAL_VIEW_POSITION)
         } else {
-            arrangedWeeks.lastIndex - minOf(currentAcademicWeekIndex, CENTRAL_VIEW_POSITION, arrangedWeeks.lastIndex)
+            arrangedWeeks.lastIndex - minOf(currentAcademicWeekIndex, CENTRAL_VIEW_POSITION)
         }
 
         with(binding.viewpagerWeeks) {
