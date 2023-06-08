@@ -21,7 +21,7 @@ class SharedPreferencesRepository @Inject constructor(
         val id = sharedPreferences.getInt(KEY_SCHEDULECONTAINER_ID, Int.DEFAULT)
         val value = sharedPreferences.getString(KEY_SCHEDULECONTAINER_VALUE, null) ?: String.DEFAULT
         val typeString = sharedPreferences.getString(KEY_SCHEDULECONTAINER_TYPE, null) ?: String.DEFAULT
-        val type = ScheduleTypeConverter.stringToScheduleType(typeString)
+        val type = ScheduleTypeConverter.fromString(typeString)
         val year = sharedPreferences.getInt(KEY_SCHEDULECONTAINER_YEAR, Int.DEFAULT)
         return ScheduleContainer(id, value, type, year)
     }

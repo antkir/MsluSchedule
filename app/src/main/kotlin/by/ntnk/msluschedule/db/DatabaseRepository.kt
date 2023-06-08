@@ -192,7 +192,7 @@ class DatabaseRepository @Inject constructor(
         return appDatabase.weekdayDao.getWeekdays(weekId)
             .flatMapObservable { Observable.fromIterable(it) }
             .flatMapSingle { weekday ->
-                val classes = weekdays.firstOrNull { it.weekday == weekday.value }?.classes ?: emptyList()
+                val classes = weekdays.firstOrNull { it.value == weekday.value }?.classes ?: emptyList()
                 insertStudyGroupClasses(classes, weekday.id)
                     .flatMap { insertedClasses ->
                         Single.just(
@@ -217,10 +217,11 @@ class DatabaseRepository @Inject constructor(
             .flatMap { dbClasses ->
                 appDatabase.studyGroupLessonDao.insert(dbClasses)
                     .flatMapObservable { ids ->
+                        val insertedClasses = mutableListOf<StudyGroupLesson>()
                         for (i in ids.indices) {
-                            classes[i].id = ids[i].toInt()
+                            insertedClasses.add(classes[i].copy(id = ids[i].toInt()))
                         }
-                        Observable.fromIterable(classes)
+                        Observable.fromIterable(insertedClasses)
                     }
                     .toList()
             }
@@ -233,7 +234,7 @@ class DatabaseRepository @Inject constructor(
         return appDatabase.weekdayDao.getWeekdays(weekId)
             .flatMapObservable { Observable.fromIterable(it) }
             .flatMapSingle { weekday ->
-                val classes = weekdays.firstOrNull { it.weekday == weekday.value }?.classes ?: emptyList()
+                val classes = weekdays.firstOrNull { it.value == weekday.value }?.classes ?: emptyList()
                 insertTeacherClasses(classes, weekday.id)
                     .flatMap { insertedClasses ->
                         Single.just(
@@ -255,10 +256,11 @@ class DatabaseRepository @Inject constructor(
             .flatMap { dbClasses ->
                 appDatabase.teacherLessonDao.insert(dbClasses)
                     .flatMapObservable { ids ->
+                        val insertedClasses = mutableListOf<TeacherLesson>()
                         for (i in ids.indices) {
-                            classes[i].id = ids[i].toInt()
+                            insertedClasses.add(classes[i].copy(id = ids[i].toInt()))
                         }
-                        Observable.fromIterable(classes)
+                        Observable.fromIterable(insertedClasses)
                     }
                     .toList()
             }
@@ -266,21 +268,31 @@ class DatabaseRepository @Inject constructor(
 
     fun getStudyGroupLesson(id: Int): Single<StudyGroupLesson> {
         return appDatabase.studyGroupLessonDao.getLesson(id)
-            .map { StudyGroupLesson(it.subject, it.type, it.teacher, it.classroom, it.startTime, it.endTime, it.id) }
+            .map { classDescriptor ->
+                StudyGroupLesson(
+                    classDescriptor.id,
+                    classDescriptor.subject,
+                    classDescriptor.type,
+                    classDescriptor.classroom,
+                    classDescriptor.startTime,
+                    classDescriptor.endTime,
+                    classDescriptor.teacher
+                )
+            }
     }
 
     fun getTeacherLesson(id: Int): Single<TeacherLesson> {
         return appDatabase.teacherLessonDao.getLesson(id)
-            .map {
+            .map { classDescriptor ->
                 TeacherLesson(
-                    it.subject,
-                    it.faculty,
-                    it.groups,
-                    it.type,
-                    it.classroom,
-                    it.startTime,
-                    it.endTime,
-                    it.id
+                    classDescriptor.id,
+                    classDescriptor.subject,
+                    classDescriptor.type,
+                    classDescriptor.classroom,
+                    classDescriptor.startTime,
+                    classDescriptor.endTime,
+                    classDescriptor.faculty,
+                    classDescriptor.groups
                 )
             }
     }

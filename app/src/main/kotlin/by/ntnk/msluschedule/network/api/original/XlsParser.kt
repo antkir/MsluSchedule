@@ -4,6 +4,7 @@ import by.ntnk.msluschedule.data.StudyGroupLesson
 import by.ntnk.msluschedule.data.TeacherLesson
 import by.ntnk.msluschedule.data.WeekdayWithStudyGroupLessons
 import by.ntnk.msluschedule.data.WeekdayWithTeacherLessons
+import by.ntnk.msluschedule.utils.AUTO_ID
 import by.ntnk.msluschedule.utils.Days
 import by.ntnk.msluschedule.utils.DEFAULT
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
@@ -53,7 +54,7 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
             when (cell.columnIndex) {
                 0 -> {
                     if (cell.stringCellValue.isNotEmpty()) {
-                        weekdayDescriptor = WeekdayWithStudyGroupLessons(weekday = cell.stringCellValue)
+                        weekdayDescriptor = WeekdayWithStudyGroupLessons(id = AUTO_ID, value = cell.stringCellValue)
                         weekdays.add(weekdayDescriptor)
                     }
                 }
@@ -103,7 +104,16 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
                     classroom = cell.stringCellValue.replace(" ", String.DEFAULT)
 
                     if (startTime.isNotEmpty() || subject.isNotEmpty()) {
-                        val classDescriptor = StudyGroupLesson(subject, type, teacher, classroom, startTime, endTime)
+                        val classDescriptor =
+                            StudyGroupLesson(
+                                AUTO_ID,
+                                subject,
+                                type,
+                                classroom,
+                                startTime,
+                                endTime,
+                                teacher
+                            )
                         if (sharedPreferencesRepository.isPhysEdClassHidden()) {
                             if (subject.contains("физ", ignoreCase = true) &&
                                 subject.contains("культура", ignoreCase = true)
@@ -135,8 +145,8 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
             }
         }
 
-        if (weekdays.firstOrNull { it.weekday == Days.SUNDAY } == null) {
-            weekdayDescriptor = WeekdayWithStudyGroupLessons(weekday = Days.SUNDAY)
+        if (weekdays.firstOrNull { it.value == Days.SUNDAY } == null) {
+            weekdayDescriptor = WeekdayWithStudyGroupLessons(id = AUTO_ID, value = Days.SUNDAY)
             weekdays.add(weekdayDescriptor)
         }
 
@@ -187,13 +197,13 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
         getWorkbookFontAt: (Short) -> HSSFFont
     ): List<WeekdayWithTeacherLessons> {
         val weekdays = listOf(
-            WeekdayWithTeacherLessons(weekday = Days.MONDAY),
-            WeekdayWithTeacherLessons(weekday = Days.TUESDAY),
-            WeekdayWithTeacherLessons(weekday = Days.WEDNESDAY),
-            WeekdayWithTeacherLessons(weekday = Days.THURSDAY),
-            WeekdayWithTeacherLessons(weekday = Days.FRIDAY),
-            WeekdayWithTeacherLessons(weekday = Days.SATURDAY),
-            WeekdayWithTeacherLessons(weekday = Days.SUNDAY)
+            WeekdayWithTeacherLessons(id = AUTO_ID, value = Days.MONDAY),
+            WeekdayWithTeacherLessons(id = AUTO_ID, value = Days.TUESDAY),
+            WeekdayWithTeacherLessons(id = AUTO_ID, value = Days.WEDNESDAY),
+            WeekdayWithTeacherLessons(id = AUTO_ID, value = Days.THURSDAY),
+            WeekdayWithTeacherLessons(id = AUTO_ID, value = Days.FRIDAY),
+            WeekdayWithTeacherLessons(id = AUTO_ID, value = Days.SATURDAY),
+            WeekdayWithTeacherLessons(id = AUTO_ID, value = Days.SUNDAY)
         )
         var startTime = String.DEFAULT
         var endTime = String.DEFAULT
@@ -230,13 +240,14 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
 
         if (richTextString.numFormattingRuns() == 0) {
             return TeacherLesson(
+                AUTO_ID,
                 subject = valueString.trim(),
-                faculty = String.DEFAULT,
-                groups = String.DEFAULT,
                 type = String.DEFAULT,
                 classroom = String.DEFAULT,
                 startTime,
-                endTime
+                endTime,
+                faculty = String.DEFAULT,
+                groups = String.DEFAULT
             )
         }
 
@@ -273,11 +284,20 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
                     .substringAfterLast(')')
                     .filter { it != ' ' }
 
-                return TeacherLesson(subject, faculties, groups, classType, classroom, startTime, endTime)
+                return TeacherLesson(AUTO_ID, subject, classType, classroom, startTime, endTime, faculties, groups)
             }
         }
 
-        return TeacherLesson(startTime, endTime)
+        return TeacherLesson(
+            AUTO_ID,
+            subject = String.DEFAULT,
+            type = String.DEFAULT,
+            classroom = String.DEFAULT,
+            startTime,
+            endTime,
+            faculty = String.DEFAULT,
+            groups = String.DEFAULT
+        )
     }
 
     private fun findOpeningParenthesisIndex(str: String): Int {

@@ -1,14 +1,11 @@
 package by.ntnk.msluschedule.db
 
-import by.ntnk.msluschedule.data.StudyGroup
 import by.ntnk.msluschedule.data.StudyGroupLesson
-import by.ntnk.msluschedule.data.Teacher
 import by.ntnk.msluschedule.data.TeacherLesson
 import by.ntnk.msluschedule.data.WeekdayWithStudyGroupLessons
 import by.ntnk.msluschedule.data.WeekdayWithTeacherLessons
 import by.ntnk.msluschedule.db.data.DbWeekdayWithStudyGroupLessons
 import by.ntnk.msluschedule.db.data.DbWeekdayWithTeacherLessons
-import by.ntnk.msluschedule.db.data.ScheduleContainer
 import by.ntnk.msluschedule.db.data.Week
 import by.ntnk.msluschedule.db.data.Weekday
 import by.ntnk.msluschedule.di.PerApp
@@ -34,40 +31,40 @@ class DatabaseDataMapper @Inject constructor() {
             .map { weekdayValue -> Weekday(weekdayValue, weekId) }
             .toList()
 
-    fun map(weekdayWithLessons: DbWeekdayWithTeacherLessons): WeekdayWithTeacherLessons {
-        val lessons = ArrayList<TeacherLesson>(weekdayWithLessons.lessons.size)
-        for (lesson in weekdayWithLessons.lessons) {
-            lessons.add(
+    fun map(weekdayWithClasses: DbWeekdayWithTeacherLessons): WeekdayWithTeacherLessons {
+        val classes = ArrayList<TeacherLesson>(weekdayWithClasses.lessons.size)
+        for (classDescriptor in weekdayWithClasses.lessons) {
+            classes.add(
                 TeacherLesson(
-                    lesson.subject,
-                    lesson.faculty,
-                    lesson.groups,
-                    lesson.type,
-                    lesson.classroom,
-                    lesson.startTime,
-                    lesson.endTime,
-                    lesson.id
+                    classDescriptor.id,
+                    classDescriptor.subject,
+                    classDescriptor.type,
+                    classDescriptor.classroom,
+                    classDescriptor.startTime,
+                    classDescriptor.endTime,
+                    classDescriptor.faculty,
+                    classDescriptor.groups
                 )
             )
         }
-        return WeekdayWithTeacherLessons(weekdayWithLessons.weekday.id, weekdayWithLessons.weekday.value, lessons)
+        return WeekdayWithTeacherLessons(weekdayWithClasses.weekday.id, weekdayWithClasses.weekday.value, classes)
     }
 
-    fun map(weekdayWithLessons: DbWeekdayWithStudyGroupLessons): WeekdayWithStudyGroupLessons {
-        val lessons = ArrayList<StudyGroupLesson>(weekdayWithLessons.lessons.size)
-        for (lesson in weekdayWithLessons.lessons) {
-            lessons.add(
+    fun map(weekdayWithClasses: DbWeekdayWithStudyGroupLessons): WeekdayWithStudyGroupLessons {
+        val classes = ArrayList<StudyGroupLesson>(weekdayWithClasses.lessons.size)
+        for (classDescriptor in weekdayWithClasses.lessons) {
+            classes.add(
                 StudyGroupLesson(
-                    lesson.subject,
-                    lesson.type,
-                    lesson.teacher,
-                    lesson.classroom,
-                    lesson.startTime,
-                    lesson.endTime,
-                    lesson.id
+                    classDescriptor.id,
+                    classDescriptor.subject,
+                    classDescriptor.type,
+                    classDescriptor.classroom,
+                    classDescriptor.startTime,
+                    classDescriptor.endTime,
+                    classDescriptor.teacher
                 )
             )
         }
-        return WeekdayWithStudyGroupLessons(weekdayWithLessons.weekday.id, weekdayWithLessons.weekday.value, lessons)
+        return WeekdayWithStudyGroupLessons(weekdayWithClasses.weekday.id, weekdayWithClasses.weekday.value, classes)
     }
 }

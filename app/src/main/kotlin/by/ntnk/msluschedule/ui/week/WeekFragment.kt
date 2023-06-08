@@ -200,7 +200,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
                     if (scheduleUiState.isData()) {
                         onScheduleData(scheduleUiState.data)
                         for (weekday in scheduleUiState.data) {
-                            setNotesStatus(weekday.weekdayId)
+                            setNotesStatus(weekday.id)
                         }
                     }
 

@@ -68,7 +68,7 @@ class LessonInfoActivity :
         classId = intent?.getIntExtra(ARG_CLASS_ID, Int.DEFAULT) ?: Int.DEFAULT
         weekId = intent?.getIntExtra(ARG_WEEK_ID, Int.DEFAULT) ?: Int.DEFAULT
         val scheduleTypeString = intent?.getStringExtra(ARG_SCHEDULE_TYPE) ?: String.DEFAULT
-        scheduleType = ScheduleTypeConverter.stringToScheduleType(scheduleTypeString)
+        scheduleType = ScheduleTypeConverter.fromString(scheduleTypeString)
 
         when (scheduleType) {
             ScheduleType.STUDYGROUP -> setContentView(bindingStudyGroup.root)
@@ -193,7 +193,7 @@ class LessonInfoActivity :
             val intent = Intent(context, LessonInfoActivity::class.java).apply {
                 putExtra(ARG_CLASS_ID, lessonId)
                 putExtra(ARG_WEEK_ID, weekId)
-                putExtra(ARG_SCHEDULE_TYPE, ScheduleTypeConverter.scheduleTypeToString(scheduleType))
+                putExtra(ARG_SCHEDULE_TYPE, ScheduleTypeConverter.toString(scheduleType))
             }
             context.startActivity(intent)
         }

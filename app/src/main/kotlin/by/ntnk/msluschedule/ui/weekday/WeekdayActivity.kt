@@ -437,7 +437,7 @@ class WeekdayActivity :
     }
 
     private fun onWeekdayData(weekday: WeekdayWithLessons<Lesson>) {
-        supportActionBar?.title = AndroidUtils.getWeekdayFromTag(weekday.weekday, applicationContext)
+        supportActionBar?.title = AndroidUtils.getWeekdayFromTag(weekday.value, applicationContext)
 
         val subjects = weekday.classes
             .map { classDescriptor ->

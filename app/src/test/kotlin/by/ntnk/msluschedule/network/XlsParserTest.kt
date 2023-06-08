@@ -30,8 +30,9 @@ class XlsParserTest {
     @Test
     fun `Check if saturday classes for a studygroup schedule are parsed correctly`() {
         // given
-        val weekday = WeekdayWithStudyGroupLessons(weekday = Days.SATURDAY)
+        val weekday = WeekdayWithStudyGroupLessons(id = 0, value = Days.SATURDAY)
         val class1 = StudyGroupLesson(
+            id = 0,
             subject = "СОРО",
             type = "",
             teacher = "пр. Якушева  Н. В.",
@@ -40,6 +41,7 @@ class XlsParserTest {
             endTime = "9:35"
         )
         val class2 = StudyGroupLesson(
+            id = 0,
             subject = "Практ. фон. (2)",
             type = "",
             teacher = "пр. Евдокимова В. В.",
@@ -48,6 +50,7 @@ class XlsParserTest {
             endTime = "11:05"
         )
         val class3 = StudyGroupLesson(
+            id = 0,
             subject = "Спецмодуль: Логика / Этика",
             type = "",
             teacher = "",
@@ -71,8 +74,9 @@ class XlsParserTest {
     @Test
     fun `Check if saturday classes for a teacher schedule are parsed correctly`() {
         // given
-        val weekday = WeekdayWithTeacherLessons(weekday = Days.SATURDAY)
+        val weekday = WeekdayWithTeacherLessons(id = 0, value = Days.SATURDAY)
         val class1 = TeacherLesson(
+            id = 0,
             subject = "ПППТР",
             faculty = "Англ.яз., Нем.яз., ФРЯ (исп.), ФРЯ (фр.)",
             groups = "521 а.исп, 522 а.фр, 523 а.нем, 524 а.нем, 502 н- кл, 505 и., 509 фр.",
@@ -82,6 +86,7 @@ class XlsParserTest {
             endTime = "9:35"
         )
         val class2 = TeacherLesson(
+            id = 0,
             subject = "Стр. и содерж. рекл. текста",
             faculty = "Меж.ком.",
             groups = "316 мк_а_н, 317 мк_а-ис, 318 мк_а_ис",
@@ -91,6 +96,7 @@ class XlsParserTest {
             endTime = "11:05"
         )
         val class3 = TeacherLesson(
+            id = 0,
             subject = "Введ. в литер-ние",
             faculty = "ФРЯ",
             groups = "201 и., 202 и., 203 и., 204 и., 205 и., 206 ф., 207 ф., 208 ф., 209 ф.",
@@ -100,6 +106,7 @@ class XlsParserTest {
             endTime = "12:35"
         )
         val class4 = TeacherLesson(
+            id = 0,
             subject = "Практ. фон. (2)",
             faculty = "Англ.яз.",
             groups = "301 а.исп",
@@ -125,8 +132,9 @@ class XlsParserTest {
     @Test
     fun `Check if classes with incomplete data for a studygroup schedule for 2020 are parsed correctly`() {
         // given
-        val friday = WeekdayWithStudyGroupLessons(weekday = Days.FRIDAY)
+        val friday = WeekdayWithStudyGroupLessons(id = 0, value = Days.FRIDAY)
         val fridayClass1 = StudyGroupLesson(
+            id = 0,
             subject = "Физ. культура, ЛК\nпреп. Пронский А.",
             type = "",
             teacher = "",
@@ -135,6 +143,7 @@ class XlsParserTest {
             endTime = "12:35"
         )
         val fridayClass2 = StudyGroupLesson(
+            id = 0,
             subject = "Безоп. жизнедеят. чел-ка",
             type = "ЛК",
             teacher = "",
@@ -143,6 +152,7 @@ class XlsParserTest {
             endTime = "15:50"
         )
         val fridayClass3 = StudyGroupLesson(
+            id = 0,
             subject = "Практ. фонетика (1 ин. яз.)",
             type = "",
             teacher = "ст.пр. Абламейко  В. С.",
@@ -151,6 +161,7 @@ class XlsParserTest {
             endTime = "17:20"
         )
         val fridayClass4 = StudyGroupLesson(
+            id = 0,
             subject = "История: Ист. Беларуси",
             type = "",
             teacher = "доц. Цымбал  А. Г.",
@@ -163,8 +174,9 @@ class XlsParserTest {
         friday.classes.add(fridayClass3)
         friday.classes.add(fridayClass4)
 
-        val saturday = WeekdayWithStudyGroupLessons(weekday = Days.SATURDAY)
+        val saturday = WeekdayWithStudyGroupLessons(id = 0, value = Days.SATURDAY)
         val saturdayClass1 = StudyGroupLesson(
+            id = 0,
             subject = "Практ. фонетика (1 ин. яз.)",
             type = "ПЗ",
             teacher = "ст.пр. Абламейко  В. С.",
@@ -173,6 +185,7 @@ class XlsParserTest {
             endTime = "14:20"
         )
         val saturdayClass2 = StudyGroupLesson(
+            id = 0,
             subject = "История: Ист. Беларуси",
             type = "",
             teacher = "доц. Цымбал  А. Г.",
@@ -181,6 +194,7 @@ class XlsParserTest {
             endTime = "15:50"
         )
         val saturdayClass3 = StudyGroupLesson(
+            id = 0,
             subject = "Практ. фонетика (1 ин. яз.)",
             type = "",
             teacher = "",
@@ -205,9 +219,10 @@ class XlsParserTest {
     @Test
     fun `Check if class with multiple parentheses for a teacher schedule is parsed correctly`() {
         // given
-        val wednesday = WeekdayWithTeacherLessons(weekday = Days.WEDNESDAY)
+        val wednesday = WeekdayWithTeacherLessons(id = 0, value = Days.WEDNESDAY)
 
         val wednesdayClass1 = TeacherLesson(
+            id = 0,
             subject = "Психология",
             faculty = "ФРЯ (фр.)",
             groups = "104/1 (фр.), 104/2 (фр.), 104/3 (фр.)",
@@ -232,9 +247,10 @@ class XlsParserTest {
     @Test
     fun `Check if classes with the same start time are parsed correctly`() {
         // given
-        val tuesday = WeekdayWithStudyGroupLessons(weekday = Days.TUESDAY)
+        val tuesday = WeekdayWithStudyGroupLessons(id = 0, value = Days.TUESDAY)
 
         val class1 = StudyGroupLesson(
+            id = 0,
             subject = "Просодия речи",
             type = "ПЗ",
             teacher = "пр. Репина К. П.",
@@ -244,6 +260,7 @@ class XlsParserTest {
         )
 
         val class2 = StudyGroupLesson(
+            id = 0,
             subject = "МСЛБДЗ",
             type = "ЛК",
             teacher = "проф. Зубов  А. В.",
@@ -253,6 +270,7 @@ class XlsParserTest {
         )
 
         val class3 = StudyGroupLesson(
+            id = 0,
             subject = "Практическая грамматика (2)",
             type = "",
             teacher = "пр. Евдокимова В. В.",
@@ -262,6 +280,7 @@ class XlsParserTest {
         )
 
         val class4 = StudyGroupLesson(
+            id = 0,
             subject = "СОРО",
             type = "",
             teacher = "пр. Якушева  Н. В.",

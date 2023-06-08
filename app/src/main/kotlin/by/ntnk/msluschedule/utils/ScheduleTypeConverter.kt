@@ -6,7 +6,7 @@ class ScheduleTypeConverter {
     companion object {
         @TypeConverter
         @JvmStatic
-        fun stringToScheduleType(value: String): ScheduleType {
+        fun fromString(value: String): ScheduleType {
             return when (value) {
                 ScheduleType.STUDYGROUP.name -> ScheduleType.STUDYGROUP
                 ScheduleType.TEACHER.name -> ScheduleType.TEACHER
@@ -16,7 +16,7 @@ class ScheduleTypeConverter {
 
         @TypeConverter
         @JvmStatic
-        fun scheduleTypeToString(type: ScheduleType): String {
+        fun toString(type: ScheduleType): String {
             return type.name
         }
     }

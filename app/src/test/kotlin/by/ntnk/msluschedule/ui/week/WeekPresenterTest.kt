@@ -94,22 +94,26 @@ class WeekPresenterTest {
             )
         whenever(databaseRepository.getWeekdaysWithStudyGroupLessons(anyInt()))
             .thenReturn(
-                Observable.just(WeekdayWithStudyGroupLessons(weekday = String.DEFAULT) as WeekdayWithLessons<Lesson>)
+                Observable.just(
+                    WeekdayWithStudyGroupLessons(id = 0, value = String.DEFAULT) as WeekdayWithLessons<Lesson>
+                )
                     .doOnSubscribe { disposable -> getWeekdayWithStudyGroupLessonsForWeekTest.onSubscribe(disposable) }
             )
         whenever(databaseRepository.getWeekdaysWithTeacherLessons(anyInt()))
             .thenReturn(
-                Observable.just(WeekdayWithTeacherLessons(weekday = String.DEFAULT) as WeekdayWithLessons<Lesson>)
+                Observable.just(
+                    WeekdayWithTeacherLessons(id = 0, value = String.DEFAULT) as WeekdayWithLessons<Lesson>
+                )
                     .doOnSubscribe { disposable -> getWeekdayWithTeacherLessonsForWeekTest.onSubscribe(disposable) }
             )
         whenever(databaseRepository.insertStudyGroupSchedule(any(), anyInt()))
             .thenReturn(
-                Single.just(listOf(WeekdayWithStudyGroupLessons(weekday = String.DEFAULT)))
+                Single.just(listOf(WeekdayWithStudyGroupLessons(id = 0, value = String.DEFAULT)))
                     .doOnSubscribe { disposable -> insertStudyGroupScheduleTest.onSubscribe(disposable) }
             )
         whenever(databaseRepository.insertTeacherSchedule(any(), anyInt()))
             .thenReturn(
-                Single.just(listOf(WeekdayWithTeacherLessons(weekday = String.DEFAULT)))
+                Single.just(listOf(WeekdayWithTeacherLessons(id = 0, value = String.DEFAULT)))
                     .doOnSubscribe { disposable -> insertTeacherScheduleTest.onSubscribe(disposable) }
             )
         whenever(databaseRepository.insertWeekdays(anyInt()))
@@ -124,12 +128,12 @@ class WeekPresenterTest {
             )
         whenever(networkRepository.getSchedule(any<StudyGroup>(), anyInt()))
             .thenReturn(
-                Observable.just(WeekdayWithStudyGroupLessons(weekday = String.DEFAULT))
+                Observable.just(WeekdayWithStudyGroupLessons(id = 0, value = String.DEFAULT))
                     .doOnSubscribe { disposable -> downloadStudyGroupScheduleTest.onSubscribe(disposable) }
             )
         whenever(networkRepository.getSchedule(any<Teacher>(), anyInt()))
             .thenReturn(
-                Observable.just(WeekdayWithTeacherLessons(weekday = String.DEFAULT))
+                Observable.just(WeekdayWithTeacherLessons(id = 0, value = String.DEFAULT))
                     .doOnSubscribe { disposable -> downloadTeacherScheduleTest.onSubscribe(disposable) }
             )
 
@@ -240,7 +244,7 @@ class WeekPresenterTest {
         scheduleUiStateObserver.assertNoErrors()
         scheduleUiStateObserver.assertValues(
             ScheduleUiState(),
-            ScheduleUiState(data = listOf(WeekdayWithStudyGroupLessons(weekday = String.DEFAULT)))
+            ScheduleUiState(data = listOf(WeekdayWithStudyGroupLessons(id = 0, value = String.DEFAULT)))
         )
     }
 
@@ -290,7 +294,7 @@ class WeekPresenterTest {
         scheduleUiStateObserver.assertValues(
             ScheduleUiState(),
             ScheduleUiState(isProcessingFirstUpdate = true),
-            ScheduleUiState(data = listOf(WeekdayWithStudyGroupLessons(weekday = String.DEFAULT)))
+            ScheduleUiState(data = listOf(WeekdayWithStudyGroupLessons(id = 0, value = String.DEFAULT)))
         )
         scheduleUpdateEventObserver.assertSubscribed()
         scheduleUpdateEventObserver.assertNoErrors()
@@ -355,7 +359,7 @@ class WeekPresenterTest {
         scheduleUiStateObserver.assertNoErrors()
         scheduleUiStateObserver.assertValues(
             ScheduleUiState(),
-            ScheduleUiState(data = listOf(WeekdayWithStudyGroupLessons(weekday = String.DEFAULT)))
+            ScheduleUiState(data = listOf(WeekdayWithStudyGroupLessons(id = 0, value = String.DEFAULT)))
         )
         scheduleUpdateEventObserver.assertSubscribed()
         scheduleUpdateEventObserver.assertNoErrors()

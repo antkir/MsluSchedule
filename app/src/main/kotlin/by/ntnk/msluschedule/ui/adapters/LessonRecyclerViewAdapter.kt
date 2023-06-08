@@ -54,7 +54,7 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
         itemViews.clear()
 
         for (day in days) {
-            itemViews.add(DayItemView(day.weekdayId, day.weekday))
+            itemViews.add(DayItemView(day.id, day.value))
             if (day.classes.isNotEmpty()) {
                 var prevStartTime: String = String.DEFAULT
                 for (classDesciptor in day.classes) {
@@ -62,10 +62,10 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
                         when (classDesciptor) {
                             is StudyGroupLesson -> {
                                 val overlapsPreviousClass: Boolean = prevStartTime == classDesciptor.startTime
-                                StudyGroupClassItemView(classDesciptor, day.weekdayId, overlapsPreviousClass)
+                                StudyGroupClassItemView(classDesciptor, day.id, overlapsPreviousClass)
                             }
 
-                            is TeacherLesson -> TeacherClassItemView(classDesciptor, day.weekdayId)
+                            is TeacherLesson -> TeacherClassItemView(classDesciptor, day.id)
                             else -> throw IllegalStateException("Illegal class type!")
                         }
                     itemViews.add(classItemView)

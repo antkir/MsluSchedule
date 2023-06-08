@@ -68,7 +68,7 @@ class WeekdayPresenter @Inject constructor(
 
     fun observeNotes(weekday: WeekdayWithLessons<Lesson>) {
         notesUiState.onNext(NotesUiState(isLoading = true))
-        disposables += databaseRepository.getNotesForWeekday(weekday.weekdayId)
+        disposables += databaseRepository.getNotesForWeekday(weekday.id)
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
