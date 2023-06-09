@@ -47,7 +47,7 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
         lateinit var teacher: String
         lateinit var classroom: String
 
-        var prevTime: Pair<String, String> = Pair(String.DEFAULT, String.DEFAULT)
+        var prevTimePair = Pair(String.DEFAULT, String.DEFAULT)
         var isPreviousClassPhysEd = false
 
         for (cell in cells) {
@@ -60,11 +60,11 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
                 }
 
                 1 -> {
-                    val time = getClassTimePair(cell.stringCellValue)
-                    startTime = if (time.first != String.DEFAULT) time.first else prevTime.first
-                    endTime = if (time.second != String.DEFAULT) time.second else prevTime.second
+                    val timePair = parseClassTimePair(cell.stringCellValue)
+                    startTime = if (timePair.first != String.DEFAULT) timePair.first else prevTimePair.first
+                    endTime = if (timePair.second != String.DEFAULT) timePair.second else prevTimePair.second
 
-                    prevTime = Pair(startTime, endTime)
+                    prevTimePair = Pair(startTime, endTime)
                 }
 
                 2 -> {
@@ -72,26 +72,26 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
                     type = String.DEFAULT
                     teacher = String.DEFAULT
 
-                    val richTextString = cell.richStringCellValue as HSSFRichTextString
-                    val valueString = richTextString.string
-                    val substringLengths = getRichTextSubstringLengths(richTextString)
+                    val valueRichString = cell.richStringCellValue as HSSFRichTextString
+                    val substringLengths = getRichTextSubstringLengths(valueRichString)
+                    val valueString = valueRichString.string
 
-                    if (richTextString.numFormattingRuns() == 0) {
+                    if (valueRichString.numFormattingRuns() == 0) {
                         subject = valueString.trim()
                         type = String.DEFAULT
                         teacher = String.DEFAULT
                     }
 
-                    for (i in 0 until richTextString.numFormattingRuns()) {
-                        val startIdx = richTextString.getIndexOfFormattingRun(i)
-                        val fontIdx = richTextString.getFontAtIndex(startIdx)
-                        val font: HSSFFont = getWorkbookFontAt(fontIdx)
+                    for (i in 0 until valueRichString.numFormattingRuns()) {
+                        val startIdx = valueRichString.getIndexOfFormattingRun(i)
+                        val fontIdx = valueRichString.getFontAtIndex(startIdx)
+                        val font = getWorkbookFontAt(fontIdx)
 
                         if (font.bold) {
                             val nextStartIdx = substringLengths[i]
-                            val typeTeacherString = valueString.substring(nextStartIdx, richTextString.length()).trim()
+                            val typeTeacherString = valueString.substring(nextStartIdx, valueRichString.length()).trim()
                             val hasNewline = valueString.contains("\n")
-                            val (classType, classTeacher) = getTypeTeacherPair(typeTeacherString, hasNewline)
+                            val (classType, classTeacher) = parseTypeTeacherPair(typeTeacherString, hasNewline)
 
                             subject = valueString.substring(0, nextStartIdx).trim()
                             type = classType
@@ -153,7 +153,7 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
         return weekdays
     }
 
-    private fun getClassTimePair(value: String): Pair<String, String> {
+    private fun parseClassTimePair(value: String): Pair<String, String> {
         return if (value.isNotEmpty()) {
             val values = value.split("-".toRegex())
             Pair(values[0].trim(), values[1].trim())
@@ -162,7 +162,7 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
         }
     }
 
-    private fun getTypeTeacherPair(value: String, hasNewline: Boolean): Pair<String, String> {
+    private fun parseTypeTeacherPair(value: String, hasNewline: Boolean): Pair<String, String> {
         return if (value.isNotEmpty()) {
             if (hasNewline) {
                 if (value.contains("\n")) {
@@ -212,9 +212,9 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
             for (columnIndex in 0 until hssfRows[rowIndex].lastCellNum) {
                 val hssfCell = hssfRows[rowIndex].getCell(columnIndex)
                 if (hssfCell.columnIndex == 1 && hssfCell.stringCellValue.isNotEmpty()) {
-                    val values = getClassTimePair(hssfCell.stringCellValue)
-                    startTime = values.first
-                    endTime = values.second
+                    val timePair = parseClassTimePair(hssfCell.stringCellValue)
+                    startTime = timePair.first
+                    endTime = timePair.second
                 } else if (hssfCell.columnIndex in 2..7) {
                     val weekday = weekdays[hssfCell.columnIndex - 2].classes
                     if (hssfCell.stringCellValue.isNotEmpty()) {
@@ -234,11 +234,11 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
         endTime: String,
         getWorkbookFontAt: (Short) -> HSSFFont
     ): TeacherLesson {
-        val richTextString = cell.richStringCellValue as HSSFRichTextString
-        val valueString = richTextString.string
-        val substringLengths = getRichTextSubstringLengths(richTextString)
+        val valueRichString = cell.richStringCellValue as HSSFRichTextString
+        val substringLengths = getRichTextSubstringLengths(valueRichString)
+        val valueString = valueRichString.string
 
-        if (richTextString.numFormattingRuns() == 0) {
+        if (valueRichString.numFormattingRuns() == 0) {
             return TeacherLesson(
                 AUTO_ID,
                 subject = valueString.trim(),
@@ -251,28 +251,28 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
             )
         }
 
-        for (i in 0 until richTextString.numFormattingRuns()) {
-            val startIdx = richTextString.getIndexOfFormattingRun(i)
-            val fontIdx = richTextString.getFontAtIndex(startIdx)
+        for (i in 0 until valueRichString.numFormattingRuns()) {
+            val startIdx = valueRichString.getIndexOfFormattingRun(i)
+            val fontIdx = valueRichString.getFontAtIndex(startIdx)
             val font: HSSFFont = getWorkbookFontAt(fontIdx)
 
             if (font.bold) {
                 val nextStartIdx = startIdx + substringLengths[i]
                 val subject = valueString.substring(startIdx, nextStartIdx).trim()
-                val classType = valueString.substring(nextStartIdx, richTextString.length()).trim()
+                val classType = valueString.substring(nextStartIdx, valueRichString.length()).trim()
 
                 val groupsFacultiesClassroom = valueString.substring(0, startIdx).trim()
 
-                val groupsFaculties = with(groupsFacultiesClassroom.substringBeforeLast(')')) {
-                    if (groupsFacultiesClassroom.contains(')')) "$this)" else String.DEFAULT
+                val groupsFaculties = with(groupsFacultiesClassroom.substringBeforeLast(')', String.DEFAULT)) {
+                    if (this != String.DEFAULT) "$this)" else this
                 }
 
-                val splitIdx = findOpeningParenthesisIndex(groupsFaculties)
+                val groupsFacultiesSplitIdx = findOpeningParenthesisIndex(groupsFaculties)
 
-                val groups = groupsFaculties.substring(0, splitIdx).trim()
+                val groups = groupsFaculties.substring(0, groupsFacultiesSplitIdx).trim()
 
-                val faculties = if (splitIdx != groupsFaculties.length) {
-                    groupsFaculties.substring(splitIdx, groupsFaculties.length)
+                val faculties = if (groupsFacultiesSplitIdx != groupsFaculties.length) {
+                    groupsFaculties.substring(groupsFacultiesSplitIdx, groupsFaculties.length)
                         .drop(1)
                         .dropLast(1)
                         .trim()
@@ -302,15 +302,14 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
 
     private fun findOpeningParenthesisIndex(str: String): Int {
         if (str != String.DEFAULT) {
-            var closingParenthesisCnt = 0
-            var openingParenthesisCnt = 0
-            for (chIdx in str.indices) {
-                val idx = str.lastIndex - chIdx
-                if (str[idx] == ')') closingParenthesisCnt++
-                if (str[idx] == '(') openingParenthesisCnt++
+            var closingParenthesisCount = 0
+            var openingParenthesisCount = 0
+            for (index in str.indices.reversed()) {
+                if (str[index] == ')') closingParenthesisCount++
+                if (str[index] == '(') openingParenthesisCount++
 
-                if (closingParenthesisCnt != 0 && closingParenthesisCnt == openingParenthesisCnt) {
-                    return idx
+                if (closingParenthesisCount != 0 && closingParenthesisCount == openingParenthesisCount) {
+                    return index
                 }
             }
         }
