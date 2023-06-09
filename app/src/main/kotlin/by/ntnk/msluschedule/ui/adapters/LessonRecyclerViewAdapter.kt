@@ -49,23 +49,23 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
     val onClickObservable: Observable<BaseItemView>
         get() = onClickSubject
 
-    fun onNewData(days: List<WeekdayWithLessons<Lesson>>) {
+    fun onNewData(weekdays: List<WeekdayWithLessons<Lesson>>) {
         val oldItemViews = ArrayList(itemViews)
         itemViews.clear()
 
-        for (day in days) {
-            itemViews.add(DayItemView(day.id, day.value))
-            if (day.classes.isNotEmpty()) {
+        for (weekday in weekdays) {
+            itemViews.add(DayItemView(weekday.id, weekday.value))
+            if (weekday.classes.isNotEmpty()) {
                 var prevStartTime: String = String.DEFAULT
-                for (classDesciptor in day.classes) {
+                for (classDesciptor in weekday.classes) {
                     val classItemView: BaseItemView =
                         when (classDesciptor) {
                             is StudyGroupLesson -> {
                                 val overlapsPreviousClass: Boolean = prevStartTime == classDesciptor.startTime
-                                StudyGroupClassItemView(classDesciptor, day.id, overlapsPreviousClass)
+                                StudyGroupClassItemView(classDesciptor, weekday.id, overlapsPreviousClass)
                             }
 
-                            is TeacherLesson -> TeacherClassItemView(classDesciptor, day.id)
+                            is TeacherLesson -> TeacherClassItemView(classDesciptor, weekday.id)
                             else -> throw IllegalStateException("Illegal class type!")
                         }
                     itemViews.add(classItemView)
@@ -86,14 +86,14 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
         }
     }
 
-    fun getWeekdayViewIndex(weekdayNumber: Int): Int {
-        var dayIdx = 0
+    fun getWeekdayViewIndex(weekdayOrdinal: Int): Int {
+        var weekdayIdx = 0
         for (i in 0 until itemViews.size) {
             if (itemViews[i].viewType == ItemViewType.DAY) {
-                if (dayIdx == weekdayNumber - 1) {
+                if (weekdayIdx == weekdayOrdinal - 1) {
                     return i
                 }
-                ++dayIdx
+                ++weekdayIdx
             }
         }
         return 0
