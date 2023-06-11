@@ -67,7 +67,6 @@ class WeekdayActivity :
 
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            presenter.destroy()
             remove()
             onBackPressedDispatcher.onBackPressed()
         }
@@ -347,7 +346,6 @@ class WeekdayActivity :
 
         if (weekdayId <= 0) {
             Timber.e(IllegalArgumentException())
-            presenter.destroy()
             NavUtils.navigateUpFromSameTask(this)
             return
         }
@@ -420,13 +418,15 @@ class WeekdayActivity :
 
     override fun onDestroy() {
         super.onDestroy()
+        if (!isChangingConfigurations) {
+            presenter.destroy()
+        }
         adapterOnClickDisposable.dispose()
         binding.layoutEditNote.animate().setListener(null)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
-            presenter.destroy()
             NavUtils.navigateUpFromSameTask(this)
             return true
         }
