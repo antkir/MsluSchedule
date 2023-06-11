@@ -18,7 +18,7 @@ import androidx.core.app.NavUtils
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.core.view.isEmpty
+import androidx.core.view.isNotEmpty
 import androidx.core.widget.doOnTextChanged
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -118,7 +118,7 @@ class WeekdayActivity :
             }
         })
 
-        binding.fabAddNote.setOnClickListener { showNoteEditLayout() }
+        binding.fabAddNote.setOnClickListener { showEditNoteLayout() }
         binding.buttonSaveNote.setOnClickListener { onSaveNoteClick() }
         val buttonInactiveTint = ContextCompat.getColor(this@WeekdayActivity, R.color.ic_save_note_inactive_tint)
         binding.buttonSaveNote.setColorFilter(buttonInactiveTint)
@@ -145,7 +145,7 @@ class WeekdayActivity :
         onBackPressedDispatcher.addCallback(this, onEditNoteBackPressedCallback)
     }
 
-    private fun showNoteEditLayout() {
+    private fun showEditNoteLayout() {
         binding.fabAddNote.visibility = View.INVISIBLE
 
         val editNotelayoutAnimDelay: Long = 50
@@ -257,10 +257,10 @@ class WeekdayActivity :
                 })
                 .start()
         } else {
+            binding.layoutEditNote.visibility = View.INVISIBLE
+
             binding.scrollViewChips.translationY = binding.scrollViewChips.height.toFloat()
             binding.scrollViewChips.visibility = View.INVISIBLE
-
-            binding.layoutEditNote.visibility = View.INVISIBLE
 
             if (resetViews || adapter.isNoteSelected()) {
                 resetEditNoteLayoutViews()
@@ -336,7 +336,7 @@ class WeekdayActivity :
                 }
                 binding.edittextNote.setText(note.text, TextView.BufferType.EDITABLE)
                 binding.edittextNote.setSelection(note.text.length)
-                showNoteEditLayout()
+                showEditNoteLayout()
             },
             onError = { throwable -> Timber.e(throwable) }
         )
@@ -363,10 +363,7 @@ class WeekdayActivity :
 
                     if (weekdayUiState.isData()) {
                         val weekday = weekdayUiState.data!!
-
-                        if (binding.chipsSubjects.isEmpty()) {
-                            onWeekdayData(weekday)
-                        }
+                        onWeekdayData(weekday)
 
                         if (presenter.isNotesUiStateDefault()) {
                             presenter.observeNotes(weekday)
@@ -438,6 +435,10 @@ class WeekdayActivity :
 
     private fun onWeekdayData(weekday: WeekdayWithLessons<Lesson>) {
         supportActionBar?.title = AndroidUtils.getWeekdayFromTag(weekday.value, applicationContext)
+
+        if (binding.chipsSubjects.isNotEmpty()) {
+            return
+        }
 
         val subjects = weekday.classes
             .map { classDescriptor ->
