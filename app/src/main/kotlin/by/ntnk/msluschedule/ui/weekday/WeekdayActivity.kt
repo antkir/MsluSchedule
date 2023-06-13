@@ -7,6 +7,8 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
+import android.os.Parcelable
+import android.util.SparseArray
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewTreeObserver
@@ -18,6 +20,7 @@ import androidx.core.app.NavUtils
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.doOnLayout
 import androidx.core.view.isNotEmpty
 import androidx.core.widget.doOnTextChanged
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
@@ -36,6 +39,7 @@ import by.ntnk.msluschedule.ui.customviews.ItemSwipeCallback
 import by.ntnk.msluschedule.utils.AndroidUtils
 import by.ntnk.msluschedule.utils.DEFAULT
 import by.ntnk.msluschedule.utils.dipToPixels
+import by.ntnk.msluschedule.utils.getWidthMinusPadding
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipDrawable
 import com.google.android.material.snackbar.Snackbar
@@ -59,6 +63,9 @@ class WeekdayActivity :
     private var weekdayId: Int = Int.DEFAULT
     private lateinit var adapterOnClickDisposable: Disposable
     private val disposables: CompositeDisposable = CompositeDisposable()
+
+    private var restoredScrollableViewChipsOffset: Int = Int.DEFAULT
+    private var restoredChipsState: SparseArray<Parcelable>? = null
 
     private lateinit var binding: ActivityWeekdayBinding
 
@@ -142,6 +149,9 @@ class WeekdayActivity :
 
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
         onBackPressedDispatcher.addCallback(this, onEditNoteBackPressedCallback)
+
+        restoredScrollableViewChipsOffset = savedInstanceState?.getInt(ARG_SCROLL_VIEW_CHIPS_SAVED_STATE) ?: Int.DEFAULT
+        restoredChipsState = savedInstanceState?.getSparseParcelableArray(ARG_CHIPS_SAVED_STATE)
     }
 
     private fun showEditNoteLayout() {
@@ -453,18 +463,32 @@ class WeekdayActivity :
         if (subjects.isEmpty()) {
             binding.chipsSubjects.visibility = View.GONE
         } else {
-            for (subject in subjects) {
+            for ((index, subject) in subjects.withIndex()) {
                 if (subject == String.DEFAULT) {
                     continue
                 }
 
                 val chipDrawable = ChipDrawable.createFromAttributes(this, null, 0, R.style.MsluTheme_Chip_Filter)
                 val chip = Chip(this).apply {
+                    id = index
                     setChipDrawable(chipDrawable)
                     setTextAppearanceResource(R.style.MsluTheme_Chip_Text_Appearance)
                     text = subject
                 }
                 binding.chipsSubjects.addView(chip)
+            }
+        }
+
+        if (restoredChipsState != null) {
+            binding.chipsSubjects.restoreHierarchyState(restoredChipsState)
+            restoredChipsState = null
+        }
+
+        binding.scrollViewChips.doOnLayout {
+            if (restoredScrollableViewChipsOffset != Int.DEFAULT) {
+                val scrollViewWidthMinusPadding = binding.scrollViewChips.getWidthMinusPadding()
+                binding.scrollViewChips.scrollX = restoredScrollableViewChipsOffset - scrollViewWidthMinusPadding
+                restoredScrollableViewChipsOffset = Int.DEFAULT
             }
         }
     }
@@ -479,8 +503,21 @@ class WeekdayActivity :
         }
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        val scrollViewWidthMinusPadding = binding.scrollViewChips.getWidthMinusPadding()
+        val scrollOffsetFromStart = binding.scrollViewChips.scrollX + scrollViewWidthMinusPadding
+        outState.putInt(ARG_SCROLL_VIEW_CHIPS_SAVED_STATE, scrollOffsetFromStart)
+
+        val stateContainer = SparseArray<Parcelable>()
+        binding.chipsSubjects.saveHierarchyState(stateContainer)
+        outState.putSparseParcelableArray(ARG_CHIPS_SAVED_STATE, stateContainer)
+    }
+
     companion object {
         private const val ARG_WEEKDAY_ID = "weekdayId"
+        private const val ARG_SCROLL_VIEW_CHIPS_SAVED_STATE = "scrollViewChipsSavedState"
+        private const val ARG_CHIPS_SAVED_STATE = "chipsSavedState"
 
         fun startActivity(context: Context, weekdayId: Int) {
             val intent = Intent(context, WeekdayActivity::class.java).apply {

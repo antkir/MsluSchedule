@@ -33,6 +33,10 @@ fun IntRange.random(): Int {
     }
 }
 
+fun View.getWidthMinusPadding(): Int {
+    return width - paddingLeft - paddingRight
+}
+
 /**
  * Compares the contents of this [SparseArrayCompat] to the specified [SparseArrayCompat].
  *
