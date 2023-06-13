@@ -14,6 +14,25 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.BehaviorSubject
 import javax.inject.Inject
 
+data class StoredTeachersLoadedEvent(
+    private var isLoaded: Boolean = false,
+    private var throwable: Throwable? = null
+) {
+    fun isEvent(): Boolean = isLoaded
+
+    fun consumeEvent() {
+        isLoaded = false
+    }
+
+    fun isError(): Boolean = throwable != null
+
+    fun consumeError(): Throwable {
+        val throwableCopy = throwable!!
+        throwable = null
+        return throwableCopy
+    }
+}
+
 data class ScheduleFilterUiState(
     val isLoading: Boolean = false,
     val data: ScheduleFilter? = null,
@@ -31,8 +50,11 @@ class AddTeacherPresenter @Inject constructor(
 ) : Presenter<AddTeacherView>() {
 
     private val storedTeachers: BehaviorSubject<List<Teacher>> = BehaviorSubject.createDefault(emptyList())
-    val storedTeachersObservable: Observable<List<Teacher>>
-        get() = storedTeachers
+
+    private val storedTeachersLoadedEvent: BehaviorSubject<StoredTeachersLoadedEvent> =
+        BehaviorSubject.createDefault(StoredTeachersLoadedEvent())
+    val storedTeachersLoadedEventObservable: Observable<StoredTeachersLoadedEvent>
+        get() = storedTeachersLoadedEvent
 
     private val teacherFilter: BehaviorSubject<ScheduleFilterUiState> =
         BehaviorSubject.createDefault(ScheduleFilterUiState(isLoading = true))
@@ -49,8 +71,13 @@ class AddTeacherPresenter @Inject constructor(
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
-                onSuccess = { teachers -> storedTeachers.onNext(teachers) },
-                onError = { throwable -> storedTeachers.onError(throwable) }
+                onSuccess = { groups ->
+                    storedTeachers.onNext(groups)
+                    storedTeachersLoadedEvent.onNext(StoredTeachersLoadedEvent(isLoaded = true))
+                },
+                onError = { throwable ->
+                    storedTeachersLoadedEvent.onNext(StoredTeachersLoadedEvent(throwable = throwable))
+                }
             )
 
         getTeacherScheduleFilter()

@@ -135,8 +135,20 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
     override fun onStart() {
         super.onStart()
 
-        disposables += presenter.storedGroupsObservable.subscribeBy(
-            onError = { throwable -> showError(throwable) }
+        disposables += presenter.storedGroupsLoadedEventObservable.subscribeBy(
+            onNext = { storedGroupsLoadedEvent ->
+                if (storedGroupsLoadedEvent.isEvent()) {
+                    storedGroupsLoadedEvent.consumeEvent()
+                    binding.autocompletetextFaculty.text.clear()
+                    binding.autocompletetextCourse.text.clear()
+                    binding.autocompletetextGroup.text.clear()
+                }
+
+                if (storedGroupsLoadedEvent.isError()) {
+                    val throwable = storedGroupsLoadedEvent.consumeError()
+                    showError(throwable)
+                }
+            },
         )
 
         disposables += presenter.facultyFilterObservable.subscribeBy(

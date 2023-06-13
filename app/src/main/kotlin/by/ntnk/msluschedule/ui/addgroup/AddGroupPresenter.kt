@@ -16,6 +16,25 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.BehaviorSubject
 import javax.inject.Inject
 
+data class StoredGroupsLoadedEvent(
+    private var isLoaded: Boolean = false,
+    private var throwable: Throwable? = null
+) {
+    fun isEvent(): Boolean = isLoaded
+
+    fun consumeEvent() {
+        isLoaded = false
+    }
+
+    fun isError(): Boolean = throwable != null
+
+    fun consumeError(): Throwable {
+        val throwableCopy = throwable!!
+        throwable = null
+        return throwableCopy
+    }
+}
+
 data class ScheduleFilterUiState(
     val isLoading: Boolean = false,
     val data: ScheduleFilter? = null,
@@ -33,8 +52,11 @@ class AddGroupPresenter @Inject constructor(
 ) : Presenter<AddGroupView>() {
 
     private val storedGroups: BehaviorSubject<List<StudyGroup>> = BehaviorSubject.createDefault(emptyList())
-    val storedGroupsObservable: Observable<List<StudyGroup>>
-        get() = storedGroups
+
+    private val storedGroupsLoadedEvent: BehaviorSubject<StoredGroupsLoadedEvent> =
+        BehaviorSubject.createDefault(StoredGroupsLoadedEvent())
+    val storedGroupsLoadedEventObservable: Observable<StoredGroupsLoadedEvent>
+        get() = storedGroupsLoadedEvent
 
     private val facultyFilter: BehaviorSubject<ScheduleFilterUiState> =
         BehaviorSubject.createDefault(ScheduleFilterUiState())
@@ -72,8 +94,13 @@ class AddGroupPresenter @Inject constructor(
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
-                onSuccess = { groups -> storedGroups.onNext(groups) },
-                onError = { throwable -> storedGroups.onError(throwable) }
+                onSuccess = { groups ->
+                    storedGroups.onNext(groups)
+                    storedGroupsLoadedEvent.onNext(StoredGroupsLoadedEvent(isLoaded = true))
+                },
+                onError = { throwable ->
+                    storedGroupsLoadedEvent.onNext(StoredGroupsLoadedEvent(throwable = throwable))
+                }
             )
 
         downloadFacultyFilter()

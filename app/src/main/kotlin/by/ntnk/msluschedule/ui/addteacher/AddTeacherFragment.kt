@@ -90,8 +90,18 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
     override fun onStart() {
         super.onStart()
 
-        disposables += presenter.storedTeachersObservable.subscribeBy(
-            onError = { throwable -> showError(throwable) }
+        disposables += presenter.storedTeachersLoadedEventObservable.subscribeBy(
+            onNext = { storedTeachersLoadedEvent ->
+                if (storedTeachersLoadedEvent.isEvent()) {
+                    storedTeachersLoadedEvent.consumeEvent()
+                    binding.autocompletetextTeacher.text.clear()
+                }
+
+                if (storedTeachersLoadedEvent.isError()) {
+                    val throwable = storedTeachersLoadedEvent.consumeError()
+                    showError(throwable)
+                }
+            },
         )
 
         disposables += presenter.teacherFilterObservable.subscribeBy(
