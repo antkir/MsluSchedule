@@ -2,7 +2,6 @@ package by.ntnk.msluschedule.ui.weekscontainer
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -10,9 +9,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.text.TextUtilsCompat
 import androidx.core.view.MenuProvider
-import androidx.core.view.ViewCompat
 import androidx.lifecycle.Lifecycle
 import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.data.ScheduleContainer
@@ -25,7 +22,6 @@ import by.ntnk.msluschedule.ui.weekscontainer.WeeksContainerPresenter.Companion.
 import by.ntnk.msluschedule.utils.DEFAULT
 import dagger.Lazy
 import dagger.android.support.AndroidSupportInjection
-import java.util.Locale
 import javax.inject.Inject
 
 class WeeksContainerFragment :
@@ -97,9 +93,6 @@ class WeeksContainerFragment :
     private fun setupTabLayout() {
         binding.tabLayoutWeeks.setupWithViewPager(binding.viewpagerWeeks)
         binding.tabLayoutWeeks.setOnTouchListener { _, _ -> true }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            binding.tabLayoutWeeks.layoutDirection = View.LAYOUT_DIRECTION_LTR
-        }
     }
 
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
@@ -123,17 +116,10 @@ class WeeksContainerFragment :
     }
 
     override fun onData(weeks: List<Week>, currentAcademicWeekIndex: Int) {
-        val layoutDirection = TextUtilsCompat.getLayoutDirectionFromLocale(Locale.getDefault())
-        val isLTR = layoutDirection == ViewCompat.LAYOUT_DIRECTION_LTR
-        val arrangedWeeks = if (isLTR) weeks else weeks.reversed()
-        val currentWeekPosition = if (isLTR) {
-            minOf(currentAcademicWeekIndex, CENTRAL_VIEW_POSITION)
-        } else {
-            arrangedWeeks.lastIndex - minOf(currentAcademicWeekIndex, CENTRAL_VIEW_POSITION)
-        }
+        val currentWeekPosition = minOf(currentAcademicWeekIndex, CENTRAL_VIEW_POSITION)
 
         with(binding.viewpagerWeeks) {
-            offscreenPageLimit = arrangedWeeks.size - 1
+            offscreenPageLimit = weeks.size - 1
 
             var isNewData = false
             // Initialize adapter here because otherwise TabLayout does not properly scroll to the
@@ -142,12 +128,12 @@ class WeeksContainerFragment :
                 isNewData = true
                 val weekAdapter = WeekFragmentViewPagerAdapter(childFragmentManager)
                 // Set initial data here so adapter's state is restored properly when setAdapter is called in ViewPager.
-                weekAdapter.setData(arrangedWeeks, currentWeekPosition)
+                weekAdapter.setData(weeks, currentWeekPosition)
                 adapter = weekAdapter
             }
 
             val adapter = adapter as WeekFragmentViewPagerAdapter
-            isNewData = adapter.onData(arrangedWeeks, currentWeekPosition) || isNewData
+            isNewData = adapter.onData(weeks, currentWeekPosition) || isNewData
 
             if (restoredAdapterPosition != Int.DEFAULT) {
                 setCurrentItem(restoredAdapterPosition, false)

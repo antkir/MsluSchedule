@@ -18,7 +18,6 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
-import androidx.core.text.TextUtilsCompat
 import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
@@ -60,7 +59,6 @@ import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasAndroidInjector
 import io.reactivex.disposables.Disposable
 import java.lang.ref.WeakReference
-import java.util.Locale
 import javax.inject.Inject
 
 class MainActivity :
@@ -225,17 +223,14 @@ class MainActivity :
     }
 
     private fun startOnboarding() {
-        val layoutDirection = TextUtilsCompat.getLayoutDirectionFromLocale(Locale.getDefault())
-        val isRTL = layoutDirection == ViewCompat.LAYOUT_DIRECTION_RTL
         val insetsSystemBars = WindowInsetsCompat.Type.systemBars()
         val insetTop = ViewCompat.getRootWindowInsets(window.decorView)?.getInsets(insetsSystemBars)?.top ?: 0
 
-        val navIconOffsetX = dipToPixels(28f).toFloat()
-        val navigationViewTargetX = if (isRTL) binding.toolbar.right.toFloat() - navIconOffsetX else navIconOffsetX
+        val navigationViewTargetX = dipToPixels(28f).toFloat()
         val navigationViewTargetY = insetTop.toFloat() + binding.toolbar.height / 2
 
         val actIconOffsetX = dipToPixels(22f).toFloat()
-        val actionMenuTargetX = if (isRTL) actIconOffsetX else binding.toolbar.right.toFloat() - actIconOffsetX
+        val actionMenuTargetX = binding.toolbar.right.toFloat() - actIconOffsetX
         val actionMenuTargetY = insetTop.toFloat() + binding.toolbar.height / 2
 
         val welcomeAnchorPoint = getViewLocationInWindow(binding.content.imageSmile)
