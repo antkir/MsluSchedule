@@ -11,7 +11,7 @@ import by.ntnk.msluschedule.utils.SharedPreferencesRepository
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.plusAssign
+import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.BehaviorSubject
 import timber.log.Timber
@@ -49,7 +49,7 @@ class WeekdayPresenter @Inject constructor(
     val notesUiStateObservable: Observable<NotesUiState>
         get() = notesUiState
 
-    private val disposables: CompositeDisposable = CompositeDisposable()
+    private var notesDisposable: Disposable = CompositeDisposable()
 
     fun getWeekday(id: Int) {
         weekdayUiState.onNext(WeekdayUiState(isLoading = true))
@@ -68,7 +68,8 @@ class WeekdayPresenter @Inject constructor(
 
     fun observeNotes(weekday: WeekdayWithLessons<Lesson>) {
         notesUiState.onNext(NotesUiState(isLoading = true))
-        disposables += databaseRepository.getNotesForWeekday(weekday.id)
+        notesDisposable.dispose()
+        notesDisposable = databaseRepository.getNotesForWeekday(weekday.id)
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
@@ -115,6 +116,6 @@ class WeekdayPresenter @Inject constructor(
     }
 
     fun destroy() {
-        disposables.clear()
+        notesDisposable.dispose()
     }
 }
