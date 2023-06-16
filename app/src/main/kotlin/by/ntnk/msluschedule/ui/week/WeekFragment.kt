@@ -181,8 +181,8 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
 
                     if (scheduleUiState.isInitializingWeek ||
                         scheduleUiState.isWeekInitializedNoData ||
-                        scheduleUiState.isProcessingFirstUpdate ||
-                        scheduleUiState.isFirstUpdateError
+                        scheduleUiState.isProcessingAutoUpdate ||
+                        scheduleUiState.isAutoUpdateError
                     ) {
                         binding.progressIndicatorInit.visibility = View.VISIBLE
                     } else {
@@ -190,7 +190,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
                     }
 
                     if (scheduleUiState.isWeekInitializedNoData) {
-                        presenter.updateSchedule(scheduleContainer, weekId, isFirstUpdate = true)
+                        presenter.updateSchedule(scheduleContainer, weekId, isAutoUpdate = true)
                     }
 
                     if (scheduleUiState.isWeekInitialized) {
@@ -206,7 +206,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
 
                     if (scheduleUiState.isError()) {
                         val throwable = scheduleUiState.throwable!!
-                        if (scheduleUiState.isFirstUpdateError) {
+                        if (scheduleUiState.isAutoUpdateError) {
                             if (Utils.isNetworkException(throwable)) {
                                 Timber.i(throwable)
                                 showError(throwable, showRetryButton = false)

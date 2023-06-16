@@ -21,11 +21,11 @@ data class ScheduleUiState(
     val isCheckingWeekStatus: Boolean = false,
     val isInitializingWeek: Boolean = false,
     val isWeekInitializedNoData: Boolean = false,
-    val isProcessingFirstUpdate: Boolean = false,
+    val isProcessingAutoUpdate: Boolean = false,
     val isWeekInitialized: Boolean = false,
     val data: List<WeekdayWithLessons<Lesson>> = emptyList(),
     val throwable: Throwable? = null,
-    val isFirstUpdateError: Boolean = false
+    val isAutoUpdateError: Boolean = false
 ) {
     fun isData(): Boolean = data.isNotEmpty()
     fun isError(): Boolean = throwable != null
@@ -116,14 +116,14 @@ class WeekPresenter @Inject constructor(
             )
     }
 
-    fun updateSchedule(scheduleContainer: ScheduleContainer, weekId: Int, isFirstUpdate: Boolean = false) {
+    fun updateSchedule(scheduleContainer: ScheduleContainer, weekId: Int, isAutoUpdate: Boolean = false) {
         assert(scheduleUpdateEvent.hasValue())
         if (scheduleUpdateEvent.value!! != ScheduleUpdateEvent()) {
             return
         }
 
-        if (isFirstUpdate) {
-            scheduleUiState.onNext(ScheduleUiState(isProcessingFirstUpdate = true))
+        if (isAutoUpdate) {
+            scheduleUiState.onNext(ScheduleUiState(isProcessingAutoUpdate = true))
         } else {
             scheduleUpdateEvent.onNext(ScheduleUpdateEvent(isLoading = true))
         }
@@ -140,14 +140,14 @@ class WeekPresenter @Inject constructor(
                     val state = ScheduleUiState(data = weekdays)
                     scheduleUiState.onNext(state)
 
-                    if (!isFirstUpdate) {
+                    if (!isAutoUpdate) {
                         val event = ScheduleUpdateEvent(isUpdateSuccessful = true)
                         scheduleUpdateEvent.onNext(event)
                     }
                 },
                 onError = { throwable ->
-                    if (isFirstUpdate) {
-                        val state = ScheduleUiState(throwable = throwable, isFirstUpdateError = true)
+                    if (isAutoUpdate) {
+                        val state = ScheduleUiState(throwable = throwable, isAutoUpdateError = true)
                         scheduleUiState.onNext(state)
                     } else {
                         val updateState = ScheduleUpdateEvent(throwable = throwable)
