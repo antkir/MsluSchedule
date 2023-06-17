@@ -20,7 +20,6 @@ import javax.inject.Inject
 data class ScheduleUiState(
     val isCheckingWeekStatus: Boolean = false,
     val isInitializingWeek: Boolean = false,
-    val isWeekInitializedNoData: Boolean = false,
     val isProcessingAutoUpdate: Boolean = false,
     val isWeekInitialized: Boolean = false,
     val data: List<WeekdayWithLessons<Lesson>> = emptyList(),
@@ -111,12 +110,19 @@ class WeekPresenter @Inject constructor(
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
-                onComplete = { scheduleUiState.onNext(ScheduleUiState(isWeekInitializedNoData = true)) },
+                onComplete = {
+                    val scheduleContainer = getScheduleContainer()
+                    updateSchedule(scheduleContainer, weekId, isAutoUpdate = true)
+                },
                 onError = { throwable -> scheduleUiState.onNext(ScheduleUiState(throwable = throwable)) }
             )
     }
 
-    fun updateSchedule(scheduleContainer: ScheduleContainer, weekId: Int, isAutoUpdate: Boolean = false) {
+    fun updateSchedule(scheduleContainer: ScheduleContainer, weekId: Int) {
+        updateSchedule(scheduleContainer, weekId, isAutoUpdate = false)
+    }
+
+    private fun updateSchedule(scheduleContainer: ScheduleContainer, weekId: Int, isAutoUpdate: Boolean) {
         assert(scheduleUpdateEvent.hasValue())
         if (scheduleUpdateEvent.value!! != ScheduleUpdateEvent()) {
             return

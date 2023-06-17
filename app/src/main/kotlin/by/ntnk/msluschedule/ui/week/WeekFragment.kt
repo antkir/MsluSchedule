@@ -180,17 +180,12 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
                     }
 
                     if (scheduleUiState.isInitializingWeek ||
-                        scheduleUiState.isWeekInitializedNoData ||
                         scheduleUiState.isProcessingAutoUpdate ||
                         scheduleUiState.isAutoUpdateError
                     ) {
                         binding.progressIndicatorInit.visibility = View.VISIBLE
                     } else {
                         binding.progressIndicatorInit.visibility = View.GONE
-                    }
-
-                    if (scheduleUiState.isWeekInitializedNoData) {
-                        presenter.updateSchedule(scheduleContainer, weekId, isAutoUpdate = true)
                     }
 
                     if (scheduleUiState.isWeekInitialized) {
