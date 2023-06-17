@@ -14,7 +14,6 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.BehaviorSubject
-import timber.log.Timber
 import javax.inject.Inject
 
 data class WeekdayUiState(
@@ -35,6 +34,38 @@ data class NotesUiState(
     fun isError(): Boolean = throwable != null
 }
 
+data class NoteChangeEvent(
+    private var isInserted: Boolean = false,
+    private var isDeleted: Boolean = false,
+    private var isUpdated: Boolean = false,
+    private var data: Note? = null,
+    private var throwable: Throwable? = null
+) {
+    fun isInserted(): Boolean = isInserted
+
+    fun isDataDeleted(): Boolean = data != null && isDeleted
+
+    fun isUpdated(): Boolean = isUpdated
+
+    fun consumeDataDeleted(): Note {
+        isDeleted = false
+        val note = data!!
+        data = null
+        return note
+    }
+
+    fun isError(): Boolean = throwable != null
+
+    fun consumeError(): Throwable {
+        isInserted = false
+        isDeleted = false
+        isUpdated = false
+        val throwableCopy = throwable!!
+        throwable = null
+        return throwableCopy
+    }
+}
+
 class WeekdayPresenter @Inject constructor(
     private val databaseRepository: DatabaseRepository,
     private val sharedPreferencesRepository: SharedPreferencesRepository,
@@ -48,6 +79,11 @@ class WeekdayPresenter @Inject constructor(
     private val notesUiState: BehaviorSubject<NotesUiState> = BehaviorSubject.createDefault(NotesUiState())
     val notesUiStateObservable: Observable<NotesUiState>
         get() = notesUiState
+
+    private val noteChangeEvent: BehaviorSubject<NoteChangeEvent> =
+        BehaviorSubject.createDefault(NoteChangeEvent())
+    val noteChangeEventObservable: Observable<NoteChangeEvent>
+        get() = noteChangeEvent
 
     private var notesDisposable: Disposable = CompositeDisposable()
 
@@ -83,16 +119,21 @@ class WeekdayPresenter @Inject constructor(
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
-                onError = { throwable -> Timber.e(throwable) }
+                onError = { throwable ->
+                    noteChangeEvent.onNext(NoteChangeEvent(isInserted = true, throwable = throwable))
+                }
             )
     }
 
-    fun deleteNote(id: Int) {
-        databaseRepository.deleteNote(id)
+    fun deleteNote(note: Note) {
+        databaseRepository.deleteNote(note.id)
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
-                onError = { throwable -> Timber.e(throwable) }
+                onComplete = { noteChangeEvent.onNext(NoteChangeEvent(isDeleted = true, data = note)) },
+                onError = { throwable ->
+                    noteChangeEvent.onNext(NoteChangeEvent(isDeleted = true, throwable = throwable))
+                }
             )
     }
 
@@ -101,7 +142,9 @@ class WeekdayPresenter @Inject constructor(
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
-                onError = { throwable -> Timber.e(throwable) }
+                onError = { throwable ->
+                    noteChangeEvent.onNext(NoteChangeEvent(isUpdated = true, throwable = throwable))
+                }
             )
     }
 

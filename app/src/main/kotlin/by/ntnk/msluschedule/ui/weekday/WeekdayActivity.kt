@@ -7,6 +7,8 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.os.Parcelable
 import android.util.SparseArray
 import android.view.MenuItem
@@ -18,7 +20,6 @@ import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.core.app.NavUtils
 import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.doOnLayout
 import androidx.core.view.isNotEmpty
@@ -309,16 +310,7 @@ class WeekdayActivity :
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val adapter = binding.recyclerviewNotes.adapter as NoteRecyclerViewAdapter
                 val note = adapter.getNoteFromPosition(viewHolder.bindingAdapterPosition)
-                presenter.deleteNote(note.id)
-
-                val noteDeleted = resources.getString(R.string.snackbar_note_deleted)
-                val snackbar = Snackbar.make(binding.coordinatorLayout, noteDeleted, Snackbar.LENGTH_LONG)
-                    .setAnchorView(binding.fabAddNote)
-                    .setAction(resources.getString(R.string.snackbar_action_undo)) {
-                        presenter.insertNote(note, weekdayId)
-                    }
-                ViewCompat.setOnApplyWindowInsetsListener(snackbar.view) { _, insets -> insets }
-                snackbar.show()
+                presenter.deleteNote(note)
             }
         }
     }
@@ -378,6 +370,7 @@ class WeekdayActivity :
                     if (weekdayUiState.isError()) {
                         val throwable = weekdayUiState.throwable!!
                         Timber.e(throwable)
+                        NavUtils.navigateUpFromSameTask(this)
                     }
                 }
             )
@@ -394,6 +387,34 @@ class WeekdayActivity :
                     if (notesUiState.isError()) {
                         val throwable = notesUiState.throwable!!
                         Timber.e(throwable)
+                        NavUtils.navigateUpFromSameTask(this)
+                    }
+                }
+            )
+
+        disposables += presenter.noteChangeEventObservable
+            .subscribeBy(
+                onNext = { noteChangeEvent ->
+                    if (noteChangeEvent.isDataDeleted()) {
+                        val note = noteChangeEvent.consumeDataDeleted()
+                        val noteDeletedText = resources.getString(R.string.snackbar_note_deleted)
+                        val snackbar = Snackbar.make(binding.coordinatorLayout, noteDeletedText, Snackbar.LENGTH_LONG)
+                        snackbar.anchorView = binding.fabAddNote
+                        snackbar.setAction(resources.getString(R.string.snackbar_action_undo)) {
+                            presenter.insertNote(note, weekdayId)
+                        }
+                        snackbar.show()
+                    }
+
+                    if (noteChangeEvent.isError()) {
+                        var delayMillis: Long = 0
+                        if (noteChangeEvent.isInserted() || noteChangeEvent.isUpdated()) {
+                            delayMillis = ANIMATION_HIDE_EDIT_NOTE_LAYOUT_DURATION + ANIMATION_SHOW_FAB_DURATION
+                        }
+
+                        val throwable = noteChangeEvent.consumeError()
+                        Timber.e(throwable)
+                        showError(throwable, delayMillis)
                     }
                 }
             )
@@ -498,6 +519,14 @@ class WeekdayActivity :
         } else {
             binding.textZeroNotes.visibility = View.GONE
         }
+    }
+
+    private fun showError(t: Throwable, delayMillis: Long) {
+        Handler(Looper.getMainLooper()).postDelayed({
+            val snackbar = Snackbar.make(binding.root, AndroidUtils.getErrorMessageResId(t), Snackbar.LENGTH_LONG)
+            snackbar.anchorView = binding.fabAddNote
+            snackbar.show()
+        }, delayMillis)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
