@@ -20,11 +20,11 @@ import javax.inject.Inject
 data class ScheduleUiState(
     val isCheckingWeekStatus: Boolean = false,
     val isInitializingWeek: Boolean = false,
-    val isProcessingAutoUpdate: Boolean = false,
+    val isProcessingInitialUpdate: Boolean = false,
     val isWeekInitialized: Boolean = false,
     val data: List<WeekdayWithLessons<Lesson>> = emptyList(),
     val throwable: Throwable? = null,
-    val isAutoUpdateError: Boolean = false
+    val isInitialUpdateError: Boolean = false
 ) {
     fun isData(): Boolean = data.isNotEmpty()
     fun isError(): Boolean = throwable != null
@@ -112,24 +112,24 @@ class WeekPresenter @Inject constructor(
             .subscribeBy(
                 onComplete = {
                     val scheduleContainer = getScheduleContainer()
-                    updateSchedule(scheduleContainer, weekId, isAutoUpdate = true)
+                    updateSchedule(scheduleContainer, weekId, isInitialUpdate = true)
                 },
                 onError = { throwable -> scheduleUiState.onNext(ScheduleUiState(throwable = throwable)) }
             )
     }
 
     fun updateSchedule(scheduleContainer: ScheduleContainer, weekId: Int) {
-        updateSchedule(scheduleContainer, weekId, isAutoUpdate = false)
+        updateSchedule(scheduleContainer, weekId, isInitialUpdate = false)
     }
 
-    private fun updateSchedule(scheduleContainer: ScheduleContainer, weekId: Int, isAutoUpdate: Boolean) {
+    private fun updateSchedule(scheduleContainer: ScheduleContainer, weekId: Int, isInitialUpdate: Boolean) {
         assert(scheduleUpdateEvent.hasValue())
         if (scheduleUpdateEvent.value!! != ScheduleUpdateEvent()) {
             return
         }
 
-        if (isAutoUpdate) {
-            scheduleUiState.onNext(ScheduleUiState(isProcessingAutoUpdate = true))
+        if (isInitialUpdate) {
+            scheduleUiState.onNext(ScheduleUiState(isProcessingInitialUpdate = true))
         } else {
             scheduleUpdateEvent.onNext(ScheduleUpdateEvent(isLoading = true))
         }
@@ -146,14 +146,14 @@ class WeekPresenter @Inject constructor(
                     val state = ScheduleUiState(data = weekdays)
                     scheduleUiState.onNext(state)
 
-                    if (!isAutoUpdate) {
+                    if (!isInitialUpdate) {
                         val event = ScheduleUpdateEvent(isUpdateSuccessful = true)
                         scheduleUpdateEvent.onNext(event)
                     }
                 },
                 onError = { throwable ->
-                    if (isAutoUpdate) {
-                        val state = ScheduleUiState(throwable = throwable, isAutoUpdateError = true)
+                    if (isInitialUpdate) {
+                        val state = ScheduleUiState(throwable = throwable, isInitialUpdateError = true)
                         scheduleUiState.onNext(state)
                     } else {
                         val updateState = ScheduleUpdateEvent(throwable = throwable)
