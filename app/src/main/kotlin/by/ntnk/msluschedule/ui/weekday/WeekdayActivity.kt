@@ -36,6 +36,7 @@ import by.ntnk.msluschedule.databinding.ActivityWeekdayBinding
 import by.ntnk.msluschedule.mvp.views.MvpActivity
 import by.ntnk.msluschedule.ui.adapters.NoteRecyclerViewAdapter
 import by.ntnk.msluschedule.ui.customviews.ItemSwipeCallback
+import by.ntnk.msluschedule.utils.AUTO_ID
 import by.ntnk.msluschedule.utils.AndroidUtils
 import by.ntnk.msluschedule.utils.DEFAULT
 import by.ntnk.msluschedule.utils.dipToPixels
@@ -157,9 +158,6 @@ class WeekdayActivity :
     private fun showEditNoteLayout() {
         binding.fabAddNote.visibility = View.INVISIBLE
 
-        val editNotelayoutAnimDelay: Long = 50
-        val editNoteLayoutAnimDuration: Long = 100
-
         val backgroundColor = ContextCompat.getColor(applicationContext, R.color.unfocused_background)
         binding.layoutEditNote.setBackgroundColor(backgroundColor)
         binding.layoutEditNote.visibility = View.VISIBLE
@@ -168,13 +166,13 @@ class WeekdayActivity :
         binding.layoutEditNote.translationY = binding.layoutEditNote.height.toFloat()
         binding.layoutEditNote.animate()
             .translationY(0f)
-            .setStartDelay(editNotelayoutAnimDelay)
-            .setDuration(editNoteLayoutAnimDuration)
+            .setStartDelay(ANIMATION_SHOW_EDIT_NOTE_LAYOUT_DELAY)
+            .setDuration(ANIMATION_SHOW_EDIT_NOTE_LAYOUT_DURATION)
             .setInterpolator(FastOutSlowInInterpolator())
             .setListener(object : AnimatorListenerAdapter() {
                 private val alphaAnimation = AlphaAnimation(0f, 1f).apply {
-                    startOffset = editNotelayoutAnimDelay
-                    duration = editNoteLayoutAnimDuration
+                    startOffset = ANIMATION_SHOW_EDIT_NOTE_LAYOUT_DELAY
+                    duration = ANIMATION_SHOW_EDIT_NOTE_LAYOUT_DURATION
                 }
 
                 override fun onAnimationStart(animation: Animator) {
@@ -191,8 +189,8 @@ class WeekdayActivity :
         binding.scrollViewChips.visibility = View.VISIBLE
         binding.scrollViewChips.animate()
             .translationY(0f)
-            .setStartDelay(editNotelayoutAnimDelay + editNoteLayoutAnimDuration)
-            .setDuration(150)
+            .setStartDelay(ANIMATION_SHOW_EDIT_NOTE_LAYOUT_DELAY + ANIMATION_SHOW_EDIT_NOTE_LAYOUT_DURATION)
+            .setDuration(ANIMATION_SHOW_CHIPS_DURATION)
             .setInterpolator(FastOutSlowInInterpolator())
             .start()
 
@@ -214,7 +212,7 @@ class WeekdayActivity :
                 val note = Note(selectedNoteId, text, subject)
                 presenter.updateNote(note, weekdayId)
             } else {
-                val note = Note(0, text, subject)
+                val note = Note(AUTO_ID, text, subject)
                 presenter.insertNote(note, weekdayId)
             }
 
@@ -228,16 +226,14 @@ class WeekdayActivity :
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(binding.edittextNote.windowToken, 0)
 
-        val editNoteLayoutAnimDuration: Long = 100
-
         binding.fabAddNote.scaleX = 0f
         binding.fabAddNote.scaleY = 0f
         binding.fabAddNote.visibility = View.VISIBLE
         binding.fabAddNote.animate()
-            .setDuration(150)
+            .setDuration(ANIMATION_SHOW_FAB_DURATION)
             .scaleY(1f)
             .scaleX(1f)
-            .setStartDelay(editNoteLayoutAnimDuration)
+            .setStartDelay(ANIMATION_HIDE_EDIT_NOTE_LAYOUT_DURATION)
             .setInterpolator(FastOutSlowInInterpolator())
             .start()
 
@@ -249,7 +245,7 @@ class WeekdayActivity :
         if (isEditNoteLayoutAnimEnabled) {
             binding.layoutEditNote.animate()
                 .translationY(binding.edittextNote.height.toFloat())
-                .setDuration(editNoteLayoutAnimDuration)
+                .setDuration(ANIMATION_HIDE_EDIT_NOTE_LAYOUT_DURATION)
                 .setInterpolator(FastOutSlowInInterpolator())
                 .setListener(object : AnimatorListenerAdapter() {
                     override fun onAnimationEnd(animation: Animator) {
@@ -302,7 +298,8 @@ class WeekdayActivity :
         return object : ItemSwipeCallback(binding.recyclerviewNotes.context) {
             override fun getSwipeDirs(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
                 val adapter = binding.recyclerviewNotes.adapter as NoteRecyclerViewAdapter
-                return if (viewHolder.itemViewType == NoteRecyclerViewAdapter.ItemViewType.NOTE.toInt() && !adapter.isNoteSelected()) {
+                val noteViewType = NoteRecyclerViewAdapter.ItemViewType.NOTE
+                return if (viewHolder.itemViewType == noteViewType.toInt() && !adapter.isNoteSelected()) {
                     super.getSwipeDirs(recyclerView, viewHolder)
                 } else {
                     NO_DIRECION
@@ -328,8 +325,8 @@ class WeekdayActivity :
 
     private fun showZeroNotesView() {
         val alphaAnimation = AlphaAnimation(0f, 1f).apply {
-            startOffset = 100
-            duration = 100
+            startOffset = ANIMATION_SHOW_ZERO_NOTES_TEXT_DELAY
+            duration = ANIMATION_SHOW_ZERO_NOTES_TEXT_DURATION
         }
         binding.textZeroNotes.startAnimation(alphaAnimation)
         binding.textZeroNotes.visibility = View.VISIBLE
@@ -518,6 +515,14 @@ class WeekdayActivity :
         private const val ARG_WEEKDAY_ID = "weekdayId"
         private const val ARG_SCROLL_VIEW_CHIPS_SAVED_STATE = "scrollViewChipsSavedState"
         private const val ARG_CHIPS_SAVED_STATE = "chipsSavedState"
+
+        private const val ANIMATION_SHOW_EDIT_NOTE_LAYOUT_DELAY = 50L
+        private const val ANIMATION_SHOW_EDIT_NOTE_LAYOUT_DURATION = 100L
+        private const val ANIMATION_HIDE_EDIT_NOTE_LAYOUT_DURATION = 100L
+        private const val ANIMATION_SHOW_ZERO_NOTES_TEXT_DELAY = 100L
+        private const val ANIMATION_SHOW_ZERO_NOTES_TEXT_DURATION = 100L
+        private const val ANIMATION_SHOW_CHIPS_DURATION = 150L
+        private const val ANIMATION_SHOW_FAB_DURATION = 150L
 
         fun startActivity(context: Context, weekdayId: Int) {
             val intent = Intent(context, WeekdayActivity::class.java).apply {
