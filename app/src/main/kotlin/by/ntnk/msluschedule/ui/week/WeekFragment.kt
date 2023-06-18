@@ -173,37 +173,37 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     override fun onStart() {
         super.onStart()
 
-        disposables += presenter.scheduleUiStateObservable
+        disposables += presenter.weekUiStateObservable
             .subscribeBy(
-                onNext = { scheduleUiState ->
-                    if (scheduleUiState == ScheduleUiState()) {
+                onNext = { weekUiState ->
+                    if (weekUiState == WeekUiState()) {
                         presenter.checkWeekInitialized(weekId)
                     }
 
-                    if (scheduleUiState.isInitializingWeek ||
-                        scheduleUiState.isProcessingInitialUpdate ||
-                        scheduleUiState.isInitialUpdateError
+                    if (weekUiState.isInitializingWeek ||
+                        weekUiState.isProcessingInitialUpdate ||
+                        weekUiState.isInitialUpdateError
                     ) {
                         binding.progressIndicatorInit.visibility = View.VISIBLE
                     } else {
                         binding.progressIndicatorInit.visibility = View.GONE
                     }
 
-                    if (scheduleUiState.isWeekInitialized) {
+                    if (weekUiState.isWeekInitialized) {
                         presenter.getSchedule(scheduleContainer.type, weekId)
                     }
 
-                    if (scheduleUiState.isData()) {
-                        val data = scheduleUiState.data!!
-                        onScheduleData(data)
+                    if (weekUiState.isData()) {
+                        val data = weekUiState.data!!
+                        onWeekData(data)
                         for (weekday in data) {
                             setNotesStatus(weekday.id)
                         }
                     }
 
-                    if (scheduleUiState.isError()) {
-                        val throwable = scheduleUiState.throwable!!
-                        if (scheduleUiState.isInitialUpdateError) {
+                    if (weekUiState.isError()) {
+                        val throwable = weekUiState.throwable!!
+                        if (weekUiState.isInitialUpdateError) {
                             if (Utils.isNetworkException(throwable)) {
                                 Timber.i(throwable)
                                 showError(throwable, showRetryButton = false)
@@ -219,10 +219,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
                     }
 
                     if (isCurrentWeek) {
-                        if (scheduleUiState.isInitializingWeek ||
-                            scheduleUiState.isData() ||
-                            scheduleUiState.isError()
-                        ) {
+                        if (weekUiState.isInitializingWeek || weekUiState.isData() || weekUiState.isError()) {
                             activity?.findViewById<View>(R.id.progressindicator)?.visibility = View.GONE
                             parentFragment?.view?.findViewById<ViewGroup>(R.id.viewpager_weeks)?.alpha = 1f
                         }
@@ -318,7 +315,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         }
     }
 
-    private fun onScheduleData(data: List<WeekdayWithLessons<Lesson>>) {
+    private fun onWeekData(data: List<WeekdayWithLessons<Lesson>>) {
         if (data.sumOf { weekday -> weekday.classes.size } == 0) {
             binding.buttonSwitchNoClassesLayout.visibility = View.VISIBLE
             if (isNoClassesViewVisible) {

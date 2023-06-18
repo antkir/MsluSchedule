@@ -17,7 +17,7 @@ import io.reactivex.subjects.BehaviorSubject
 import org.threeten.bp.DayOfWeek
 import javax.inject.Inject
 
-data class ScheduleUiState(
+data class WeekUiState(
     val isCheckingWeekStatus: Boolean = false,
     val isInitializingWeek: Boolean = false,
     val isProcessingInitialUpdate: Boolean = false,
@@ -60,9 +60,9 @@ class WeekPresenter @Inject constructor(
     private val networkRepository: NetworkRepository
 ) : Presenter<WeekView>() {
 
-    private val scheduleUiState: BehaviorSubject<ScheduleUiState> = BehaviorSubject.createDefault(ScheduleUiState())
-    val scheduleUiStateObservable: Observable<ScheduleUiState>
-        get() = scheduleUiState
+    private val weekUiState: BehaviorSubject<WeekUiState> = BehaviorSubject.createDefault(WeekUiState())
+    val weekUiStateObservable: Observable<WeekUiState>
+        get() = weekUiState
 
     private val scheduleUpdateEvent: BehaviorSubject<ScheduleUpdateEvent> =
         BehaviorSubject.createDefault(ScheduleUpdateEvent())
@@ -80,12 +80,12 @@ class WeekPresenter @Inject constructor(
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
                 onSuccess = { weekdays ->
-                    val state = ScheduleUiState(data = weekdays)
-                    scheduleUiState.onNext(state)
+                    val state = WeekUiState(data = weekdays)
+                    weekUiState.onNext(state)
                 },
                 onError = { throwable ->
-                    val state = ScheduleUiState(throwable = throwable)
-                    scheduleUiState.onNext(state)
+                    val state = WeekUiState(throwable = throwable)
+                    weekUiState.onNext(state)
                 }
             )
     }
@@ -105,7 +105,7 @@ class WeekPresenter @Inject constructor(
     }
 
     private fun initializeWeek(weekId: Int) {
-        scheduleUiState.onNext(ScheduleUiState(isInitializingWeek = true))
+        weekUiState.onNext(WeekUiState(isInitializingWeek = true))
         databaseRepository.insertWeekdays(weekId)
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
@@ -114,7 +114,7 @@ class WeekPresenter @Inject constructor(
                     val scheduleContainer = getScheduleContainer()
                     updateSchedule(scheduleContainer, weekId, isInitialUpdate = true)
                 },
-                onError = { throwable -> scheduleUiState.onNext(ScheduleUiState(throwable = throwable)) }
+                onError = { throwable -> weekUiState.onNext(WeekUiState(throwable = throwable)) }
             )
     }
 
@@ -129,7 +129,7 @@ class WeekPresenter @Inject constructor(
         }
 
         if (isInitialUpdate) {
-            scheduleUiState.onNext(ScheduleUiState(isProcessingInitialUpdate = true))
+            weekUiState.onNext(WeekUiState(isProcessingInitialUpdate = true))
         } else {
             scheduleUpdateEvent.onNext(ScheduleUpdateEvent(isLoading = true))
         }
@@ -143,8 +143,8 @@ class WeekPresenter @Inject constructor(
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
                 onSuccess = { weekdays ->
-                    val state = ScheduleUiState(data = weekdays)
-                    scheduleUiState.onNext(state)
+                    val state = WeekUiState(data = weekdays)
+                    weekUiState.onNext(state)
 
                     if (!isInitialUpdate) {
                         val event = ScheduleUpdateEvent(isUpdateSuccessful = true)
@@ -153,8 +153,8 @@ class WeekPresenter @Inject constructor(
                 },
                 onError = { throwable ->
                     if (isInitialUpdate) {
-                        val state = ScheduleUiState(throwable = throwable, isInitialUpdateError = true)
-                        scheduleUiState.onNext(state)
+                        val state = WeekUiState(throwable = throwable, isInitialUpdateError = true)
+                        weekUiState.onNext(state)
                     } else {
                         val updateState = ScheduleUpdateEvent(throwable = throwable)
                         scheduleUpdateEvent.onNext(updateState)
@@ -194,19 +194,19 @@ class WeekPresenter @Inject constructor(
     }
 
     fun checkWeekInitialized(weekId: Int) {
-        scheduleUiState.onNext(ScheduleUiState(isCheckingWeekStatus = true))
+        weekUiState.onNext(WeekUiState(isCheckingWeekStatus = true))
         databaseRepository.isWeekInitialized(weekId)
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
                 onSuccess = { isInitialized ->
                     if (isInitialized) {
-                        scheduleUiState.onNext(ScheduleUiState(isWeekInitialized = true))
+                        weekUiState.onNext(WeekUiState(isWeekInitialized = true))
                     } else {
                         initializeWeek(weekId)
                     }
                 },
-                onError = { throwable -> scheduleUiState.onNext(ScheduleUiState(throwable = throwable)) }
+                onError = { throwable -> weekUiState.onNext(WeekUiState(throwable = throwable)) }
             )
     }
 
