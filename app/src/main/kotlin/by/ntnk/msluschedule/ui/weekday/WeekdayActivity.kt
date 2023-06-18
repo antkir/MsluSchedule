@@ -521,9 +521,10 @@ class WeekdayActivity :
         }
     }
 
-    private fun showError(t: Throwable, delayMillis: Long) {
+    private fun showError(throwable: Throwable, delayMillis: Long) {
         Handler(Looper.getMainLooper()).postDelayed({
-            val snackbar = Snackbar.make(binding.root, AndroidUtils.getErrorMessageResId(t), Snackbar.LENGTH_LONG)
+            val errorMessageResource = AndroidUtils.getErrorMessageResId(throwable)
+            val snackbar = Snackbar.make(binding.root, errorMessageResource, Snackbar.LENGTH_LONG)
             snackbar.anchorView = binding.fabAddNote
             snackbar.show()
         }, delayMillis)

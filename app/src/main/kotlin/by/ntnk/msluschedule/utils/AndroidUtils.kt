@@ -108,8 +108,8 @@ object AndroidUtils {
         snackbar.show()
     }
 
-    fun getErrorMessageResId(t: Throwable): Int {
-        return when (t) {
+    fun getErrorMessageResId(throwable: Throwable): Int {
+        return when (throwable) {
             is ConnectException -> R.string.error_website_unavailable
             is HttpStatusException -> R.string.error_website_unavailable
             is SocketTimeoutException -> R.string.error_website_unavailable

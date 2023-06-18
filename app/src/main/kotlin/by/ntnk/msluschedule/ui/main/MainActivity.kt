@@ -542,9 +542,9 @@ class MainActivity :
         presenter.addTeacher(teacher)
     }
 
-    override fun onDialogFragmentError(t: Throwable) {
-        val snackbar =
-            Snackbar.make(binding.content.constraintLayout, AndroidUtils.getErrorMessageResId(t), Snackbar.LENGTH_LONG)
+    override fun onDialogFragmentError(throwable: Throwable) {
+        val errorMessageResource = AndroidUtils.getErrorMessageResId(throwable)
+        val snackbar = Snackbar.make(binding.content.constraintLayout, errorMessageResource, Snackbar.LENGTH_LONG)
         snackbar.anchorView = binding.fam.fabBase
         ViewCompat.setOnApplyWindowInsetsListener(snackbar.view) { _, insets -> insets }
         snackbar.show()

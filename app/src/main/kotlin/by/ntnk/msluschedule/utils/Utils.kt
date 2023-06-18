@@ -40,10 +40,10 @@ typealias ImmutableEntry = AbstractMap.SimpleImmutableEntry<Int, String>
 class InvalidYearException : Exception()
 
 object Utils {
-    fun isNetworkException(t: Throwable): Boolean {
-        return t is ConnectException ||
-            t is HttpStatusException ||
-            t is SocketTimeoutException ||
-            t is UnknownHostException
+    fun isNetworkException(throwable: Throwable): Boolean {
+        return throwable is ConnectException ||
+            throwable is HttpStatusException ||
+            throwable is SocketTimeoutException ||
+            throwable is UnknownHostException
     }
 }

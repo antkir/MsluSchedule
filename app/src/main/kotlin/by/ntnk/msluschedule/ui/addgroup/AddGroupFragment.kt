@@ -255,14 +255,14 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
         fragmentBinding = null
     }
 
-    private fun showError(t: Throwable) {
-        if (Utils.isNetworkException(t)) {
-            Timber.i(t)
+    private fun showError(throwable: Throwable) {
+        if (Utils.isNetworkException(throwable)) {
+            Timber.i(throwable)
         } else {
-            Timber.e(t)
+            Timber.e(throwable)
         }
         dismiss()
-        listener.onDialogFragmentError(t)
+        listener.onDialogFragmentError(throwable)
     }
 
     private fun onFacultyFilterChanged(data: ScheduleFilter) {
@@ -308,7 +308,7 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
 
     interface DialogListener {
         fun onNewStudyGroup(studyGroup: StudyGroup)
-        fun onDialogFragmentError(t: Throwable)
+        fun onDialogFragmentError(throwable: Throwable)
     }
 
     companion object {

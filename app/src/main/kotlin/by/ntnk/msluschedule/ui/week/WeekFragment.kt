@@ -437,10 +437,11 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         }
     }
 
-    private fun showError(t: Throwable, showRetryButton: Boolean) {
+    private fun showError(throwable: Throwable, showRetryButton: Boolean) {
         val baseFABMain = requireActivity().findViewById<FloatingActionButton>(R.id.fab_base)
-        val snackbar = Snackbar.make(requireView(), AndroidUtils.getErrorMessageResId(t), SNACKBAR_LENGTH_LONGER)
-            .setAnchorView(baseFABMain)
+        val errorMessageResource = AndroidUtils.getErrorMessageResId(throwable)
+        val snackbar = Snackbar.make(requireView(), errorMessageResource, SNACKBAR_LENGTH_LONGER)
+        snackbar.anchorView = baseFABMain
         if (showRetryButton) {
             snackbar.setAction(R.string.snackbar_week_init_retry) {
                 context ?: return@setAction

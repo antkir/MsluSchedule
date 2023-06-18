@@ -171,19 +171,19 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
         )
     }
 
-    private fun showError(t: Throwable) {
-        if (Utils.isNetworkException(t)) {
-            Timber.i(t)
+    private fun showError(throwable: Throwable) {
+        if (Utils.isNetworkException(throwable)) {
+            Timber.i(throwable)
         } else {
-            Timber.e(t)
+            Timber.e(throwable)
         }
         dismiss()
-        listener.onDialogFragmentError(t)
+        listener.onDialogFragmentError(throwable)
     }
 
     interface DialogListener {
         fun onNewTeacher(teacher: Teacher)
-        fun onDialogFragmentError(t: Throwable)
+        fun onDialogFragmentError(throwable: Throwable)
     }
 
     companion object {
