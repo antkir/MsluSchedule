@@ -22,11 +22,11 @@ data class ScheduleUiState(
     val isInitializingWeek: Boolean = false,
     val isProcessingInitialUpdate: Boolean = false,
     val isWeekInitialized: Boolean = false,
-    val data: List<WeekdayWithLessons<Lesson>> = emptyList(),
+    val data: List<WeekdayWithLessons<Lesson>>? = null,
     val throwable: Throwable? = null,
     val isInitialUpdateError: Boolean = false
 ) {
-    fun isData(): Boolean = data.isNotEmpty()
+    fun isData(): Boolean = data != null
     fun isError(): Boolean = throwable != null
 }
 
