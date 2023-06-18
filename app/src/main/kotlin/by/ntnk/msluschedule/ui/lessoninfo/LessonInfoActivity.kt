@@ -101,14 +101,12 @@ class LessonInfoActivity :
                         presenter.getClassDescriptor(classId, scheduleType, weekId)
                     }
 
-                    if (classUiState.isData()) {
-                        if (classUiState.groupClassDescriptor != null) {
-                            onClassDataReceived(classUiState.groupClassDescriptor, classUiState.weekdays)
-                        }
+                    if (classUiState.isGroupData()) {
+                        onClassDataReceived(classUiState.groupClassDescriptor!!, classUiState.weekdays!!)
+                    }
 
-                        if (classUiState.teacherClassDescriptor != null) {
-                            onClassDataReceived(classUiState.teacherClassDescriptor, classUiState.weekdays)
-                        }
+                    if (classUiState.isTeacherData()) {
+                        onClassDataReceived(classUiState.teacherClassDescriptor!!, classUiState.weekdays!!)
                     }
 
                     if (classUiState.isError()) {

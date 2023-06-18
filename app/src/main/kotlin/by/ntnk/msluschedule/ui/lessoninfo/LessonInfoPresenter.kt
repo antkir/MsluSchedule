@@ -14,10 +14,11 @@ import javax.inject.Inject
 data class ClassUiState(
     val groupClassDescriptor: StudyGroupLesson? = null,
     val teacherClassDescriptor: TeacherLesson? = null,
-    val weekdays: List<String> = emptyList(),
+    val weekdays: List<String>? = null,
     val throwable: Throwable? = null
 ) {
-    fun isData(): Boolean = weekdays.isNotEmpty()
+    fun isGroupData(): Boolean = groupClassDescriptor != null && weekdays != null
+    fun isTeacherData(): Boolean = teacherClassDescriptor != null && weekdays != null
     fun isError(): Boolean = throwable != null
 }
 
@@ -51,6 +52,7 @@ class LessonInfoPresenter @Inject constructor(
                         }
                     )
             }
+
             ScheduleType.TEACHER -> {
                 databaseRepository.getTeacherLesson(classId)
                     .flatMap { classDescriptor ->
@@ -70,6 +72,7 @@ class LessonInfoPresenter @Inject constructor(
                         }
                     )
             }
+
             else -> {}
         }
     }
