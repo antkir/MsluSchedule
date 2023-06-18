@@ -34,6 +34,7 @@ import by.ntnk.msluschedule.ui.adapters.LessonRecyclerViewAdapter
 import by.ntnk.msluschedule.ui.lessoninfo.LessonInfoActivity
 import by.ntnk.msluschedule.ui.weekday.WeekdayActivity
 import by.ntnk.msluschedule.utils.AndroidUtils
+import by.ntnk.msluschedule.utils.AndroidUtils.SNACKBAR_LENGTH_LONGER
 import by.ntnk.msluschedule.utils.DEFAULT
 import by.ntnk.msluschedule.utils.ScheduleType
 import by.ntnk.msluschedule.utils.Utils
@@ -305,7 +306,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
             val fromColor = ContextCompat.getColor(requireContext(), R.color.surface)
             val toColor = ContextCompat.getColor(requireContext(), R.color.item_highlight)
             val highlightAnimation = ValueAnimator.ofObject(ArgbEvaluator(), fromColor, toColor)
-            highlightAnimation.duration = 500
+            highlightAnimation.duration = ANIMATION_WEEKDAY_HIGHLIGHT_DURATION
             highlightAnimation.repeatMode = ValueAnimator.REVERSE
             highlightAnimation.repeatCount = 1
             highlightAnimation.addUpdateListener { animator ->
@@ -394,11 +395,11 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     private fun hideUpdateProgressIndicator() {
         binding.recyclerviewDays.animate()
             .translationY(0f)
-            .setDuration(200)
+            .setDuration(ANIMATION_HIDE_SCHEDULE_UPDATE_INDICATOR_DURATION)
             .start()
         binding.progressIndicatorUpdate.animate()
             .translationY(-binding.progressIndicatorUpdate.height.toFloat())
-            .setDuration(200)
+            .setDuration(ANIMATION_HIDE_SCHEDULE_UPDATE_INDICATOR_DURATION)
             .setListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator) {
                     binding.progressIndicatorUpdate.animate()?.setListener(null)
@@ -412,17 +413,18 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         binding.progressIndicatorUpdate.visibility = View.VISIBLE
         binding.recyclerviewDays.animate()
             .translationY(binding.progressIndicatorUpdate.height.toFloat())
-            .setDuration(200)
+            .setDuration(ANIMATION_SHOW_SCHEDULE_UPDATE_INDICATOR_DURATION)
             .start()
         binding.progressIndicatorUpdate.y = -binding.progressIndicatorUpdate.height.toFloat()
         binding.progressIndicatorUpdate.animate()
             .translationY(0f)
-            .setDuration(200)
+            .setDuration(ANIMATION_SHOW_SCHEDULE_UPDATE_INDICATOR_DURATION)
             .start()
     }
 
     private fun showSuccessfulUpdateToast() {
-        Handler(Looper.getMainLooper()).postDelayed(ScheduleUpdateNotificationRunnable(context), 250)
+        Handler(Looper.getMainLooper())
+            .postDelayed(ScheduleUpdateNotificationRunnable(context), TOAST_SCHEDULE_UPDATED_DELAY)
     }
 
     private class ScheduleUpdateNotificationRunnable(context: Context?) : Runnable {
@@ -431,18 +433,15 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         override fun run() {
             val context = contextWeakRef.get()
             if (context != null) {
-                Toast.makeText(
-                    context,
-                    context.resources.getString(R.string.messsage_schedule_update_successful),
-                    Toast.LENGTH_SHORT
-                ).show()
+                val updateSuccessfulText = context.resources.getString(R.string.messsage_schedule_update_successful)
+                Toast.makeText(context, updateSuccessfulText, Toast.LENGTH_SHORT).show()
             }
         }
     }
 
     private fun showError(t: Throwable, showRetryButton: Boolean) {
         val baseFABMain = requireActivity().findViewById<FloatingActionButton>(R.id.fab_base)
-        val snackbar = Snackbar.make(requireView(), AndroidUtils.getErrorMessageResId(t), 5000)
+        val snackbar = Snackbar.make(requireView(), AndroidUtils.getErrorMessageResId(t), SNACKBAR_LENGTH_LONGER)
             .setAnchorView(baseFABMain)
         if (showRetryButton) {
             snackbar.setAction(R.string.snackbar_week_init_retry) {
@@ -465,13 +464,21 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
      */
     private fun checkUiEventExpired(eventTimestamp: Long): Boolean {
         val timeDelta = System.nanoTime() - eventTimestamp
-        return timeDelta > TimeUnit.MINUTES.toNanos(2)
+        return timeDelta > TimeUnit.MILLISECONDS.toNanos(EVENT_EXPIRATION_TIME_LIMIT)
     }
 
     companion object {
         private const val ARG_WEEK_ID = "weekID"
         private const val ARG_IS_CURRENT_WEEK = "isCurrentWeek"
         private const val ARG_RECYCLER_VIEW_SAVED_STATE = "recyclerViewSavedState"
+
+        private const val ANIMATION_WEEKDAY_HIGHLIGHT_DURATION = 500L
+        private const val ANIMATION_SHOW_SCHEDULE_UPDATE_INDICATOR_DURATION = 200L
+        private const val ANIMATION_HIDE_SCHEDULE_UPDATE_INDICATOR_DURATION = 200L
+
+        private const val TOAST_SCHEDULE_UPDATED_DELAY = 250L
+
+        private const val EVENT_EXPIRATION_TIME_LIMIT = 2 * 60 * 1000L // 2 minutes
 
         fun newInstance(weekId: Int, isCurrentWeek: Boolean): WeekFragment {
             return WeekFragment().apply {

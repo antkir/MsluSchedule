@@ -83,6 +83,9 @@ interface SimpleDrawerListener : DrawerLayout.DrawerListener {
 }
 
 object AndroidUtils {
+
+    const val SNACKBAR_LENGTH_LONGER = 5000
+
     fun isNetworkAccessible(context: Context): Boolean {
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
