@@ -157,6 +157,8 @@ class WeekPresenterTest {
     @Test
     fun `first checkWeekInitialized call for StudyGroup`() {
         // given
+        val scheduleContainer =
+            ScheduleContainer(id = 0, value = String.DEFAULT, type = ScheduleType.STUDYGROUP, year = 0)
         val weekId = 0
         whenever(databaseRepository.isWeekInitialized(anyInt()))
             .thenReturn(
@@ -166,7 +168,7 @@ class WeekPresenterTest {
         val scheduleUiStateObserver = presenter.weekUiStateObservable.test()
         val scheduleUpdateEventObserver = presenter.scheduleUpdateEventObservable.test()
         // when
-        presenter.checkWeekInitialized(weekId)
+        presenter.checkWeekInitialized(scheduleContainer, weekId)
         // then
         isWeekInitializedTest.assertSubscribed()
         insertWeekdaysTest.assertSubscribed()
@@ -194,6 +196,8 @@ class WeekPresenterTest {
     @Test
     fun `first checkWeekInitialized call for StudyGroup with database error during week initialization`() {
         // given
+        val scheduleContainer =
+            ScheduleContainer(id = 0, value = String.DEFAULT, type = ScheduleType.STUDYGROUP, year = 0)
         val weekId = 0
         val throwableObject = NullPointerException()
         whenever(databaseRepository.isWeekInitialized(anyInt()))
@@ -209,7 +213,7 @@ class WeekPresenterTest {
             )
         val scheduleUiStateObserver = presenter.weekUiStateObservable.test()
         // when
-        presenter.checkWeekInitialized(weekId)
+        presenter.checkWeekInitialized(scheduleContainer, weekId)
         // then
         isWeekInitializedTest.assertSubscribed()
         insertWeekdaysTest.assertSubscribed()
@@ -227,6 +231,8 @@ class WeekPresenterTest {
     @Test
     fun `first checkWeekInitialized call for StudyGroup with network error during initial update`() {
         // given
+        val scheduleContainer =
+            ScheduleContainer(id = 0, value = String.DEFAULT, type = ScheduleType.STUDYGROUP, year = 0)
         val weekId = 0
         val throwableObject = NullPointerException()
         whenever(databaseRepository.isWeekInitialized(anyInt()))
@@ -243,7 +249,7 @@ class WeekPresenterTest {
         val scheduleUiStateObserver = presenter.weekUiStateObservable.test()
         val scheduleUpdateEventObserver = presenter.scheduleUpdateEventObservable.test()
         // when
-        presenter.checkWeekInitialized(weekId)
+        presenter.checkWeekInitialized(scheduleContainer, weekId)
         // then
         isWeekInitializedTest.assertSubscribed()
         insertWeekdaysTest.assertSubscribed()
@@ -270,10 +276,12 @@ class WeekPresenterTest {
     @Test
     fun `checkWeekInitialized call for StudyGroup with initialized week`() {
         // given
+        val scheduleContainer =
+            ScheduleContainer(id = 0, value = String.DEFAULT, type = ScheduleType.STUDYGROUP, year = 0)
         val weekId = 0
         val scheduleUiStateObserver = presenter.weekUiStateObservable.test()
         // when
-        presenter.checkWeekInitialized(weekId)
+        presenter.checkWeekInitialized(scheduleContainer, weekId)
         // then
         isWeekInitializedTest.assertSubscribed()
         insertWeekdaysTest.assertNotSubscribed()
@@ -331,13 +339,13 @@ class WeekPresenterTest {
     @Test
     fun `updateSchedule call for StudyGroup`() {
         // given
-        val schedulerContainer =
+        val scheduleContainer =
             ScheduleContainer(id = 0, value = String.DEFAULT, type = ScheduleType.STUDYGROUP, year = 0)
         val weekId = 0
         val scheduleUiStateObserver = presenter.weekUiStateObservable.test()
         val scheduleUpdateEventObserver = presenter.scheduleUpdateEventObservable.test()
         // when
-        presenter.updateSchedule(schedulerContainer, weekId)
+        presenter.updateSchedule(scheduleContainer, weekId)
         // then
         getStudyGroupTest.assertSubscribed()
         getWeekKeyTest.assertSubscribed()
@@ -362,7 +370,7 @@ class WeekPresenterTest {
     @Test
     fun `updateSchedule call for StudyGroup with network error`() {
         // given
-        val schedulerContainer =
+        val scheduleContainer =
             ScheduleContainer(id = 0, value = String.DEFAULT, type = ScheduleType.STUDYGROUP, year = 0)
         val weekId = 0
         val throwableObject = NullPointerException()
@@ -375,7 +383,7 @@ class WeekPresenterTest {
         val scheduleUiStateObserver = presenter.weekUiStateObservable.test()
         val scheduleUpdateEventObserver = presenter.scheduleUpdateEventObservable.test()
         // when
-        presenter.updateSchedule(schedulerContainer, weekId)
+        presenter.updateSchedule(scheduleContainer, weekId)
         // then
         getStudyGroupTest.assertSubscribed()
         getWeekKeyTest.assertSubscribed()

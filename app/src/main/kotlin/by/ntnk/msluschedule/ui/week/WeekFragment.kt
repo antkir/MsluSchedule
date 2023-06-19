@@ -82,7 +82,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         val id = arguments?.getInt(ARG_WEEK_ID)
         weekId = id!!
         isCurrentWeek = arguments?.getBoolean(ARG_IS_CURRENT_WEEK) == true
-        scheduleContainer = presenter.getScheduleContainer()
+        scheduleContainer = presenter.getSelectedScheduleContainer()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -177,7 +177,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
             .subscribeBy(
                 onNext = { weekUiState ->
                     if (weekUiState == WeekUiState()) {
-                        presenter.checkWeekInitialized(weekId)
+                        presenter.checkWeekInitialized(scheduleContainer, weekId)
                     }
 
                     if (weekUiState.isInitializingWeek ||

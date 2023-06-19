@@ -69,7 +69,7 @@ class WeekPresenter @Inject constructor(
     val scheduleUpdateEventObservable: Observable<ScheduleUpdateEvent>
         get() = scheduleUpdateEvent
 
-    fun getScheduleContainer(): ScheduleContainer {
+    fun getSelectedScheduleContainer(): ScheduleContainer {
         return sharedPreferencesRepository.getSelectedScheduleContainer()
     }
 
@@ -104,16 +104,13 @@ class WeekPresenter @Inject constructor(
             .observeOn(schedulerProvider.ui())
     }
 
-    private fun initializeWeek(weekId: Int) {
+    private fun initializeWeek(scheduleContainer: ScheduleContainer, weekId: Int) {
         weekUiState.onNext(WeekUiState(isInitializingWeek = true))
         databaseRepository.insertWeekdays(weekId)
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
-                onComplete = {
-                    val scheduleContainer = getScheduleContainer()
-                    updateSchedule(scheduleContainer, weekId, isInitialUpdate = true)
-                },
+                onComplete = { updateSchedule(scheduleContainer, weekId, isInitialUpdate = true) },
                 onError = { throwable -> weekUiState.onNext(WeekUiState(throwable = throwable)) }
             )
     }
@@ -193,7 +190,7 @@ class WeekPresenter @Inject constructor(
             .flatMap { weekdays -> databaseRepository.insertTeacherSchedule(weekdays, weekId) }
     }
 
-    fun checkWeekInitialized(weekId: Int) {
+    fun checkWeekInitialized(scheduleContainer: ScheduleContainer, weekId: Int) {
         weekUiState.onNext(WeekUiState(isCheckingWeekStatus = true))
         databaseRepository.isWeekInitialized(weekId)
             .subscribeOn(schedulerProvider.io())
@@ -203,7 +200,7 @@ class WeekPresenter @Inject constructor(
                     if (isInitialized) {
                         weekUiState.onNext(WeekUiState(isWeekInitialized = true))
                     } else {
-                        initializeWeek(weekId)
+                        initializeWeek(scheduleContainer, weekId)
                     }
                 },
                 onError = { throwable -> weekUiState.onNext(WeekUiState(throwable = throwable)) }
