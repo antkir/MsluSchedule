@@ -163,24 +163,36 @@ class WeekPresenterTest {
                 Single.just(false)
                     .doOnSubscribe { isWeekInitializedTest.onSubscribe(it) }
             )
-        val scheduleUiStateObserver = presenter.scheduleUiStateObservable.test()
+        val scheduleUiStateObserver = presenter.weekUiStateObservable.test()
+        val scheduleUpdateEventObserver = presenter.scheduleUpdateEventObservable.test()
         // when
         presenter.checkWeekInitialized(weekId)
         // then
         isWeekInitializedTest.assertSubscribed()
         insertWeekdaysTest.assertSubscribed()
+        getStudyGroupTest.assertSubscribed()
+        getWeekKeyTest.assertSubscribed()
+        downloadStudyGroupScheduleTest.assertSubscribed()
+        deleteLessonsForWeekTest.assertSubscribed()
+        insertStudyGroupScheduleTest.assertSubscribed()
         scheduleUiStateObserver.assertSubscribed()
         scheduleUiStateObserver.assertNoErrors()
         scheduleUiStateObserver.assertValues(
-            ScheduleUiState(),
-            ScheduleUiState(isCheckingWeekStatus = true),
-            ScheduleUiState(isInitializingWeek = true),
-            ScheduleUiState(isWeekInitializedNoData = true)
+            WeekUiState(),
+            WeekUiState(isCheckingWeekStatus = true),
+            WeekUiState(isInitializingWeek = true),
+            WeekUiState(isProcessingInitialUpdate = true),
+            WeekUiState(data = listOf(WeekdayWithStudyGroupLessons(id = 0, value = String.DEFAULT)))
+        )
+        scheduleUpdateEventObserver.assertSubscribed()
+        scheduleUpdateEventObserver.assertNoErrors()
+        scheduleUpdateEventObserver.assertValues(
+            ScheduleUpdateEvent()
         )
     }
 
     @Test
-    fun `first checkWeekInitialized call for StudyGroup with error`() {
+    fun `first checkWeekInitialized call for StudyGroup with database error during week initialization`() {
         // given
         val weekId = 0
         val throwableObject = NullPointerException()
@@ -195,7 +207,7 @@ class WeekPresenterTest {
                     .doOnSubscribe { disposable -> insertWeekdaysTest.onSubscribe(disposable) }
                     .doOnError { throwable -> insertWeekdaysTest.onError(throwable) }
             )
-        val scheduleUiStateObserver = presenter.scheduleUiStateObservable.test()
+        val scheduleUiStateObserver = presenter.weekUiStateObservable.test()
         // when
         presenter.checkWeekInitialized(weekId)
         // then
@@ -205,10 +217,53 @@ class WeekPresenterTest {
         scheduleUiStateObserver.assertSubscribed()
         scheduleUiStateObserver.assertNoErrors()
         scheduleUiStateObserver.assertValues(
-            ScheduleUiState(),
-            ScheduleUiState(isCheckingWeekStatus = true),
-            ScheduleUiState(isInitializingWeek = true),
-            ScheduleUiState(throwable = throwableObject)
+            WeekUiState(),
+            WeekUiState(isCheckingWeekStatus = true),
+            WeekUiState(isInitializingWeek = true),
+            WeekUiState(throwable = throwableObject)
+        )
+    }
+
+    @Test
+    fun `first checkWeekInitialized call for StudyGroup with network error during initial update`() {
+        // given
+        val weekId = 0
+        val throwableObject = NullPointerException()
+        whenever(databaseRepository.isWeekInitialized(anyInt()))
+            .thenReturn(
+                Single.just(false)
+                    .doOnSubscribe { isWeekInitializedTest.onSubscribe(it) }
+            )
+        whenever(networkRepository.getSchedule(any<StudyGroup>(), anyInt()))
+            .thenReturn(
+                Observable.error<WeekdayWithStudyGroupLessons>(throwableObject)
+                    .doOnSubscribe { disposable -> downloadStudyGroupScheduleTest.onSubscribe(disposable) }
+                    .doOnError { throwable -> downloadStudyGroupScheduleTest.onError(throwable) }
+            )
+        val scheduleUiStateObserver = presenter.weekUiStateObservable.test()
+        val scheduleUpdateEventObserver = presenter.scheduleUpdateEventObservable.test()
+        // when
+        presenter.checkWeekInitialized(weekId)
+        // then
+        isWeekInitializedTest.assertSubscribed()
+        insertWeekdaysTest.assertSubscribed()
+        getStudyGroupTest.assertSubscribed()
+        getWeekKeyTest.assertSubscribed()
+        downloadStudyGroupScheduleTest.assertSubscribed()
+        downloadStudyGroupScheduleTest.assertError(throwableObject)
+        scheduleUiStateObserver.assertSubscribed()
+        scheduleUiStateObserver.assertNoErrors()
+        scheduleUiStateObserver.assertValues(
+            WeekUiState(),
+            WeekUiState(isCheckingWeekStatus = true),
+            WeekUiState(isInitializingWeek = true),
+            WeekUiState(isProcessingInitialUpdate = true),
+            WeekUiState(throwable = throwableObject, isInitialUpdateError = true)
+        )
+        scheduleUpdateEventObserver.assertSubscribed()
+        scheduleUpdateEventObserver.assertNoErrors()
+        scheduleUpdateEventObserver.assertValues(
+            ScheduleUpdateEvent()
         )
     }
 
@@ -216,7 +271,7 @@ class WeekPresenterTest {
     fun `checkWeekInitialized call for StudyGroup with initialized week`() {
         // given
         val weekId = 0
-        val scheduleUiStateObserver = presenter.scheduleUiStateObservable.test()
+        val scheduleUiStateObserver = presenter.weekUiStateObservable.test()
         // when
         presenter.checkWeekInitialized(weekId)
         // then
@@ -225,9 +280,9 @@ class WeekPresenterTest {
         scheduleUiStateObserver.assertSubscribed()
         scheduleUiStateObserver.assertNoErrors()
         scheduleUiStateObserver.assertValues(
-            ScheduleUiState(),
-            ScheduleUiState(isCheckingWeekStatus = true),
-            ScheduleUiState(isWeekInitialized = true)
+            WeekUiState(),
+            WeekUiState(isCheckingWeekStatus = true),
+            WeekUiState(isWeekInitialized = true)
         )
     }
 
@@ -235,7 +290,7 @@ class WeekPresenterTest {
     fun `getSchedule call for StudyGroup`() {
         // given
         val weekId = 0
-        val scheduleUiStateObserver = presenter.scheduleUiStateObservable.test()
+        val scheduleUiStateObserver = presenter.weekUiStateObservable.test()
         // when
         presenter.getSchedule(ScheduleType.STUDYGROUP, weekId)
         // then
@@ -243,8 +298,8 @@ class WeekPresenterTest {
         scheduleUiStateObserver.assertSubscribed()
         scheduleUiStateObserver.assertNoErrors()
         scheduleUiStateObserver.assertValues(
-            ScheduleUiState(),
-            ScheduleUiState(data = listOf(WeekdayWithStudyGroupLessons(id = 0, value = String.DEFAULT)))
+            WeekUiState(),
+            WeekUiState(data = listOf(WeekdayWithStudyGroupLessons(id = 0, value = String.DEFAULT)))
         )
     }
 
@@ -259,7 +314,7 @@ class WeekPresenterTest {
                     .doOnSubscribe { disposable -> getWeekdayWithStudyGroupLessonsForWeekTest.onSubscribe(disposable) }
                     .doOnError { throwable -> getWeekdayWithStudyGroupLessonsForWeekTest.onError(throwable) }
             )
-        val scheduleUiStateObserver = presenter.scheduleUiStateObservable.test()
+        val scheduleUiStateObserver = presenter.weekUiStateObservable.test()
         // when
         presenter.getSchedule(ScheduleType.STUDYGROUP, weekId)
         // then
@@ -268,74 +323,8 @@ class WeekPresenterTest {
         scheduleUiStateObserver.assertSubscribed()
         scheduleUiStateObserver.assertNoErrors()
         scheduleUiStateObserver.assertValues(
-            ScheduleUiState(),
-            ScheduleUiState(throwable = throwableObject)
-        )
-    }
-
-    @Test
-    fun `first updateSchedule call for StudyGroup`() {
-        // given
-        val schedulerContainer =
-            ScheduleContainer(id = 0, value = String.DEFAULT, type = ScheduleType.STUDYGROUP, year = 0)
-        val weekId = 0
-        val scheduleUiStateObserver = presenter.scheduleUiStateObservable.test()
-        val scheduleUpdateEventObserver = presenter.scheduleUpdateEventObservable.test()
-        // when
-        presenter.updateSchedule(schedulerContainer, weekId, isFirstUpdate = true)
-        // then
-        getStudyGroupTest.assertSubscribed()
-        getWeekKeyTest.assertSubscribed()
-        downloadStudyGroupScheduleTest.assertSubscribed()
-        deleteLessonsForWeekTest.assertSubscribed()
-        insertStudyGroupScheduleTest.assertSubscribed()
-        scheduleUiStateObserver.assertSubscribed()
-        scheduleUiStateObserver.assertNoErrors()
-        scheduleUiStateObserver.assertValues(
-            ScheduleUiState(),
-            ScheduleUiState(isProcessingFirstUpdate = true),
-            ScheduleUiState(data = listOf(WeekdayWithStudyGroupLessons(id = 0, value = String.DEFAULT)))
-        )
-        scheduleUpdateEventObserver.assertSubscribed()
-        scheduleUpdateEventObserver.assertNoErrors()
-        scheduleUpdateEventObserver.assertValues(
-            ScheduleUpdateEvent()
-        )
-    }
-
-    @Test
-    fun `first updateSchedule call for StudyGroup with network error`() {
-        // given
-        val schedulerContainer =
-            ScheduleContainer(id = 0, value = String.DEFAULT, type = ScheduleType.STUDYGROUP, year = 0)
-        val weekId = 0
-        val throwableObject = NullPointerException()
-        whenever(networkRepository.getSchedule(any<StudyGroup>(), anyInt()))
-            .thenReturn(
-                Observable.error<WeekdayWithStudyGroupLessons>(throwableObject)
-                    .doOnSubscribe { disposable -> downloadStudyGroupScheduleTest.onSubscribe(disposable) }
-                    .doOnError { throwable -> downloadStudyGroupScheduleTest.onError(throwable) }
-            )
-        val scheduleUiStateObserver = presenter.scheduleUiStateObservable.test()
-        val scheduleUpdateEventObserver = presenter.scheduleUpdateEventObservable.test()
-        // when
-        presenter.updateSchedule(schedulerContainer, weekId, isFirstUpdate = true)
-        // then
-        getStudyGroupTest.assertSubscribed()
-        getWeekKeyTest.assertSubscribed()
-        downloadStudyGroupScheduleTest.assertSubscribed()
-        downloadStudyGroupScheduleTest.assertError(throwableObject)
-        scheduleUiStateObserver.assertSubscribed()
-        scheduleUiStateObserver.assertNoErrors()
-        scheduleUiStateObserver.assertValues(
-            ScheduleUiState(),
-            ScheduleUiState(isProcessingFirstUpdate = true),
-            ScheduleUiState(throwable = throwableObject, isFirstUpdateError = true)
-        )
-        scheduleUpdateEventObserver.assertSubscribed()
-        scheduleUpdateEventObserver.assertNoErrors()
-        scheduleUpdateEventObserver.assertValues(
-            ScheduleUpdateEvent()
+            WeekUiState(),
+            WeekUiState(throwable = throwableObject)
         )
     }
 
@@ -345,7 +334,7 @@ class WeekPresenterTest {
         val schedulerContainer =
             ScheduleContainer(id = 0, value = String.DEFAULT, type = ScheduleType.STUDYGROUP, year = 0)
         val weekId = 0
-        val scheduleUiStateObserver = presenter.scheduleUiStateObservable.test()
+        val scheduleUiStateObserver = presenter.weekUiStateObservable.test()
         val scheduleUpdateEventObserver = presenter.scheduleUpdateEventObservable.test()
         // when
         presenter.updateSchedule(schedulerContainer, weekId)
@@ -358,8 +347,8 @@ class WeekPresenterTest {
         scheduleUiStateObserver.assertSubscribed()
         scheduleUiStateObserver.assertNoErrors()
         scheduleUiStateObserver.assertValues(
-            ScheduleUiState(),
-            ScheduleUiState(data = listOf(WeekdayWithStudyGroupLessons(id = 0, value = String.DEFAULT)))
+            WeekUiState(),
+            WeekUiState(data = listOf(WeekdayWithStudyGroupLessons(id = 0, value = String.DEFAULT)))
         )
         scheduleUpdateEventObserver.assertSubscribed()
         scheduleUpdateEventObserver.assertNoErrors()
@@ -383,7 +372,7 @@ class WeekPresenterTest {
                     .doOnSubscribe { disposable -> downloadStudyGroupScheduleTest.onSubscribe(disposable) }
                     .doOnError { throwable -> downloadStudyGroupScheduleTest.onError(throwable) }
             )
-        val scheduleUiStateObserver = presenter.scheduleUiStateObservable.test()
+        val scheduleUiStateObserver = presenter.weekUiStateObservable.test()
         val scheduleUpdateEventObserver = presenter.scheduleUpdateEventObservable.test()
         // when
         presenter.updateSchedule(schedulerContainer, weekId)
@@ -395,7 +384,7 @@ class WeekPresenterTest {
         scheduleUiStateObserver.assertSubscribed()
         scheduleUiStateObserver.assertNoErrors()
         scheduleUiStateObserver.assertValues(
-            ScheduleUiState()
+            WeekUiState()
         )
         scheduleUpdateEventObserver.assertSubscribed()
         scheduleUpdateEventObserver.assertNoErrors()
