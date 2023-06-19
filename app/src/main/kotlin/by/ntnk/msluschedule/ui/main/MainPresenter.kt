@@ -36,7 +36,7 @@ class MainPresenter @Inject constructor(
                 onSuccess = { id ->
                     val scheduleContainer =
                         ScheduleContainer(id, studyGroup.value, ScheduleType.STUDYGROUP, studyGroup.year)
-                    sharedPreferencesRepository.putSelectedScheduleContainer(scheduleContainer)
+                    sharedPreferencesRepository.setSelectedScheduleContainer(scheduleContainer)
                     view?.changeScheduleContainer(scheduleContainer)
                     view?.addScheduleContainerMenuItem(scheduleContainer)
                     view?.selectScheduleContainerMenuItem(scheduleContainer)
@@ -57,7 +57,7 @@ class MainPresenter @Inject constructor(
                 onSuccess = { teacherId ->
                     val scheduleContainer =
                         ScheduleContainer(teacherId, teacher.value, ScheduleType.TEACHER, teacher.year)
-                    sharedPreferencesRepository.putSelectedScheduleContainer(scheduleContainer)
+                    sharedPreferencesRepository.setSelectedScheduleContainer(scheduleContainer)
                     view?.changeScheduleContainer(scheduleContainer)
                     view?.addScheduleContainerMenuItem(scheduleContainer)
                     view?.selectScheduleContainerMenuItem(scheduleContainer)
@@ -107,7 +107,7 @@ class MainPresenter @Inject constructor(
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
                 onSuccess = { scheduleContainer ->
-                    sharedPreferencesRepository.putSelectedScheduleContainer(scheduleContainer)
+                    sharedPreferencesRepository.setSelectedScheduleContainer(scheduleContainer)
 
                     val value = if (scheduleContainer.year != currentDate.academicYear) {
                         "(${scheduleContainer.year}) ${scheduleContainer.value}"

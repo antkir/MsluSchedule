@@ -103,7 +103,7 @@ class WeeksContainerPresenter @Inject constructor(
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
                 onComplete = {
-                    sharedPreferencesRepository.selectEmptyScheduleContainer()
+                    sharedPreferencesRepository.clearSelectedScheduleContainer()
                     scheduleContainerDeletedEvent.onNext(ScheduleContainerDeletedEvent(data = scheduleContainer))
                 },
                 onError = { throwable ->

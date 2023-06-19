@@ -106,7 +106,7 @@ class MainPresenterTest {
         verify(networkRepository).getWeeks()
         verify(databaseRepository).insertStudyGroup(any())
         verify(databaseRepository).insertWeeksGetIds(any(), eq(0))
-        verify(sharedPreferencesRepository).putSelectedScheduleContainer(any())
+        verify(sharedPreferencesRepository).setSelectedScheduleContainer(any())
         verify(view).changeScheduleContainer(scheduleContainer)
     }
 
@@ -127,7 +127,7 @@ class MainPresenterTest {
         verify(networkRepository).getWeeks()
         verify(databaseRepository).insertTeacher(any())
         verify(databaseRepository).insertWeeksGetIds(any(), eq(0))
-        verify(sharedPreferencesRepository).putSelectedScheduleContainer(any())
+        verify(sharedPreferencesRepository).setSelectedScheduleContainer(any())
         verify(view).changeScheduleContainer(scheduleContainer)
     }
 
@@ -146,7 +146,7 @@ class MainPresenterTest {
 
         verify(networkRepository).getWeeks()
         verify(databaseRepository).deleteScheduleContainer(eq(0))
-        verify(sharedPreferencesRepository, times(0)).putSelectedScheduleContainer(any())
+        verify(sharedPreferencesRepository, times(0)).setSelectedScheduleContainer(any())
         verify(view).showError()
     }
 
@@ -165,7 +165,7 @@ class MainPresenterTest {
 
         verify(networkRepository).getWeeks()
         verify(databaseRepository).deleteScheduleContainer(eq(0))
-        verify(sharedPreferencesRepository, times(0)).putSelectedScheduleContainer(any())
+        verify(sharedPreferencesRepository, times(0)).setSelectedScheduleContainer(any())
         verify(view).showError()
     }
 }

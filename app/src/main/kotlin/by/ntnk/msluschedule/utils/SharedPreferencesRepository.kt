@@ -26,7 +26,7 @@ class SharedPreferencesRepository @Inject constructor(
         return ScheduleContainer(id, value, type, year)
     }
 
-    fun putSelectedScheduleContainer(scheduleContainer: ScheduleContainer) {
+    fun setSelectedScheduleContainer(scheduleContainer: ScheduleContainer) {
         sharedPreferences.edit()
             .putInt(KEY_SCHEDULECONTAINER_ID, scheduleContainer.id)
             .putString(KEY_SCHEDULECONTAINER_VALUE, scheduleContainer.value)
@@ -35,7 +35,7 @@ class SharedPreferencesRepository @Inject constructor(
             .apply()
     }
 
-    fun selectEmptyScheduleContainer() {
+    fun clearSelectedScheduleContainer() {
         sharedPreferences.edit()
             .putInt(KEY_SCHEDULECONTAINER_ID, Int.DEFAULT)
             .putString(KEY_SCHEDULECONTAINER_VALUE, String.DEFAULT)
