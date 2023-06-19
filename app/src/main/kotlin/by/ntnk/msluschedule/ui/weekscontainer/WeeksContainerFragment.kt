@@ -19,9 +19,15 @@ import by.ntnk.msluschedule.mvp.views.MvpFragment
 import by.ntnk.msluschedule.ui.adapters.WeekFragmentViewPagerAdapter
 import by.ntnk.msluschedule.ui.deleteschedule.DeleteScheduleFragment
 import by.ntnk.msluschedule.ui.weekscontainer.WeeksContainerPresenter.Companion.CENTRAL_VIEW_POSITION
+import by.ntnk.msluschedule.utils.AndroidUtils
 import by.ntnk.msluschedule.utils.DEFAULT
+import com.google.android.material.snackbar.Snackbar
 import dagger.Lazy
 import dagger.android.support.AndroidSupportInjection
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.plusAssign
+import io.reactivex.rxkotlin.subscribeBy
+import timber.log.Timber
 import javax.inject.Inject
 
 class WeeksContainerFragment :
@@ -33,6 +39,7 @@ class WeeksContainerFragment :
     private val binding get() = fragmentBinding!!
     private lateinit var listener: OnScheduleContainerDeletedListener
     private var restoredAdapterPosition = Int.DEFAULT
+    private val disposables: CompositeDisposable = CompositeDisposable()
 
     override val view: WeeksContainerView
         get() = this
@@ -102,12 +109,47 @@ class WeeksContainerFragment :
 
     override fun onStart() {
         super.onStart()
-        presenter.getWeeks()
+
+        if (presenter.isAcademicWeekChanged()) {
+            val scheduleContainer = presenter.getSelectedScheduleContainer()
+            presenter.getWeeks(scheduleContainer.id)
+        }
+
+        disposables += presenter.scheduleUiStateObservable
+            .subscribeBy(
+                onNext = { scheduleUiState ->
+                    if (scheduleUiState.isData()) {
+                        onData(scheduleUiState.weeks!!, scheduleUiState.currentAcademicWeekIndex)
+                    }
+
+                    if (scheduleUiState.isError()) {
+                        val throwable = scheduleUiState.throwable!!
+                        Timber.e(throwable)
+                        showError(throwable)
+                    }
+                }
+            )
+
+        disposables += presenter.scheduleContainerDeletedEventObservable
+            .subscribeBy(
+                onNext = { scheduleContainerDeletedEvent ->
+                    if (scheduleContainerDeletedEvent.isEvent()) {
+                        val scheduleContainer = scheduleContainerDeletedEvent.consumeEvent()
+                        listener.onScheduleContainerDeleted(scheduleContainer)
+                    }
+
+                    if (scheduleContainerDeletedEvent.isError()) {
+                        val throwable = scheduleContainerDeletedEvent.consumeError()
+                        Timber.e(throwable)
+                        showError(throwable)
+                    }
+                }
+            )
     }
 
     override fun onStop() {
         super.onStop()
-        presenter.clearDisposables()
+        disposables.clear()
     }
 
     override fun onDestroyView() {
@@ -115,7 +157,7 @@ class WeeksContainerFragment :
         fragmentBinding = null
     }
 
-    override fun onData(weeks: List<Week>, currentAcademicWeekIndex: Int) {
+    private fun onData(weeks: List<Week>, currentAcademicWeekIndex: Int) {
         val currentWeekPosition = minOf(currentAcademicWeekIndex, CENTRAL_VIEW_POSITION)
 
         with(binding.viewpagerWeeks) {
@@ -145,7 +187,14 @@ class WeeksContainerFragment :
     }
 
     fun swapData() {
-        presenter.getWeeks()
+        val scheduleContainer = presenter.getSelectedScheduleContainer()
+        presenter.getWeeks(scheduleContainer.id)
+    }
+
+    private fun showError(throwable: Throwable) {
+        val snackbar = Snackbar.make(binding.root, AndroidUtils.getErrorMessageResId(throwable), Snackbar.LENGTH_LONG)
+        snackbar.anchorView = activity?.findViewById(R.id.fab_base)
+        snackbar.show()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -154,11 +203,8 @@ class WeeksContainerFragment :
     }
 
     override fun onDeleteScheduleContainerClick() {
-        presenter.deleteSelectedScheduleContainer()
-    }
-
-    override fun onDeleteScheduleContainer(info: ScheduleContainer) {
-        listener.onScheduleContainerDeleted(info)
+        val scheduleContainer = presenter.getSelectedScheduleContainer()
+        presenter.deleteScheduleContainer(scheduleContainer)
     }
 
     interface OnScheduleContainerDeletedListener {

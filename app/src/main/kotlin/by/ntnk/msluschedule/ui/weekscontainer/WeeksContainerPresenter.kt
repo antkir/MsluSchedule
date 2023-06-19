@@ -1,16 +1,48 @@
 package by.ntnk.msluschedule.ui.weekscontainer
 
+import by.ntnk.msluschedule.data.ScheduleContainer
 import by.ntnk.msluschedule.data.Week
 import by.ntnk.msluschedule.db.DatabaseRepository
 import by.ntnk.msluschedule.mvp.Presenter
 import by.ntnk.msluschedule.utils.CurrentDate
+import by.ntnk.msluschedule.utils.DEFAULT
 import by.ntnk.msluschedule.utils.SchedulerProvider
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.plusAssign
+import io.reactivex.Observable
 import io.reactivex.rxkotlin.subscribeBy
-import timber.log.Timber
+import io.reactivex.subjects.BehaviorSubject
 import javax.inject.Inject
+
+data class ScheduleUiState(
+    val isLoading: Boolean = false,
+    val weeks: List<Week>? = null,
+    val currentAcademicWeekIndex: Int = Int.DEFAULT,
+    val throwable: Throwable? = null
+) {
+    fun isData(): Boolean = weeks != null && currentAcademicWeekIndex != Int.DEFAULT
+    fun isError(): Boolean = throwable != null
+}
+
+data class ScheduleContainerDeletedEvent(
+    private var data: ScheduleContainer? = null,
+    private var throwable: Throwable? = null
+) {
+    fun isEvent(): Boolean = data != null
+
+    fun consumeEvent(): ScheduleContainer {
+        val dataCopy = data!!
+        data = null
+        return dataCopy
+    }
+
+    fun isError(): Boolean = throwable != null
+
+    fun consumeError(): Throwable {
+        val throwableCopy = throwable!!
+        throwable = null
+        return throwableCopy
+    }
+}
 
 class WeeksContainerPresenter @Inject constructor(
     private val databaseRepository: DatabaseRepository,
@@ -19,11 +51,30 @@ class WeeksContainerPresenter @Inject constructor(
     private val schedulerProvider: SchedulerProvider
 ) : Presenter<WeeksContainerView>() {
 
-    private val disposables: CompositeDisposable = CompositeDisposable()
+    private val academicWeek: BehaviorSubject<Int> = BehaviorSubject.createDefault(Int.DEFAULT)
 
-    fun getWeeks() {
-        val scheduleContainer = sharedPreferencesRepository.getSelectedScheduleContainer()
-        disposables += databaseRepository.getWeeks(scheduleContainer.id)
+    private val scheduleUiState: BehaviorSubject<ScheduleUiState> = BehaviorSubject.createDefault(ScheduleUiState())
+    val scheduleUiStateObservable: Observable<ScheduleUiState>
+        get() = scheduleUiState
+
+    private val scheduleContainerDeletedEvent: BehaviorSubject<ScheduleContainerDeletedEvent> =
+        BehaviorSubject.createDefault(ScheduleContainerDeletedEvent())
+    val scheduleContainerDeletedEventObservable: Observable<ScheduleContainerDeletedEvent>
+        get() = scheduleContainerDeletedEvent
+
+    fun getSelectedScheduleContainer(): ScheduleContainer {
+        return sharedPreferencesRepository.getSelectedScheduleContainer()
+    }
+
+    fun isAcademicWeekChanged(): Boolean {
+        val academicWeekPrev = academicWeek.value
+        academicWeek.onNext(currentDate.academicWeek)
+        return academicWeek.value != academicWeekPrev
+    }
+
+    fun getWeeks(scheduleContainerId: Int) {
+        scheduleUiState.onNext(ScheduleUiState(isLoading = true))
+        databaseRepository.getWeeks(scheduleContainerId)
             .toList()
             .map { weeks ->
                 val currentAcademicWeekIndex = minOf(weeks.lastIndex, maxOf(currentDate.academicWeek, 0))
@@ -38,27 +89,27 @@ class WeeksContainerPresenter @Inject constructor(
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
-                onSuccess = { (weeks, currentAcademicWeekIndex) -> view?.onData(weeks, currentAcademicWeekIndex) },
-                onError = { throwable -> Timber.e(throwable) }
+                onSuccess = { (weeks, currentAcademicWeekIndex) ->
+                    val data = ScheduleUiState(weeks = weeks, currentAcademicWeekIndex = currentAcademicWeekIndex)
+                    scheduleUiState.onNext(data)
+                },
+                onError = { throwable -> scheduleUiState.onNext(ScheduleUiState(throwable = throwable)) }
             )
     }
 
-    fun deleteSelectedScheduleContainer() {
-        val scheduleContainer = sharedPreferencesRepository.getSelectedScheduleContainer()
+    fun deleteScheduleContainer(scheduleContainer: ScheduleContainer) {
         databaseRepository.deleteScheduleContainer(scheduleContainer.id)
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
                 onComplete = {
                     sharedPreferencesRepository.selectEmptyScheduleContainer()
-                    view?.onDeleteScheduleContainer(scheduleContainer)
+                    scheduleContainerDeletedEvent.onNext(ScheduleContainerDeletedEvent(data = scheduleContainer))
                 },
-                onError = { throwable -> Timber.e(throwable) }
+                onError = { throwable ->
+                    scheduleContainerDeletedEvent.onNext(ScheduleContainerDeletedEvent(throwable = throwable))
+                }
             )
-    }
-
-    fun clearDisposables() {
-        disposables.clear()
     }
 
     companion object {
