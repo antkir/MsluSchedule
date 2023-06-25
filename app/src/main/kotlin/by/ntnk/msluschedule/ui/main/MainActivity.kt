@@ -24,7 +24,6 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.doOnPreDraw
-import androidx.drawerlayout.widget.DrawerLayout
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.viewpager.widget.ViewPager
 import by.ntnk.msluschedule.R
@@ -58,7 +57,6 @@ import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasAndroidInjector
 import io.reactivex.disposables.Disposable
-import java.lang.ref.WeakReference
 import javax.inject.Inject
 
 class MainActivity :
@@ -172,7 +170,9 @@ class MainActivity :
 
         binding.buttonSettings.setOnClickListener {
             SettingsActivity.startActivity(this)
-            Handler(Looper.getMainLooper()).postDelayed(NavigationDrawerRunnable(binding.drawerLayout), 500)
+            Handler(Looper.getMainLooper()).postDelayed({
+                binding.drawerLayout.closeDrawer(GravityCompat.START)
+            }, SETTINGS_CLOSE_NAVIGATION_DRAWER_DELAY)
         }
 
         binding.fam.fabBase.setOnClickListener {
@@ -204,14 +204,6 @@ class MainActivity :
         }
 
         onBackPressedDispatcher.addCallback(this, onDrawerOpenBackPressedCallback)
-    }
-
-    private class NavigationDrawerRunnable(context: DrawerLayout?) : Runnable {
-        private val drawerLayoutRef: WeakReference<DrawerLayout?> = WeakReference(context)
-
-        override fun run() {
-            drawerLayoutRef.get()?.closeDrawer(GravityCompat.START)
-        }
     }
 
     private fun getViewLocationInWindow(view: View): PointF {
@@ -341,7 +333,7 @@ class MainActivity :
             presenter.initContainerListView()
         }
 
-        if (presenter.isSelectedContainerDefault()) {
+        if (presenter.isSelectedScheduleContainerDefault()) {
             binding.content.imageSmile.visibility = View.VISIBLE
             binding.content.textHint.visibility = View.VISIBLE
         } else {
@@ -451,8 +443,8 @@ class MainActivity :
         isFamOpen = true
 
         ViewCompat.animate(binding.fam.fabBase)
+            .setDuration(ANIMATION_ROTATE_BASE_FAB_DURATION)
             .rotation(135f)
-            .setDuration(300)
             .setInterpolator(OvershootInterpolator(2f))
             .start()
 
@@ -462,11 +454,11 @@ class MainActivity :
             scaleY = 0f
             translationY = height / 4f
             animate()
-                .setStartDelay(75)
+                .setStartDelay(ANIMATION_SHOW_GROUP_FAB_DELAY)
+                .setDuration(ANIMATION_SHOW_CHILD_FAB_DURATION)
                 .scaleY(1f)
                 .scaleX(1f)
                 .translationY(0f)
-                .setDuration(200)
                 .setInterpolator(FastOutSlowInInterpolator())
                 .start()
         }
@@ -476,11 +468,11 @@ class MainActivity :
             scaleY = 0f
             translationY = height / 4f
             animate()
-                .setStartDelay(0)
+                .setStartDelay(ANIMATION_SHOW_TEACHER_FAB_DELAY)
+                .setDuration(ANIMATION_SHOW_CHILD_FAB_DURATION)
                 .scaleY(1f)
                 .scaleX(1f)
                 .translationY(0f)
-                .setDuration(200)
                 .setInterpolator(FastOutSlowInInterpolator())
                 .start()
         }
@@ -494,10 +486,10 @@ class MainActivity :
         isFamOpen = false
 
         binding.fam.fabGroup.animate()
-            .setStartDelay(0)
+            .setStartDelay(ANIMATION_HIDE_CHILD_FAB_DELAY)
+            .setDuration(ANIMATION_HIDE_CHILD_FAB_DURATION)
             .scaleY(0f)
             .scaleX(0f)
-            .setDuration(100)
             .setInterpolator(FastOutSlowInInterpolator())
             .setListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator) {
@@ -508,10 +500,10 @@ class MainActivity :
             .start()
 
         binding.fam.fabTeacher.animate()
+            .setStartDelay(ANIMATION_HIDE_CHILD_FAB_DELAY)
+            .setDuration(ANIMATION_HIDE_CHILD_FAB_DURATION)
             .scaleY(0f)
             .scaleX(0f)
-            .setStartDelay(0)
-            .setDuration(100)
             .setInterpolator(FastOutSlowInInterpolator())
             .setListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator) {
@@ -522,8 +514,8 @@ class MainActivity :
             .start()
 
         ViewCompat.animate(binding.fam.fabBase)
+            .setDuration(ANIMATION_ROTATE_BASE_FAB_DURATION)
             .rotation(0f)
-            .setDuration(300)
             .setInterpolator(OvershootInterpolator(2f))
             .start()
 
@@ -657,7 +649,16 @@ class MainActivity :
         }
     }
 
-    private companion object {
-        const val ARG_TOOLBAR_TITLE = "toolbarTitle"
+    companion object {
+        private const val ARG_TOOLBAR_TITLE = "toolbarTitle"
+
+        private const val ANIMATION_ROTATE_BASE_FAB_DURATION = 300L
+        private const val ANIMATION_SHOW_CHILD_FAB_DURATION = 200L
+        private const val ANIMATION_SHOW_GROUP_FAB_DELAY = 75L
+        private const val ANIMATION_SHOW_TEACHER_FAB_DELAY = 0L
+        private const val ANIMATION_HIDE_CHILD_FAB_DURATION = 100L
+        private const val ANIMATION_HIDE_CHILD_FAB_DELAY = 0L
+
+        private const val SETTINGS_CLOSE_NAVIGATION_DRAWER_DELAY = 500L
     }
 }

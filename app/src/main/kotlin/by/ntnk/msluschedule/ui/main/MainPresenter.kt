@@ -120,7 +120,7 @@ class MainPresenter @Inject constructor(
             )
     }
 
-    fun isSelectedContainerDefault(): Boolean {
+    fun isSelectedScheduleContainerDefault(): Boolean {
         return sharedPreferencesRepository.getSelectedScheduleContainer().type == ScheduleType.DEFAULT
     }
 
