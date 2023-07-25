@@ -193,7 +193,7 @@ class MainActivity :
             if (isFamOpen) collapseFam()
         }
 
-        binding.toolbar.title = savedInstanceState?.getString(ARG_TOOLBAR_TITLE) ?: String.DEFAULT
+        supportActionBar?.title = savedInstanceState?.getString(ARG_TOOLBAR_TITLE) ?: String.DEFAULT
 
         onThemeChangedDisposable = onThemeChanged
             .filter { it }
@@ -436,7 +436,7 @@ class MainActivity :
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putString(ARG_TOOLBAR_TITLE, binding.toolbar.title.toString())
+        outState.putString(ARG_TOOLBAR_TITLE, supportActionBar?.title.toString())
     }
 
     private fun expandFam() {
@@ -552,7 +552,7 @@ class MainActivity :
     }
 
     override fun changeScheduleContainer(scheduleContainer: ScheduleContainer) {
-        binding.toolbar.title = scheduleContainer.value
+        supportActionBar?.title = scheduleContainer.value
 
         val weeksContainerFragment = supportFragmentManager.findFragmentById(R.id.content)
         if (weeksContainerFragment == null) {
@@ -582,7 +582,7 @@ class MainActivity :
     }
 
     override fun selectScheduleContainerMenuItem(scheduleContainer: ScheduleContainer) {
-        binding.toolbar.title = scheduleContainer.value
+        supportActionBar?.title = scheduleContainer.value
         val subMenu = binding.navView.menu
             .findItem(getContainerMenuViewId(scheduleContainer.type))
             ?.subMenu
@@ -609,7 +609,7 @@ class MainActivity :
     }
 
     override fun showError() {
-        binding.toolbar.title = String.DEFAULT
+        supportActionBar?.title = String.DEFAULT
         removeWeeksContainerFragment()
 
         binding.content.progressindicator.visibility = View.GONE
@@ -623,7 +623,7 @@ class MainActivity :
     }
 
     override fun onScheduleContainerDeleted(scheduleContainer: ScheduleContainer) {
-        binding.toolbar.title = String.DEFAULT
+        supportActionBar?.title = String.DEFAULT
         removeWeeksContainerFragment()
 
         binding.content.imageSmile.visibility = View.VISIBLE
