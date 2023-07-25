@@ -61,7 +61,9 @@ class WeekFragmentViewPagerAdapter(fragmentManager: FragmentManager) : FragmentS
 
     override fun saveState(): Parcelable {
         val state = super.saveState() as? Bundle ?: Bundle()
-        state.putInt(ARG_CURRENT_WEEK_ID, weeks[currentWeekPosition].id)
+        if (currentWeekPosition in weeks.indices) {
+            state.putInt(ARG_CURRENT_WEEK_ID, weeks[currentWeekPosition].id)
+        }
         return state
     }
 
