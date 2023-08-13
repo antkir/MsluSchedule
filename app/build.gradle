@@ -77,23 +77,23 @@ android {
 ext {
     appcompatVersion = '1.6.1'
     constraintlayoutVersion = '2.1.4'
-    // Dagger 2.46 doesn't work with Room 2.5.1, wait until Room 2.6.0 is released.
-    daggerVersion = '2.45'
-    fragmentVersion = '1.5.7'
+    daggerVersion = '2.47'
+    fragmentVersion = '1.6.1'
     jsoupVersion = '1.16.1'
     junitVersion = '4.13.2'
-    leakcanaryVersion = '2.10'
+    leakcanaryVersion = '2.12'
     materialVersion = '1.9.0'
-    mockitoVersion = '5.3.1'
+    mockitoVersion = '5.4.0'
     multidexVersion = '2.0.1'
     // OkHttp 3.13.0 release bumps minimum requirements to Android 5+.
     okhttpVersion = '3.12.13'
     // POI 4.0.0 release bumps minimum requirements to Android 5+.
     poiVersion = '3.17'
-    preferenceVersion = '1.2.0'
+    preferenceVersion = '1.2.1'
+    recyclerviewVersion = '1.3.1'
     // Retrofit 2.7.0 release bumps minimum requirements to Android 5+.
     retrofitVersion = '2.6.4'
-    roomVersion = '2.5.1'
+    roomVersion = '2.5.2'
     rxandroidVersion = '2.1.1'
     // RxJava 3.1.0 release bumps minimum requirements to Android 5+.
     rxjavaVersion = '2.2.21'
@@ -102,8 +102,9 @@ ext {
     swiperefreshlayoutVersion = '1.1.0'
     threetenbpVersion = '1.6.8'
     timberVersion = '5.0.1'
+    windowVersion = '1.1.0'
 
-    crashlyticsVersion = '18.3.7'
+    crashlyticsVersion = '18.4.0'
     // Firebase Analytics 20.0.0+ release bumps minimum requirements to Android 4.4+.
     firebaseanalyticsVersion = '19.0.2'
 }
@@ -115,9 +116,11 @@ dependencies {
     implementation "androidx.fragment:fragment-ktx:$fragmentVersion"
     implementation "androidx.multidex:multidex:$multidexVersion"
     implementation "androidx.preference:preference-ktx:$preferenceVersion"
+    implementation "androidx.recyclerview:recyclerview:$recyclerviewVersion"
     implementation "androidx.room:room-runtime:$roomVersion"
     implementation "androidx.room:room-rxjava2:$roomVersion"
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:$swiperefreshlayoutVersion"
+    implementation "androidx.window:window:$windowVersion"
     kapt "androidx.room:room-compiler:$roomVersion"
     // Dagger
     implementation "com.google.dagger:dagger:$daggerVersion"
