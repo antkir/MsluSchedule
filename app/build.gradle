@@ -18,14 +18,15 @@ android {
     buildToolsVersion "33.0.2"
 
     buildFeatures {
+        buildConfig true
         viewBinding true
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '17'
     }
     lint {
         disable 'InvalidPackage', 'TrustAllX509TrustManager', 'OldTargetApi'
@@ -76,13 +77,14 @@ android {
 ext {
     appcompatVersion = '1.6.1'
     constraintlayoutVersion = '2.1.4'
+    // Dagger 2.46 doesn't work with Room 2.5.1, wait until Room 2.6.0 is released.
     daggerVersion = '2.45'
-    fragmentVersion = '1.5.6'
-    jsoupVersion = '1.15.4'
+    fragmentVersion = '1.5.7'
+    jsoupVersion = '1.16.1'
     junitVersion = '4.13.2'
     leakcanaryVersion = '2.10'
-    materialVersion = '1.8.0'
-    mockitoVersion = '5.1.1'
+    materialVersion = '1.9.0'
+    mockitoVersion = '5.3.1'
     multidexVersion = '2.0.1'
     // OkHttp 3.13.0 release bumps minimum requirements to Android 5+.
     okhttpVersion = '3.12.13'
@@ -97,24 +99,26 @@ ext {
     rxjavaVersion = '2.2.21'
     rxkotlinVersion = '2.4.0'
     spotlightVersion = '1.7.0'
-    swipeRefreshLayoutVersion = '1.1.0'
-    threetenbpVersion = '1.6.7'
+    swiperefreshlayoutVersion = '1.1.0'
+    threetenbpVersion = '1.6.8'
     timberVersion = '5.0.1'
 
-    crashlyticsVersion = '18.3.6'
+    crashlyticsVersion = '18.3.7'
     // Firebase Analytics 20.0.0+ release bumps minimum requirements to Android 4.4+.
-    firebaseAnalyticsVersion = '19.0.2'
+    firebaseanalyticsVersion = '19.0.2'
 }
 
 dependencies {
-    // Android libraries
+    // AndroidX libraries
     implementation "androidx.appcompat:appcompat:$appcompatVersion"
     implementation "androidx.constraintlayout:constraintlayout:$constraintlayoutVersion"
     implementation "androidx.fragment:fragment-ktx:$fragmentVersion"
     implementation "androidx.multidex:multidex:$multidexVersion"
     implementation "androidx.preference:preference-ktx:$preferenceVersion"
-    implementation "androidx.swiperefreshlayout:swiperefreshlayout:$swipeRefreshLayoutVersion"
-    implementation "com.google.android.material:material:$materialVersion"
+    implementation "androidx.room:room-runtime:$roomVersion"
+    implementation "androidx.room:room-rxjava2:$roomVersion"
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:$swiperefreshlayoutVersion"
+    kapt "androidx.room:room-compiler:$roomVersion"
     // Dagger
     implementation "com.google.dagger:dagger:$daggerVersion"
     implementation "com.google.dagger:dagger-android-support:$daggerVersion"
@@ -122,18 +126,16 @@ dependencies {
     kapt "com.google.dagger:dagger-android-processor:$daggerVersion"
     // Jsoup
     implementation "org.jsoup:jsoup:$jsoupVersion"
+    // Material Components
+    implementation "com.google.android.material:material:$materialVersion"
     // Okhttp
     implementation "com.squareup.okhttp3:logging-interceptor:$okhttpVersion"
+    // Poi
+    implementation "org.apache.poi:poi:$poiVersion"
     // Retrofit
     implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
     implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofitVersion"
     implementation "com.squareup.retrofit2:converter-moshi:$retrofitVersion"
-    // Poi
-    implementation "org.apache.poi:poi:$poiVersion"
-    // Room
-    implementation "androidx.room:room-runtime:$roomVersion"
-    implementation "androidx.room:room-rxjava2:$roomVersion"
-    kapt "androidx.room:room-compiler:$roomVersion"
     // RxAndroid
     implementation "io.reactivex.rxjava2:rxandroid:$rxandroidVersion"
     // RxJava
@@ -152,6 +154,6 @@ dependencies {
     testImplementation "org.mockito:mockito-core:$mockitoVersion"
     testImplementation "junit:junit:$junitVersion"
     // Firebase
-    implementation "com.google.firebase:firebase-analytics-ktx:$firebaseAnalyticsVersion"
+    implementation "com.google.firebase:firebase-analytics-ktx:$firebaseanalyticsVersion"
     implementation "com.google.firebase:firebase-crashlytics-ktx:$crashlyticsVersion"
 }
