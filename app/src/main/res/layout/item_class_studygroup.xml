@@ -59,7 +59,7 @@
         android:singleLine="true"
         android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
         android:textColor="@color/primary_text"
-        app:layout_constraintBottom_toTopOf="@+id/text_type"
+        app:layout_constraintBottom_toTopOf="@+id/text_class_type"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
