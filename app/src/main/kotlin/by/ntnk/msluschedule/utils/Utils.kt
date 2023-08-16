@@ -35,6 +35,8 @@ object Days {
 
 fun Boolean.toInt() = if (this) 1 else 0
 
+interface ErrorType
+
 typealias ImmutableEntry = AbstractMap.SimpleImmutableEntry<Int, String>
 
 class InvalidYearException : Exception()

@@ -56,16 +56,17 @@ class DatabaseRepository @Inject constructor(
         return appDatabase.scheduleContainerDao.delete(id)
     }
 
-    fun getScheduleContainers(): Observable<ScheduleContainer> {
-        return appDatabase.scheduleContainerDao.getScheduleContainers()
-            .flatMapObservable { Observable.fromIterable(it) }
-            .map { dbScheduleContainer ->
-                ScheduleContainer(
-                    dbScheduleContainer.id,
-                    dbScheduleContainer.name,
-                    dbScheduleContainer.type,
-                    dbScheduleContainer.year
-                )
+    fun getScheduleContainersReactive(): Observable<List<ScheduleContainer>> {
+        return appDatabase.scheduleContainerDao.getScheduleContainersReactive()
+            .map { dbScheduleContainers ->
+                dbScheduleContainers.map { dbScheduleContainer ->
+                    ScheduleContainer(
+                        dbScheduleContainer.id,
+                        dbScheduleContainer.name,
+                        dbScheduleContainer.type,
+                        dbScheduleContainer.year
+                    )
+                }
             }
     }
 
