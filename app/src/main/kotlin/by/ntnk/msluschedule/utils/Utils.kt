@@ -39,7 +39,7 @@ interface ErrorType
 
 typealias ImmutableEntry = AbstractMap.SimpleImmutableEntry<Int, String>
 
-class InvalidYearException : Exception()
+class InvalidYearException : RuntimeException()
 
 object Utils {
     fun isNetworkException(throwable: Throwable): Boolean {

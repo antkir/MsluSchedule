@@ -99,7 +99,6 @@ class NetworkHelper @Inject constructor(private val currentDate: CurrentDate) {
         return data
     }
 
-    @Throws(InvalidYearException::class)
     private fun checkYearValid(htmlBody: Document) {
         val elements = htmlBody
             .select("select[id^=${YEAR_REQUEST_INFO.requestName}]")
