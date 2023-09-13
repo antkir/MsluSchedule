@@ -62,6 +62,10 @@ class SharedPreferencesRepository @Inject constructor(
         return sharedPreferences.getBoolean(applicationContext.getString(R.string.key_hide_pe_classes), false)
     }
 
+    fun getCurrentNetworkApiVersion() : NetworkApiVersion {
+        return NetworkApiVersion.ORIGINAL
+    }
+
     private companion object {
         const val KEY_SCHEDULECONTAINER_ID = "scheduleContainerId"
         const val KEY_SCHEDULECONTAINER_VALUE = "scheduleContainerValue"
