@@ -433,7 +433,7 @@ class MainActivity :
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         if (!item.isChecked) {
-            for (scheduleType in ScheduleType.values()) {
+            for (scheduleType in ScheduleType.entries) {
                 val menuItem = binding.navView.menu
                     .findItem(getContainerMenuViewId(scheduleType))
                     ?.subMenu
@@ -647,7 +647,7 @@ class MainActivity :
     }
 
     private fun clearScheduleContainersMenu() {
-        for (type in ScheduleType.values()) {
+        for (type in ScheduleType.entries) {
             binding.navView.menu
                 .findItem(getContainerMenuViewId(type))
                 ?.subMenu

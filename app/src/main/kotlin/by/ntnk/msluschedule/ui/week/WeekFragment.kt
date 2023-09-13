@@ -18,6 +18,7 @@ import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.core.os.BundleCompat
 import androidx.core.view.MenuProvider
 import androidx.core.view.ViewCompat
 import androidx.lifecycle.Lifecycle
@@ -132,7 +133,10 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
 
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
         super.onViewStateRestored(savedInstanceState)
-        restoredRecyclerViewState = savedInstanceState?.getParcelable(ARG_RECYCLER_VIEW_SAVED_STATE)
+        if (savedInstanceState != null) {
+            restoredRecyclerViewState =
+                BundleCompat.getParcelable(savedInstanceState, ARG_RECYCLER_VIEW_SAVED_STATE, Parcelable::class.java)
+        }
     }
 
     private fun setupRecyclerView() {

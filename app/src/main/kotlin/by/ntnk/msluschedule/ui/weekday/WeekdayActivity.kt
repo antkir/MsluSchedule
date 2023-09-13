@@ -20,6 +20,7 @@ import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.core.app.NavUtils
 import androidx.core.content.ContextCompat
+import androidx.core.os.BundleCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.doOnLayout
 import androidx.core.view.isNotEmpty
@@ -153,7 +154,10 @@ class WeekdayActivity :
         onBackPressedDispatcher.addCallback(this, onEditNoteBackPressedCallback)
 
         restoredScrollableViewChipsOffset = savedInstanceState?.getInt(ARG_SCROLL_VIEW_CHIPS_SAVED_STATE) ?: Int.DEFAULT
-        restoredChipsState = savedInstanceState?.getSparseParcelableArray(ARG_CHIPS_SAVED_STATE)
+        if (savedInstanceState != null) {
+            restoredChipsState =
+                BundleCompat.getSparseParcelableArray(savedInstanceState, ARG_CHIPS_SAVED_STATE, Parcelable::class.java)
+        }
     }
 
     private fun showEditNoteLayout() {
