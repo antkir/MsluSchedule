@@ -14,8 +14,8 @@ android {
 
     namespace 'by.ntnk.msluschedule'
 
-    compileSdk 33
-    buildToolsVersion "33.0.2"
+    compileSdk 34
+    buildToolsVersion = "34.0.0"
 
     buildFeatures {
         buildConfig true
@@ -77,13 +77,14 @@ android {
 ext {
     appcompatVersion = '1.6.1'
     constraintlayoutVersion = '2.1.4'
-    daggerVersion = '2.47'
+    coreVersion = '1.12.0'
+    daggerVersion = '2.48'
     fragmentVersion = '1.6.1'
     jsoupVersion = '1.16.1'
     junitVersion = '4.13.2'
     leakcanaryVersion = '2.12'
     materialVersion = '1.9.0'
-    mockitoVersion = '5.4.0'
+    mockitoVersion = '5.5.0'
     multidexVersion = '2.0.1'
     // OkHttp 3.13.0 release bumps minimum requirements to Android 5+.
     okhttpVersion = '3.12.13'
@@ -104,7 +105,7 @@ ext {
     timberVersion = '5.0.1'
     windowVersion = '1.1.0'
 
-    crashlyticsVersion = '18.4.0'
+    crashlyticsVersion = '18.4.1'
     // Firebase Analytics 20.0.0+ release bumps minimum requirements to Android 4.4+.
     firebaseanalyticsVersion = '19.0.2'
 }
@@ -113,6 +114,7 @@ dependencies {
     // AndroidX libraries
     implementation "androidx.appcompat:appcompat:$appcompatVersion"
     implementation "androidx.constraintlayout:constraintlayout:$constraintlayoutVersion"
+    implementation "androidx.core:core-ktx:$coreVersion"
     implementation "androidx.fragment:fragment-ktx:$fragmentVersion"
     implementation "androidx.multidex:multidex:$multidexVersion"
     implementation "androidx.preference:preference-ktx:$preferenceVersion"
