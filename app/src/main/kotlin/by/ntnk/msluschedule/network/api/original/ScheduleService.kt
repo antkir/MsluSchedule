@@ -1,6 +1,6 @@
-package by.ntnk.msluschedule.network
+package by.ntnk.msluschedule.network.api.original
 
-import by.ntnk.msluschedule.network.data.JsonBody
+import by.ntnk.msluschedule.network.api.original.data.JsonBody
 import io.reactivex.Single
 import okhttp3.ResponseBody
 import retrofit2.Response
@@ -12,7 +12,7 @@ import retrofit2.http.Headers
 import retrofit2.http.POST
 import retrofit2.http.Path
 
-interface ScheduleApi {
+interface ScheduleService {
     // scheduletype doesn't matter here, session ID is shared across the website
     @HEAD("schedule/reports/publicreports/schedulelistforgroupreport")
     fun initSession(): Single<Response<Void>>

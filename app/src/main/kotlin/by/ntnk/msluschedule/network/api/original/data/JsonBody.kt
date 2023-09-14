@@ -1,4 +1,4 @@
-package by.ntnk.msluschedule.network.data
+package by.ntnk.msluschedule.network.api.original.data
 
 data class JsonBody constructor(private val zones: Zones) {
     val studyWeekZone: String

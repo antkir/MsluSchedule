@@ -1,4 +1,4 @@
-package by.ntnk.msluschedule.network.dns
+package by.ntnk.msluschedule.network.api.original.dns
 
 import okio.Buffer
 import org.threeten.bp.Instant

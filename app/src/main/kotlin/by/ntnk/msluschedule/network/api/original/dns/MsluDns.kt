@@ -1,4 +1,4 @@
-package by.ntnk.msluschedule.network.dns
+package by.ntnk.msluschedule.network.api.original.dns
 
 import okhttp3.Dns
 import okhttp3.internal.publicsuffix.PublicSuffixDatabase

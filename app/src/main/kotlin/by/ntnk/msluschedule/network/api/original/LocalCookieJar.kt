@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package by.ntnk.msluschedule.network
+package by.ntnk.msluschedule.network.api.original
 
 import by.ntnk.msluschedule.utils.EMPTY_STRING
 import okhttp3.Cookie

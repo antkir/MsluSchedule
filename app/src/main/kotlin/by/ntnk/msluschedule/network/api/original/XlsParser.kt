@@ -1,4 +1,4 @@
-package by.ntnk.msluschedule.network
+package by.ntnk.msluschedule.network.api.original
 
 import by.ntnk.msluschedule.data.StudyGroupLesson
 import by.ntnk.msluschedule.data.TeacherLesson

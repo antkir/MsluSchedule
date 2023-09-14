@@ -86,7 +86,7 @@ class AddGroupPresenter @Inject constructor(
     }
 
     private fun getCourseScheduleFilter() {
-        disposables += networkRepository.getCourses()
+        disposables += networkRepository.getCourses(faculty)
             .subscribeOn(schedulerProvider.single())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(

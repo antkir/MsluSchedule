@@ -2,9 +2,14 @@ package by.ntnk.msluschedule.di.modules
 
 import by.ntnk.msluschedule.BuildConfig
 import by.ntnk.msluschedule.di.PerApp
-import by.ntnk.msluschedule.network.LocalCookieJar
-import by.ntnk.msluschedule.network.dns.MsluDns
-import by.ntnk.msluschedule.network.ScheduleApi
+import by.ntnk.msluschedule.network.NetworkRepository
+import by.ntnk.msluschedule.network.api.original.LocalCookieJar
+import by.ntnk.msluschedule.network.api.original.dns.MsluDns
+import by.ntnk.msluschedule.utils.NetworkApiVersion
+import by.ntnk.msluschedule.utils.SharedPreferencesRepository
+import dagger.Lazy
+import by.ntnk.msluschedule.network.api.original.NetworkRepository as NetworkRepositoryOriginal
+import by.ntnk.msluschedule.network.api.original.ScheduleService as ScheduleServiceOriginal
 import dagger.Module
 import dagger.Provides
 import okhttp3.OkHttpClient
@@ -16,6 +21,7 @@ import timber.log.Timber
 import java.io.File
 import java.util.concurrent.TimeUnit
 import javax.inject.Named
+import javax.inject.Qualifier
 
 @Module
 class NetworkModule {
@@ -41,6 +47,7 @@ class NetworkModule {
 
     @Provides
     @PerApp
+    @Api(NetworkApiVersion.ORIGINAL.name)
     fun provideOkHttpClient(
         @Named("cache") cacheDir: File,
         httpLoggingInterceptor: HttpLoggingInterceptor,
@@ -66,7 +73,8 @@ class NetworkModule {
 
     @Provides
     @PerApp
-    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
+    @Api(NetworkApiVersion.ORIGINAL.name)
+    fun provideRetrofit(@Api(NetworkApiVersion.ORIGINAL.name) okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
             .baseUrl("http://raspisanie.mslu.by/")
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
@@ -77,7 +85,26 @@ class NetworkModule {
 
     @Provides
     @PerApp
-    fun provideScheduleApi(retrofit: Retrofit): ScheduleApi {
-        return retrofit.create(ScheduleApi::class.java)
+    fun provideScheduleServiceOriginal(
+        @Api(NetworkApiVersion.ORIGINAL.name) retrofit: Retrofit
+    ): ScheduleServiceOriginal {
+        return retrofit.create(ScheduleServiceOriginal::class.java)
+    }
+
+    @Provides
+    @PerApp
+    fun provideNetworkRepository(
+        sharedPreferencesRepository: SharedPreferencesRepository,
+        networkRepositoryOriginal: Lazy<NetworkRepositoryOriginal>
+    ): NetworkRepository {
+        return when (sharedPreferencesRepository.getCurrentNetworkApiVersion()) {
+            NetworkApiVersion.ORIGINAL -> networkRepositoryOriginal.get()
+        }
+    }
+
+    private companion object {
+        @Qualifier
+        @Retention(AnnotationRetention.RUNTIME)
+        annotation class Api(val value: String)
     }
 }

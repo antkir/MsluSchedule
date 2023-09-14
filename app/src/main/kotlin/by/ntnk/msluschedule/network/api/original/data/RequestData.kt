@@ -1,4 +1,4 @@
-package by.ntnk.msluschedule.network.data
+package by.ntnk.msluschedule.network.api.original.data
 
 data class RequestData constructor(private val requestInfo: RequestInfo, val selectedValue: Int) {
     val requestName: String
