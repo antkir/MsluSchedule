@@ -398,8 +398,8 @@ class MainActivity :
         val weeksContainerFragment = supportFragmentManager.findFragmentById(R.id.content)
         if (weeksContainerFragment == null) {
             supportFragmentManager.beginTransaction()
-                .replace(R.id.content, WeeksContainerFragment())
-                .commit()
+                .add(R.id.content, WeeksContainerFragment())
+                .commitNow()
         } else {
             weeksContainerFragment as WeeksContainerFragment
             weeksContainerFragment.swapTabs()
@@ -518,8 +518,8 @@ class MainActivity :
         val weeksContainerFragment = supportFragmentManager.findFragmentById(R.id.content)
         if (weeksContainerFragment == null) {
             supportFragmentManager.beginTransaction()
-                .replace(R.id.content, WeeksContainerFragment())
-                .commit()
+                .add(R.id.content, WeeksContainerFragment())
+                .commitNow()
         }
 
         binding.content.imageSmile.visibility = View.GONE
@@ -606,7 +606,7 @@ class MainActivity :
             supportFragmentManager
                 .beginTransaction()
                 .remove(fragment)
-                .commit()
+                .commitNow()
         }
     }
 }
