@@ -46,7 +46,9 @@ class SettingsActivity : AppCompatActivity(), HasAndroidInjector {
         super.onCreate(savedInstanceState)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         if (savedInstanceState == null) {
-            supportFragmentManager.beginTransaction().replace(android.R.id.content, SettingsFragment()).commit()
+            supportFragmentManager.beginTransaction()
+                .replace(android.R.id.content, SettingsFragment())
+                .commitNow()
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {

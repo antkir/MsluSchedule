@@ -604,7 +604,7 @@ class MainActivity :
         if (weeksContainerFragment == null) {
             supportFragmentManager.beginTransaction()
                 .replace(R.id.content, WeeksContainerFragment())
-                .commit()
+                .commitNow()
         } else {
             weeksContainerFragment as WeeksContainerFragment
             weeksContainerFragment.swapData()
@@ -619,7 +619,7 @@ class MainActivity :
             supportFragmentManager
                 .beginTransaction()
                 .remove(scheduleContainerFragment)
-                .commit()
+                .commitNow()
         }
     }
 
