@@ -346,17 +346,8 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
             presenter.getSchedule(weekId, shouldUpdateAdapter = true)
         }
         val baseFABMain = requireActivity().findViewById<FloatingActionButton>(R.id.fab_base)
-        val snackbar = Snackbar.make(requireView(), AndroidUtils.getErrorMessageResId(t), 5000)
+        val snackbar = Snackbar.make(requireView(), AndroidUtils.getErrorMessageResId(t), Snackbar.LENGTH_LONG)
             .setAnchorView(baseFABMain)
-            .setAction(R.string.snackbar_week_init_retry) {
-                context ?: return@setAction
-                if (AndroidUtils.isNetworkAccessible(requireContext().applicationContext)) {
-                    layoutManagerSavedState = binding.recyclerViewDays.layoutManager?.onSaveInstanceState()
-                    presenter.updateSchedule(weekId)
-                } else {
-                    showError(t, shouldSetupViews = false)
-                }
-            }
         ViewCompat.setOnApplyWindowInsetsListener(snackbar.view) { _, insets -> insets }
         snackbar.show()
     }
