@@ -348,6 +348,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         val baseFABMain = requireActivity().findViewById<FloatingActionButton>(R.id.fab_base)
         val snackbar = Snackbar.make(requireView(), AndroidUtils.getErrorMessageResId(t), Snackbar.LENGTH_LONG)
             .setAnchorView(baseFABMain)
+            .setTextMaxLines(5)
         ViewCompat.setOnApplyWindowInsetsListener(snackbar.view) { _, insets -> insets }
         snackbar.show()
     }
