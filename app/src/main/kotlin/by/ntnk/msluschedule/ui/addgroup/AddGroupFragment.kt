@@ -110,6 +110,7 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
         }
 
         with(courseView) {
+            progressBar = layout.findViewById(R.id.progressbar_dialog_course)
             setEnabledFocusable(false)
             keyListener = null
             setOnClickListener { courseView.showDropDown() }
@@ -119,7 +120,7 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
                 groupView.setEnabledFocusable(false)
                 presenter.setCourseKeyFromPosition(position)
                 presenter.setGroupsNull()
-                presenter.getScheduleGroups(showGroupsForAllCourses = false)
+                presenter.getScheduleGroups()
             }
         }
 
@@ -129,15 +130,16 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
             keyListener = null
             setOnClickListener { facultyView.showDropDown() }
             setOnItemClickListener { _, _, position, _ ->
-                textinputlayoutCourseView.visibility = View.GONE
-                groupView.progressBarVisibility = View.VISIBLE
+                courseView.progressBarVisibility = View.VISIBLE
+                courseView.text.clear()
+                courseView.setEnabledFocusable(false)
+                groupView.progressBarVisibility = View.GONE
                 groupView.text.clear()
                 groupView.setEnabledFocusable(false)
-                courseView.text.clear()
                 presenter.setFacultyKeyFromPosition(position)
                 presenter.setCoursesNull()
                 presenter.setGroupsNull()
-                presenter.getScheduleGroups()
+                presenter.getCourseScheduleFilter()
             }
         }
     }
@@ -147,12 +149,13 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
         when {
             presenter.isFacultiesInitialized() -> {
                 presenter.populateFacultiesAdapter()
+                if (presenter.isFacultySet() && !presenter.isCoursesInitialized()) {
+                    courseView.progressBarVisibility = View.VISIBLE
+                }
                 if (presenter.isCoursesInitialized()) {
                     presenter.populateCoursesAdapter()
                 }
-                if ((presenter.isFacultySet() && textinputlayoutCourseView.visibility != View.VISIBLE) ||
-                    (presenter.isFacultySet() && presenter.isCourseSet() && !presenter.isGroupsInitialized())
-                ) {
+                if (presenter.isFacultySet() && presenter.isCourseSet() && !presenter.isGroupsInitialized()) {
                     groupView.progressBarVisibility = View.VISIBLE
                 }
                 if (presenter.isGroupsInitialized()) {
@@ -185,9 +188,6 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
     override fun populateCoursesAdapter(data: ScheduleFilter) {
         val adapter = initAdapter(data)
         adapter.isFilteringEnabled = false
-        textinputlayoutCourseView.visibility = View.VISIBLE
-        groupView.progressBarVisibility = View.GONE
-        groupView.text.clear()
         with(courseView) {
             progressBarVisibility = View.GONE
             setEnabledFocusable(true)
@@ -198,19 +198,11 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
 
     override fun populateGroupsAdapter(data: ScheduleFilter) {
         val adapter = initAdapter(data)
-        val isStartsWithFilterActive = !presenter.isCourseSet()
-        adapter.isStartsWithFilterActive = isStartsWithFilterActive
-        adapter.isIgnoreCaseFilterActive = presenter.isCourseSet()
+        adapter.isIgnoreCaseFilterActive = true
         with(groupView) {
-            inputType = if (presenter.isCourseSet()) {
-                InputType.TYPE_CLASS_TEXT or
-                    InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD or
-                    InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
-            } else {
-                InputType.TYPE_CLASS_NUMBER or
-                    InputType.TYPE_NUMBER_VARIATION_NORMAL or
-                    InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
-            }
+            inputType = InputType.TYPE_CLASS_TEXT or
+                InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD or
+                InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
             setTypeface(null, Typeface.NORMAL)
             progressBarVisibility = View.GONE
             setEnabledFocusable(true)

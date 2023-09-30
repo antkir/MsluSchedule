@@ -6,7 +6,6 @@ import by.ntnk.msluschedule.db.data.ScheduleContainer
 import by.ntnk.msluschedule.mvp.Presenter
 import by.ntnk.msluschedule.network.NetworkRepository
 import by.ntnk.msluschedule.network.data.ScheduleFilter
-import by.ntnk.msluschedule.utils.COURSE_VALUE
 import by.ntnk.msluschedule.utils.CurrentDate
 import by.ntnk.msluschedule.utils.EMPTY_STRING
 import by.ntnk.msluschedule.utils.SchedulerProvider
@@ -85,7 +84,7 @@ class AddGroupPresenter @Inject constructor(
             )
     }
 
-    private fun getCourseScheduleFilter() {
+    fun getCourseScheduleFilter() {
         disposables += networkRepository.getCourses(faculty)
             .subscribeOn(schedulerProvider.single())
             .observeOn(schedulerProvider.ui())
@@ -101,20 +100,14 @@ class AddGroupPresenter @Inject constructor(
             )
     }
 
-    fun getScheduleGroups(showGroupsForAllCourses: Boolean = true) {
-        val courseKey = if (course > 0) course else COURSE_VALUE
-        val year = if (!showGroupsForAllCourses) currentDate.academicYear else 0
-        disposables += networkRepository.getGroups(faculty, courseKey, year)
+    fun getScheduleGroups() {
+        disposables += networkRepository.getGroups(faculty, course, currentDate.academicYear)
             .subscribeOn(schedulerProvider.single())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
                 onSuccess = { scheduleFilter ->
-                    if (scheduleFilter.size > 0 && course == 0 && !scheduleFilter.canDetectCourse) {
-                        getCourseScheduleFilter()
-                    } else {
-                        groups = scheduleFilter
-                        populateGroupsAdapter()
-                    }
+                    groups = scheduleFilter
+                    populateGroupsAdapter()
                 },
                 onError = { throwable ->
                     Timber.i(throwable)
@@ -146,12 +139,7 @@ class AddGroupPresenter @Inject constructor(
             view?.showError(exception)
             return null
         }
-        val courseKey = if (course > 0) {
-            course
-        } else {
-            Character.getNumericValue(groupValue[0])
-        }
-        return StudyGroup(group, groupValue, faculty, courseKey, currentDate.academicYear)
+        return StudyGroup(group, groupValue, faculty, course, currentDate.academicYear)
     }
 
     fun populateFacultiesAdapter() = view?.populateFacultiesAdapter(faculties!!)

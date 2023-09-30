@@ -59,7 +59,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
-            android:visibility="gone"
             app:layout_constraintBottom_toTopOf="@+id/textinputlayout_group"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -81,6 +80,19 @@
                 android:paddingRight="@dimen/actv_padding_side" />
 
         </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/progressbar_dialog_course"
+            android:layout_width="@dimen/actv_progressbar_size"
+            android:layout_height="@dimen/actv_progressbar_size"
+            android:indeterminate="true"
+            android:visibility="gone"
+            app:indicatorColor="@color/colorAccent"
+            app:indicatorInset="@dimen/actv_progressbar_inset"
+            app:indicatorSize="@dimen/actv_progressbar_size"
+            app:layout_constraintBottom_toBottomOf="@id/textinputlayout_course"
+            app:layout_constraintEnd_toEndOf="@id/textinputlayout_course"
+            app:trackThickness="@dimen/actv_progressbar_thickness" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/textinputlayout_group"
