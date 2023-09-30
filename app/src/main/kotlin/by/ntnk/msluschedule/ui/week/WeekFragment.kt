@@ -446,6 +446,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         val errorMessageResource = AndroidUtils.getErrorMessageResId(throwable)
         val snackbar = Snackbar.make(requireView(), errorMessageResource, SNACKBAR_LENGTH_LONGER)
         snackbar.anchorView = baseFABMain
+        snackbar.setTextMaxLines(5)
         if (showRetryButton) {
             snackbar.setAction(R.string.snackbar_week_init_retry) {
                 context ?: return@setAction
