@@ -25,6 +25,7 @@ import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
 import by.ntnk.msluschedule.BuildConfig
 import by.ntnk.msluschedule.R
+import by.ntnk.msluschedule.utils.NetworkApiVersion
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
 import by.ntnk.msluschedule.utils.onThemeChanged
 import dagger.android.AndroidInjection
@@ -120,8 +121,12 @@ class SettingsActivity : AppCompatActivity(), HasAndroidInjector {
             val keyShowAddSchedule = getString(R.string.key_show_add_schedule)
             findPreference<SwitchPreferenceCompat>(keyShowAddSchedule)!!.isSingleLineTitle = false
 
-            val keyFullSubjects = getString(R.string.key_full_subjects)
-            findPreference<CheckBoxPreference>(keyFullSubjects)!!.isSingleLineTitle = false
+            if (sharedPreferencesRepository.getCurrentNetworkApiVersion() == NetworkApiVersion.ORIGINAL) {
+                val keyFullSubjects = getString(R.string.key_full_subjects)
+                findPreference<CheckBoxPreference>(keyFullSubjects)!!.isVisible = true
+                findPreference<CheckBoxPreference>(keyFullSubjects)!!.isSingleLineTitle = false
+            }
+
             val keyHidePEClasses = getString(R.string.key_hide_pe_classes)
             findPreference<CheckBoxPreference>(keyHidePEClasses)!!.isSingleLineTitle = false
 

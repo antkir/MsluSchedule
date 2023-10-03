@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <PreferenceCategory android:title="@string/pref_header_appearence">
         <ListPreference
             android:defaultValue="1"
@@ -22,7 +23,8 @@
             android:icon="@drawable/ic_null"
             android:key="@string/key_full_subjects"
             android:summary="@string/pref_next_update_summary"
-            android:title="@string/pref_full_subjects_title" />
+            android:title="@string/pref_full_subjects_title"
+            app:isPreferenceVisible="false" />
 
         <CheckBoxPreference
             android:defaultValue="false"
