@@ -251,7 +251,7 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
                 binding.textSubject.text = classDesciptor.subject
                 binding.textTeacher.text = classDesciptor.teacher
                 binding.textClassroom.text = classDesciptor.classroom
-                binding.textClassType.text = classDesciptor.type
+                binding.textClassType.text = classDesciptor.type.lowercase()
 
                 if (overlapsPreviousClass) {
                     binding.imageClassOverlap.visibility = View.VISIBLE
@@ -278,7 +278,7 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
                 binding.textSubject.text = classDesciptor.subject
                 binding.textGroups.text = classDesciptor.groups
                 binding.textClassroom.text = classDesciptor.classroom
-                binding.textClassType.text = classDesciptor.type
+                binding.textClassType.text = classDesciptor.type.lowercase()
                 binding.textFaculty.text = classDesciptor.faculty
 
                 if (binding.textClassType.text.isBlank()) {

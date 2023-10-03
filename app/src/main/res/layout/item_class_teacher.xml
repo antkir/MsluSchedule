@@ -38,7 +38,7 @@
     <TextView
         android:id="@+id/text_subject"
         android:layout_width="0dp"
-        android:layout_height="@dimen/item_lesson_text_height"
+        android:layout_height="@dimen/item_class_text_height"
         android:layout_marginStart="72dp"
         android:layout_marginLeft="72dp"
         android:layout_marginTop="6dp"
@@ -47,55 +47,48 @@
         android:singleLine="true"
         android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
         android:textColor="@color/primary_text"
-        app:layout_constraintBottom_toTopOf="@+id/wrapper_class_type"
+        app:layout_constraintBottom_toTopOf="@+id/text_class_type"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Мод. &quot;Экономика&quot;: Экон. теория" />
 
-    <LinearLayout
-        android:id="@+id/wrapper_class_type"
-        android:layout_width="0dp"
-        android:layout_height="@dimen/item_lesson_subtext_height"
+    <TextView
+        android:id="@+id/text_class_type"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/item_class_type_height"
+        android:background="@drawable/lesson_type_rect"
+        android:paddingLeft="8dp"
+        android:paddingTop="2dp"
+        android:paddingRight="8dp"
+        android:paddingBottom="2dp"
+        android:singleLine="true"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textColor="@color/primary_text"
         app:layout_constraintBottom_toTopOf="@+id/text_faculty"
         app:layout_constraintEnd_toEndOf="@+id/text_subject"
+        app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toStartOf="@+id/text_subject"
-        app:layout_constraintTop_toBottomOf="@+id/text_subject">
-
-        <TextView
-            android:id="@+id/text_class_type"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:background="@drawable/lesson_type_rect"
-            android:paddingLeft="8dp"
-            android:paddingTop="2dp"
-            android:paddingRight="8dp"
-            android:paddingBottom="2dp"
-            android:singleLine="true"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-            android:textColor="@color/chip_text"
-            android:textSize="12sp"
-            tools:text="ЛК (В онлайн режиме)" />
-
-    </LinearLayout>
+        app:layout_constraintTop_toBottomOf="@+id/text_subject"
+        tools:text="лк (в онлайн режиме)" />
 
     <TextView
         android:id="@+id/text_faculty"
         android:layout_width="0dp"
-        android:layout_height="@dimen/item_lesson_subtext_height"
+        android:layout_height="@dimen/item_class_subtext_height"
         android:singleLine="true"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textColor="@color/tertiary_text"
         app:layout_constraintBottom_toTopOf="@+id/text_groups"
         app:layout_constraintEnd_toEndOf="@+id/text_subject"
         app:layout_constraintStart_toStartOf="@+id/text_subject"
-        app:layout_constraintTop_toBottomOf="@+id/wrapper_class_type"
+        app:layout_constraintTop_toBottomOf="@+id/text_class_type"
         tools:text="Меж.ком." />
 
     <TextView
         android:id="@+id/text_groups"
         android:layout_width="0dp"
-        android:layout_height="@dimen/item_lesson_subtext_height"
+        android:layout_height="@dimen/item_class_subtext_height"
         android:layout_marginBottom="6dp"
         android:singleLine="true"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
