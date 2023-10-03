@@ -8,9 +8,11 @@ import by.ntnk.msluschedule.db.data.ScheduleContainer
 import by.ntnk.msluschedule.mvp.Presenter
 import by.ntnk.msluschedule.network.NetworkRepository
 import by.ntnk.msluschedule.utils.CurrentDate
+import by.ntnk.msluschedule.utils.NoDataOnServerException
 import by.ntnk.msluschedule.utils.ScheduleType
 import by.ntnk.msluschedule.utils.SchedulerProvider
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
+import com.squareup.moshi.JsonDataException
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
@@ -48,8 +50,16 @@ class WeekPresenter @Inject constructor(
                     }
                 },
                 onError = {
-                    Timber.i(it)
-                    view?.showError(it, shouldSetupViews = true)
+                    if (it is JsonDataException) {
+                        Timber.e(it)
+                    } else {
+                        Timber.i(it)
+                    }
+                    if (it is NoDataOnServerException) {
+                        getSchedule(weekId, shouldUpdateAdapter = true)
+                    } else {
+                        view?.showError(it, shouldSetupViews = true)
+                    }
                 }
             )
     }
@@ -158,8 +168,16 @@ class WeekPresenter @Inject constructor(
             .subscribeBy(
                 onSuccess = { weekdayEntities -> view?.showSchedule(weekdayEntities) },
                 onError = {
-                    Timber.i(it)
-                    view?.showError(it, shouldSetupViews = false)
+                    if (it is JsonDataException) {
+                        Timber.e(it)
+                    } else {
+                        Timber.i(it)
+                    }
+                    if (it is NoDataOnServerException) {
+                        view?.showUpdateSuccessMessage()
+                    } else {
+                        view?.showError(it, shouldSetupViews = false)
+                    }
                 }
             )
     }
