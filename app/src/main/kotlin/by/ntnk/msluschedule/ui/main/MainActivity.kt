@@ -223,7 +223,8 @@ class MainActivity :
     }
 
     private fun showTutorial() {
-        binding.drawerLayout.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+        binding.drawerLayout.viewTreeObserver.addOnGlobalLayoutListener(object :
+            ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
                 binding.drawerLayout.viewTreeObserver?.removeOnGlobalLayoutListener(this)
 
@@ -233,7 +234,8 @@ class MainActivity :
                 val insetsTop = ViewCompat.getRootWindowInsets(window.decorView)?.getInsets(insetsSystemBars)?.top ?: 0
 
                 val navIconOffsetX = dipToPixels(28f).toFloat()
-                val navigationViewTargetX = if (isRTL) binding.toolbar.right.toFloat() - navIconOffsetX else navIconOffsetX
+                val navigationViewTargetX =
+                    if (isRTL) binding.toolbar.right.toFloat() - navIconOffsetX else navIconOffsetX
                 val navigationViewTargetY = insetsTop.toFloat() + binding.toolbar.height / 2
 
                 val actIconOffsetX = dipToPixels(22f).toFloat()
@@ -508,7 +510,8 @@ class MainActivity :
     }
 
     override fun onError(t: Throwable) {
-        val snackbar = Snackbar.make(binding.content.constraintLayout, AndroidUtils.getErrorMessageResId(t), Snackbar.LENGTH_LONG)
+        val snackbar =
+            Snackbar.make(binding.content.constraintLayout, AndroidUtils.getErrorMessageResId(t), Snackbar.LENGTH_LONG)
         snackbar.anchorView = binding.fam.fabBase
         ViewCompat.setOnApplyWindowInsetsListener(snackbar.view) { _, insets -> insets }
         snackbar.show()
