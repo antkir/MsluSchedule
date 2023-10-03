@@ -9,7 +9,7 @@
     <string name="saturday">Субота</string>
     <string name="sunday">Нядзеля</string>
     <string name="item_blanklesson">Няма заняткаў у гэты дзень</string>
-    <string name="snackbar_internet_unavailable">Злучэнне з інтэрнэтам недаступна, паспрабуйце пазней.</string>
+    <string name="snackbar_internet_unavailable">Няма злучэння з інтэрнэтам</string>
     <string name="messsage_schedule_update_successful">Расклад для гэтага тыдня быў абноўлены</string>
     <string name="course">Курс</string>
     <string name="group">Група</string>
@@ -29,6 +29,7 @@
     <string name="pref_header_about">Аб прыкладанні</string>
     <string name="pref_header_schedule">Расклад</string>
     <string name="pref_header_appearence">"Знешні выгляд "</string>
+    <string name="error_no_data_on_server">На сайце з раскладам у гэты момант няма запытаных дадзеных</string>
     <string name="activity_settings_title">Налады</string>
     <string name="activity_lesson_info_title">Падрабязнасці</string>
     <string name="imageview_weekdays_description">Дні</string>
@@ -59,12 +60,12 @@
     <string name="navigation_drawer_settings">Налады</string>
     <string name="action_delete_schedule">Выдаліць расклад</string>
     <string name="dialog_delete_container_title">Вы ўпэўненыя, што жадаеце выдаліць гэты расклад?</string>
-    <string name="dialog_delete_container_message">Расклад для выбранай групы ці выкладчыка будзе выдалены, у тым ліку ўсе звесткі для гэтага раскладу (напрыклад, нататкі).</string>
+    <string name="dialog_delete_container_message">Расклад для выбранай групы ці выкладчыка будзе выдалены, у тым ліку ўсе дадзеныя для гэтага раскладу (напрыклад, нататкі).</string>
     <string name="view_main_image_description">Эмодзі з крыху ўсмешлівым тварам</string>
     <string name="view_main_empty_message">Дадайце новы расклад або абярыце ўжо дададзены са спісу.</string>
     <string name="action_show_today">Выбраць сённяшні дзень</string>
-    <string name="error_general">Адбылася памылка :(</string>
-    <string name="error_website_unavailable">Памылка: Немагчыма звязацца з серверам :(</string>
+    <string name="error_general">Адбылася памылка &#128542;</string>
+    <string name="error_website_unavailable">Немагчыма звязацца з сайтам з раскладам</string>
     <string name="snackbar_week_init_retry">Паўтарыць</string>
     <string name="text_week_no_classes">Няма заняткаў на гэтым тыдні. Удачы!</string>
 
@@ -88,4 +89,5 @@
     <string name="fab_add_schedule_studygroup_description">Дадаць расклад групы</string>
     <string name="fab_add_schedule_teacher_description">Дадаць расклад выкладчыка</string>
     <string name="fab_edit_note">Рэдагаваць нататку</string>
+    <string name="error_network_api_version">Гэты расклад быў спампаваны з сайта, які зараз не падтрымліваецца, і не можа быць абноўлены</string>
 </resources>

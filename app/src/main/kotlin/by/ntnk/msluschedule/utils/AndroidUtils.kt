@@ -80,6 +80,8 @@ object AndroidUtils {
             is HttpStatusException -> R.string.error_website_unavailable
             is SocketTimeoutException -> R.string.error_website_unavailable
             is UnknownHostException -> R.string.error_website_unavailable
+            is NetworkApiVersionException -> R.string.error_network_api_version
+            is NoDataOnServerException -> R.string.error_no_data_on_server
             else -> R.string.error_general
         }
     }

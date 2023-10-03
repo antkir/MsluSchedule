@@ -28,13 +28,13 @@
     <string name="saturday">Суббота</string>
     <string name="sunday">Воскресенье</string>
     <string name="item_blanklesson">Нет занятий в этот день</string>
-    <string name="snackbar_internet_unavailable">Соединение с интернетом недоступно, повторите позже.</string>
+    <string name="snackbar_internet_unavailable">Нет соединения с интернетом</string>
     <string name="view_main_image_description">Эмодзи с немного улыбающимся лицом</string>
     <string name="view_main_empty_message">Добавьте новое расписание или выберите уже добавленное из списка.</string>
     <string name="action_show_today">Выбрать сегодняшний день</string>
     <string name="action_update_schedule">Обновить</string>
-    <string name="error_general">Произошла ошибка :(</string>
-    <string name="error_website_unavailable">Ошибка: Не удалось подключиться к серверу :(</string>
+    <string name="error_general">Произошла ошибка &#128542;</string>
+    <string name="error_website_unavailable">Не удалось подключиться к cайту с расписанием</string>
     <string name="snackbar_week_init_retry">Повторить</string>
     <string name="text_week_no_classes">Нет занятий на этой неделе. Удачи!</string>
     <string name="button_week_show_weekdays">Показать дни</string>
@@ -52,6 +52,7 @@
     <string name="imageview_weekdays_description">Дни</string>
     <string name="class_same_time_description">Это занятие начинается одновременно с занятием выше в списке</string>
     <string name="activity_lesson_info_title">Подробности</string>
+    <string name="error_no_data_on_server">На сайте с расписанием в настоящий момент нет запрашиваемых данных</string>
     <string name="activity_settings_title">Настройки</string>
     <string name="pref_header_appearence">Внешний вид</string>
     <string name="pref_header_schedule">Расписание</string>
@@ -88,4 +89,5 @@
     <string name="fab_add_schedule_studygroup_description">Добавить расписание группы</string>
     <string name="fab_add_schedule_teacher_description">Добавить расписание преподавателя</string>
     <string name="fab_edit_note">Редактировать заметку</string>
+    <string name="error_network_api_version">Это расписание было загружено с неподдерживаемого сейчас сайта и не может быть обновлено</string>
 </resources>

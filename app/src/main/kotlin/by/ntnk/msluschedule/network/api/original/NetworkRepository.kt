@@ -12,7 +12,10 @@ import by.ntnk.msluschedule.network.api.original.data.RequestInfo
 import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.utils.EMPTY_STRING
 import by.ntnk.msluschedule.utils.HttpStatusException
+import by.ntnk.msluschedule.utils.NetworkApiVersion
+import by.ntnk.msluschedule.utils.NetworkApiVersionException
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
+import by.ntnk.msluschedule.utils.getNetworkApiVersionFromWeekKey
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -66,12 +69,20 @@ class NetworkRepository @Inject constructor(
     }
 
     override fun getSchedule(studyGroup: StudyGroup, weekKey: Int): Observable<WeekdayWithStudyGroupLessons> {
+        if (getNetworkApiVersionFromWeekKey(weekKey) != NetworkApiVersion.ORIGINAL) {
+            throw NetworkApiVersionException()
+        }
+
         val requestDataList = networkHelper.getStudyGroupRequestDataList(studyGroup, weekKey)
         return wrapRequest { getScheduleData(NetworkHelper.groupSchedule, requestDataList) }
             .flatMapObservable { xlsParser.parseStudyGroupXls(it) }
     }
 
     override fun getSchedule(teacher: Teacher, weekKey: Int): Observable<WeekdayWithTeacherLessons> {
+        if (getNetworkApiVersionFromWeekKey(weekKey) != NetworkApiVersion.ORIGINAL) {
+            throw NetworkApiVersionException()
+        }
+
         val requestDataList = networkHelper.getTeacherRequestDataList(teacher, weekKey)
         return wrapRequest { getScheduleData(NetworkHelper.teacherSchedule, requestDataList) }
             .flatMapObservable { xlsParser.parseTeacherXls(it) }

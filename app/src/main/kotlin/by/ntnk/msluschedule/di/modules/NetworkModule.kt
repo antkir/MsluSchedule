@@ -10,6 +10,8 @@ import by.ntnk.msluschedule.utils.SharedPreferencesRepository
 import dagger.Lazy
 import by.ntnk.msluschedule.network.api.original.NetworkRepository as NetworkRepositoryOriginal
 import by.ntnk.msluschedule.network.api.original.ScheduleService as ScheduleServiceOriginal
+import by.ntnk.msluschedule.network.api.myuniversity.NetworkRepository as NetworkRepositoryMyUniversity
+import by.ntnk.msluschedule.network.api.myuniversity.ScheduleService as ScheduleServiceMyUniversity
 import dagger.Module
 import dagger.Provides
 import okhttp3.OkHttpClient
@@ -93,12 +95,46 @@ class NetworkModule {
 
     @Provides
     @PerApp
+    @Api(NetworkApiVersion.MYUNIVERSITY.name)
+    fun provideOkHttpClientMyUniversity(httpLoggingInterceptor: HttpLoggingInterceptor): OkHttpClient {
+        return OkHttpClient().newBuilder()
+            .addNetworkInterceptor(httpLoggingInterceptor)
+            .connectTimeout(60, TimeUnit.SECONDS)
+            .readTimeout(60, TimeUnit.SECONDS)
+            .writeTimeout(60, TimeUnit.SECONDS)
+            .build()
+    }
+
+    @Provides
+    @PerApp
+    @Api(NetworkApiVersion.MYUNIVERSITY.name)
+    fun provideRetrofitMyUniversity(@Api(NetworkApiVersion.MYUNIVERSITY.name) okHttpClient: OkHttpClient): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl("https://myuniversity.by/api/schedule/mglu/")
+            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+            .addConverterFactory(MoshiConverterFactory.create())
+            .client(okHttpClient)
+            .build()
+    }
+
+    @Provides
+    @PerApp
+    fun provideScheduleServiceMyUniversity(
+        @Api(NetworkApiVersion.MYUNIVERSITY.name) retrofit: Retrofit
+    ): ScheduleServiceMyUniversity {
+        return retrofit.create(ScheduleServiceMyUniversity::class.java)
+    }
+
+    @Provides
+    @PerApp
     fun provideNetworkRepository(
         sharedPreferencesRepository: SharedPreferencesRepository,
-        networkRepositoryOriginal: Lazy<NetworkRepositoryOriginal>
+        networkRepositoryOriginal: Lazy<NetworkRepositoryOriginal>,
+        networkRepositoryMyUniversity: Lazy<NetworkRepositoryMyUniversity>
     ): NetworkRepository {
         return when (sharedPreferencesRepository.getCurrentNetworkApiVersion()) {
             NetworkApiVersion.ORIGINAL -> networkRepositoryOriginal.get()
+            NetworkApiVersion.MYUNIVERSITY -> networkRepositoryMyUniversity.get()
         }
     }
 

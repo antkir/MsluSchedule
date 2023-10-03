@@ -32,7 +32,7 @@ open class CurrentDate @Inject constructor() {
     private val week: Int
         get() = date.get(weekField)
 
-    private val academicYearStartDate: LocalDate
+    val academicYearStartDate: LocalDate
         get() {
             var date = LocalDate.of(academicYear, Month.SEPTEMBER, 1)
             if (date.dayOfWeek == DayOfWeek.SUNDAY) {
