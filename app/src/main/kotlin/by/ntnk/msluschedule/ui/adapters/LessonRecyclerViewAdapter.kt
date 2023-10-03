@@ -237,7 +237,7 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
                 lessonSubject.text = lesson.subject
                 lessonTeacher.text = lesson.teacher
                 lessonClassroom.text = lesson.classroom
-                lessonType.text = lesson.type
+                lessonType.text = lesson.type.lowercase()
 
                 if (isClassAlternative) {
                     lessonImgTime.visibility = View.VISIBLE
@@ -264,7 +264,7 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
                 lessonSubject.text = lesson.subject
                 lessonGroups.text = lesson.groups
                 lessonClassroom.text = lesson.classroom
-                lessonType.text = lesson.type
+                lessonType.text = lesson.type.lowercase()
                 lessonFaculty.text = lesson.faculty
 
                 if (lessonType.text.isBlank()) {

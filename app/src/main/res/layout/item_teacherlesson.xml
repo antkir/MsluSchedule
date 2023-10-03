@@ -47,37 +47,30 @@
         android:singleLine="true"
         android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
         android:textColor="@color/primary_text"
-        app:layout_constraintBottom_toTopOf="@+id/wrapper_teacherlesson_type"
+        app:layout_constraintBottom_toTopOf="@+id/text_teacherlesson_type"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Мод. &quot;Экономика&quot;: Экон. теория" />
 
-    <LinearLayout
-        android:id="@+id/wrapper_teacherlesson_type"
-        android:layout_width="0dp"
-        android:layout_height="@dimen/item_lesson_subtext_height"
+    <TextView
+        android:id="@+id/text_teacherlesson_type"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/item_lesson_type_height"
+        android:background="@drawable/lesson_type_rect"
+        android:paddingLeft="8dp"
+        android:paddingTop="2dp"
+        android:paddingRight="8dp"
+        android:paddingBottom="2dp"
+        android:singleLine="true"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textColor="@color/primary_text"
         app:layout_constraintBottom_toTopOf="@+id/text_teacherlesson_faculty"
         app:layout_constraintEnd_toEndOf="@+id/text_teacherlesson_subject"
+        app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toStartOf="@+id/text_teacherlesson_subject"
-        app:layout_constraintTop_toBottomOf="@+id/text_teacherlesson_subject">
-
-        <TextView
-            android:id="@+id/text_teacherlesson_type"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:background="@drawable/lesson_type_rect"
-            android:paddingLeft="8dp"
-            android:paddingTop="2dp"
-            android:paddingRight="8dp"
-            android:paddingBottom="2dp"
-            android:singleLine="true"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-            android:textColor="@color/chip_text"
-            android:textSize="12sp"
-            tools:text="ЛК (В онлайн режиме)" />
-
-    </LinearLayout>
+        app:layout_constraintTop_toBottomOf="@+id/text_teacherlesson_subject"
+        tools:text="лк (в онлайн режиме)" />
 
     <TextView
         android:id="@+id/text_teacherlesson_faculty"
@@ -89,7 +82,7 @@
         app:layout_constraintBottom_toTopOf="@+id/text_teacherlesson_groups"
         app:layout_constraintEnd_toEndOf="@+id/text_teacherlesson_subject"
         app:layout_constraintStart_toStartOf="@+id/text_teacherlesson_subject"
-        app:layout_constraintTop_toBottomOf="@+id/wrapper_teacherlesson_type"
+        app:layout_constraintTop_toBottomOf="@+id/text_teacherlesson_type"
         tools:text="Меж.ком." />
 
     <TextView
