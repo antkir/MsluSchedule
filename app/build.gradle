@@ -105,9 +105,8 @@ ext {
     timberVersion = '5.0.1'
     windowVersion = '1.1.0'
 
-    crashlyticsVersion = '18.4.1'
-    // Firebase Analytics 20.0.0+ release bumps minimum requirements to Android 4.4+.
-    firebaseanalyticsVersion = '19.0.2'
+    // Firebase BoM 29.0.0+ release bumps minimum requirements to Android 4.4+.
+    firebasebomVersion = '28.4.2'
 }
 
 dependencies {
@@ -159,6 +158,7 @@ dependencies {
     testImplementation "org.mockito:mockito-core:$mockitoVersion"
     testImplementation "junit:junit:$junitVersion"
     // Firebase
-    implementation "com.google.firebase:firebase-analytics-ktx:$firebaseanalyticsVersion"
-    implementation "com.google.firebase:firebase-crashlytics-ktx:$crashlyticsVersion"
+    implementation platform("com.google.firebase:firebase-bom:$firebasebomVersion")
+    implementation 'com.google.firebase:firebase-analytics-ktx'
+    implementation 'com.google.firebase:firebase-crashlytics-ktx'
 }
