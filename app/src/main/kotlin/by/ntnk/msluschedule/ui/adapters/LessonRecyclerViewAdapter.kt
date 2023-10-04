@@ -186,7 +186,6 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
             VIEWTYPE_WEEKDAY -> {
                 val surfaceColor = ContextCompat.getColor(viewHolder.itemView.context, R.color.surface)
                 viewHolder.itemView.setBackgroundColor(surfaceColor)
-                viewHolder.itemView.setOnClickListener { onClickSubject.onNext(data[position]) }
             }
             else -> Unit
         }
