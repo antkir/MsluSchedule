@@ -8,7 +8,9 @@ import by.ntnk.msluschedule.network.NetworkRepository
 import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.utils.CurrentDate
 import by.ntnk.msluschedule.utils.EMPTY_STRING
+import by.ntnk.msluschedule.utils.NetworkApiVersion
 import by.ntnk.msluschedule.utils.SchedulerProvider
+import by.ntnk.msluschedule.utils.SharedPreferencesRepository
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
@@ -19,7 +21,8 @@ class AddGroupPresenter @Inject constructor(
     private val databaseRepository: DatabaseRepository,
     private val networkRepository: NetworkRepository,
     private val currentDate: CurrentDate,
-    private val schedulerProvider: SchedulerProvider
+    private val schedulerProvider: SchedulerProvider,
+    private val sharedPreferencesRepository: SharedPreferencesRepository
 ) : Presenter<AddGroupView>() {
 
     private val disposables: CompositeDisposable = CompositeDisposable()
@@ -128,18 +131,35 @@ class AddGroupPresenter @Inject constructor(
         return scheduleContaners
             ?.filter { scheduleContainer -> scheduleContainer.year == currentDate.academicYear }
             ?.filter { scheduleContainer -> scheduleContainer.faculty == faculty }
-            ?.map { scheduleContainer -> scheduleContainer.name }
-            ?.any { it == name } == true
+            ?.any { scheduleContaner ->
+                val facultyName = faculties!!.getValue(faculty)
+                scheduleContaner.name == formatGroupName(name, facultyName)
+            } == true
     }
 
     fun getStudyGroup(): StudyGroup? {
-        val groupValue = groups!!.getValue(group)
-        if (groupValue == EMPTY_STRING) {
+        val facultyName = faculties!!.getValue(faculty)
+        if (facultyName == EMPTY_STRING) {
+            val exception = IllegalStateException("Faculty value wasn't found in the array.")
+            view?.showError(exception)
+            return null
+        }
+        val groupName = groups!!.getValue(group)
+        if (groupName == EMPTY_STRING) {
             val exception = IllegalStateException("Group value wasn't found in the array.")
             view?.showError(exception)
             return null
         }
-        return StudyGroup(group, groupValue, faculty, course, currentDate.academicYear)
+        val name = formatGroupName(groupName, facultyName)
+        return StudyGroup(group, name, faculty, course, currentDate.academicYear)
+    }
+
+    private fun formatGroupName(groupName: String, facultyName: String): String {
+        return if (sharedPreferencesRepository.getCurrentNetworkApiVersion() == NetworkApiVersion.MYUNIVERSITY) {
+            "$groupName ($facultyName)"
+        } else {
+            groupName
+        }
     }
 
     fun populateFacultiesAdapter() = view?.populateFacultiesAdapter(faculties!!)
