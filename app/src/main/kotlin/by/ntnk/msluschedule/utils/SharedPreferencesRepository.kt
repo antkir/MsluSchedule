@@ -78,6 +78,11 @@ class SharedPreferencesRepository @Inject constructor(
             .getBoolean(applicationContext.getString(R.string.key_hide_pe_classes), false)
     }
 
+    fun isSelfStudyClassHidden(): Boolean {
+        return sharedPreferences
+            .getBoolean(applicationContext.getString(R.string.key_hide_self_study_classes), false)
+    }
+
     fun getCurrentNetworkApiVersion() : NetworkApiVersion {
         return NetworkApiVersion.ORIGINAL
     }

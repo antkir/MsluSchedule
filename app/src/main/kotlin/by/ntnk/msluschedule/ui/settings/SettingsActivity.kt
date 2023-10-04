@@ -130,6 +130,12 @@ class SettingsActivity : AppCompatActivity(), HasAndroidInjector {
             val keyHidePEClasses = getString(R.string.key_hide_pe_classes)
             findPreference<CheckBoxPreference>(keyHidePEClasses)!!.isSingleLineTitle = false
 
+            if (sharedPreferencesRepository.getCurrentNetworkApiVersion() == NetworkApiVersion.MYUNIVERSITY) {
+                val keyHideSelfStudyClasses = getString(R.string.key_hide_self_study_classes)
+                findPreference<CheckBoxPreference>(keyHideSelfStudyClasses)!!.isVisible = true
+                findPreference<CheckBoxPreference>(keyHideSelfStudyClasses)!!.isSingleLineTitle = false
+            }
+
             val sendFeedback = findPreference<Preference>(getString(R.string.key_send_feedback))!!
             sendFeedback.setOnPreferenceClickListener {
                 try {

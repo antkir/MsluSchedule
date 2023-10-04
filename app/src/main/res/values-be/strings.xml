@@ -90,4 +90,5 @@
     <string name="fab_add_schedule_teacher_description">Дадаць расклад выкладчыка</string>
     <string name="fab_edit_note">Рэдагаваць нататку</string>
     <string name="error_network_api_version">Гэты расклад быў спампаваны з сайта, які зараз не падтрымліваецца, і не можа быць абноўлены</string>
+    <string name="pref_hide_self_study_classes_title">Хаваць заняткі самастойнай працы</string>
 </resources>
