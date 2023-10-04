@@ -1,14 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="60dp">
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:text="@string/item_blanklesson"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:textColor="@color/tertiary_text" />
-
-</LinearLayout>
+    android:layout_height="60dp"
+    android:background="@drawable/item_surface"
+    android:gravity="center"
+    android:text="@string/item_blanklesson"
+    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+    android:textColor="@color/tertiary_text" />
