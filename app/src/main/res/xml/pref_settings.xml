@@ -32,6 +32,14 @@
             android:key="@string/key_hide_pe_classes"
             android:summary="@string/pref_next_update_summary"
             android:title="@string/pref_hide_pe_classes_title" />
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:icon="@drawable/ic_null"
+            android:key="@string/key_hide_self_study_classes"
+            android:summary="@string/pref_next_update_summary"
+            android:title="@string/pref_hide_self_study_classes_title"
+            app:isPreferenceVisible="false" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/pref_header_about">
