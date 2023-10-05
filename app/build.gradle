@@ -105,8 +105,7 @@ ext {
     timberVersion = '5.0.1'
     windowVersion = '1.1.0'
 
-    // Firebase BoM 29.0.0+ release bumps minimum requirements to Android 4.4+.
-    firebasebomVersion = '28.4.2'
+    firebasebomVersion = '32.3.1'
 }
 
 dependencies {
