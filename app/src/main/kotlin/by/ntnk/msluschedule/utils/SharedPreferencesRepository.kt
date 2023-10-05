@@ -84,6 +84,6 @@ class SharedPreferencesRepository @Inject constructor(
     }
 
     fun getCurrentNetworkApiVersion() : NetworkApiVersion {
-        return NetworkApiVersion.ORIGINAL
+        return NetworkApiVersion.MYUNIVERSITY
     }
 }
