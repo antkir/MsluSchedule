@@ -30,7 +30,7 @@
     </style>
 
     <style name="MsluTheme.LaunchScreen" parent="MsluTheme.NoActionBar">
-        <item name="android:windowBackground">@drawable/launch_screen</item>
+        <item name="android:windowBackground">@drawable/splash_screen</item>
         <item name="android:navigationBarColor">@color/nav_bar_launch_screen</item>
     </style>
 </resources>

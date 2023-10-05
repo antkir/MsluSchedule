@@ -33,7 +33,7 @@
     </style>
 
     <style name="MsluTheme.LaunchScreen" parent="MsluTheme.NoActionBar">
-        <item name="android:windowBackground">@drawable/launch_screen</item>
+        <item name="android:windowBackground">@drawable/splash_screen</item>
     </style>
 
     <style name="MsluTheme.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar">
