@@ -29,7 +29,7 @@
     <string name="sunday">Воскресенье</string>
     <string name="item_blanklesson">Нет занятий в этот день</string>
     <string name="snackbar_internet_unavailable">Нет соединения с интернетом</string>
-    <string name="view_main_image_description">Эмодзи с немного улыбающимся лицом</string>
+    <string name="main_background_image_description">Изображение студентов, разговаривающих друг с другом.</string>
     <string name="view_main_empty_message">Добавьте новое расписание или выберите уже добавленное из списка.</string>
     <string name="action_show_today">Выбрать сегодняшний день</string>
     <string name="action_update_schedule">Обновить</string>
@@ -39,11 +39,13 @@
     <string name="text_week_no_classes">Нет занятий на этой неделе. Удачи!</string>
     <string name="button_week_show_weekdays">Показать дни</string>
     <string name="button_week_hide_weekdays">Скрыть дни</string>
+    <string name="week_background_image_description">Изображение парня, отдыхающего в кресле.</string>
     <string name="edittext_weekday_note">Введите заметку</string>
     <string name="textview_other_notes_header">Другие заметки</string>
     <string name="textview_zeronotes">Нет заметок на этот день</string>
     <string name="snackbar_note_deleted">Заметка была удалена</string>
     <string name="snackbar_action_undo">Отменить</string>
+    <string name="weekday_background_image_description">Изображение девушки с длинным списком заметок.</string>
     <string name="imageview_dayitem_description">Заметки</string>
     <string name="imageview_subject_description">Предмет</string>
     <string name="imageview_time_description">Время</string>

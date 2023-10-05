@@ -243,8 +243,8 @@ class MainActivity :
                 val actionMenuTargetY = insetsTop.toFloat() + binding.toolbar.height / 2
 
                 val welcomeTarget = SimpleTarget.Builder(this@MainActivity)
-                    .setPoint(binding.content.imageSmile)
-                    .setShape(Circle(dipToPixels(60f).toFloat()))
+                    .setPoint(binding.content.imageBackground)
+                    .setShape(Circle(dipToPixels(120f).toFloat()))
                     .setTitle(getString(R.string.tutorial_welcome_title))
                     .setDescription(getString(R.string.tutorial_welcome_description))
                     .build()
@@ -267,8 +267,8 @@ class MainActivity :
                     .setDescription(getString(R.string.tutorial_action_menu_description))
                     .build()
                 val finishTarget = SimpleTarget.Builder(this@MainActivity)
-                    .setPoint(binding.content.imageSmile)
-                    .setShape(Circle(dipToPixels(60f).toFloat()))
+                    .setPoint(binding.content.imageBackground)
+                    .setShape(Circle(dipToPixels(120f).toFloat()))
                     .setTitle(getString(R.string.tutorial_finish_title))
                     .setDescription(getString(R.string.tutorial_finish_description))
                     .build()
@@ -282,9 +282,18 @@ class MainActivity :
                         finishTarget
                     )
                     .setOnSpotlightStateListener(object : OnSpotlightStateChangedListener {
-                        override fun onStarted() = Unit
+                        override fun onStarted() {
+                            binding.content.textHint.alpha = 0f
+                        }
+
                         override fun onEnded() {
                             sharedPreferencesRepository.isFirstAppLaunch = false
+                            binding.content.textHint.animate()
+                                .setStartDelay(0)
+                                .alpha(1f)
+                                .setDuration(500)
+                                .setInterpolator(FastOutSlowInInterpolator())
+                                .start()
                         }
                     })
                     .start()
@@ -299,7 +308,7 @@ class MainActivity :
         }
 
         if (presenter.isSelectedContainerNull()) {
-            binding.content.imageSmile.visibility = View.VISIBLE
+            binding.content.imageBackground.visibility = View.VISIBLE
             binding.content.textHint.visibility = View.VISIBLE
         } else {
             initMainContent()
@@ -407,7 +416,7 @@ class MainActivity :
             weeksContainerFragment.swapTabs()
         }
 
-        binding.content.imageSmile.visibility = View.GONE
+        binding.content.imageBackground.visibility = View.GONE
         binding.content.textHint.visibility = View.GONE
     }
 
@@ -525,7 +534,7 @@ class MainActivity :
                 .commitNow()
         }
 
-        binding.content.imageSmile.visibility = View.GONE
+        binding.content.imageBackground.visibility = View.GONE
         binding.content.textHint.visibility = View.GONE
         binding.content.progressbar.visibility = View.GONE
     }
@@ -568,7 +577,7 @@ class MainActivity :
         removeWeeksContainerFragment()
 
         binding.content.progressbar.visibility = View.VISIBLE
-        binding.content.imageSmile.visibility = View.GONE
+        binding.content.imageBackground.visibility = View.GONE
         binding.content.textHint.visibility = View.GONE
     }
 
@@ -577,7 +586,7 @@ class MainActivity :
         removeWeeksContainerFragment()
 
         binding.content.progressbar.visibility = View.GONE
-        binding.content.imageSmile.visibility = View.VISIBLE
+        binding.content.imageBackground.visibility = View.VISIBLE
         binding.content.textHint.visibility = View.VISIBLE
 
         val snackbar = Snackbar.make(binding.content.constraintLayout, R.string.error_general, Snackbar.LENGTH_LONG)
@@ -590,7 +599,7 @@ class MainActivity :
         supportActionBar?.title = EMPTY_STRING
         removeWeeksContainerFragment()
 
-        binding.content.imageSmile.visibility = View.VISIBLE
+        binding.content.imageBackground.visibility = View.VISIBLE
         binding.content.textHint.visibility = View.VISIBLE
 
         binding.navView.menu

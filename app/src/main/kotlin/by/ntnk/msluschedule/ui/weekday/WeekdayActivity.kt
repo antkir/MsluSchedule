@@ -301,8 +301,8 @@ class WeekdayActivity :
                 startOffset = 100
                 duration = 100
             }
-            binding.textZeroNotes.startAnimation(alphaAnimation)
-            binding.textZeroNotes.visibility = View.VISIBLE
+            binding.viewZeroNotes.startAnimation(alphaAnimation)
+            binding.viewZeroNotes.visibility = View.VISIBLE
         }
     }
 
@@ -377,7 +377,7 @@ class WeekdayActivity :
 
         adapter.initData(data, weekdayWithLessons.lessons, resources)
         if (adapter.itemCount > 0) {
-            binding.textZeroNotes.visibility = View.GONE
+            binding.viewZeroNotes.visibility = View.GONE
         }
         binding.recyclerviewNotes.layoutManager?.onRestoreInstanceState(layoutManagerSavedState)
 
@@ -403,12 +403,12 @@ class WeekdayActivity :
     }
 
     override fun addNote(note: Note) {
-        binding.textZeroNotes.visibility = View.GONE
+        binding.viewZeroNotes.visibility = View.GONE
         adapter.addNote(note)
     }
 
     override fun restoreNote(note: Note, color: Int, position: Int) {
-        binding.textZeroNotes.visibility = View.GONE
+        binding.viewZeroNotes.visibility = View.GONE
         adapter.restoreNote(note, color, position)
     }
 

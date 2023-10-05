@@ -44,8 +44,10 @@
     <string name="textview_zeronotes">Няма нататкаў на гэты дзень</string>
     <string name="textview_other_notes_header">Іншыя нататкі</string>
     <string name="edittext_weekday_note">Увядзіце нататку</string>
+    <string name="weekday_background_image_description">Выява дзяўчыны з доўгім спісам нататак.</string>
     <string name="button_week_hide_weekdays">Схаваць дні</string>
     <string name="button_week_show_weekdays">Паказаць дні</string>
+    <string name="week_background_image_description">Выява хлопца, які адпачывае ў крэсле.</string>
     <string name="add_group_title">Дадаць групу</string>
     <string name="group_already_added">Група ўжо была дададзеная.</string>
     <string name="add_teacher_title">Дадаць выкладчыка</string>
@@ -61,7 +63,7 @@
     <string name="action_delete_schedule">Выдаліць расклад</string>
     <string name="dialog_delete_container_title">Вы ўпэўненыя, што жадаеце выдаліць гэты расклад?</string>
     <string name="dialog_delete_container_message">Расклад для выбранай групы ці выкладчыка будзе выдалены, у тым ліку ўсе дадзеныя для гэтага раскладу (напрыклад, нататкі).</string>
-    <string name="view_main_image_description">Эмодзі з крыху ўсмешлівым тварам</string>
+    <string name="main_background_image_description">Выява студэнтаў, якія размаўляюць адзін з адным.</string>
     <string name="view_main_empty_message">Дадайце новы расклад або абярыце ўжо дададзены са спісу.</string>
     <string name="action_show_today">Выбраць сённяшні дзень</string>
     <string name="error_general">Адбылася памылка &#128542;</string>

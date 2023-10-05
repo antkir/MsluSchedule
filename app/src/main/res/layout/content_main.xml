@@ -25,13 +25,12 @@
         tools:ignore="UnusedAttribute" />
 
     <ImageView
-        android:id="@+id/image_smile"
-        android:layout_width="96dp"
-        android:layout_height="96dp"
+        android:id="@+id/image_background"
+        android:layout_width="200dp"
+        android:layout_height="156dp"
         android:layout_centerInParent="true"
-        android:alpha="0.2"
-        android:contentDescription="@string/view_main_image_description"
-        android:src="@drawable/ic_emoji_smile"
+        android:contentDescription="@string/main_background_image_description"
+        android:src="@drawable/ic_students"
         android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@+id/text_hint"
         app:layout_constraintEnd_toEndOf="parent"
@@ -43,21 +42,20 @@
         android:id="@+id/text_hint"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/image_smile"
+        android:layout_below="@+id/image_background"
         android:layout_centerHorizontal="true"
-        android:layout_marginStart="32dp"
-        android:layout_marginLeft="32dp"
-        android:layout_marginEnd="32dp"
-        android:layout_marginRight="32dp"
-        android:alpha="0.3"
+        android:layout_marginHorizontal="64dp"
+        android:layout_marginTop="8dp"
         android:gravity="center"
         android:text="@string/view_main_empty_message"
         android:textAlignment="center"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+        android:textColor="@color/primary_text"
+        android:textSize="14sp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/image_smile" />
+        app:layout_constraintTop_toBottomOf="@+id/image_background" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

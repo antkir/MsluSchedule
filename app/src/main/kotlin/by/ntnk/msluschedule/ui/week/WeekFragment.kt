@@ -196,7 +196,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     }
 
     fun highlightToday() {
-        if (binding.textNoLessons.visibility != View.VISIBLE) {
+        if (binding.viewNoClasses.visibility != View.VISIBLE) {
             val index = adapter.getWeekdayViewIndex(presenter.getCurrentDayOfWeek())
             smoothScroller.targetPosition = index
             binding.recyclerViewDays.layoutManager?.startSmoothScroll(smoothScroller)
@@ -218,15 +218,15 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         if (data.sumOf { it.lessons.size } == 0) {
             binding.buttonDaysVisibility.visibility = View.VISIBLE
             if (!isEmptyScheduleDaysVisible) {
-                binding.textNoLessons.visibility = View.VISIBLE
+                binding.viewNoClasses.visibility = View.VISIBLE
             } else {
-                binding.textNoLessons.visibility = View.GONE
+                binding.viewNoClasses.visibility = View.GONE
             }
             binding.recyclerViewDays.addOnScrollListener(recyclerViewScrollListener)
             binding.buttonDaysVisibility.setOnClickListener { onWeekdaysButtonClickListener() }
         } else {
             binding.buttonDaysVisibility.visibility = View.GONE
-            binding.textNoLessons.visibility = View.GONE
+            binding.viewNoClasses.visibility = View.GONE
             binding.recyclerViewDays.removeOnScrollListener(recyclerViewScrollListener)
         }
 
@@ -268,12 +268,12 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     private fun onWeekdaysButtonClickListener() {
         if (!isEmptyScheduleDaysVisible) {
             isEmptyScheduleDaysVisible = true
-            binding.textNoLessons.visibility = View.GONE
+            binding.viewNoClasses.visibility = View.GONE
 
             binding.buttonDaysVisibility.text = requireContext().getString(R.string.button_week_hide_weekdays)
         } else {
             isEmptyScheduleDaysVisible = false
-            binding.textNoLessons.visibility = View.VISIBLE
+            binding.viewNoClasses.visibility = View.VISIBLE
 
             // workaround the edge case, when the button is pressed during
             // the hiding animation and won't show again

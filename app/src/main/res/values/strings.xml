@@ -43,7 +43,7 @@
 
     <string name="messsage_schedule_update_successful">The schedule for this week was updated</string>
 
-    <string name="view_main_image_description">Slightly smiling face emoji</string>
+    <string name="main_background_image_description">Image of students talking to each other.</string>
     <string name="view_main_empty_message">Add a new schedule or choose one from the list.</string>
 
     <string name="action_show_today">Highlight today\’s date</string>
@@ -54,12 +54,14 @@
     <string name="text_week_no_classes">No classes this week. Good luck!</string>
     <string name="button_week_show_weekdays">Show weekdays</string>
     <string name="button_week_hide_weekdays">Hide weekdays</string>
+    <string name="week_background_image_description">Image of a guy resting on a chair.</string>
 
     <string name="edittext_weekday_note">Enter a note</string>
     <string name="textview_other_notes_header">Other notes</string>
     <string name="textview_zeronotes">No notes for this day</string>
     <string name="snackbar_note_deleted">The note was deleted</string>
     <string name="snackbar_action_undo">Undo</string>
+    <string name="weekday_background_image_description">Image of a girl with a long list of notes.</string>
 
     <string name="imageview_dayitem_description">Notes</string>
     <string name="imageview_subject_description">Subject</string>

@@ -13,22 +13,36 @@
         android:orientation="vertical"
         tools:context="by.ntnk.msluschedule.ui.weekday.WeekdayActivity">
 
-        <TextView
-            android:id="@+id/text_zero_notes"
+        <LinearLayout
+            android:id="@+id/view_zero_notes"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:paddingStart="@dimen/textview_zeronotes_padding"
-            android:paddingLeft="@dimen/textview_zeronotes_padding"
-            android:paddingEnd="@dimen/textview_zeronotes_padding"
-            android:paddingRight="@dimen/textview_zeronotes_padding"
-            android:text="@string/textview_zeronotes"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
-            android:textColor="@color/tertiary_text"
+            android:gravity="center"
+            android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:contentDescription="@string/weekday_background_image_description"
+                android:src="@drawable/ic_notes" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginHorizontal="64dp"
+                android:layout_marginTop="8dp"
+                android:text="@string/textview_zeronotes"
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+                android:textColor="@color/primary_text"
+                android:textSize="14sp" />
+
+        </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerview_notes"
