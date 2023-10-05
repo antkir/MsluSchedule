@@ -79,6 +79,7 @@
         android:singleLine="true"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textColor="@color/tertiary_text"
+        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@+id/text_teacherlesson_groups"
         app:layout_constraintEnd_toEndOf="@+id/text_teacherlesson_subject"
         app:layout_constraintStart_toStartOf="@+id/text_teacherlesson_subject"
@@ -94,9 +95,9 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textColor="@color/tertiary_text"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/text_teacherlesson_faculty"
-        app:layout_constraintStart_toStartOf="@+id/text_teacherlesson_faculty"
-        app:layout_constraintTop_toBottomOf="@+id/text_teacherlesson_faculty"
+        app:layout_constraintEnd_toEndOf="@+id/text_teacherlesson_subject"
+        app:layout_constraintStart_toStartOf="@+id/text_teacherlesson_subject"
+        app:layout_constraintTop_toBottomOf="@+id/text_teacherlesson_type"
         tools:text="308 мк_а-н, 309 мк_а-ит, 310 мк_а-ит, 311 мк_а-кит, 312 мк_а-нем, 313 мк_а-фр, 314 мк_а_фр, 315 мк_а-фр" />
 
     <TextView
