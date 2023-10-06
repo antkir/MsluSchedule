@@ -8,6 +8,7 @@ import by.ntnk.msluschedule.network.NetworkRepository
 import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.utils.CurrentDate
 import by.ntnk.msluschedule.utils.SchedulerProvider
+import by.ntnk.msluschedule.utils.isUnexpectedException
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 import timber.log.Timber
@@ -46,7 +47,11 @@ class AddTeacherPresenter @Inject constructor(
                     populateTeachersAdapter()
                 },
                 onError = { throwable ->
-                    Timber.i(throwable)
+                    if (isUnexpectedException(throwable)) {
+                        Timber.e(throwable)
+                    } else {
+                        Timber.i(throwable)
+                    }
                     view?.showError(throwable)
                 }
             )

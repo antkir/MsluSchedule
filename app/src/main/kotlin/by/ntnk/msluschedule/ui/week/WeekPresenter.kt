@@ -12,7 +12,7 @@ import by.ntnk.msluschedule.utils.NoDataOnServerException
 import by.ntnk.msluschedule.utils.ScheduleType
 import by.ntnk.msluschedule.utils.SchedulerProvider
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
-import com.squareup.moshi.JsonDataException
+import by.ntnk.msluschedule.utils.isUnexpectedException
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
@@ -49,16 +49,16 @@ class WeekPresenter @Inject constructor(
                         getNotesStatus(weekday.weekdayId)
                     }
                 },
-                onError = {
-                    if (it is JsonDataException) {
-                        Timber.e(it)
+                onError = { throwable ->
+                    if (isUnexpectedException(throwable)) {
+                        Timber.e(throwable)
                     } else {
-                        Timber.i(it)
+                        Timber.i(throwable)
                     }
-                    if (it is NoDataOnServerException) {
+                    if (throwable is NoDataOnServerException) {
                         getSchedule(weekId, shouldUpdateAdapter = true)
                     } else {
-                        view?.showError(it, shouldSetupViews = true)
+                        view?.showError(throwable, shouldSetupViews = true)
                     }
                 }
             )
@@ -167,16 +167,16 @@ class WeekPresenter @Inject constructor(
             .doOnSuccess { view?.showUpdateSuccessMessage() }
             .subscribeBy(
                 onSuccess = { weekdayEntities -> view?.showSchedule(weekdayEntities) },
-                onError = {
-                    if (it is JsonDataException) {
-                        Timber.e(it)
+                onError = { throwable ->
+                    if (isUnexpectedException(throwable)) {
+                        Timber.e(throwable)
                     } else {
-                        Timber.i(it)
+                        Timber.i(throwable)
                     }
-                    if (it is NoDataOnServerException) {
+                    if (throwable is NoDataOnServerException) {
                         view?.showUpdateSuccessMessage()
                     } else {
-                        view?.showError(it, shouldSetupViews = false)
+                        view?.showError(throwable, shouldSetupViews = false)
                     }
                 }
             )

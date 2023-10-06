@@ -1,5 +1,8 @@
 package by.ntnk.msluschedule.utils
 
+import java.net.ConnectException
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 import java.util.AbstractMap
 
 const val EMPTY_STRING = ""
@@ -54,4 +57,14 @@ class HttpStatusException(message: String, statusCode: Int, url: String) :
  */
 fun getNetworkApiVersionFromWeekKey(weekKey: Int): NetworkApiVersion {
     return if (weekKey < 400) NetworkApiVersion.MYUNIVERSITY else NetworkApiVersion.ORIGINAL
+}
+
+fun isUnexpectedException(t: Throwable): Boolean {
+    return t !is ConnectException &&
+        t !is SocketTimeoutException &&
+        t !is UnknownHostException &&
+        t !is HttpStatusException &&
+        t !is InvalidYearException &&
+        t !is NetworkApiVersionException &&
+        t !is NoDataOnServerException
 }

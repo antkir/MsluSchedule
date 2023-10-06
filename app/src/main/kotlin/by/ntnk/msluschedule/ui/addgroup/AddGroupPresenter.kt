@@ -11,6 +11,7 @@ import by.ntnk.msluschedule.utils.EMPTY_STRING
 import by.ntnk.msluschedule.utils.NetworkApiVersion
 import by.ntnk.msluschedule.utils.SchedulerProvider
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
+import by.ntnk.msluschedule.utils.isUnexpectedException
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
@@ -81,7 +82,11 @@ class AddGroupPresenter @Inject constructor(
                     populateFacultiesAdapter()
                 },
                 onError = { throwable ->
-                    Timber.i(throwable)
+                    if (isUnexpectedException(throwable)) {
+                        Timber.e(throwable)
+                    } else {
+                        Timber.i(throwable)
+                    }
                     view?.showError(throwable)
                 }
             )
@@ -97,7 +102,11 @@ class AddGroupPresenter @Inject constructor(
                     populateCoursesAdapter()
                 },
                 onError = { throwable ->
-                    Timber.i(throwable)
+                    if (isUnexpectedException(throwable)) {
+                        Timber.e(throwable)
+                    } else {
+                        Timber.i(throwable)
+                    }
                     view?.showError(throwable)
                 }
             )
@@ -113,7 +122,11 @@ class AddGroupPresenter @Inject constructor(
                     populateGroupsAdapter()
                 },
                 onError = { throwable ->
-                    Timber.i(throwable)
+                    if (isUnexpectedException(throwable)) {
+                        Timber.e(throwable)
+                    } else {
+                        Timber.i(throwable)
+                    }
                     view?.showError(throwable)
                 }
             )
