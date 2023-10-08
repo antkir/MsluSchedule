@@ -14,6 +14,7 @@ import by.ntnk.msluschedule.network.api.myuniversity.NetworkRepository as Networ
 import by.ntnk.msluschedule.network.api.myuniversity.ScheduleService as ScheduleServiceMyUniversity
 import dagger.Module
 import dagger.Provides
+import okhttp3.Cache
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -96,8 +97,12 @@ class NetworkModule {
     @Provides
     @PerApp
     @Api(NetworkApiVersion.MYUNIVERSITY.name)
-    fun provideOkHttpClientMyUniversity(httpLoggingInterceptor: HttpLoggingInterceptor): OkHttpClient {
+    fun provideOkHttpClientMyUniversity(
+        @Named("cache") cacheDir: File,
+        httpLoggingInterceptor: HttpLoggingInterceptor
+    ): OkHttpClient {
         return OkHttpClient().newBuilder()
+            .cache(Cache(cacheDir, 5 * 1024 * 1024)) // 5MB
             .addNetworkInterceptor(httpLoggingInterceptor)
             .connectTimeout(60, TimeUnit.SECONDS)
             .readTimeout(60, TimeUnit.SECONDS)
