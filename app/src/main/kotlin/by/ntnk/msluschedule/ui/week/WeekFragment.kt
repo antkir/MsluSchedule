@@ -204,8 +204,8 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
             val toColor = ContextCompat.getColor(requireContext(), R.color.item_highlight)
             val highlightAnimation = ValueAnimator.ofObject(ArgbEvaluator(), fromColor, toColor)
             highlightAnimation.duration = 500
+            val view = binding.recyclerViewDays.layoutManager?.findViewByPosition(index)
             highlightAnimation.addUpdateListener { animator ->
-                val view: View? = binding.recyclerViewDays.layoutManager?.findViewByPosition(index)
                 view?.setBackgroundColor(animator.animatedValue as Int)
             }
             highlightAnimation.repeatMode = ValueAnimator.REVERSE
