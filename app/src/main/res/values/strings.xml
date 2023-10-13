@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">MSLU Schedule</string>
+
     <string name="add_group_title">Add a group</string>
     <string name="group_already_added">The group is already added.</string>
     <string name="add_teacher_title">Add a teacher</string>
@@ -10,19 +11,24 @@
     <string name="fab_add_schedule_studygroup_description">Add a group schedule</string>
     <string name="fab_add_schedule_teacher_description">Add a teacher schedule</string>
     <string name="fab_edit_note">Edit a note</string>
+
     <string name="faculty">Faculty</string>
     <string name="course">Course</string>
     <string name="group">Group</string>
     <string name="teacher">Teacher</string>
+
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="navigation_drawer_studygroups">Groups</string>
     <string name="navigation_drawer_teachers">Teachers</string>
     <string name="navigation_drawer_settings">Settings</string>
+
     <string name="action_delete_schedule">Delete the schedule</string>
+
     <string name="dialog_delete_container_title">Are you sure you want to delete the schedule?</string>
     <string name="dialog_delete_container_message">The schedule for the selected group/teacher and all the data associated with it (e.g notes) will be deleted.</string>
     <string name="button_delete">Delete</string>
+
     <string name="monday">Monday</string>
     <string name="tuesday">Tuesday</string>
     <string name="wednesday">Wednesday</string>
@@ -30,15 +36,19 @@
     <string name="friday">Friday</string>
     <string name="saturday">Saturday</string>
     <string name="sunday">Sunday</string>
+
     <string name="item_blanklesson">No classes this day</string>
+
     <string name="snackbar_internet_unavailable">No network connection available</string>
+
     <string name="messsage_schedule_update_successful">The schedule for this week was updated</string>
     <string name="view_main_image_description">Slightly smiling face emoji</string>
     <string name="view_main_empty_message">Add a new schedule or choose one from the list.</string>
-    <string name="action_show_today">Highlight today\'s date</string>
+
+    <string name="action_show_today">Highlight today\’s date</string>
     <string name="action_update_schedule">Update</string>
     <string name="error_general">An error occurred &#128542;</string>
-    <string name="error_website_unavailable">Error: Could not connect to the schedule website &#128542;</string>
+    <string name="error_website_unavailable">Could not connect to the schedule website</string>
     <string name="snackbar_week_init_retry">Retry</string>
     <string name="text_week_no_classes">No classes this week. Good luck!</string>
     <string name="button_week_show_weekdays">Show weekdays</string>
@@ -56,6 +66,9 @@
     <string name="imageview_weekdays_description">Weekdays</string>
     <string name="class_same_time_description">This class starts at the same time as the class higher in the list</string>
     <string name="activity_lesson_info_title">Details</string>
+
+    <string name="error_network_api_version">This schedule was downloaded from a currently not supported website and can\’t be updated</string>
+    <string name="error_no_data_on_server">The schedule website currently doesn\’t have the requested data</string>
 
     <!-- Settings -->
     <string name="activity_settings_title">Settings</string>
@@ -88,7 +101,7 @@
     <string name="tutorial_navigation_view_description">Check the list of the added schedules or change the settings here.</string>
     <string name="tutorial_action_menu_title">Schedule menu</string>
     <string name="tutorial_action_menu_description">Update the schedule for the week from here or just pull the screen down to update it.</string>
-    <string name="tutorial_finish_title">That\'s all</string>
+    <string name="tutorial_finish_title">That\’s all</string>
     <string name="tutorial_finish_description">Thank you!</string>
 
     <string name="key_theme" translatable="false">key_theme</string>

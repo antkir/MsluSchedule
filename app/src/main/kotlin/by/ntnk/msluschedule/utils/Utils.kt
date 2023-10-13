@@ -4,11 +4,8 @@ import org.jsoup.HttpStatusException
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
-import java.util.AbstractMap
 
 const val EMPTY_STRING = ""
-
-const val INVALID_VALUE = -1
 
 const val AUTO_ID: Int = 0
 
@@ -35,11 +32,25 @@ object Days {
 
 fun Boolean.toInt() = if (this) 1 else 0
 
+inline fun <T> T.takeIfOrDefault(predicate: (T) -> Boolean, defaultValue: T): T {
+    return takeIf(predicate) ?: defaultValue
+}
+
+inline fun <T> T.takeUnlessOrDefault(predicate: (T) -> Boolean, defaultValue: T): T {
+    return takeUnless(predicate) ?: defaultValue
+}
+
+inline fun <T> Iterable<T>.firstOrDefault(predicate: (T) -> Boolean, defaultValue: T): T {
+    return firstOrNull(predicate) ?: defaultValue
+}
+
 interface ErrorType
 
-typealias ImmutableEntry = AbstractMap.SimpleImmutableEntry<Int, String>
-
 class InvalidYearException : RuntimeException()
+
+class NetworkApiVersionException : RuntimeException()
+
+class NoDataOnServerException : RuntimeException()
 
 object Utils {
     fun isNetworkException(throwable: Throwable): Boolean {
@@ -47,5 +58,15 @@ object Utils {
             throwable is HttpStatusException ||
             throwable is SocketTimeoutException ||
             throwable is UnknownHostException
+    }
+
+    /*
+     * The week key values for the original schedule API started at about 400 in
+     * the app's release year (2018) and were incremented every year by about 50.
+     * Let's just assume that newer schedule APIs will have their week keys set in 0-399 range
+     * instead of adding a networkApiVersion field to database entities.
+     */
+    fun getNetworkApiVersionFromWeekKey(weekKey: Int): NetworkApiVersion {
+        return if (weekKey < 400) NetworkApiVersion.MYUNIVERSITY else NetworkApiVersion.ORIGINAL
     }
 }
