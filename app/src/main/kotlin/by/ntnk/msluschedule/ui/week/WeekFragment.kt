@@ -37,6 +37,7 @@ import by.ntnk.msluschedule.ui.weekday.WeekdayActivity
 import by.ntnk.msluschedule.utils.AndroidUtils
 import by.ntnk.msluschedule.utils.AndroidUtils.SNACKBAR_LENGTH_LONGER
 import by.ntnk.msluschedule.utils.DEFAULT
+import by.ntnk.msluschedule.utils.NoDataOnServerException
 import by.ntnk.msluschedule.utils.ScheduleType
 import by.ntnk.msluschedule.utils.Utils
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -208,7 +209,9 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
                     if (weekUiState.isError()) {
                         val throwable = weekUiState.throwable!!
                         if (weekUiState.isInitialUpdateError) {
-                            if (Utils.isNetworkException(throwable)) {
+                            if (throwable is NoDataOnServerException) {
+                                Timber.i(throwable)
+                            } else if (Utils.isNetworkException(throwable)) {
                                 Timber.i(throwable)
                                 showError(throwable, showRetryButton = false)
                             } else {
@@ -249,7 +252,12 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
 
                     if (scheduleUpdateEvent.isError()) {
                         val throwable = scheduleUpdateEvent.consumeError()
-                        if (Utils.isNetworkException(throwable)) {
+                        if (throwable is NoDataOnServerException) {
+                            Timber.i(throwable)
+                            if (!checkUiEventExpired(scheduleUpdateEvent.timestamp)) {
+                                showSuccessfulUpdateToast()
+                            }
+                        } else if (Utils.isNetworkException(throwable)) {
                             Timber.i(throwable)
                             if (!checkUiEventExpired(scheduleUpdateEvent.timestamp)) {
                                 showError(throwable, showRetryButton = true)
