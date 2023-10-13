@@ -8,7 +8,9 @@ import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.utils.AUTO_ID
 import by.ntnk.msluschedule.utils.CurrentDate
 import by.ntnk.msluschedule.utils.DEFAULT
+import by.ntnk.msluschedule.utils.NetworkApiVersion
 import by.ntnk.msluschedule.utils.SchedulerProvider
+import by.ntnk.msluschedule.utils.SharedPreferencesRepository
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
@@ -48,7 +50,8 @@ class AddGroupPresenter @Inject constructor(
     databaseRepository: DatabaseRepository,
     private val networkRepository: NetworkRepository,
     private val currentDate: CurrentDate,
-    private val schedulerProvider: SchedulerProvider
+    private val schedulerProvider: SchedulerProvider,
+    private val sharedPreferencesRepository: SharedPreferencesRepository
 ) : Presenter<AddGroupView>() {
 
     private val storedGroups: BehaviorSubject<List<StudyGroup>> = BehaviorSubject.createDefault(emptyList())
@@ -190,17 +193,33 @@ class AddGroupPresenter @Inject constructor(
         return storedGroups.value
             ?.filter { group -> group.year == currentDate.academicYear }
             ?.filter { group -> group.faculty == facultyKey.value }
-            ?.map { group -> group.value }
-            ?.any { groupName -> groupName == groupFilter.value!!.data!!.getValue(key) } == true
+            ?.any { group ->
+                val facultyKey = facultyKey.value!!
+                val facultyName = facultyFilter.value!!.data!!.getValue(facultyKey)
+                val groupName = groupFilter.value!!.data!!.getValue(key)
+                group.value == formatGroupName(groupName, facultyName)
+            } == true
     }
 
     fun createSelectedStudyGroupObject(): StudyGroup {
         assert(facultyFilter.hasValue() && facultyKey.hasValue())
         assert(courseFilter.hasValue() && courseKey.hasValue())
         assert(groupFilter.hasValue() && groupKey.hasValue())
+        assert(!facultyFilter.value!!.isError() && facultyFilter.value!!.isData())
         assert(!groupFilter.value!!.isError() && groupFilter.value!!.isData())
+        val facultyKey = facultyKey.value!!
+        val facultyName = facultyFilter.value!!.data!!.getValue(facultyKey)
         val groupKey = groupKey.value!!
         val groupName = groupFilter.value!!.data!!.getValue(groupKey)
-        return StudyGroup(AUTO_ID, groupKey, groupName, currentDate.academicYear, facultyKey.value!!, courseKey.value!!)
+        val name = formatGroupName(groupName, facultyName)
+        return StudyGroup(AUTO_ID, groupKey, name, currentDate.academicYear, facultyKey, courseKey.value!!)
+    }
+
+    private fun formatGroupName(groupName: String, facultyName: String): String {
+        return if (sharedPreferencesRepository.getCurrentNetworkApiVersion() == NetworkApiVersion.MYUNIVERSITY) {
+            "$groupName ($facultyName)"
+        } else {
+            groupName
+        }
     }
 }
