@@ -305,7 +305,7 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     }
 
     fun highlightToday() {
-        if (binding.textNoClasses.visibility != View.VISIBLE) {
+        if (binding.viewNoClasses.visibility != View.VISIBLE) {
             val adapter = binding.recyclerviewDays.adapter as LessonRecyclerViewAdapter
             val index = adapter.getWeekdayViewIndex(presenter.getCurrentDayOfWeek())
             val smoothScroller = object : LinearSmoothScroller(requireContext()) {
@@ -329,18 +329,18 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
 
     private fun onWeekData(data: List<WeekdayWithLessons<Lesson>>) {
         if (data.sumOf { weekday -> weekday.classes.size } == 0) {
-            binding.buttonSwitchNoClassesLayout.visibility = View.VISIBLE
+            binding.buttonSwitchLayout.visibility = View.VISIBLE
             if (isNoClassesViewVisible) {
-                binding.textNoClasses.visibility = View.VISIBLE
+                binding.viewNoClasses.visibility = View.VISIBLE
             } else {
-                binding.textNoClasses.visibility = View.GONE
+                binding.viewNoClasses.visibility = View.GONE
             }
             binding.recyclerviewDays.clearOnScrollListeners()
             binding.recyclerviewDays.addOnScrollListener(recyclerViewScrollListener)
-            binding.buttonSwitchNoClassesLayout.setOnClickListener { onSwitchNoClassesLayoutButtonClickListener() }
+            binding.buttonSwitchLayout.setOnClickListener { onSwitchNoClassesLayoutButtonClickListener() }
         } else {
-            binding.buttonSwitchNoClassesLayout.visibility = View.GONE
-            binding.textNoClasses.visibility = View.GONE
+            binding.buttonSwitchLayout.visibility = View.GONE
+            binding.viewNoClasses.visibility = View.GONE
             binding.recyclerviewDays.clearOnScrollListeners()
         }
 
@@ -364,20 +364,20 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     private val recyclerViewScrollListener: RecyclerView.OnScrollListener =
         object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                if (binding.buttonSwitchNoClassesLayout.visibility == View.VISIBLE && dy > 0) {
-                    binding.buttonSwitchNoClassesLayout.visibility = View.GONE
+                if (binding.buttonSwitchLayout.visibility == View.VISIBLE && dy > 0) {
+                    binding.buttonSwitchLayout.visibility = View.GONE
                     val anim = AnimationUtils.loadAnimation(
-                        binding.buttonSwitchNoClassesLayout.context,
+                        binding.buttonSwitchLayout.context,
                         R.anim.button_week_slide_down
                     )
-                    binding.buttonSwitchNoClassesLayout.startAnimation(anim)
-                } else if (binding.buttonSwitchNoClassesLayout.visibility != View.VISIBLE && dy < 0) {
-                    binding.buttonSwitchNoClassesLayout.visibility = View.VISIBLE
+                    binding.buttonSwitchLayout.startAnimation(anim)
+                } else if (binding.buttonSwitchLayout.visibility != View.VISIBLE && dy < 0) {
+                    binding.buttonSwitchLayout.visibility = View.VISIBLE
                     val anim = AnimationUtils.loadAnimation(
-                        binding.buttonSwitchNoClassesLayout.context,
+                        binding.buttonSwitchLayout.context,
                         R.anim.button_week_slide_up
                     )
-                    binding.buttonSwitchNoClassesLayout.startAnimation(anim)
+                    binding.buttonSwitchLayout.startAnimation(anim)
                 }
             }
         }
@@ -386,13 +386,13 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         if (isNoClassesViewVisible) {
             isNoClassesViewVisible = false
 
-            binding.textNoClasses.visibility = View.GONE
-            binding.buttonSwitchNoClassesLayout.text = requireContext().getString(R.string.button_week_hide_weekdays)
+            binding.viewNoClasses.visibility = View.GONE
+            binding.buttonSwitchLayout.text = requireContext().getString(R.string.button_week_hide_weekdays)
         } else {
             isNoClassesViewVisible = true
 
-            binding.textNoClasses.visibility = View.VISIBLE
-            binding.buttonSwitchNoClassesLayout.text = requireContext().getString(R.string.button_week_show_weekdays)
+            binding.viewNoClasses.visibility = View.VISIBLE
+            binding.buttonSwitchLayout.text = requireContext().getString(R.string.button_week_show_weekdays)
 
             // workaround the edge case when the button is pressed during
             // the hiding animation and won't show again

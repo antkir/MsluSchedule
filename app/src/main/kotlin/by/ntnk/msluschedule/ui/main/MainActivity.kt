@@ -226,8 +226,8 @@ class MainActivity :
         val actionMenuTargetX = binding.toolbar.right.toFloat() - actIconOffsetX
         val actionMenuTargetY = insetTop.toFloat() + binding.toolbar.height / 2
 
-        val welcomeAnchorPoint = getViewLocationInWindow(binding.content.imageSmile)
-        val welcomeShapeRadius = dipToPixels(60f).toFloat()
+        val welcomeAnchorPoint = getViewLocationInWindow(binding.content.imageBackground)
+        val welcomeShapeRadius = dipToPixels(120f).toFloat()
         val welcomeOverlay = OverlayLayout(
             this@MainActivity,
             welcomeAnchorPoint,
@@ -286,8 +286,8 @@ class MainActivity :
             .setOverlay(actionMenuOverlay)
             .build()
 
-        val finishAnchorPoint = getViewLocationInWindow(binding.content.imageSmile)
-        val finishShapeRadius = dipToPixels(60f).toFloat()
+        val finishAnchorPoint = getViewLocationInWindow(binding.content.imageBackground)
+        val finishShapeRadius = dipToPixels(120f).toFloat()
         val finishOverlay = OverlayLayout(
             this@MainActivity,
             finishAnchorPoint,
@@ -313,9 +313,18 @@ class MainActivity :
             .setTargets(targets)
             .setBackgroundColor(overlayColor)
             .setOnSpotlightListener(object : OnSpotlightListener {
-                override fun onStarted() = Unit
+                override fun onStarted() {
+                    binding.content.textHint.alpha = 0f
+                }
+
                 override fun onEnded() {
                     presenter.completeOnboarding()
+                    binding.content.textHint.animate()
+                        .setStartDelay(0)
+                        .alpha(1f)
+                        .setDuration(500)
+                        .setInterpolator(FastOutSlowInInterpolator())
+                        .start()
                 }
             })
             .build()
@@ -356,7 +365,7 @@ class MainActivity :
                 onNext = { selectedScheduleContainer ->
                     if (isScheduleContainerDefault(selectedScheduleContainer)) {
                         clearScheduleContainer()
-                        binding.content.imageSmile.visibility = View.VISIBLE
+                        binding.content.imageBackground.visibility = View.VISIBLE
                         binding.content.textHint.visibility = View.VISIBLE
 
                         if (binding.fam.container.visibility == View.INVISIBLE) {
@@ -366,7 +375,7 @@ class MainActivity :
                         binding.content.progressindicator.visibility = View.GONE
                     } else {
                         changeScheduleContainer(selectedScheduleContainer)
-                        binding.content.imageSmile.visibility = View.GONE
+                        binding.content.imageBackground.visibility = View.GONE
                         binding.content.textHint.visibility = View.GONE
 
                         selectScheduleContainerMenuItem(selectedScheduleContainer)
@@ -398,7 +407,7 @@ class MainActivity :
                         setWeeksContainerViewTransparent()
 
                         if (isScheduleContainerDefault(presenter.getSelectedScheduleContainer())) {
-                            binding.content.imageSmile.visibility = View.GONE
+                            binding.content.imageBackground.visibility = View.GONE
                             binding.content.textHint.visibility = View.GONE
                         }
                     }
@@ -446,7 +455,7 @@ class MainActivity :
                     binding.content.progressindicator.visibility = View.VISIBLE
                     setWeeksContainerViewTransparent()
 
-                    binding.content.imageSmile.visibility = View.GONE
+                    binding.content.imageBackground.visibility = View.GONE
                     binding.content.textHint.visibility = View.GONE
                 }
             }

@@ -324,8 +324,8 @@ class WeekdayActivity :
             startOffset = ANIMATION_SHOW_ZERO_NOTES_TEXT_DELAY
             duration = ANIMATION_SHOW_ZERO_NOTES_TEXT_DURATION
         }
-        binding.textZeroNotes.startAnimation(alphaAnimation)
-        binding.textZeroNotes.visibility = View.VISIBLE
+        binding.viewZeroNotes.startAnimation(alphaAnimation)
+        binding.viewZeroNotes.visibility = View.VISIBLE
     }
 
     private fun observeAdapterOnLongClick() {
@@ -521,7 +521,7 @@ class WeekdayActivity :
         if (adapter.isEmpty()) {
             showZeroNotesView()
         } else {
-            binding.textZeroNotes.visibility = View.GONE
+            binding.viewZeroNotes.visibility = View.GONE
         }
     }
 
