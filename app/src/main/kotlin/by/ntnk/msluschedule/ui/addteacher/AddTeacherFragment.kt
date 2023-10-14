@@ -172,10 +172,10 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
     }
 
     private fun showError(throwable: Throwable) {
-        if (Utils.isNetworkException(throwable)) {
-            Timber.i(throwable)
-        } else {
+        if (Utils.isUnexpectedException(throwable)) {
             Timber.e(throwable)
+        } else {
+            Timber.i(throwable)
         }
         dismiss()
         listener.onDialogFragmentError(throwable)

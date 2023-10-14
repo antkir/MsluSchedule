@@ -50,6 +50,7 @@ import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import timber.log.Timber
 import java.lang.ref.WeakReference
+import java.net.SocketTimeoutException
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -209,13 +210,12 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
                     if (weekUiState.isError()) {
                         val throwable = weekUiState.throwable!!
                         if (weekUiState.isInitialUpdateError) {
-                            if (throwable is NoDataOnServerException) {
-                                Timber.i(throwable)
-                            } else if (Utils.isNetworkException(throwable)) {
-                                Timber.i(throwable)
-                                showError(throwable, showRetryButton = false)
-                            } else {
+                            if (Utils.isUnexpectedException(throwable)) {
                                 Timber.e(throwable)
+                            } else {
+                                Timber.i(throwable)
+                            }
+                            if (throwable !is NoDataOnServerException) {
                                 showError(throwable, showRetryButton = false)
                             }
                             presenter.getSchedule(scheduleContainer.type, weekId)
@@ -252,20 +252,16 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
 
                     if (scheduleUpdateEvent.isError()) {
                         val throwable = scheduleUpdateEvent.consumeError()
-                        if (throwable is NoDataOnServerException) {
-                            Timber.i(throwable)
-                            if (!checkUiEventExpired(scheduleUpdateEvent.timestamp)) {
-                                showSuccessfulUpdateToast()
-                            }
-                        } else if (Utils.isNetworkException(throwable)) {
-                            Timber.i(throwable)
-                            if (!checkUiEventExpired(scheduleUpdateEvent.timestamp)) {
-                                showError(throwable, showRetryButton = true)
-                            }
-                        } else {
+                        if (Utils.isUnexpectedException(throwable)) {
                             Timber.e(throwable)
-                            if (!checkUiEventExpired(scheduleUpdateEvent.timestamp)) {
-                                showError(throwable, showRetryButton = false)
+                        } else {
+                            Timber.i(throwable)
+                        }
+                        if (!checkUiEventExpired(scheduleUpdateEvent.timestamp)) {
+                            when (throwable) {
+                                is NoDataOnServerException -> showSuccessfulUpdateToast()
+                                is SocketTimeoutException -> showError(throwable, showRetryButton = true)
+                                else -> showError(throwable, showRetryButton = false)
                             }
                         }
                     }

@@ -53,11 +53,15 @@ class NetworkApiVersionException : RuntimeException()
 class NoDataOnServerException : RuntimeException()
 
 object Utils {
-    fun isNetworkException(throwable: Throwable): Boolean {
-        return throwable is ConnectException ||
-            throwable is HttpStatusException ||
-            throwable is SocketTimeoutException ||
-            throwable is UnknownHostException
+
+    fun isUnexpectedException(throwable: Throwable): Boolean {
+        return throwable !is ConnectException &&
+            throwable !is SocketTimeoutException &&
+            throwable !is UnknownHostException &&
+            throwable !is HttpStatusException &&
+            throwable !is InvalidYearException &&
+            throwable !is NetworkApiVersionException &&
+            throwable !is NoDataOnServerException
     }
 
     /*

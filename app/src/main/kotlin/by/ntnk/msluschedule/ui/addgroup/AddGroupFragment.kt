@@ -256,10 +256,10 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
     }
 
     private fun showError(throwable: Throwable) {
-        if (Utils.isNetworkException(throwable)) {
-            Timber.i(throwable)
-        } else {
+        if (Utils.isUnexpectedException(throwable)) {
             Timber.e(throwable)
+        } else {
+            Timber.i(throwable)
         }
         dismiss()
         listener.onDialogFragmentError(throwable)
