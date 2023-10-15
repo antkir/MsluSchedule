@@ -17,7 +17,6 @@ import io.reactivex.subjects.PublishSubject
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
-import java.util.Random
 import java.util.concurrent.ThreadLocalRandom
 
 val onThemeChanged: PublishSubject<Boolean> = PublishSubject.create()
@@ -26,11 +25,7 @@ fun Context.dipToPixels(dipValue: Float) =
     TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dipValue, resources.displayMetrics).toInt()
 
 fun IntRange.random(): Int {
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-        ThreadLocalRandom.current().nextInt((endInclusive + 1) - start) + start
-    } else {
-        Random().nextInt((endInclusive + 1) - start) + start
-    }
+    return ThreadLocalRandom.current().nextInt((endInclusive + 1) - start) + start
 }
 
 interface SimpleTextWatcher : TextWatcher {

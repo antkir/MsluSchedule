@@ -11,6 +11,7 @@
         <item name="snackbarStyle">@style/MsluTheme.Snackbar</item>
         <item name="snackbarTextViewStyle">@style/MsluTheme.Snackbar.TextView</item>
         <item name="snackbarButtonStyle">@style/MsluTheme.Snackbar.Button</item>
+        <item name="android:statusBarColor">?attr/colorPrimary</item>
     </style>
 
     <style name="MsluTheme.PreferenceThemeOverlay" parent="@style/PreferenceThemeOverlay.v14.Material">
@@ -29,10 +30,12 @@
     </style>
 
     <style name="MsluTheme.NoActionBarTransparentStatusBar" parent="MsluTheme.NoActionBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowBackground">@color/surface</item>
     </style>
 
     <style name="MsluTheme.LaunchScreen" parent="MsluTheme.NoActionBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowBackground">@drawable/splash_screen</item>
     </style>
 
@@ -49,7 +52,9 @@
         <item name="colorSurface">@color/surface</item>
     </style>
 
-    <style name="MsluTheme.ActionModeButton" parent="Widget.MaterialComponents.Button" />
+    <style name="MsluTheme.ActionModeButton" parent="Widget.MaterialComponents.Button">
+        <item name="android:backgroundTint">@color/transparent</item>
+    </style>
 
     <style name="MsluTheme.Dialog.Alert" parent="Theme.MaterialComponents.Light.Dialog.Alert">
         <item name="colorAccent">@color/colorAccent</item>

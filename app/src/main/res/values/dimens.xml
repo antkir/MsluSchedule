@@ -35,5 +35,4 @@
     <dimen name="imageview_lessoninfo_margin_start">16dp</dimen>
 
     <dimen name="toolbar_height">56dp</dimen>
-    <dimen name="shadow_toolbar_height">2dp</dimen>
 </resources>

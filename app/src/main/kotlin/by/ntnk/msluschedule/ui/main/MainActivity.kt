@@ -122,55 +122,54 @@ class MainActivity :
         binding.drawerLayout.addDrawerListener(this)
 
         binding.navView.setNavigationItemSelectedListener(this)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            WindowCompat.setDecorFitsSystemWindows(window, false)
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-                val nightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
-                if (nightMode == Configuration.UI_MODE_NIGHT_NO) {
-                    val insetsController = WindowInsetsControllerCompat(window, window.decorView)
-                    insetsController.isAppearanceLightNavigationBars = true
-                }
-            }
+        WindowCompat.setDecorFitsSystemWindows(window, false)
 
-            ViewCompat.setOnApplyWindowInsetsListener(binding.drawerLayout) { view, insets ->
-                val layoutParams = view.layoutParams as ViewGroup.MarginLayoutParams
-                val insetsSystemBars = WindowInsetsCompat.Type.systemBars()
-                layoutParams.bottomMargin = insets.getInsetsIgnoringVisibility(insetsSystemBars).bottom
-                layoutParams.leftMargin = insets.getInsetsIgnoringVisibility(insetsSystemBars).left
-                layoutParams.rightMargin = insets.getInsetsIgnoringVisibility(insetsSystemBars).right
-                return@setOnApplyWindowInsetsListener insets
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+            val nightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+            if (nightMode == Configuration.UI_MODE_NIGHT_NO) {
+                val insetsController = WindowInsetsControllerCompat(window, window.decorView)
+                insetsController.isAppearanceLightNavigationBars = true
             }
+        }
 
-            ViewCompat.setOnApplyWindowInsetsListener(binding.navDrawerLayout) { view, insets ->
-                val insetsSystemBars = WindowInsetsCompat.Type.systemBars()
-                view.setPadding(
-                    view.paddingStart,
-                    insets.getInsetsIgnoringVisibility(insetsSystemBars).top,
-                    view.paddingEnd,
-                    view.paddingBottom
-                )
-                return@setOnApplyWindowInsetsListener insets
-            }
+        ViewCompat.setOnApplyWindowInsetsListener(binding.drawerLayout) { view, insets ->
+            val layoutParams = view.layoutParams as ViewGroup.MarginLayoutParams
+            val insetsSystemBars = WindowInsetsCompat.Type.systemBars()
+            layoutParams.bottomMargin = insets.getInsetsIgnoringVisibility(insetsSystemBars).bottom
+            layoutParams.leftMargin = insets.getInsetsIgnoringVisibility(insetsSystemBars).left
+            layoutParams.rightMargin = insets.getInsetsIgnoringVisibility(insetsSystemBars).right
+            return@setOnApplyWindowInsetsListener insets
+        }
 
-            ViewCompat.setOnApplyWindowInsetsListener(binding.appbar) { view, insets ->
-                val insetsSystemBars = WindowInsetsCompat.Type.systemBars()
-                view.setPadding(
-                    view.paddingStart,
-                    insets.getInsetsIgnoringVisibility(insetsSystemBars).top,
-                    view.paddingEnd,
-                    view.paddingBottom
-                )
-                return@setOnApplyWindowInsetsListener insets
-            }
+        ViewCompat.setOnApplyWindowInsetsListener(binding.navDrawerLayout) { view, insets ->
+            val insetsSystemBars = WindowInsetsCompat.Type.systemBars()
+            view.setPadding(
+                view.paddingStart,
+                insets.getInsetsIgnoringVisibility(insetsSystemBars).top,
+                view.paddingEnd,
+                view.paddingBottom
+            )
+            return@setOnApplyWindowInsetsListener insets
+        }
 
-            ViewCompat.setOnApplyWindowInsetsListener(binding.content.constraintLayout) { view, insets ->
-                val layoutParams = view.layoutParams as ViewGroup.MarginLayoutParams
-                val toolbarHeight = resources.getDimension(R.dimen.toolbar_height).toInt()
-                val insetsSystemBars = WindowInsetsCompat.Type.systemBars()
-                layoutParams.topMargin = toolbarHeight + insets.getInsetsIgnoringVisibility(insetsSystemBars).top
-                return@setOnApplyWindowInsetsListener insets
-            }
+        ViewCompat.setOnApplyWindowInsetsListener(binding.appbar) { view, insets ->
+            val insetsSystemBars = WindowInsetsCompat.Type.systemBars()
+            view.setPadding(
+                view.paddingStart,
+                insets.getInsetsIgnoringVisibility(insetsSystemBars).top,
+                view.paddingEnd,
+                view.paddingBottom
+            )
+            return@setOnApplyWindowInsetsListener insets
+        }
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.content.constraintLayout) { view, insets ->
+            val layoutParams = view.layoutParams as ViewGroup.MarginLayoutParams
+            val toolbarHeight = resources.getDimension(R.dimen.toolbar_height).toInt()
+            val insetsSystemBars = WindowInsetsCompat.Type.systemBars()
+            layoutParams.topMargin = toolbarHeight + insets.getInsetsIgnoringVisibility(insetsSystemBars).top
+            return@setOnApplyWindowInsetsListener insets
         }
 
         binding.buttonSettings.setOnClickListener {
@@ -360,11 +359,9 @@ class MainActivity :
     }
 
     override fun onDrawerOpened(drawerView: View) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            val nightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
-            if (nightMode == Configuration.UI_MODE_NIGHT_NO) {
-                window.statusBarColor = ContextCompat.getColor(this, R.color.statusbar_nav_drawer)
-            }
+        val nightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+        if (nightMode == Configuration.UI_MODE_NIGHT_NO) {
+            window.statusBarColor = ContextCompat.getColor(this, R.color.statusbar_nav_drawer)
         }
 
         onDrawerOpenBackPressedCallback.isEnabled = true
@@ -375,17 +372,15 @@ class MainActivity :
     }
 
     override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            val nightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
-            if (nightMode == Configuration.UI_MODE_NIGHT_NO) {
-                val color = ContextCompat.getColor(this, R.color.statusbar_nav_drawer)
-                window.statusBarColor = Color.argb(
-                    (slideOffset * Color.alpha(color)).toInt(),
-                    Color.red(color),
-                    Color.green(color),
-                    Color.blue(color)
-                )
-            }
+        val nightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+        if (nightMode == Configuration.UI_MODE_NIGHT_NO) {
+            val color = ContextCompat.getColor(this, R.color.statusbar_nav_drawer)
+            window.statusBarColor = Color.argb(
+                (slideOffset * Color.alpha(color)).toInt(),
+                Color.red(color),
+                Color.green(color),
+                Color.blue(color)
+            )
         }
 
         if (isUpdatingWeeksContainer) {
