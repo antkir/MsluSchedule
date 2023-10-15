@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <array name="note_colors">
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <array name="note_colors" tools:ignore="UnusedResources">
         <item name="purple_A400" type="color">#d500f9</item>
         <item name="deep_purple_A400" type="color">#651fff</item>
         <item name="indigo_A400" type="color">#3d5afe</item>
