@@ -2,7 +2,6 @@ package by.ntnk.msluschedule.ui.weekscontainer
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -77,9 +76,7 @@ class WeeksContainerFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.tabLayoutWeeks.setOnTouchListener { _, _ -> true }
         binding.tabLayoutWeeks.setupWithViewPager(binding.viewpagerWeeks)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            binding.tabLayoutWeeks.layoutDirection = View.LAYOUT_DIRECTION_LTR
-        }
+        binding.tabLayoutWeeks.layoutDirection = View.LAYOUT_DIRECTION_LTR
 
         requireActivity().addMenuProvider(
             object : MenuProvider {

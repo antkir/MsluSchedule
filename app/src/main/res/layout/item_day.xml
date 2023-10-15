@@ -17,8 +17,6 @@
         android:layout_marginEnd="16dp"
         android:gravity="start|center_vertical"
         android:layout_alignParentStart="true"
-        android:layout_alignParentLeft="true"
-        android:layout_toLeftOf="@id/imageview_notes_day"
         android:layout_toStartOf="@id/imageview_notes_day"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
         android:textColor="@color/primary_text"
@@ -30,10 +28,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp"
         android:background="@drawable/ic_note_day"
         android:contentDescription="@string/imageview_dayitem_description" />
 
