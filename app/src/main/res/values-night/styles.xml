@@ -11,6 +11,7 @@
         <item name="snackbarStyle">@style/MsluTheme.Snackbar</item>
         <item name="snackbarTextViewStyle">@style/MsluTheme.Snackbar.TextView</item>
         <item name="snackbarButtonStyle">@style/MsluTheme.Snackbar.Button</item>
+        <item name="android:statusBarColor">?attr/colorPrimary</item>
     </style>
 
     <style name="MsluTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Dark" >

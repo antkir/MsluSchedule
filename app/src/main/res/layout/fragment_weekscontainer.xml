@@ -25,10 +25,4 @@
         android:layout_height="match_parent"
         android:layout_marginTop="?attr/actionBarSize" />
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/shadow_toolbar_height"
-        android:layout_alignTop="@id/viewpager_weeks"
-        android:background="@drawable/toolbar_shadow" />
-
 </RelativeLayout>
