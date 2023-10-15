@@ -3,6 +3,7 @@ package by.ntnk.msluschedule.utils
 import by.ntnk.msluschedule.di.PerApp
 import org.threeten.bp.DayOfWeek
 import org.threeten.bp.LocalDate
+import org.threeten.bp.LocalDateTime
 import org.threeten.bp.Month
 import org.threeten.bp.ZoneId
 import org.threeten.bp.temporal.TemporalField
@@ -11,8 +12,12 @@ import javax.inject.Inject
 
 @PerApp
 open class CurrentDate @Inject constructor() {
+
+    open val time: LocalDateTime
+        get() = LocalDateTime.now(localTimeZone)
+
     open val date: LocalDate
-        get() = LocalDate.now(localTimeZone)
+        get() = time.toLocalDate()
 
     private val year: Int
         get() = date.year

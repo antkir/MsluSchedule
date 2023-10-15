@@ -150,7 +150,7 @@ class NetworkRepository @Inject constructor(
         // Schedule data is served only for the current week (for now), so
         // we need to preserve the local data if the schedule for
         // the selected academic week is already gone from the server.
-        if (getLastDayOfAcademicWeek(academicWeek) < currentDate.date) {
+        if (getEstimatedScheduleUpdateTime(academicWeek) <= currentDate.time) {
             throw NoDataOnServerException()
         }
 
@@ -259,7 +259,7 @@ class NetworkRepository @Inject constructor(
         // Schedule data is served only for the current week (for now), so
         // we need to preserve the local data if the schedule for
         // the selected academic week is already gone from the server.
-        if (getLastDayOfAcademicWeek(academicWeek) < currentDate.date) {
+        if (getEstimatedScheduleUpdateTime(academicWeek) <= currentDate.time) {
             throw NoDataOnServerException()
         }
 
@@ -399,13 +399,14 @@ class NetworkRepository @Inject constructor(
         return dayDifference / 7 == academicWeek
     }
 
-    private fun getLastDayOfAcademicWeek(academicWeek: Long): LocalDate {
+    private fun getEstimatedScheduleUpdateTime(academicWeek: Long): LocalDateTime {
+        // Schedule data for the current week is usually deleted
+        // from the server on Saturday evening (after 6pm) or on Sunday.
         return currentDate.academicYearStartDate
-            // Schedule data for the current week is usually deleted from the server on Sunday.
-            // Classes cannot be scheduled on Sunday (for now), so
-            // we assume Saturday is the last day of an academic week.
-            .with(TemporalAdjusters.nextOrSame(DayOfWeek.SATURDAY))
+            .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
             .plusWeeks(academicWeek)
+            .with(TemporalAdjusters.nextOrSame(DayOfWeek.SATURDAY))
+            .atTime(18, 0)
     }
 
     private fun getAcademicYearWeeks(): List<String> {
