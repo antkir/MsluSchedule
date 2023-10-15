@@ -147,9 +147,8 @@ class NetworkRepository @Inject constructor(
         }
 
         val academicWeek = weekKey.toLong()
-
         // Schedule data is served only for the current week (for now), so
-        // we need to preserve existing local data if the schedule for
+        // we need to preserve the local data if the schedule for
         // the selected academic week is already gone from the server.
         if (getLastDayOfAcademicWeek(academicWeek) < currentDate.date) {
             throw NoDataOnServerException()
@@ -160,23 +159,33 @@ class NetworkRepository @Inject constructor(
             .flatMapObservable { response ->
                 checkResponse(response)
 
+                val weekdays = listOf(
+                    WeekdayWithStudyGroupLessons(Days.MONDAY),
+                    WeekdayWithStudyGroupLessons(Days.TUESDAY),
+                    WeekdayWithStudyGroupLessons(Days.WEDNESDAY),
+                    WeekdayWithStudyGroupLessons(Days.THURSDAY),
+                    WeekdayWithStudyGroupLessons(Days.FRIDAY),
+                    WeekdayWithStudyGroupLessons(Days.SATURDAY),
+                    WeekdayWithStudyGroupLessons(Days.SUNDAY)
+                )
+
                 val body = response.body() ?: throw JsonDataException()
-                val schedule = body.result ?: throw NoDataOnServerException()
-                val classes = schedule.schedule ?: throw JsonDataException()
+                val result = body.result ?: throw NoDataOnServerException()
+                val classes = result.schedule ?: throw JsonDataException()
 
                 val filteredClasses = mutableListOf<Pair<LocalDateTime, StudyGroupLesson>>()
 
-                for (jsonClass in classes) {
-                    jsonClass.title ?: throw JsonDataException()
-                    jsonClass.summary ?: throw JsonDataException()
-                    jsonClass.room ?: throw JsonDataException()
-                    jsonClass.start ?: throw JsonDataException()
-                    jsonClass.end ?: throw JsonDataException()
-                    jsonClass.day ?: throw JsonDataException()
+                for (jsonGroupClass in classes) {
+                    jsonGroupClass.title ?: throw JsonDataException()
+                    jsonGroupClass.summary ?: throw JsonDataException()
+                    jsonGroupClass.room ?: throw JsonDataException()
+                    jsonGroupClass.start ?: throw JsonDataException()
+                    jsonGroupClass.end ?: throw JsonDataException()
+                    jsonGroupClass.day ?: throw JsonDataException()
 
-                    val classDate = LocalDate.parse(jsonClass.day)
+                    val classDate = LocalDate.parse(jsonGroupClass.day)
                     if (isClassDateInWeek(classDate, academicWeek)) {
-                        val subjectTypePair = jsonClass.title.trim()
+                        val subjectTypePair = jsonGroupClass.title.trim()
                         val subjectTypeSplitIdx = findOpeningParenthesisIndex(subjectTypePair)
                         val subject = subjectTypePair
                             .substring(0, subjectTypeSplitIdx)
@@ -187,44 +196,35 @@ class NetworkRepository @Inject constructor(
                             .drop(1)
                             .dropLast(1)
                             .trim()
-                        val teacher = jsonClass.summary
+                        val teacher = jsonGroupClass.summary
                             .split('/')
                             .getOrElse(0) { EMPTY_STRING }
                             .trim()
                             .takeIfOrDefault({ s -> s.count { c -> c.isDigit() } < 3 }, EMPTY_STRING)
-                        val classroom = jsonClass.room
+                        val classroom = jsonGroupClass.room
                             .replace(" ", EMPTY_STRING)
                             .trim()
                             .ifEmpty {
-                                jsonClass.summary
+                                jsonGroupClass.summary
                                     .split('/')
                                     .getOrElse(1) { EMPTY_STRING }
                                     .trim()
                                     .ifEmpty {
-                                        jsonClass.summary
+                                        jsonGroupClass.summary
                                             .replace(" ", EMPTY_STRING)
                                             .trim()
                                             .takeIfOrDefault({ s -> s.count { c -> c.isDigit() } >= 3 }, EMPTY_STRING)
                                     }
                             }
-                        val startDateTime = parseDateTime(jsonClass.start)
+                        val startDateTime = parseDateTime(jsonGroupClass.start)
                         val start = formatTime(startDateTime)
-                        val endDateTime = parseDateTime(jsonClass.end)
+                        val endDateTime = parseDateTime(jsonGroupClass.end)
                         val end = formatTime(endDateTime)
-                        val studyGroupClass = StudyGroupLesson(subject, type, teacher, classroom, start, end)
-                        filteredClasses.add(Pair(startDateTime, studyGroupClass))
+                        val groupClass = StudyGroupLesson(subject, type, teacher, classroom, start, end)
+                        filteredClasses.add(Pair(startDateTime, groupClass))
                     }
                 }
 
-                val weekdaysWithClasses: List<WeekdayWithStudyGroupLessons> = listOf(
-                    WeekdayWithStudyGroupLessons(Days.MONDAY),
-                    WeekdayWithStudyGroupLessons(Days.TUESDAY),
-                    WeekdayWithStudyGroupLessons(Days.WEDNESDAY),
-                    WeekdayWithStudyGroupLessons(Days.THURSDAY),
-                    WeekdayWithStudyGroupLessons(Days.FRIDAY),
-                    WeekdayWithStudyGroupLessons(Days.SATURDAY),
-                    WeekdayWithStudyGroupLessons(Days.SUNDAY)
-                )
                 val isPhysEdClassHidden = sharedPreferencesRepository.isPhysEdClassHidden()
                 val isSelfStudyClassHidden = sharedPreferencesRepository.isSelfStudyClassHidden()
                 filteredClasses
@@ -243,10 +243,10 @@ class NetworkRepository @Inject constructor(
                     .sortedBy { entry -> entry.first }
                     .forEach { entry ->
                         val dayOfWeekIndex = entry.first.dayOfWeek.ordinal
-                        weekdaysWithClasses[dayOfWeekIndex].lessons.add(entry.second)
+                        weekdays[dayOfWeekIndex].lessons.add(entry.second)
                     }
 
-                return@flatMapObservable Observable.fromIterable(weekdaysWithClasses)
+                return@flatMapObservable Observable.fromIterable(weekdays)
             }
     }
 
@@ -256,9 +256,8 @@ class NetworkRepository @Inject constructor(
         }
 
         val academicWeek = weekKey.toLong()
-
         // Schedule data is served only for the current week (for now), so
-        // we need to preserve existing local data if the schedule for
+        // we need to preserve the local data if the schedule for
         // the selected academic week is already gone from the server.
         if (getLastDayOfAcademicWeek(academicWeek) < currentDate.date) {
             throw NoDataOnServerException()
@@ -268,23 +267,33 @@ class NetworkRepository @Inject constructor(
             .flatMapObservable { response ->
                 checkResponse(response)
 
+                val weekdays = listOf(
+                    WeekdayWithTeacherLessons(Days.MONDAY),
+                    WeekdayWithTeacherLessons(Days.TUESDAY),
+                    WeekdayWithTeacherLessons(Days.WEDNESDAY),
+                    WeekdayWithTeacherLessons(Days.THURSDAY),
+                    WeekdayWithTeacherLessons(Days.FRIDAY),
+                    WeekdayWithTeacherLessons(Days.SATURDAY),
+                    WeekdayWithTeacherLessons(Days.SUNDAY)
+                )
+
                 val body = response.body() ?: throw JsonDataException()
                 val classes = body.result ?: throw NoDataOnServerException()
 
                 val filteredClasses = mutableMapOf<LocalDateTime, MutableList<TeacherLesson>>()
 
-                for (jsonClass in classes) {
-                    jsonClass.title ?: throw JsonDataException()
-                    jsonClass.summary ?: throw JsonDataException()
-                    jsonClass.room ?: throw JsonDataException()
-                    jsonClass.start ?: throw JsonDataException()
-                    jsonClass.end ?: throw JsonDataException()
-                    jsonClass.day ?: throw JsonDataException()
-                    jsonClass.groupLabel ?: throw JsonDataException()
+                for (jsonTeacherClass in classes) {
+                    jsonTeacherClass.title ?: throw JsonDataException()
+                    jsonTeacherClass.summary ?: throw JsonDataException()
+                    jsonTeacherClass.room ?: throw JsonDataException()
+                    jsonTeacherClass.start ?: throw JsonDataException()
+                    jsonTeacherClass.end ?: throw JsonDataException()
+                    jsonTeacherClass.day ?: throw JsonDataException()
+                    jsonTeacherClass.groupLabel ?: throw JsonDataException()
 
-                    val classDate = LocalDate.parse(jsonClass.day)
+                    val classDate = LocalDate.parse(jsonTeacherClass.day)
                     if (isClassDateInWeek(classDate, academicWeek)) {
-                        val subjectType = jsonClass.title.trim()
+                        val subjectType = jsonTeacherClass.title.trim()
                         val subjectTypeSplitIdx = findOpeningParenthesisIndex(subjectType)
                         val subject = subjectType
                             .substring(0, subjectTypeSplitIdx)
@@ -296,13 +305,13 @@ class NetworkRepository @Inject constructor(
                             .dropLast(1)
                             .trim()
                         val faculty = EMPTY_STRING
-                        val groups = jsonClass.groupLabel.trim()
-                        val classroom = jsonClass.room
+                        val groups = jsonTeacherClass.groupLabel.trim()
+                        val classroom = jsonTeacherClass.room
                             .replace(" ", EMPTY_STRING)
                             .trim()
-                        val startDateTime = parseDateTime(jsonClass.start)
+                        val startDateTime = parseDateTime(jsonTeacherClass.start)
                         val start = formatTime(startDateTime)
-                        val endDateTime = parseDateTime(jsonClass.end)
+                        val endDateTime = parseDateTime(jsonTeacherClass.end)
                         val end = formatTime(endDateTime)
 
                         if (!filteredClasses.contains(startDateTime)) {
@@ -348,24 +357,14 @@ class NetworkRepository @Inject constructor(
                     }
                 }
 
-                val weekdaysWithClasses: List<WeekdayWithTeacherLessons> = listOf(
-                    WeekdayWithTeacherLessons(Days.MONDAY),
-                    WeekdayWithTeacherLessons(Days.TUESDAY),
-                    WeekdayWithTeacherLessons(Days.WEDNESDAY),
-                    WeekdayWithTeacherLessons(Days.THURSDAY),
-                    WeekdayWithTeacherLessons(Days.FRIDAY),
-                    WeekdayWithTeacherLessons(Days.SATURDAY),
-                    WeekdayWithTeacherLessons(Days.SUNDAY)
-                )
-
                 filteredClasses.entries
                     .sortedBy { entry -> entry.key }
                     .forEach { entry ->
                         val dayOfWeekIndex = entry.key.dayOfWeek.ordinal
-                        weekdaysWithClasses[dayOfWeekIndex].lessons.addAll(entry.value)
+                        weekdays[dayOfWeekIndex].lessons.addAll(entry.value)
                     }
 
-                return@flatMapObservable Observable.fromIterable(weekdaysWithClasses)
+                return@flatMapObservable Observable.fromIterable(weekdays)
             }
     }
 
