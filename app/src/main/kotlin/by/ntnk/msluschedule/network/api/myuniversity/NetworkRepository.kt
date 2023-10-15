@@ -171,7 +171,7 @@ class NetworkRepository @Inject constructor(
                 )
 
                 val body = response.body() ?: throw JsonDataException()
-                val result = body.result ?: throw NoDataOnServerException()
+                val result = body.result ?: return@flatMapObservable Observable.fromIterable(weekdays)
                 val classes = result.schedule ?: throw JsonDataException()
 
                 val filteredClasses = mutableListOf<Pair<LocalDateTime, StudyGroupLesson>>()
@@ -279,7 +279,7 @@ class NetworkRepository @Inject constructor(
                 )
 
                 val body = response.body() ?: throw JsonDataException()
-                val classes = body.result ?: throw NoDataOnServerException()
+                val classes = body.result ?: return@flatMapObservable Observable.fromIterable(weekdays)
 
                 val filteredClasses = mutableMapOf<LocalDateTime, MutableList<TeacherLesson>>()
 
