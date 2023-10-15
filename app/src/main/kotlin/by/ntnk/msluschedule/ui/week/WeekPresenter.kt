@@ -92,6 +92,7 @@ class WeekPresenter @Inject constructor(
             ScheduleType.STUDYGROUP -> {
                 databaseRepository.getWeekdaysWithStudyGroupLessons(weekId)
             }
+
             ScheduleType.TEACHER -> {
                 databaseRepository.getWeekdaysWithTeacherLessons(weekId)
             }
@@ -109,7 +110,11 @@ class WeekPresenter @Inject constructor(
             .doOnEvent { _, _ -> view?.hideInitProgressBar() }
     }
 
-    private fun downloadSchedule(isUpdate: Boolean, container: ScheduleContainer, weekId: Int): Single<List<WeekdayWithLessons<Lesson>>> {
+    private fun downloadSchedule(
+        isUpdate: Boolean,
+        container: ScheduleContainer,
+        weekId: Int
+    ): Single<List<WeekdayWithLessons<Lesson>>> {
         return when (container.type) {
             ScheduleType.STUDYGROUP -> {
                 databaseRepository.getWeekKey(weekId)
@@ -130,6 +135,7 @@ class WeekPresenter @Inject constructor(
                         databaseRepository.insertStudyGroupSchedule(weekdaysWithLessons, weekId)
                     }
             }
+
             ScheduleType.TEACHER -> {
                 databaseRepository.getWeekKey(weekId)
                     .flatMapObservable {
