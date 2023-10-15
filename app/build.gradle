@@ -29,7 +29,7 @@ android {
         jvmTarget = '17'
     }
     lint {
-        disable 'InvalidPackage', 'TrustAllX509TrustManager', 'OldTargetApi'
+        disable 'UseCompoundDrawables', 'CheckResult'
     }
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
