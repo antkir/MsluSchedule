@@ -104,14 +104,14 @@ class AddTeacherPresenter @Inject constructor(
         return storedTeachers.value
             ?.filter { teacher -> teacher.year == currentDate.academicYear }
             ?.map { teacher -> teacher.value }
-            ?.any { teacherName -> teacherName == teacherFilter.value!!.data!!.getValue(key) } == true
+            ?.any { teacherName -> teacherName == teacherFilter.value!!.data!!.getValueOrDefault(key) } == true
     }
 
     fun createSelectedTeacherObject(): Teacher {
         assert(teacherFilter.hasValue() && teacherKey.hasValue())
         assert(!teacherFilter.value!!.isError() && teacherFilter.value!!.isData())
         val teacherKey = teacherKey.value!!
-        val teacherName = teacherFilter.value!!.data!!.getValue(teacherKey)
+        val teacherName = teacherFilter.value!!.data!!.getValueOrDefault(teacherKey)
         return Teacher(AUTO_ID, teacherKey, teacherName, currentDate.academicYear)
     }
 }

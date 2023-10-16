@@ -195,8 +195,8 @@ class AddGroupPresenter @Inject constructor(
             ?.filter { group -> group.faculty == facultyKey.value }
             ?.any { group ->
                 val facultyKey = facultyKey.value!!
-                val facultyName = facultyFilter.value!!.data!!.getValue(facultyKey)
-                val groupName = groupFilter.value!!.data!!.getValue(key)
+                val facultyName = facultyFilter.value!!.data!!.getValueOrDefault(facultyKey)
+                val groupName = groupFilter.value!!.data!!.getValueOrDefault(key)
                 group.value == formatGroupName(groupName, facultyName)
             } == true
     }
@@ -208,9 +208,9 @@ class AddGroupPresenter @Inject constructor(
         assert(!facultyFilter.value!!.isError() && facultyFilter.value!!.isData())
         assert(!groupFilter.value!!.isError() && groupFilter.value!!.isData())
         val facultyKey = facultyKey.value!!
-        val facultyName = facultyFilter.value!!.data!!.getValue(facultyKey)
+        val facultyName = facultyFilter.value!!.data!!.getValueOrDefault(facultyKey)
         val groupKey = groupKey.value!!
-        val groupName = groupFilter.value!!.data!!.getValue(groupKey)
+        val groupName = groupFilter.value!!.data!!.getValueOrDefault(groupKey)
         val name = formatGroupName(groupName, facultyName)
         return StudyGroup(AUTO_ID, groupKey, name, currentDate.academicYear, facultyKey, courseKey.value!!)
     }
