@@ -3,7 +3,6 @@ package by.ntnk.msluschedule.utils
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
-import java.util.AbstractMap
 
 const val EMPTY_STRING = ""
 
@@ -38,7 +37,7 @@ inline fun <T> Iterable<T>.firstOrDefault(predicate: (T) -> Boolean, defaultValu
     return firstOrNull(predicate) ?: defaultValue
 }
 
-typealias ImmutableEntry = AbstractMap.SimpleImmutableEntry<Int, String>
+data class Entry<K, V>(override val key: K, override val value: V) : Map.Entry<K, V>
 
 class InvalidYearException : RuntimeException()
 

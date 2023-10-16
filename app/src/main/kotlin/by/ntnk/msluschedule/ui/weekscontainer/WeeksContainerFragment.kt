@@ -20,7 +20,7 @@ import by.ntnk.msluschedule.mvp.views.MvpFragment
 import by.ntnk.msluschedule.ui.adapters.WeekFragmentViewPagerAdapter
 import by.ntnk.msluschedule.ui.warningdialog.WarningDialogFragment
 import by.ntnk.msluschedule.utils.INVALID_VALUE
-import by.ntnk.msluschedule.utils.ImmutableEntry
+import by.ntnk.msluschedule.utils.Entry
 import dagger.Lazy
 import dagger.android.support.AndroidSupportInjection
 import java.util.Locale
@@ -122,7 +122,7 @@ class WeeksContainerFragment :
         fragmentBinding = null
     }
 
-    override fun initWeeksAdapter(weekIds: List<ImmutableEntry>, currentWeekItemIndex: Int) {
+    override fun initWeeksAdapter(weekIds: List<Entry<Int, String>>, currentWeekItemIndex: Int) {
         this.currentWeekItemIndex = currentWeekItemIndex
 
         with(binding.viewpagerWeeks) {
