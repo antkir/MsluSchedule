@@ -74,7 +74,7 @@ class AddTeacherPresenter @Inject constructor(
     }
 
     fun getTeacher(): Teacher? {
-        val teacherName = teachers!!.getValue(teacher)
+        val teacherName = teachers!!.getValueOrDefault(teacher)
         if (teacherName == EMPTY_STRING) {
             return null
         }

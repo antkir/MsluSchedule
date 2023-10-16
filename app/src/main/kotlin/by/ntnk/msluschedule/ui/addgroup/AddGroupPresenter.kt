@@ -145,17 +145,17 @@ class AddGroupPresenter @Inject constructor(
             ?.filter { scheduleContainer -> scheduleContainer.year == currentDate.academicYear }
             ?.filter { scheduleContainer -> scheduleContainer.faculty == faculty }
             ?.any { scheduleContaner ->
-                val facultyName = faculties!!.getValue(faculty)
+                val facultyName = faculties!!.getValueOrDefault(faculty)
                 scheduleContaner.name == formatGroupName(name, facultyName)
             } == true
     }
 
     fun getStudyGroup(): StudyGroup? {
-        val facultyName = faculties!!.getValue(faculty)
+        val facultyName = faculties!!.getValueOrDefault(faculty)
         if (facultyName == EMPTY_STRING) {
             return null
         }
-        val groupName = groups!!.getValue(group)
+        val groupName = groups!!.getValueOrDefault(group)
         if (groupName == EMPTY_STRING) {
             return null
         }
