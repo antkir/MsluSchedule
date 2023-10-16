@@ -37,6 +37,7 @@ android {
         release.java.srcDirs += 'src/release/kotlin'
         test.java.srcDirs += 'src/test/kotlin'
         androidTest.java.srcDirs += 'src/androidTest/kotlin'
+        androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
     }
     packagingOptions {
         resources {
@@ -79,6 +80,7 @@ ext {
     constraintlayoutVersion = '2.1.4'
     coreVersion = '1.12.0'
     daggerVersion = '2.48'
+    firebasebomVersion = '32.3.1'
     fragmentVersion = '1.6.1'
     jsoupVersion = '1.16.1'
     junitVersion = '4.13.2'
@@ -101,11 +103,11 @@ ext {
     rxkotlinVersion = '2.4.0'
     spotlightVersion = '1.7.0'
     swiperefreshlayoutVersion = '1.1.0'
+    testextjunitVersion = '1.1.5'
+    testrunnerVersion = '1.5.2'
     threetenbpVersion = '1.6.8'
     timberVersion = '5.0.1'
     windowVersion = '1.1.0'
-
-    firebasebomVersion = '32.3.1'
 }
 
 dependencies {
@@ -122,6 +124,9 @@ dependencies {
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:$swiperefreshlayoutVersion"
     implementation "androidx.window:window:$windowVersion"
     kapt "androidx.room:room-compiler:$roomVersion"
+    androidTestImplementation "androidx.room:room-testing:$roomVersion"
+    androidTestImplementation "androidx.test.ext:junit-ktx:$testextjunitVersion"
+    androidTestImplementation "androidx.test:runner:$testrunnerVersion"
     // Dagger
     implementation "com.google.dagger:dagger:$daggerVersion"
     implementation "com.google.dagger:dagger-android-support:$daggerVersion"
