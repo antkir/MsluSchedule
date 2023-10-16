@@ -153,14 +153,10 @@ class AddGroupPresenter @Inject constructor(
     fun getStudyGroup(): StudyGroup? {
         val facultyName = faculties!!.getValue(faculty)
         if (facultyName == EMPTY_STRING) {
-            val exception = IllegalStateException("Faculty value wasn't found in the array.")
-            view?.showError(exception)
             return null
         }
         val groupName = groups!!.getValue(group)
         if (groupName == EMPTY_STRING) {
-            val exception = IllegalStateException("Group value wasn't found in the array.")
-            view?.showError(exception)
             return null
         }
         val name = formatGroupName(groupName, facultyName)

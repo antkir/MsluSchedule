@@ -7,6 +7,7 @@ import by.ntnk.msluschedule.mvp.Presenter
 import by.ntnk.msluschedule.network.NetworkRepository
 import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.utils.CurrentDate
+import by.ntnk.msluschedule.utils.EMPTY_STRING
 import by.ntnk.msluschedule.utils.SchedulerProvider
 import by.ntnk.msluschedule.utils.isUnexpectedException
 import io.reactivex.disposables.Disposable
@@ -72,7 +73,13 @@ class AddTeacherPresenter @Inject constructor(
             ?.any { it == name } == true
     }
 
-    fun getTeacher() = Teacher(teacher, teachers!!.getValue(teacher), currentDate.academicYear)
+    fun getTeacher(): Teacher? {
+        val teacherName = teachers!!.getValue(teacher)
+        if (teacherName == EMPTY_STRING) {
+            return null
+        }
+        return Teacher(teacher, teacherName, currentDate.academicYear)
+    }
 
     fun populateTeachersAdapter() = view?.populateTeachersView(teachers!!)
 

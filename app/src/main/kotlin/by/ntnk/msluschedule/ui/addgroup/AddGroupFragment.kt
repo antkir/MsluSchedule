@@ -68,7 +68,10 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
             .setView(layout)
             .setPositiveButton(R.string.button_add) { _, _ ->
                 val studyGroup = presenter.getStudyGroup()
-                studyGroup ?: return@setPositiveButton
+                if (studyGroup == null) {
+                    showError(IllegalStateException())
+                    return@setPositiveButton
+                }
                 listener.onNewStudyGroup(studyGroup)
             }
             .setNegativeButton(R.string.button_cancel) { _, _ ->

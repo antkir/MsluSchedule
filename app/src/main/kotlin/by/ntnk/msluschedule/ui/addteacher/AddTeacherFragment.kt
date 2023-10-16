@@ -80,7 +80,12 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
             .setTitle((R.string.add_teacher_title))
             .setView(layout)
             .setPositiveButton(R.string.button_add) { _, _ ->
-                listener.onNewTeacher(presenter.getTeacher())
+                val teacher = presenter.getTeacher()
+                if (teacher == null) {
+                    showError(IllegalStateException())
+                    return@setPositiveButton
+                }
+                listener.onNewTeacher(teacher)
             }
             .setNegativeButton(R.string.button_cancel) { _, _ ->
                 dismiss()
