@@ -27,7 +27,7 @@ class DatabaseDataMapper @Inject constructor() {
     fun map(data: ScheduleFilter, containerId: Int): List<Week> {
         val weeks = ArrayList<Week>(data.size)
         for (i in 0 until data.size) {
-            val key = data.keyAt(i)
+            val key = data.keyAt(i).toInt()
             val value = data.valueAt(i)
             val week = Week(key, value, containerId)
             weeks.add(week)

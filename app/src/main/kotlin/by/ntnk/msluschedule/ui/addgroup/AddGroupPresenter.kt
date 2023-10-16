@@ -30,9 +30,9 @@ class AddGroupPresenter @Inject constructor(
     private var faculties: ScheduleFilter? = null
     private var courses: ScheduleFilter? = null
     private var groups: ScheduleFilter? = null
-    private var faculty: Int = 0
-    private var course: Int = 0
-    private var group: Int = 0
+    private var facultyKey: String = EMPTY_STRING
+    private var courseKey: String = EMPTY_STRING
+    private var groupKey: String = EMPTY_STRING
 
     private var scheduleContaners: List<ScheduleContainer>? = null
 
@@ -42,26 +42,26 @@ class AddGroupPresenter @Inject constructor(
 
     fun isGroupsInitialized(): Boolean = groups != null
 
-    fun isFacultySet(): Boolean = faculty > 0
+    fun isFacultySet(): Boolean = facultyKey != EMPTY_STRING
 
-    fun isCourseSet(): Boolean = course > 0
+    fun isCourseSet(): Boolean = courseKey != EMPTY_STRING
 
     fun setFacultyKeyFromPosition(position: Int) {
-        faculty = faculties!!.keyAt(position)
+        facultyKey = faculties!!.keyAt(position)
     }
 
     fun setCourseKeyFromPosition(position: Int) {
-        course = courses!!.keyAt(position)
+        courseKey = courses!!.keyAt(position)
     }
 
     fun setCoursesNull() {
         courses = null
-        course = 0
+        courseKey = EMPTY_STRING
     }
 
     fun setGroupsNull() {
         groups = null
-        group = 0
+        groupKey = EMPTY_STRING
     }
 
     fun getFacultyScheduleFilter() {
@@ -93,7 +93,7 @@ class AddGroupPresenter @Inject constructor(
     }
 
     fun getCourseScheduleFilter() {
-        disposables += networkRepository.getCourses(faculty)
+        disposables += networkRepository.getCourses(facultyKey.toInt())
             .subscribeOn(schedulerProvider.single())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
@@ -113,7 +113,7 @@ class AddGroupPresenter @Inject constructor(
     }
 
     fun getScheduleGroups() {
-        disposables += networkRepository.getGroups(faculty, course, currentDate.academicYear)
+        disposables += networkRepository.getGroups(facultyKey.toInt(), courseKey.toInt(), currentDate.academicYear)
             .subscribeOn(schedulerProvider.single())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
@@ -132,8 +132,8 @@ class AddGroupPresenter @Inject constructor(
             )
     }
 
-    fun setGroupValue(value: Int) {
-        group = value
+    fun setGroupKey(key: String) {
+        groupKey = key
     }
 
     fun isValidGroup(name: String): Boolean {
@@ -143,24 +143,27 @@ class AddGroupPresenter @Inject constructor(
     fun isGroupStored(name: String): Boolean {
         return scheduleContaners
             ?.filter { scheduleContainer -> scheduleContainer.year == currentDate.academicYear }
-            ?.filter { scheduleContainer -> scheduleContainer.faculty == faculty }
+            ?.filter { scheduleContainer -> scheduleContainer.faculty == facultyKey.toInt() }
             ?.any { scheduleContaner ->
-                val facultyName = faculties!!.getValueOrDefault(faculty)
+                val facultyName = faculties!!.getValueOrDefault(facultyKey)
                 scheduleContaner.name == formatGroupName(name, facultyName)
             } == true
     }
 
     fun getStudyGroup(): StudyGroup? {
-        val facultyName = faculties!!.getValueOrDefault(faculty)
+        val facultyName = faculties!!.getValueOrDefault(facultyKey)
         if (facultyName == EMPTY_STRING) {
             return null
         }
-        val groupName = groups!!.getValueOrDefault(group)
+        val groupName = groups!!.getValueOrDefault(groupKey)
         if (groupName == EMPTY_STRING) {
             return null
         }
+        if (groupKey.any { c -> !c.isDigit() }) {
+            return null
+        }
         val name = formatGroupName(groupName, facultyName)
-        return StudyGroup(group, name, faculty, course, currentDate.academicYear)
+        return StudyGroup(groupKey.toInt(), name, facultyKey.toInt(), courseKey.toInt(), currentDate.academicYear)
     }
 
     private fun formatGroupName(groupName: String, facultyName: String): String {

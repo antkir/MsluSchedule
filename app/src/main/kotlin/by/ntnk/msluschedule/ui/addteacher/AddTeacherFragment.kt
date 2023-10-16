@@ -60,7 +60,11 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
         teacherView.progressBar = layout.findViewById(R.id.progressbar_dialog_teacher)
         val teacherTextInputLayout: TextInputLayout = layout.findViewById(R.id.textinputlayout_teacher)
         teacherView.setEnabledFocusable(false)
-        teacherView.setOnItemClickListener { _, _, _, id -> presenter.setTeacherValue(id.toInt()) }
+        teacherView.setOnItemClickListener { parent, _, position, _ ->
+            val adapter = parent.adapter as ScheduleFilterAdapter
+            val key = adapter.getKey(position)
+            presenter.setTeacherKey(key)
+        }
         teacherView.addTextChangedListener(object : SimpleTextWatcher {
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
                 teacherTextInputLayout.error = EMPTY_STRING

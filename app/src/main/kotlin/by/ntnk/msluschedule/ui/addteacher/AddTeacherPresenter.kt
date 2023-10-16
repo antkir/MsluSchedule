@@ -24,7 +24,7 @@ class AddTeacherPresenter @Inject constructor(
 
     private lateinit var disposable: Disposable
     private var teachers: ScheduleFilter? = null
-    private var teacher: Int = 0
+    private var teacherKey: String = EMPTY_STRING
 
     private var scheduleContaners: List<ScheduleContainer>? = null
 
@@ -58,8 +58,8 @@ class AddTeacherPresenter @Inject constructor(
             )
     }
 
-    fun setTeacherValue(value: Int) {
-        teacher = value
+    fun setTeacherKey(key: String) {
+        teacherKey = key
     }
 
     fun isValidTeacher(name: String): Boolean {
@@ -74,11 +74,14 @@ class AddTeacherPresenter @Inject constructor(
     }
 
     fun getTeacher(): Teacher? {
-        val teacherName = teachers!!.getValueOrDefault(teacher)
+        val teacherName = teachers!!.getValueOrDefault(teacherKey)
         if (teacherName == EMPTY_STRING) {
             return null
         }
-        return Teacher(teacher, teacherName, currentDate.academicYear)
+        if (teacherKey.any { c -> !c.isDigit() }) {
+            return null
+        }
+        return Teacher(teacherKey.toInt(), teacherName, currentDate.academicYear)
     }
 
     fun populateTeachersAdapter() = view?.populateTeachersView(teachers!!)

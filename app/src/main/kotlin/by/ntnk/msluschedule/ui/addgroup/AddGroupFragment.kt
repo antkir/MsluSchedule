@@ -89,7 +89,11 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
         with(groupView) {
             progressBar = layout.findViewById(R.id.progressbar_dialog_group)
             setEnabledFocusable(false)
-            setOnItemClickListener { _, _, _, id -> presenter.setGroupValue(id.toInt()) }
+            setOnItemClickListener { parent, _, position, _ ->
+                val adapter = parent.adapter as ScheduleFilterAdapter
+                val key = adapter.getKey(position)
+                presenter.setGroupKey(key)
+            }
 
             val groupTextInputLayout: TextInputLayout = layout.findViewById(R.id.textinputlayout_group)
             addTextChangedListener(object : SimpleTextWatcher {

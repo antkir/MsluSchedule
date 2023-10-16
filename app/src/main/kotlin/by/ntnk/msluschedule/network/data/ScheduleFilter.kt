@@ -1,24 +1,24 @@
 package by.ntnk.msluschedule.network.data
 
-import androidx.collection.SparseArrayCompat
 import by.ntnk.msluschedule.utils.EMPTY_STRING
+import by.ntnk.msluschedule.utils.Entry
 
-data class ScheduleFilter(private val data: SparseArrayCompat<String>) {
+data class ScheduleFilter(private val data: MutableList<Entry<String, String>>) {
     val size: Int
-        get() = data.size()
+        get() = data.size
 
-    constructor() : this(SparseArrayCompat<String>())
+    constructor() : this(mutableListOf())
 
-    fun getValueOrDefault(key: Int, defaultValue: String = EMPTY_STRING): String {
-        return data.get(key, defaultValue)
+    fun getValueOrDefault(key: String, defaultValue: String = EMPTY_STRING): String {
+        return data.find { it.key == key }?.value ?: defaultValue
     }
 
     fun valueAt(index: Int): String {
-        return data.valueAt(index)
+        return data[index].value
     }
 
-    fun keyAt(index: Int): Int {
-        return data.keyAt(index)
+    fun keyAt(index: Int): String {
+        return data[index].key
     }
 
     /**
@@ -26,16 +26,20 @@ data class ScheduleFilter(private val data: SparseArrayCompat<String>) {
      * replacing the previous mapping from the specified key if there
      * was one.
      */
-    fun put(key: Int, value: String) {
-        data.put(key, value)
+    fun put(key: String, value: String) {
+        val iterator = data.listIterator()
+        while (iterator.hasNext()) {
+            val entry = iterator.next()
+            if (entry.key == key) {
+                iterator.set(Entry(key, value))
+                return
+            }
+        }
+        data.add(Entry(key, value))
     }
 
     fun containsValue(value: String): Boolean {
-        var ret = false
-        for (i in 0 until size) {
-            if (valueAt(i) == value) ret = true
-        }
-        return ret
+        return data.any { it.value == value }
     }
 
     override fun equals(other: Any?): Boolean {
@@ -45,7 +49,7 @@ data class ScheduleFilter(private val data: SparseArrayCompat<String>) {
         other as ScheduleFilter
         if (size != other.size) return false
         for (i in 0 until size) {
-            if (data.get(i) != other.data.get(i)) return false
+            if (data[i] != other.data[i]) return false
         }
 
         return true
