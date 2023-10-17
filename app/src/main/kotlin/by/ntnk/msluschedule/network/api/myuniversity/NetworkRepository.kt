@@ -122,7 +122,7 @@ class NetworkRepository @Inject constructor(
                 val scheduleFilter = ScheduleFilter()
                 val body = response.body() ?: throw JsonDataException()
                 val teachers = body.result ?: throw NoDataOnServerException()
-                for ((i, teacher) in teachers.withIndex()) {
+                for ((i, teacher) in teachers.sorted().withIndex()) {
                     scheduleFilter.put(i.toString(10), teacher)
                 }
                 return@map scheduleFilter
