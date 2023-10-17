@@ -1,8 +1,10 @@
 package by.ntnk.msluschedule.utils
 
 import java.net.ConnectException
+import java.net.SocketException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
+import javax.net.ssl.SSLException
 
 const val EMPTY_STRING = ""
 
@@ -65,5 +67,7 @@ fun isUnexpectedException(t: Throwable): Boolean {
         t !is HttpStatusException &&
         t !is InvalidYearException &&
         t !is NetworkApiVersionException &&
-        t !is NoDataOnServerException
+        t !is NoDataOnServerException &&
+        t !is SSLException &&
+        t !is SocketException
 }
