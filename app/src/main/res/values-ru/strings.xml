@@ -92,5 +92,5 @@
     <string name="fab_add_schedule_teacher_description">Добавить расписание преподавателя</string>
     <string name="fab_edit_note">Редактировать заметку</string>
     <string name="error_network_api_version">Это расписание было загружено с неподдерживаемого сейчас сайта и не может быть обновлено</string>
-    <string name="pref_hide_self_study_classes_title">Прятать занятия самостоятельной работы</string>
+    <string name="pref_hide_self_study_classes_title">Прятать занятия в дни самостоятельной работы</string>
 </resources>

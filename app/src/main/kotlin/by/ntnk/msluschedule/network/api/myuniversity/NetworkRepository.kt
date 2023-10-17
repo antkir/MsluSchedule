@@ -231,10 +231,7 @@ class NetworkRepository @Inject constructor(
                         val isPhysEdClass =
                             studyGroupClass.subject.startsWith("физ", ignoreCase = true) &&
                                 studyGroupClass.subject.endsWith("ра", ignoreCase = true)
-                        val isSelfStudyClass =
-                            studyGroupClass.type.contains("ср", ignoreCase = true) &&
-                                studyGroupClass.subject.contains("сам", ignoreCase = true) &&
-                                studyGroupClass.subject.contains("раб", ignoreCase = true)
+                        val isSelfStudyClass = studyGroupClass.type.equals("дср", ignoreCase = true)
                         return@filter (!isPhysEdClassHidden || !isPhysEdClass) &&
                             (!isSelfStudyClassHidden || !isSelfStudyClass)
                     }
