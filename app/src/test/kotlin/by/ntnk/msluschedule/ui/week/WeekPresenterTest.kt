@@ -84,7 +84,7 @@ class WeekPresenterTest {
             .thenReturn(ScheduleContainerInfo(0, "", ScheduleType.STUDYGROUP))
         whenever(databaseRepository.getScheduleContainer(anyInt()))
             .thenReturn(
-                Single.just(ScheduleContainer(0, "", ScheduleType.STUDYGROUP, 0))
+                Single.just(ScheduleContainer("", "", ScheduleType.STUDYGROUP, 0))
                     .doOnSubscribe { getScheduleContainerTest.onSubscribe(it) }
             )
         whenever(databaseRepository.getWeekKey(anyInt()))
@@ -138,9 +138,9 @@ class WeekPresenterTest {
                     .doOnSubscribe { getTeacherScheduleTest.onSubscribe(it) }
             )
         whenever(databaseDataMapper.mapToStudyGroup(any()))
-            .thenReturn(StudyGroup(0, "", 0, 0, 0))
+            .thenReturn(StudyGroup("", "", 0, 0, 0))
         whenever(databaseDataMapper.mapToTeacher(any()))
-            .thenReturn(Teacher(0, "", 0))
+            .thenReturn(Teacher("", "", 0))
 
         whenever(schedulerProvider.single())
             .thenReturn(Schedulers.trampoline())

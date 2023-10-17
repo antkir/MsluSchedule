@@ -159,11 +159,8 @@ class AddGroupPresenter @Inject constructor(
         if (groupName == EMPTY_STRING) {
             return null
         }
-        if (groupKey.any { c -> !c.isDigit() }) {
-            return null
-        }
         val name = formatGroupName(groupName, facultyName)
-        return StudyGroup(groupKey.toInt(), name, facultyKey.toInt(), courseKey.toInt(), currentDate.academicYear)
+        return StudyGroup(groupKey, name, facultyKey.toInt(), courseKey.toInt(), currentDate.academicYear)
     }
 
     private fun formatGroupName(groupName: String, facultyName: String): String {

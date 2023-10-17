@@ -78,10 +78,7 @@ class AddTeacherPresenter @Inject constructor(
         if (teacherName == EMPTY_STRING) {
             return null
         }
-        if (teacherKey.any { c -> !c.isDigit() }) {
-            return null
-        }
-        return Teacher(teacherKey.toInt(), teacherName, currentDate.academicYear)
+        return Teacher(teacherKey, teacherName, currentDate.academicYear)
     }
 
     fun populateTeachersAdapter() = view?.populateTeachersView(teachers!!)

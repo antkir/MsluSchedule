@@ -153,8 +153,7 @@ class NetworkRepository @Inject constructor(
             throw NoDataOnServerException()
         }
 
-        val groupKey = groupKeyToString(studyGroup.key)
-        return scheduleService.getGroupClasses(groupKey)
+        return scheduleService.getGroupClasses(studyGroup.key)
             .flatMapObservable { response ->
                 checkResponse(response)
 
@@ -452,17 +451,6 @@ class NetworkRepository @Inject constructor(
         return localDateTime.format(dateTimeFormatter)
     }
 
-    private fun groupKeyToString(groupKey: Int): String {
-        return if (groupKey >= 0) {
-            groupKey.toString(10)
-        } else {
-            val groupCode = -groupKey
-            val code = groupCode / GROUP_CODE_OFFSET
-            val subcode = groupCode % GROUP_CODE_OFFSET
-            "$code-$subcode"
-        }
-    }
-
     @Throws(HttpStatusException::class)
     private fun <T> checkResponse(response: Response<T>) {
         if (!response.isSuccessful) {
@@ -472,12 +460,5 @@ class NetworkRepository @Inject constructor(
                 response.raw().request().url().toString()
             )
         }
-    }
-
-    companion object {
-        // Myuniversity API serves group codes not only as integers, but also as strings (e.g. "1000-7").
-        // We store group keys as integer numbers, so use an offset to transform these string values to integers.
-        // Maximum group code value is 202092, while maximum group subcode value is 4 (for now).
-        private const val GROUP_CODE_OFFSET = 100
     }
 }

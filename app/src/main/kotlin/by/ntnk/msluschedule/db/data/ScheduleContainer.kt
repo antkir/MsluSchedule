@@ -9,7 +9,7 @@ import by.ntnk.msluschedule.utils.ScheduleTypeConverter
 @Entity
 @TypeConverters(ScheduleTypeConverter::class)
 data class ScheduleContainer constructor(
-    val key: Int,
+    val key: String,
     val name: String,
     val type: ScheduleType,
     val year: Int,
