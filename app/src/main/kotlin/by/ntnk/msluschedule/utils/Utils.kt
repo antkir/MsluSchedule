@@ -2,8 +2,10 @@ package by.ntnk.msluschedule.utils
 
 import org.jsoup.HttpStatusException
 import java.net.ConnectException
+import java.net.SocketException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
+import javax.net.ssl.SSLException
 
 const val EMPTY_STRING = ""
 
@@ -63,7 +65,9 @@ object Utils {
             throwable !is HttpStatusException &&
             throwable !is InvalidYearException &&
             throwable !is NetworkApiVersionException &&
-            throwable !is NoDataOnServerException
+            throwable !is NoDataOnServerException &&
+            throwable !is SSLException &&
+            throwable !is SocketException
     }
 
     /*
