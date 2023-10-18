@@ -164,7 +164,7 @@ class MainActivity :
             return@setOnApplyWindowInsetsListener insets
         }
 
-        ViewCompat.setOnApplyWindowInsetsListener(binding.content.constraintLayout) { view, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(binding.content.layout) { view, insets ->
             val layoutParams = view.layoutParams as ViewGroup.MarginLayoutParams
             val toolbarHeight = resources.getDimension(R.dimen.toolbar_height).toInt()
             val insetsSystemBars = WindowInsetsCompat.Type.systemBars()
@@ -385,7 +385,7 @@ class MainActivity :
 
         if (isUpdatingWeeksContainer) {
             var viewPagerWeeksContainer: ViewPager? = null
-            val weeksContainerFragment = supportFragmentManager.findFragmentById(R.id.content)
+            val weeksContainerFragment = supportFragmentManager.findFragmentById(R.id.fragment)
             if (weeksContainerFragment != null) {
                 viewPagerWeeksContainer = weeksContainerFragment.view?.findViewById(R.id.viewpager_weeks)
             }
@@ -401,10 +401,10 @@ class MainActivity :
     }
 
     private fun swapMainContent() {
-        val weeksContainerFragment = supportFragmentManager.findFragmentById(R.id.content)
+        val weeksContainerFragment = supportFragmentManager.findFragmentById(R.id.fragment)
         if (weeksContainerFragment == null) {
             supportFragmentManager.beginTransaction()
-                .add(R.id.content, WeeksContainerFragment())
+                .add(R.id.fragment, WeeksContainerFragment())
                 .commitNow()
         } else {
             weeksContainerFragment as WeeksContainerFragment
@@ -514,18 +514,17 @@ class MainActivity :
     }
 
     override fun onError(t: Throwable) {
-        val snackbar =
-            Snackbar.make(binding.content.constraintLayout, AndroidUtils.getErrorMessageResId(t), Snackbar.LENGTH_LONG)
+        val snackbar = Snackbar.make(binding.content.layout, AndroidUtils.getErrorMessageResId(t), Snackbar.LENGTH_LONG)
         snackbar.anchorView = binding.fam.fabBase
         ViewCompat.setOnApplyWindowInsetsListener(snackbar.view) { _, insets -> insets }
         snackbar.show()
     }
 
     override fun initMainContent() {
-        val weeksContainerFragment = supportFragmentManager.findFragmentById(R.id.content)
+        val weeksContainerFragment = supportFragmentManager.findFragmentById(R.id.fragment)
         if (weeksContainerFragment == null) {
             supportFragmentManager.beginTransaction()
-                .add(R.id.content, WeeksContainerFragment())
+                .add(R.id.fragment, WeeksContainerFragment())
                 .commitNow()
         }
 
@@ -584,7 +583,7 @@ class MainActivity :
         binding.content.imageBackground.visibility = View.VISIBLE
         binding.content.textHint.visibility = View.VISIBLE
 
-        val snackbar = Snackbar.make(binding.content.constraintLayout, R.string.error_general, Snackbar.LENGTH_LONG)
+        val snackbar = Snackbar.make(binding.content.layout, R.string.error_general, Snackbar.LENGTH_LONG)
         snackbar.anchorView = binding.fam.fabBase
         ViewCompat.setOnApplyWindowInsetsListener(snackbar.view) { _, insets -> insets }
         snackbar.show()
@@ -608,7 +607,7 @@ class MainActivity :
     }
 
     private fun removeWeeksContainerFragment() {
-        val fragment = supportFragmentManager.findFragmentById(R.id.content)
+        val fragment = supportFragmentManager.findFragmentById(R.id.fragment)
         if (fragment != null) {
             supportFragmentManager
                 .beginTransaction()
