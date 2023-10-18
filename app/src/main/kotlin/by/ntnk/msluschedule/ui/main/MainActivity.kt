@@ -158,7 +158,7 @@ class MainActivity :
             return@setOnApplyWindowInsetsListener insets
         }
 
-        ViewCompat.setOnApplyWindowInsetsListener(binding.content.constraintLayout) { view, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(binding.content.layout) { view, insets ->
             val insetsSystemBars = WindowInsetsCompat.Type.systemBars()
             val layoutParams = view.layoutParams as ViewGroup.MarginLayoutParams
             val toolbarHeight = resources.getDimension(R.dimen.toolbar_height).toInt()
@@ -595,7 +595,7 @@ class MainActivity :
 
     override fun onDialogFragmentError(throwable: Throwable) {
         val errorMessageResource = AndroidUtils.getErrorMessageResId(throwable)
-        val snackbar = Snackbar.make(binding.content.constraintLayout, errorMessageResource, Snackbar.LENGTH_LONG)
+        val snackbar = Snackbar.make(binding.content.layout, errorMessageResource, Snackbar.LENGTH_LONG)
         snackbar.anchorView = binding.fam.fabBase
         ViewCompat.setOnApplyWindowInsetsListener(snackbar.view) { _, insets -> insets }
         snackbar.show()
@@ -604,10 +604,10 @@ class MainActivity :
     private fun changeScheduleContainer(scheduleContainer: ScheduleContainer) {
         supportActionBar?.title = scheduleContainer.value
 
-        val weeksContainerFragment = supportFragmentManager.findFragmentById(R.id.content)
+        val weeksContainerFragment = supportFragmentManager.findFragmentById(R.id.fragment)
         if (weeksContainerFragment == null) {
             supportFragmentManager.beginTransaction()
-                .replace(R.id.content, WeeksContainerFragment())
+                .replace(R.id.fragment, WeeksContainerFragment())
                 .commitNow()
         } else {
             weeksContainerFragment as WeeksContainerFragment
@@ -618,7 +618,7 @@ class MainActivity :
     private fun clearScheduleContainer() {
         supportActionBar?.title = String.DEFAULT
 
-        val scheduleContainerFragment = supportFragmentManager.findFragmentById(R.id.content)
+        val scheduleContainerFragment = supportFragmentManager.findFragmentById(R.id.fragment)
         if (scheduleContainerFragment != null) {
             supportFragmentManager
                 .beginTransaction()
@@ -668,7 +668,7 @@ class MainActivity :
     }
 
     private fun setWeeksContainerViewTransparent() {
-        val weeksContainerView = supportFragmentManager.findFragmentById(R.id.content)
+        val weeksContainerView = supportFragmentManager.findFragmentById(R.id.fragment)
             ?.view
             ?.findViewById<View>(R.id.viewpager_weeks)
         weeksContainerView?.alpha = 0f
@@ -679,7 +679,7 @@ class MainActivity :
     }
 
     private fun showError() {
-        val snackbar = Snackbar.make(binding.content.constraintLayout, R.string.error_general, Snackbar.LENGTH_LONG)
+        val snackbar = Snackbar.make(binding.content.layout, R.string.error_general, Snackbar.LENGTH_LONG)
         snackbar.anchorView = binding.fam.fabBase
         ViewCompat.setOnApplyWindowInsetsListener(snackbar.view) { _, insets -> insets }
         snackbar.show()
