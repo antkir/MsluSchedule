@@ -391,6 +391,8 @@ class MainActivity :
             }
             viewPagerWeeksContainer?.alpha = slideOffset
             binding.content.progressbar.visibility = View.VISIBLE
+            binding.content.imageBackground.visibility = View.GONE
+            binding.content.textHint.visibility = View.GONE
             if (slideOffset < 0.03) {
                 isUpdatingWeeksContainer = false
                 viewPagerWeeksContainer?.visibility = View.INVISIBLE
@@ -410,9 +412,6 @@ class MainActivity :
             weeksContainerFragment as WeeksContainerFragment
             weeksContainerFragment.swapTabs()
         }
-
-        binding.content.imageBackground.visibility = View.GONE
-        binding.content.textHint.visibility = View.GONE
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
