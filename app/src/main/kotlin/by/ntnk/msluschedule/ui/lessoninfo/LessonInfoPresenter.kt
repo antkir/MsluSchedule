@@ -36,7 +36,7 @@ class LessonInfoPresenter @Inject constructor(
             ScheduleType.STUDYGROUP -> {
                 databaseRepository.getStudyGroupLesson(classId)
                     .flatMap { classDescriptor ->
-                        databaseRepository.getWeekdaysWithStudyGroupClassBySubject(weekId, classDescriptor)
+                        databaseRepository.getWeekdaysWithStudyGroupClass(weekId, classDescriptor)
                             .map { weekdays -> Pair(classDescriptor, weekdays) }
                     }
                     .subscribeOn(schedulerProvider.io())
@@ -56,7 +56,7 @@ class LessonInfoPresenter @Inject constructor(
             ScheduleType.TEACHER -> {
                 databaseRepository.getTeacherLesson(classId)
                     .flatMap { classDescriptor ->
-                        databaseRepository.getWeekdaysWithTeacherClassByGroups(weekId, classDescriptor.groups)
+                        databaseRepository.getWeekdaysWithTeacherClass(weekId, classDescriptor)
                             .map { weekdays -> Pair(classDescriptor, weekdays) }
                     }
                     .subscribeOn(schedulerProvider.io())
