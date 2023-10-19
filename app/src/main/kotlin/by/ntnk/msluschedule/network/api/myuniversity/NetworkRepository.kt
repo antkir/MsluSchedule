@@ -201,7 +201,7 @@ class NetworkRepository @Inject constructor(
                             .trim()
                             .takeIfOrDefault({ s -> s.count { c -> c.isDigit() } < 3 }, String.DEFAULT)
                         val classroom = jsonGroupClass.room
-                            .replace(" ", String.DEFAULT)
+                            .replace(Regex("[\\s-]+"), String.DEFAULT)
                             .trim()
                             .ifEmpty {
                                 jsonGroupClass.summary
@@ -210,7 +210,7 @@ class NetworkRepository @Inject constructor(
                                     .trim()
                                     .ifEmpty {
                                         jsonGroupClass.summary
-                                            .replace(" ", String.DEFAULT)
+                                            .replace(Regex("[\\s-]+"), String.DEFAULT)
                                             .trim()
                                             .takeIfOrDefault({ s -> s.count { c -> c.isDigit() } >= 3 }, String.DEFAULT)
                                     }
@@ -302,7 +302,7 @@ class NetworkRepository @Inject constructor(
                         val faculty = String.DEFAULT
                         val groups = jsonTeacherClass.groupLabel.trim()
                         val classroom = jsonTeacherClass.room
-                            .replace(" ", String.DEFAULT)
+                            .replace(Regex("[\\s-]+"), String.DEFAULT)
                             .trim()
                         val startDateTime = parseDateTime(jsonTeacherClass.start)
                         val start = formatTime(startDateTime)
