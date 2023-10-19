@@ -18,7 +18,7 @@ class LessonInfoPresenter @Inject constructor(
             ScheduleType.STUDYGROUP -> {
                 databaseRepository.getStudyGroupLesson(lessonId)
                     .flatMap { lesson ->
-                        databaseRepository.getWeekdaysWithStudyGroupClassBySubject(weekId, lesson)
+                        databaseRepository.getWeekdaysWithStudyGroupClass(weekId, lesson)
                             .map { Pair(lesson, it) }
                             .toMaybe()
                     }
@@ -33,10 +33,11 @@ class LessonInfoPresenter @Inject constructor(
                         onComplete = { view?.destroyView() }
                     )
             }
+
             ScheduleType.TEACHER -> {
                 databaseRepository.getTeacherLesson(lessonId)
                     .flatMap { lesson ->
-                        databaseRepository.getWeekdaysWithTeacherClassByGroups(weekId, lesson.groups)
+                        databaseRepository.getWeekdaysWithTeacherClass(weekId, lesson)
                             .map { Pair(lesson, it) }
                             .toMaybe()
                     }

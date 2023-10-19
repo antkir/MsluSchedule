@@ -184,7 +184,7 @@ class DatabaseRepository @Inject constructor(
             }
     }
 
-    fun getWeekdaysWithStudyGroupClassBySubject(weekId: Int, classDescriptor: StudyGroupLesson): Single<List<String>> {
+    fun getWeekdaysWithStudyGroupClass(weekId: Int, classDescriptor: StudyGroupLesson): Single<List<String>> {
         return appDatabase.weekdayDao.getWeekdays(weekId)
             .flatMapObservable { Observable.fromIterable(it) }
             .flatMapMaybe { weekday ->
@@ -199,11 +199,15 @@ class DatabaseRepository @Inject constructor(
             .toList()
     }
 
-    fun getWeekdaysWithTeacherClassByGroups(weekId: Int, groups: String): Single<List<String>> {
+    fun getWeekdaysWithTeacherClass(weekId: Int, classDescriptor: TeacherLesson): Single<List<String>> {
         return appDatabase.weekdayDao.getWeekdays(weekId)
             .flatMapObservable { Observable.fromIterable(it) }
             .flatMapMaybe { weekday ->
-                return@flatMapMaybe appDatabase.teacherLessonDao.getClassesByGroups(weekday.id, groups)
+                return@flatMapMaybe appDatabase.teacherLessonDao.getClassesBySubject(
+                    weekday.id,
+                    classDescriptor.subject,
+                    classDescriptor.groups
+                )
                     .filter { it.isNotEmpty() }
                     .map { weekday.value }
             }
