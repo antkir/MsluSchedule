@@ -13,6 +13,7 @@ import by.ntnk.msluschedule.utils.AUTO_ID
 import by.ntnk.msluschedule.utils.CurrentDate
 import by.ntnk.msluschedule.utils.DEFAULT
 import by.ntnk.msluschedule.utils.Days
+import by.ntnk.msluschedule.utils.HttpStatusException
 import by.ntnk.msluschedule.utils.NetworkApiVersion
 import by.ntnk.msluschedule.utils.NetworkApiVersionException
 import by.ntnk.msluschedule.utils.NoDataOnServerException
@@ -24,7 +25,6 @@ import by.ntnk.msluschedule.utils.takeUnlessOrDefault
 import com.squareup.moshi.JsonDataException
 import io.reactivex.Observable
 import io.reactivex.Single
-import org.jsoup.HttpStatusException
 import org.threeten.bp.DayOfWeek
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
@@ -458,7 +458,6 @@ class NetworkRepository @Inject constructor(
         return localDateTime.format(dateTimeFormatter)
     }
 
-    @Throws(HttpStatusException::class)
     private fun <T> checkResponse(response: Response<T>) {
         if (!response.isSuccessful) {
             throw HttpStatusException(

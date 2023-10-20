@@ -11,7 +11,6 @@ import androidx.drawerlayout.widget.DrawerLayout
 import by.ntnk.msluschedule.R
 import com.google.android.material.snackbar.Snackbar
 import io.reactivex.subjects.PublishSubject
-import org.jsoup.HttpStatusException
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException

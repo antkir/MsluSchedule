@@ -11,6 +11,7 @@ import by.ntnk.msluschedule.network.api.original.data.RequestData
 import by.ntnk.msluschedule.network.api.original.data.RequestInfo
 import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.utils.DEFAULT
+import by.ntnk.msluschedule.utils.HttpStatusException
 import by.ntnk.msluschedule.utils.NetworkApiVersion
 import by.ntnk.msluschedule.utils.NetworkApiVersionException
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
@@ -18,7 +19,6 @@ import by.ntnk.msluschedule.utils.Utils
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
-import org.jsoup.HttpStatusException
 import retrofit2.Response
 import java.io.InputStream
 import javax.inject.Inject
@@ -173,7 +173,6 @@ class NetworkRepository @Inject constructor(
             .map { response -> response.body()?.byteStream() }
     }
 
-    @Throws(HttpStatusException::class)
     private fun <T> checkErrors(response: Response<T>) {
         if (!response.isSuccessful) {
             throw HttpStatusException(

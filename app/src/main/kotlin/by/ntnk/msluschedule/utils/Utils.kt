@@ -1,6 +1,5 @@
 package by.ntnk.msluschedule.utils
 
-import org.jsoup.HttpStatusException
 import java.net.ConnectException
 import java.net.SocketException
 import java.net.SocketTimeoutException
@@ -55,6 +54,13 @@ class InvalidYearException : RuntimeException()
 class NetworkApiVersionException : RuntimeException()
 
 class NoDataOnServerException : RuntimeException()
+
+/**
+ * Signals that a HTTP request resulted in a not OK HTTP response.
+ */
+class HttpStatusException(message: String, statusCode: Int, url: String) : RuntimeException(
+    "$message. Status=$statusCode, URL=[$url]"
+)
 
 object Utils {
 
