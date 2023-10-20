@@ -79,8 +79,16 @@ class WeekPresenterTest {
             )
         whenever(databaseRepository.getStudyGroup(anyInt()))
             .thenReturn(
-                Single.just(StudyGroup(id = 0, key = 0, value = String.DEFAULT, year = 0, faculty = 0, course = 0))
-                    .doOnSubscribe { disposable -> getStudyGroupTest.onSubscribe(disposable) }
+                Single.just(
+                    StudyGroup(
+                        id = 0,
+                        key = String.DEFAULT,
+                        value = String.DEFAULT,
+                        year = 0,
+                        faculty = 0,
+                        course = 0
+                    )
+                ).doOnSubscribe { disposable -> getStudyGroupTest.onSubscribe(disposable) }
             )
         whenever(databaseRepository.getWeekKey(anyInt()))
             .thenReturn(

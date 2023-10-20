@@ -16,7 +16,8 @@ class DatabaseModule {
         return Room.databaseBuilder(app, AppDatabase::class.java, DATABASE_NAME)
             .addMigrations(
                 Migrations.MIGRATION_8_9,
-                Migrations.MIGRATION_9_10
+                Migrations.MIGRATION_9_10,
+                Migrations.MIGRATION_10_11
             )
             .build()
     }

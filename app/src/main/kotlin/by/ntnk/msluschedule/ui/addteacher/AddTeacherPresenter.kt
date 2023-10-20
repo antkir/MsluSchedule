@@ -112,6 +112,6 @@ class AddTeacherPresenter @Inject constructor(
         assert(!teacherFilter.value!!.isError() && teacherFilter.value!!.isData())
         val teacherKey = teacherKey.value!!
         val teacherName = teacherFilter.value!!.data!!.getValueOrDefault(teacherKey)
-        return Teacher(AUTO_ID, teacherKey.toInt(), teacherName, currentDate.academicYear)
+        return Teacher(AUTO_ID, teacherKey, teacherName, currentDate.academicYear)
     }
 }

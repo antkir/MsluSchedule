@@ -113,8 +113,14 @@ class MainPresenterTest {
     @Test
     fun addGroup() {
         // given
-        val studyGroup =
-            StudyGroup(id = 0, key = 0, value = String.DEFAULT, year = ACADEMIC_YEAR, faculty = 0, course = 0)
+        val studyGroup = StudyGroup(
+            id = 0,
+            key = String.DEFAULT,
+            value = String.DEFAULT,
+            year = ACADEMIC_YEAR,
+            faculty = 0,
+            course = 0
+        )
         val scheduleContainer =
             ScheduleContainer(studyGroup.id, studyGroup.value, ScheduleType.STUDYGROUP, studyGroup.year)
         whenever(sharedPreferencesRepository.getSelectedScheduleContainer()).thenReturn(scheduleContainer)
@@ -143,7 +149,7 @@ class MainPresenterTest {
     @Test
     fun addTeacher() {
         // given
-        val teacher = Teacher(id = 0, key = 0, value = String.DEFAULT, year = ACADEMIC_YEAR)
+        val teacher = Teacher(id = 0, key = String.DEFAULT, value = String.DEFAULT, year = ACADEMIC_YEAR)
         val scheduleContainer =
             ScheduleContainer(teacher.id, teacher.value, ScheduleType.TEACHER, teacher.year)
         whenever(sharedPreferencesRepository.getSelectedScheduleContainer()).thenReturn(scheduleContainer)
@@ -172,8 +178,14 @@ class MainPresenterTest {
     @Test
     fun `Delete the inserted group if we aren't able to get weeks`() {
         // given
-        val studyGroup =
-            StudyGroup(id = 0, key = 0, value = String.DEFAULT, year = ACADEMIC_YEAR, faculty = 0, course = 0)
+        val studyGroup = StudyGroup(
+            id = 0,
+            key = String.DEFAULT,
+            value = String.DEFAULT,
+            year = ACADEMIC_YEAR,
+            faculty = 0,
+            course = 0
+        )
         whenever(networkRepository.getWeeks()).thenReturn(Single.error(NullPointerException()))
         val mainUiStateObserver = presenter.mainUiStateObservable.test()
         // when
@@ -202,7 +214,7 @@ class MainPresenterTest {
     @Test
     fun `Delete the inserted teacher if we aren't able to get weeks`() {
         // given
-        val teacher = Teacher(id = 0, key = 0, value = String.DEFAULT, year = ACADEMIC_YEAR)
+        val teacher = Teacher(id = 0, key = String.DEFAULT, value = String.DEFAULT, year = ACADEMIC_YEAR)
         whenever(networkRepository.getWeeks()).thenReturn(Single.error(NullPointerException()))
         val mainUiStateObserver = presenter.mainUiStateObservable.test()
         // when

@@ -207,7 +207,8 @@ class AddGroupPresenter @Inject constructor(
         val groupKey = groupKey.value!!
         val groupName = groupFilter.value!!.data!!.getValueOrDefault(groupKey)
         val name = formatGroupName(groupName, facultyName)
-        return StudyGroup(AUTO_ID, groupKey.toInt(), name, currentDate.academicYear, facultyKey.toInt(), courseKey.value!!.toInt())
+        val courseKey = courseKey.value!!
+        return StudyGroup(AUTO_ID, groupKey, name, currentDate.academicYear, facultyKey.toInt(), courseKey.toInt())
     }
 
     private fun formatGroupName(groupName: String, facultyName: String): String {

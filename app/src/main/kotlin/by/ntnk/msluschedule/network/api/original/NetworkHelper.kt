@@ -53,14 +53,14 @@ class NetworkHelper @Inject constructor(private val currentDate: CurrentDate) {
             createWeekRequestDataInstance(weekKey),
             createFacultyRequestDataInstance(studyGroup.faculty),
             createCourseRequestDataInstance(studyGroup.course),
-            createStudyGroupRequestDataInstance(studyGroup.key)
+            createStudyGroupRequestDataInstance(studyGroup.key.toInt())
         )
 
     fun getTeacherRequestDataList(teacher: Teacher, weekKey: Int): List<RequestData> =
         listOf(
             createYearRequestDataInstance(teacher.year),
             createWeekRequestDataInstance(weekKey),
-            createTeacherRequestDataInstance(teacher.key)
+            createTeacherRequestDataInstance(teacher.key.toInt())
         )
 
     fun parseDataFromHtmlBody(requestInfo: RequestInfo, htmlBody: String): Single<ScheduleFilter> {
