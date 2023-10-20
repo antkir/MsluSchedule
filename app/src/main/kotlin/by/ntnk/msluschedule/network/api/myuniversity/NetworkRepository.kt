@@ -229,22 +229,21 @@ class NetworkRepository @Inject constructor(
                 val isPhysEdClassHidden = sharedPreferencesRepository.isPhysEdClassHidden()
                 val isSelfStudyClassHidden = sharedPreferencesRepository.isSelfStudyClassHidden()
                 filteredClasses
-                    .filter { entry ->
-                        val studyGroupClass = entry.second
+                    .filter { (_, groupClass) ->
                         val isPhysEdClass =
-                            studyGroupClass.subject.startsWith("физ", ignoreCase = true) &&
-                                studyGroupClass.subject.endsWith("ра", ignoreCase = true)
+                            groupClass.subject.startsWith("физ", ignoreCase = true) &&
+                                groupClass.subject.endsWith("ра", ignoreCase = true)
                         val isSelfStudyClass =
-                            studyGroupClass.type.contains("ср", ignoreCase = true) &&
-                                studyGroupClass.subject.contains("сам", ignoreCase = true) &&
-                                studyGroupClass.subject.contains("раб", ignoreCase = true)
+                            groupClass.type.contains("ср", ignoreCase = true) &&
+                                groupClass.subject.contains("сам", ignoreCase = true) &&
+                                groupClass.subject.contains("раб", ignoreCase = true)
                         return@filter (!isPhysEdClassHidden || !isPhysEdClass) &&
                             (!isSelfStudyClassHidden || !isSelfStudyClass)
                     }
-                    .sortedBy { entry -> entry.first }
-                    .forEach { entry ->
-                        val dayOfWeekIndex = entry.first.dayOfWeek.ordinal
-                        weekdays[dayOfWeekIndex].classes.add(entry.second)
+                    .sortedBy { (dateTime, _) -> dateTime }
+                    .forEach { (dateTime, groupClass) ->
+                        val dayOfWeek = dateTime.dayOfWeek.ordinal
+                        weekdays[dayOfWeek].classes.add(groupClass)
                     }
 
                 return@flatMapObservable Observable.fromIterable(weekdays)
