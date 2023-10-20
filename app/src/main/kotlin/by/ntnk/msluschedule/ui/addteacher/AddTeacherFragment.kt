@@ -62,12 +62,14 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
     private fun setupViews() {
         with(binding.autocompletetextTeacher) {
             setEnabledFocusable(false)
-            setOnItemClickListener { _, _, _, id ->
-                presenter.setTeacherKey(id.toInt())
+            setOnItemClickListener { parent, _, position, _ ->
+                val adapter = parent.adapter as ScheduleFilterAdapter
+                val key = adapter.getKey(position)
+                presenter.setTeacherKey(key)
             }
             doOnTextChanged { _, _, before, _ ->
                 if (before > 0) {
-                    presenter.setTeacherKey(Int.DEFAULT)
+                    presenter.setTeacherKey(String.DEFAULT)
                 }
             }
         }
@@ -79,7 +81,8 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
             .setTitle((R.string.add_teacher_title))
             .setView(binding.root)
             .setPositiveButton(R.string.button_add) { _, _ ->
-                listener.onNewTeacher(presenter.createSelectedTeacherObject())
+                val teacher = presenter.createSelectedTeacherObject()
+                listener.onNewTeacher(teacher)
             }
             .setNegativeButton(R.string.button_cancel) { _, _ ->
                 dismiss()
@@ -126,7 +129,7 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
             onNext = { key ->
                 val alertDialog = dialog as AlertDialog
                 var isEnabled = false
-                if (key != Int.DEFAULT) {
+                if (key != String.DEFAULT) {
                     if (presenter.isTeacherAdded(key)) {
                         binding.textinputlayoutTeacher.error = resources.getString(R.string.teacher_already_added)
                         isEnabled = false

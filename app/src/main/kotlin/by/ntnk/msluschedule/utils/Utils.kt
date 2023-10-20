@@ -44,6 +44,8 @@ inline fun <T> Iterable<T>.firstOrDefault(predicate: (T) -> Boolean, defaultValu
     return firstOrNull(predicate) ?: defaultValue
 }
 
+data class Entry<K, V>(override val key: K, override val value: V) : Map.Entry<K, V>
+
 interface ErrorType
 
 class InvalidYearException : RuntimeException()

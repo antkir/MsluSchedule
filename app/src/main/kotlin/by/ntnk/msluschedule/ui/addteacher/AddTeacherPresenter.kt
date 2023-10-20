@@ -61,8 +61,8 @@ class AddTeacherPresenter @Inject constructor(
     val teacherFilterObservable: Observable<ScheduleFilterUiState>
         get() = teacherFilter
 
-    private val teacherKey: BehaviorSubject<Int> = BehaviorSubject.createDefault(Int.DEFAULT)
-    val teacherKeyObservable: Observable<Int>
+    private val teacherKey: BehaviorSubject<String> = BehaviorSubject.createDefault(String.DEFAULT)
+    val teacherKeyObservable: Observable<String>
         get() = teacherKey
 
     init {
@@ -94,11 +94,11 @@ class AddTeacherPresenter @Inject constructor(
             )
     }
 
-    fun setTeacherKey(key: Int) {
+    fun setTeacherKey(key: String) {
         teacherKey.onNext(key)
     }
 
-    fun isTeacherAdded(key: Int): Boolean {
+    fun isTeacherAdded(key: String): Boolean {
         assert(storedTeachers.hasValue() && teacherFilter.hasValue())
         assert(!teacherFilter.value!!.isError() && teacherFilter.value!!.isData())
         return storedTeachers.value
@@ -112,6 +112,6 @@ class AddTeacherPresenter @Inject constructor(
         assert(!teacherFilter.value!!.isError() && teacherFilter.value!!.isData())
         val teacherKey = teacherKey.value!!
         val teacherName = teacherFilter.value!!.data!!.getValueOrDefault(teacherKey)
-        return Teacher(AUTO_ID, teacherKey, teacherName, currentDate.academicYear)
+        return Teacher(AUTO_ID, teacherKey.toInt(), teacherName, currentDate.academicYear)
     }
 }

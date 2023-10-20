@@ -73,7 +73,7 @@ class NetworkRepository @Inject constructor(
                 val faculties = body.result ?: throw NoDataOnServerException()
                 for (faculty in faculties) {
                     val facultyCode = faculty.facultyCode ?: throw JsonDataException()
-                    if (facultyCode == facultyKey) {
+                    if (facultyCode == facultyKey.toString(10)) {
                         val courses = faculty.courses ?: throw JsonDataException()
                         for (course in courses) {
                             val courseCode = course.courseCode ?: throw JsonDataException()
@@ -96,17 +96,16 @@ class NetworkRepository @Inject constructor(
                 val faculties = body.result ?: throw NoDataOnServerException()
                 for (faculty in faculties) {
                     val facultyCode = faculty.facultyCode ?: throw JsonDataException()
-                    if (facultyCode == facultyKey) {
+                    if (facultyCode == facultyKey.toString(10)) {
                         val courses = faculty.courses ?: throw JsonDataException()
                         for (course in courses) {
                             val courseCode = course.courseCode ?: throw JsonDataException()
-                            if (courseCode == courseKey) {
+                            if (courseCode == courseKey.toString(10)) {
                                 val groups = course.groups ?: throw JsonDataException()
                                 for (group in groups) {
                                     val groupCode = group.groupCode ?: throw JsonDataException()
                                     val groupName = group.group ?: throw JsonDataException()
-                                    val groupKey = groupKeyFromString(groupCode)
-                                    scheduleFilter.put(groupKey, groupName)
+                                    scheduleFilter.put(groupCode, groupName)
                                 }
                             }
                         }
@@ -125,7 +124,7 @@ class NetworkRepository @Inject constructor(
                 val body = response.body() ?: throw JsonDataException()
                 val teachers = body.result ?: throw NoDataOnServerException()
                 for ((i, teacher) in teachers.withIndex()) {
-                    scheduleFilter.put(i, teacher)
+                    scheduleFilter.put(i.toString(10), teacher)
                 }
                 return@map scheduleFilter
             }
@@ -136,7 +135,7 @@ class NetworkRepository @Inject constructor(
             .map { weeks ->
                 val scheduleFilter = ScheduleFilter()
                 for ((i, week) in weeks.withIndex()) {
-                    scheduleFilter.put(i, week)
+                    scheduleFilter.put(i.toString(10), week)
                 }
                 return@map scheduleFilter
             }
@@ -461,16 +460,6 @@ class NetworkRepository @Inject constructor(
             .appendValue(ChronoField.MINUTE_OF_HOUR, 2)
             .toFormatter()
         return localDateTime.format(dateTimeFormatter)
-    }
-
-    private fun groupKeyFromString(groupCode: String): Int {
-        return if (!groupCode.contains('-')) {
-            groupCode.toInt()
-        } else {
-            val code = groupCode.substringBefore('-').toInt()
-            val subcode = groupCode.substringAfter('-').toInt()
-            -(code * GROUP_CODE_OFFSET + subcode)
-        }
     }
 
     private fun groupKeyToString(groupKey: Int): String {

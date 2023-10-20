@@ -80,7 +80,7 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
         with(binding.autocompletetextFaculty) {
             keyListener = null
             setEnabledFocusable(false)
-            setOnItemClickListener { _, _, position, _ ->
+            setOnItemClickListener { parent, _, position, _ ->
                 binding.autocompletetextGroup.text.clear()
                 binding.autocompletetextGroup.setEnabledFocusable(false)
                 presenter.resetGroups()
@@ -89,7 +89,9 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
                 binding.autocompletetextCourse.setEnabledFocusable(false)
                 presenter.resetCourses()
 
-                presenter.setFacultyKeyFromPosition(position)
+                val adapter = parent.adapter as ScheduleFilterAdapter
+                val key = adapter.getKey(position)
+                presenter.setFacultyKey(key)
             }
             setOnClickListener { view ->
                 view as AutoCompleteTextView
@@ -100,12 +102,14 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
         with(binding.autocompletetextCourse) {
             keyListener = null
             setEnabledFocusable(false)
-            setOnItemClickListener { _, _, position, _ ->
+            setOnItemClickListener { parent, _, position, _ ->
                 binding.autocompletetextGroup.text.clear()
                 binding.autocompletetextGroup.setEnabledFocusable(false)
                 presenter.resetGroups()
 
-                presenter.setCourseKeyFromPosition(position)
+                val adapter = parent.adapter as ScheduleFilterAdapter
+                val key = adapter.getKey(position)
+                presenter.setCourseKey(key)
             }
             setOnClickListener { view ->
                 view as AutoCompleteTextView
@@ -115,12 +119,14 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
 
         with(binding.autocompletetextGroup) {
             setEnabledFocusable(false)
-            setOnItemClickListener { _, _, _, id ->
-                presenter.setGroupKey(id.toInt())
+            setOnItemClickListener { parent, _, position, _ ->
+                val adapter = parent.adapter as ScheduleFilterAdapter
+                val key = adapter.getKey(position)
+                presenter.setGroupKey(key)
             }
             doOnTextChanged { _, _, before, _ ->
                 if (before > 0) {
-                    presenter.setGroupKey(Int.DEFAULT)
+                    presenter.setGroupKey(String.DEFAULT)
                 }
             }
             setOnClickListener { view ->
@@ -171,7 +177,7 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
 
         disposables += presenter.facultyKeyObservable.subscribeBy(
             onNext = { key ->
-                if (key != Int.DEFAULT) {
+                if (key != String.DEFAULT) {
                     if (presenter.isCourseFilterUiStateDefault()) {
                         presenter.downloadCourseFilter()
                     }
@@ -199,7 +205,7 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
 
         disposables += presenter.courseKeyObservable.subscribeBy(
             onNext = { key ->
-                if (key != Int.DEFAULT) {
+                if (key != String.DEFAULT) {
                     if (presenter.isGroupFilterUiStateDefault()) {
                         presenter.downloadGroupFilter()
                     }
@@ -229,7 +235,7 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
             onNext = { key ->
                 val alertDialog = dialog as AlertDialog
                 var isEnabled = false
-                if (key != Int.DEFAULT) {
+                if (key != String.DEFAULT) {
                     if (presenter.isGroupAdded(key)) {
                         binding.textinputlayoutGroup.error = resources.getString(R.string.group_already_added)
                         isEnabled = false

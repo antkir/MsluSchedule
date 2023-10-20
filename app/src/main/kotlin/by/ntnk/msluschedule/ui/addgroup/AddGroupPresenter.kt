@@ -66,8 +66,8 @@ class AddGroupPresenter @Inject constructor(
     val facultyFilterObservable: Observable<ScheduleFilterUiState>
         get() = facultyFilter
 
-    private val facultyKey: BehaviorSubject<Int> = BehaviorSubject.createDefault(Int.DEFAULT)
-    val facultyKeyObservable: Observable<Int>
+    private val facultyKey: BehaviorSubject<String> = BehaviorSubject.createDefault(String.DEFAULT)
+    val facultyKeyObservable: Observable<String>
         get() = facultyKey
 
     private val courseFilter: BehaviorSubject<ScheduleFilterUiState> =
@@ -75,8 +75,8 @@ class AddGroupPresenter @Inject constructor(
     val courseFilterObservable: Observable<ScheduleFilterUiState>
         get() = courseFilter
 
-    private val courseKey: BehaviorSubject<Int> = BehaviorSubject.createDefault(Int.DEFAULT)
-    val courseKeyObservable: Observable<Int>
+    private val courseKey: BehaviorSubject<String> = BehaviorSubject.createDefault(String.DEFAULT)
+    val courseKeyObservable: Observable<String>
         get() = courseKey
 
     private val groupFilter: BehaviorSubject<ScheduleFilterUiState> =
@@ -84,8 +84,8 @@ class AddGroupPresenter @Inject constructor(
     val groupFilterObservable: Observable<ScheduleFilterUiState>
         get() = groupFilter
 
-    private val groupKey: BehaviorSubject<Int> = BehaviorSubject.createDefault(Int.DEFAULT)
-    val groupKeyObservable: Observable<Int>
+    private val groupKey: BehaviorSubject<String> = BehaviorSubject.createDefault(String.DEFAULT)
+    val groupKeyObservable: Observable<String>
         get() = groupKey
 
     private var courseFilterDisposable: Disposable = CompositeDisposable()
@@ -118,37 +118,31 @@ class AddGroupPresenter @Inject constructor(
     }
 
     fun isGroupKeyDefault(): Boolean {
-        return groupKey.value == Int.DEFAULT
+        return groupKey.value == String.DEFAULT
     }
 
-    fun setFacultyKeyFromPosition(position: Int) {
-        assert(position >= 0)
-        assert(facultyFilter.hasValue())
-        assert(!facultyFilter.value!!.isError() && facultyFilter.value!!.isData())
-        facultyKey.onNext(facultyFilter.value!!.data!!.keyAt(position))
+    fun setFacultyKey(key: String) {
+        facultyKey.onNext(key)
     }
 
-    fun setCourseKeyFromPosition(position: Int) {
-        assert(position >= 0)
-        assert(courseFilter.hasValue())
-        assert(!courseFilter.value!!.isError() && courseFilter.value!!.isData())
-        courseKey.onNext(courseFilter.value!!.data!!.keyAt(position))
+    fun setCourseKey(key: String) {
+        courseKey.onNext(key)
     }
 
-    fun setGroupKey(key: Int) {
+    fun setGroupKey(key: String) {
         groupKey.onNext(key)
     }
 
     fun resetCourses() {
         courseFilterDisposable.dispose()
         courseFilter.onNext(ScheduleFilterUiState())
-        courseKey.onNext(Int.DEFAULT)
+        courseKey.onNext(String.DEFAULT)
     }
 
     fun resetGroups() {
         groupFilterDisposable.dispose()
         groupFilter.onNext(ScheduleFilterUiState())
-        groupKey.onNext(Int.DEFAULT)
+        groupKey.onNext(String.DEFAULT)
     }
 
     private fun downloadFacultyFilter() {
@@ -165,7 +159,7 @@ class AddGroupPresenter @Inject constructor(
     fun downloadCourseFilter() {
         assert(facultyKey.hasValue())
         courseFilter.onNext(ScheduleFilterUiState(isLoading = true))
-        courseFilterDisposable = networkRepository.getCourses(facultyKey.value!!)
+        courseFilterDisposable = networkRepository.getCourses(facultyKey.value!!.toInt())
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
@@ -178,7 +172,7 @@ class AddGroupPresenter @Inject constructor(
         assert(facultyKey.hasValue() && courseKey.hasValue())
         groupFilter.onNext(ScheduleFilterUiState(isLoading = true))
         groupFilterDisposable =
-            networkRepository.getGroups(facultyKey.value!!, courseKey.value!!, currentDate.academicYear)
+            networkRepository.getGroups(facultyKey.value!!.toInt(), courseKey.value!!.toInt(), currentDate.academicYear)
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
                 .subscribeBy(
@@ -187,12 +181,12 @@ class AddGroupPresenter @Inject constructor(
                 )
     }
 
-    fun isGroupAdded(key: Int): Boolean {
+    fun isGroupAdded(key: String): Boolean {
         assert(storedGroups.hasValue() && facultyKey.hasValue() && groupFilter.hasValue())
         assert(!groupFilter.value!!.isError() && groupFilter.value!!.isData())
         return storedGroups.value
             ?.filter { group -> group.year == currentDate.academicYear }
-            ?.filter { group -> group.faculty == facultyKey.value }
+            ?.filter { group -> group.faculty.toString(10) == facultyKey.value }
             ?.any { group ->
                 val facultyKey = facultyKey.value!!
                 val facultyName = facultyFilter.value!!.data!!.getValueOrDefault(facultyKey)
@@ -206,13 +200,14 @@ class AddGroupPresenter @Inject constructor(
         assert(courseFilter.hasValue() && courseKey.hasValue())
         assert(groupFilter.hasValue() && groupKey.hasValue())
         assert(!facultyFilter.value!!.isError() && facultyFilter.value!!.isData())
+        assert(!courseFilter.value!!.isError() && courseFilter.value!!.isData())
         assert(!groupFilter.value!!.isError() && groupFilter.value!!.isData())
         val facultyKey = facultyKey.value!!
         val facultyName = facultyFilter.value!!.data!!.getValueOrDefault(facultyKey)
         val groupKey = groupKey.value!!
         val groupName = groupFilter.value!!.data!!.getValueOrDefault(groupKey)
         val name = formatGroupName(groupName, facultyName)
-        return StudyGroup(AUTO_ID, groupKey, name, currentDate.academicYear, facultyKey, courseKey.value!!)
+        return StudyGroup(AUTO_ID, groupKey.toInt(), name, currentDate.academicYear, facultyKey.toInt(), courseKey.value!!.toInt())
     }
 
     private fun formatGroupName(groupName: String, facultyName: String): String {

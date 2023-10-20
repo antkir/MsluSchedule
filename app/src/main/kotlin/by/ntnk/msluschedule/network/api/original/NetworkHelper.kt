@@ -95,7 +95,7 @@ class NetworkHelper @Inject constructor(private val currentDate: CurrentDate) {
         val data = ScheduleFilter()
         elements
             ?.filter { element -> element.`val`().isNotBlank() }
-            ?.forEach { element -> data.put(element.`val`().toInt(), element.text()) }
+            ?.forEach { element -> data.put(element.`val`(), element.text()) }
         return data
     }
 

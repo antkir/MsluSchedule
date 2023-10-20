@@ -1,26 +1,24 @@
 package by.ntnk.msluschedule.network.data
 
-import androidx.collection.SparseArrayCompat
 import by.ntnk.msluschedule.utils.DEFAULT
-import by.ntnk.msluschedule.utils.contentEquals
-import by.ntnk.msluschedule.utils.contentHashCode
+import by.ntnk.msluschedule.utils.Entry
 
-data class ScheduleFilter(private val data: SparseArrayCompat<String>) {
+data class ScheduleFilter(private val data: MutableList<Entry<String, String>>) {
     val size: Int
-        get() = data.size()
+        get() = data.size
 
-    constructor() : this(SparseArrayCompat<String>())
+    constructor() : this(mutableListOf())
 
-    fun getValueOrDefault(key: Int, defaultValue: String = String.DEFAULT): String {
-        return data.get(key, defaultValue)
+    fun getValueOrDefault(key: String, defaultValue: String = String.DEFAULT): String {
+        return data.find { it.key == key }?.value ?: defaultValue
     }
 
     fun valueAt(index: Int): String {
-        return data.valueAt(index)
+        return data[index].value
     }
 
-    fun keyAt(index: Int): Int {
-        return data.keyAt(index)
+    fun keyAt(index: Int): String {
+        return data[index].key
     }
 
     /**
@@ -28,18 +26,35 @@ data class ScheduleFilter(private val data: SparseArrayCompat<String>) {
      * replacing the previous mapping from the specified key if there
      * was one.
      */
-    fun put(key: Int, value: String) {
-        data.put(key, value)
+    fun put(key: String, value: String) {
+        val iterator = data.listIterator()
+        while (iterator.hasNext()) {
+            val entry = iterator.next()
+            if (entry.key == key) {
+                iterator.set(Entry(key, value))
+                return
+            }
+        }
+        data.add(Entry(key, value))
     }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is ScheduleFilter) return false
 
-        if (!data.contentEquals(other.data)) return false
+        if (size != other.size) return false
+        for (i in 0 until size) {
+            if (data[i] != other.data[i]) return false
+        }
 
         return true
     }
 
-    override fun hashCode(): Int = data.contentHashCode()
+    override fun hashCode(): Int {
+        var hash = 0
+        for (i in 0 until size) {
+            hash = 31 * hash + data[i].hashCode()
+        }
+        return hash
+    }
 }

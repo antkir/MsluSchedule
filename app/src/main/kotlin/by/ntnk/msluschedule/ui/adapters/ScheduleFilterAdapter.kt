@@ -54,9 +54,11 @@ class ScheduleFilterAdapter(
 
     override fun getItem(position: Int): String = filteredData.valueAt(position)
 
-    override fun getItemId(position: Int): Long = filteredData.keyAt(position).toLong()
+    override fun getItemId(position: Int): Long = position.toLong()
 
     override fun getFilter(): Filter = if (isFilteringEnabled) filter else dummyFilter
+
+    fun getKey(position: Int): String = filteredData.keyAt(position)
 
     private inner class DummyFilter : Filter() {
         override fun performFiltering(constraint: CharSequence?): FilterResults {
