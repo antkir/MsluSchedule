@@ -78,7 +78,7 @@ class MainPresenterTest {
             .thenReturn(Schedulers.trampoline())
         whenever(schedulerProvider.ui())
             .thenReturn(Schedulers.trampoline())
-        whenever(schedulerProvider.cachedThreadPool())
+        whenever(schedulerProvider.newSingleThreadScheduler())
             .thenReturn(Schedulers.trampoline())
 
         presenter = MainPresenter(

@@ -16,7 +16,7 @@ class SchedulerProvider @Inject constructor() {
 
     fun single(): Scheduler = Schedulers.single()
 
-    fun cachedThreadPool(): Scheduler = Schedulers.from(Executors.newCachedThreadPool())
+    fun newSingleThreadScheduler(): Scheduler = Schedulers.from(Executors.newSingleThreadExecutor())
 
     companion object {
         fun ui(): Scheduler = AndroidSchedulers.from(Looper.getMainLooper(), true)

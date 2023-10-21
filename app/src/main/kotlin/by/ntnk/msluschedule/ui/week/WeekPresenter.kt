@@ -32,7 +32,7 @@ class WeekPresenter @Inject constructor(
 ) : Presenter<WeekView>() {
 
     private val disposables: CompositeDisposable = CompositeDisposable()
-    private var scheduler = schedulerProvider.cachedThreadPool()
+    private val scheduler = schedulerProvider.newSingleThreadScheduler()
 
     fun getSchedule(weekId: Int, shouldUpdateAdapter: Boolean) {
         val containerInfo = sharedPreferencesRepository.getSelectedScheduleContainerInfo()
@@ -165,7 +165,7 @@ class WeekPresenter @Inject constructor(
                 downloadSchedule(isUpdate = true, container = scheduleContainer, weekId = weekId)
                     .flatMap { getWeekdaysWithLessons(weekId, containerInfo.type!!).toList() }
             }
-            .subscribeOn(schedulerProvider.cachedThreadPool())
+            .subscribeOn(scheduler)
             .observeOn(schedulerProvider.ui())
             .doOnSubscribe { view?.showUpdateProgressBar() }
             .doOnDispose { view?.hideUpdateProgressBar() }
