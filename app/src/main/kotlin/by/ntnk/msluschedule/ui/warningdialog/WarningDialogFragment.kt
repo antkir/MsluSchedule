@@ -10,18 +10,24 @@ import androidx.fragment.app.DialogFragment
 import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.utils.SchedulerProvider
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dagger.android.support.AndroidSupportInjection
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 class WarningDialogFragment : DialogFragment() {
 
     private lateinit var disposable: Disposable
     private lateinit var listener: DialogListener
 
+    @Inject
+    lateinit var schedulerProvider: SchedulerProvider
+
     override fun onAttach(context: Context) {
+        AndroidSupportInjection.inject(this)
         super.onAttach(context)
         try {
             listener = parentFragment as DialogListener
@@ -59,10 +65,10 @@ class WarningDialogFragment : DialogFragment() {
         val buttonDeleteColor = ContextCompat.getColor(requireContext(), R.color.destructive_action)
         val timeout = 3L
         disposable = Observable
-            .intervalRange(1, timeout, 0, 1, TimeUnit.SECONDS)
+            .intervalRange(1, timeout, 0, 1, TimeUnit.SECONDS, schedulerProvider.single())
             .map { timePassed -> timeout - timePassed }
             .map { timeLeft -> "$buttonDeleteString ($timeLeft)" }
-            .observeOn(SchedulerProvider.ui())
+            .observeOn(schedulerProvider.ui())
             .subscribeBy(
                 onNext = { button.text = it },
                 onComplete = {

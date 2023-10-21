@@ -6,6 +6,7 @@ import by.ntnk.msluschedule.ui.addteacher.AddTeacherFragment
 import by.ntnk.msluschedule.ui.lessoninfo.LessonInfoActivity
 import by.ntnk.msluschedule.ui.main.MainActivity
 import by.ntnk.msluschedule.ui.settings.SettingsActivity
+import by.ntnk.msluschedule.ui.warningdialog.WarningDialogFragment
 import by.ntnk.msluschedule.ui.week.WeekFragment
 import by.ntnk.msluschedule.ui.weekday.WeekdayActivity
 import by.ntnk.msluschedule.ui.weekscontainer.WeeksContainerFragment
@@ -42,4 +43,7 @@ abstract class ContributorsModule {
 
     @ContributesAndroidInjector
     abstract fun contributeSettingsFragment(): SettingsActivity.SettingsFragment
+
+    @ContributesAndroidInjector
+    abstract fun contributeWarningDialogFragment(): WarningDialogFragment
 }
