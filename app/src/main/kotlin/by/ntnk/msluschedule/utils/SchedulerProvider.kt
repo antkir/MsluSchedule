@@ -10,7 +10,7 @@ import javax.inject.Inject
 
 @PerApp
 class SchedulerProvider @Inject constructor() {
-    fun ui(): Scheduler = SchedulerProvider.ui()
+    fun ui(): Scheduler = uiScheduler
 
     fun io(): Scheduler = Schedulers.io()
 
@@ -18,7 +18,7 @@ class SchedulerProvider @Inject constructor() {
 
     fun newSingleThreadScheduler(): Scheduler = Schedulers.from(Executors.newSingleThreadExecutor())
 
-    companion object {
-        fun ui(): Scheduler = AndroidSchedulers.from(Looper.getMainLooper(), true)
+    private companion object {
+        private val uiScheduler: Scheduler by lazy { AndroidSchedulers.from(Looper.getMainLooper(), true) }
     }
 }
