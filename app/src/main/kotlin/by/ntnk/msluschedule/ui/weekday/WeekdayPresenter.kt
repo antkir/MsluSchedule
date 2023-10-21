@@ -1,14 +1,11 @@
 package by.ntnk.msluschedule.ui.weekday
 
-import by.ntnk.msluschedule.data.Lesson
 import by.ntnk.msluschedule.data.Note
-import by.ntnk.msluschedule.data.WeekdayWithLessons
 import by.ntnk.msluschedule.db.DatabaseRepository
 import by.ntnk.msluschedule.mvp.Presenter
 import by.ntnk.msluschedule.utils.ScheduleType
 import by.ntnk.msluschedule.utils.SchedulerProvider
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
-import io.reactivex.functions.BiFunction
 import io.reactivex.rxkotlin.subscribeBy
 import timber.log.Timber
 import javax.inject.Inject
@@ -26,17 +23,13 @@ class WeekdayPresenter @Inject constructor(
             else -> throw NullPointerException()
         }
 
-        val zipFun = BiFunction<List<Note>, WeekdayWithLessons<Lesson>, Pair<WeekdayWithLessons<Lesson>, List<Note>>> { notes, weekday ->
-            Pair(weekday, notes)
-        }
-
         databaseRepository.getNotesForWeekday(weekdayId)
             .toList()
-            .zipWith(weekdayWithLessons, zipFun)
+            .zipWith(weekdayWithLessons) { notes, weekday -> Pair(weekday, notes) }
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
-                onSuccess = { view?.initView(it.first, it.second) },
+                onSuccess = { (weekday, notes) -> view?.initView(weekday, notes) },
                 onError = { throwable -> Timber.e(throwable) }
             )
     }
