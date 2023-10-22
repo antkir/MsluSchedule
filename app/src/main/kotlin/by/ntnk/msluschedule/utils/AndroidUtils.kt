@@ -11,6 +11,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import by.ntnk.msluschedule.R
 import com.google.android.material.snackbar.Snackbar
 import io.reactivex.subjects.PublishSubject
+import timber.log.Timber
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
@@ -84,6 +85,14 @@ object AndroidUtils {
             Days.SATURDAY -> context.resources.getString(R.string.saturday)
             Days.SUNDAY -> context.resources.getString(R.string.sunday)
             else -> EMPTY_STRING
+        }
+    }
+
+    fun logException(t: Throwable) {
+        if (Utils.isUnexpectedException(t)) {
+            Timber.e(t)
+        } else {
+            Timber.i(t)
         }
     }
 }

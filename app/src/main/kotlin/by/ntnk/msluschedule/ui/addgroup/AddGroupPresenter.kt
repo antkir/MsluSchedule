@@ -6,11 +6,14 @@ import by.ntnk.msluschedule.mvp.Presenter
 import by.ntnk.msluschedule.network.NetworkRepository
 import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.utils.AUTO_ID
+import by.ntnk.msluschedule.utils.AndroidUtils
 import by.ntnk.msluschedule.utils.CurrentDate
 import by.ntnk.msluschedule.utils.DEFAULT
+import by.ntnk.msluschedule.utils.ErrorType
 import by.ntnk.msluschedule.utils.NetworkApiVersion
 import by.ntnk.msluschedule.utils.SchedulerProvider
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
+import by.ntnk.msluschedule.utils.Utils
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
@@ -18,33 +21,31 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.BehaviorSubject
 import javax.inject.Inject
 
-data class StoredGroupsLoadedEvent(
-    private var isLoaded: Boolean = false,
-    private var throwable: Throwable? = null
-) {
-    fun isEvent(): Boolean = isLoaded
-
-    fun consumeEvent() {
-        isLoaded = false
-    }
-
-    fun isError(): Boolean = throwable != null
-
-    fun consumeError(): Throwable {
-        val throwableCopy = throwable!!
-        throwable = null
-        return throwableCopy
-    }
-}
+data class DataState(
+    val data: ScheduleFilter? = null
+)
 
 data class ScheduleFilterUiState(
     val isLoading: Boolean = false,
-    val data: ScheduleFilter? = null,
-    val throwable: Throwable? = null
-) {
-    fun isData(): Boolean = data != null
-    fun isError(): Boolean = throwable != null
-}
+    val dataState: DataState = DataState(),
+    val key: String = String.DEFAULT
+)
+
+data class UiEvent(
+    val isTriggered: Boolean = false
+)
+
+data class ErrorUiEvent(
+    val error: ErrorType? = null
+)
+
+data class AddGroupUiState(
+    val facultyFilterUiState: ScheduleFilterUiState = ScheduleFilterUiState(),
+    val courseFilterUiState: ScheduleFilterUiState = ScheduleFilterUiState(),
+    val groupFilterUiState: ScheduleFilterUiState = ScheduleFilterUiState(),
+    val storedGroupsLoadedEvent: UiEvent = UiEvent(),
+    val errorEvent: ErrorUiEvent = ErrorUiEvent()
+)
 
 class AddGroupPresenter @Inject constructor(
     databaseRepository: DatabaseRepository,
@@ -56,53 +57,25 @@ class AddGroupPresenter @Inject constructor(
 
     private val storedGroups: BehaviorSubject<List<StudyGroup>> = BehaviorSubject.createDefault(emptyList())
 
-    private val storedGroupsLoadedEvent: BehaviorSubject<StoredGroupsLoadedEvent> =
-        BehaviorSubject.createDefault(StoredGroupsLoadedEvent())
-    val storedGroupsLoadedEventObservable: Observable<StoredGroupsLoadedEvent>
-        get() = storedGroupsLoadedEvent
+    private val uiState: BehaviorSubject<AddGroupUiState> = BehaviorSubject.createDefault(AddGroupUiState())
+    val uiStateObservable: Observable<AddGroupUiState>
+        get() = uiState
 
-    private val facultyFilter: BehaviorSubject<ScheduleFilterUiState> =
-        BehaviorSubject.createDefault(ScheduleFilterUiState())
-    val facultyFilterObservable: Observable<ScheduleFilterUiState>
-        get() = facultyFilter
-
-    private val facultyKey: BehaviorSubject<String> = BehaviorSubject.createDefault(String.DEFAULT)
-    val facultyKeyObservable: Observable<String>
-        get() = facultyKey
-
-    private val courseFilter: BehaviorSubject<ScheduleFilterUiState> =
-        BehaviorSubject.createDefault(ScheduleFilterUiState())
-    val courseFilterObservable: Observable<ScheduleFilterUiState>
-        get() = courseFilter
-
-    private val courseKey: BehaviorSubject<String> = BehaviorSubject.createDefault(String.DEFAULT)
-    val courseKeyObservable: Observable<String>
-        get() = courseKey
-
-    private val groupFilter: BehaviorSubject<ScheduleFilterUiState> =
-        BehaviorSubject.createDefault(ScheduleFilterUiState())
-    val groupFilterObservable: Observable<ScheduleFilterUiState>
-        get() = groupFilter
-
-    private val groupKey: BehaviorSubject<String> = BehaviorSubject.createDefault(String.DEFAULT)
-    val groupKeyObservable: Observable<String>
-        get() = groupKey
-
-    private var courseFilterDisposable: Disposable = CompositeDisposable()
-    private var groupFilterDisposable: Disposable = CompositeDisposable()
+    private var courseNetworkRequestDisposable: Disposable = CompositeDisposable()
+    private var groupsNetworkRequestDisposable: Disposable = CompositeDisposable()
 
     init {
         databaseRepository.getStudyGroups()
             .toList()
+            .retry()
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
                 onSuccess = { groups ->
                     storedGroups.onNext(groups)
-                    storedGroupsLoadedEvent.onNext(StoredGroupsLoadedEvent(isLoaded = true))
-                },
-                onError = { throwable ->
-                    storedGroupsLoadedEvent.onNext(StoredGroupsLoadedEvent(throwable = throwable))
+                    uiState.onNext(
+                        uiState.value!!.copy(storedGroupsLoadedEvent = UiEvent(isTriggered = true))
+                    )
                 }
             )
 
@@ -110,105 +83,197 @@ class AddGroupPresenter @Inject constructor(
     }
 
     fun isCourseFilterUiStateDefault(): Boolean {
-        return courseFilter.value == ScheduleFilterUiState()
+        return uiState.value?.courseFilterUiState == ScheduleFilterUiState()
     }
 
     fun isGroupFilterUiStateDefault(): Boolean {
-        return groupFilter.value == ScheduleFilterUiState()
+        return uiState.value?.groupFilterUiState == ScheduleFilterUiState()
     }
 
     fun isGroupKeyDefault(): Boolean {
-        return groupKey.value == String.DEFAULT
+        return uiState.value?.groupFilterUiState?.key == String.DEFAULT
     }
 
     fun setFacultyKey(key: String) {
-        facultyKey.onNext(key)
+        uiState.onNext(
+            uiState.value!!.copy(facultyFilterUiState = uiState.value!!.facultyFilterUiState.copy(key = key))
+        )
     }
 
     fun setCourseKey(key: String) {
-        courseKey.onNext(key)
+        uiState.onNext(
+            uiState.value!!.copy(courseFilterUiState = uiState.value!!.courseFilterUiState.copy(key = key))
+        )
     }
 
     fun setGroupKey(key: String) {
-        groupKey.onNext(key)
+        uiState.onNext(
+            uiState.value!!.copy(groupFilterUiState = uiState.value!!.groupFilterUiState.copy(key = key))
+        )
     }
 
     fun resetCourses() {
-        courseFilterDisposable.dispose()
-        courseFilter.onNext(ScheduleFilterUiState())
-        courseKey.onNext(String.DEFAULT)
+        courseNetworkRequestDisposable.dispose()
+        uiState.onNext(
+            uiState.value!!.copy(courseFilterUiState = ScheduleFilterUiState())
+        )
     }
 
     fun resetGroups() {
-        groupFilterDisposable.dispose()
-        groupFilter.onNext(ScheduleFilterUiState())
-        groupKey.onNext(String.DEFAULT)
+        groupsNetworkRequestDisposable.dispose()
+        uiState.onNext(
+            uiState.value!!.copy(groupFilterUiState = ScheduleFilterUiState())
+        )
     }
 
     private fun downloadFacultyFilter() {
-        facultyFilter.onNext(ScheduleFilterUiState(isLoading = true))
+        assert(uiState.value!!.facultyFilterUiState == ScheduleFilterUiState())
+
+        uiState.onNext(
+            uiState.value!!.copy(facultyFilterUiState = uiState.value!!.facultyFilterUiState.copy(isLoading = true))
+        )
+
         networkRepository.getFaculties()
+            .doOnError { AndroidUtils.logException(it) }
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
-                onSuccess = { scheduleFilter -> facultyFilter.onNext(ScheduleFilterUiState(data = scheduleFilter)) },
-                onError = { throwable -> facultyFilter.onNext(ScheduleFilterUiState(throwable = throwable)) }
+                onSuccess = { scheduleFilter ->
+                    uiState.onNext(
+                        uiState.value!!.copy(
+                            facultyFilterUiState = uiState.value!!.facultyFilterUiState.copy(
+                                isLoading = false,
+                                dataState = DataState(data = scheduleFilter)
+                            )
+                        )
+                    )
+                },
+                onError = { throwable ->
+                    val error = Utils.getErrorType(throwable)
+                    uiState.onNext(
+                        uiState.value!!.copy(
+                            facultyFilterUiState = uiState.value!!.facultyFilterUiState.copy(isLoading = false),
+                            errorEvent = ErrorUiEvent(error = error)
+                        )
+                    )
+                }
             )
     }
 
     fun downloadCourseFilter() {
-        assert(facultyKey.hasValue())
-        courseFilter.onNext(ScheduleFilterUiState(isLoading = true))
-        courseFilterDisposable = networkRepository.getCourses(facultyKey.value!!.toInt())
+        assert(uiState.value!!.courseFilterUiState == ScheduleFilterUiState())
+
+        uiState.onNext(
+            uiState.value!!.copy(courseFilterUiState = ScheduleFilterUiState(isLoading = true))
+        )
+
+        val facultyKey = uiState.value!!.facultyFilterUiState.key
+        courseNetworkRequestDisposable = networkRepository.getCourses(facultyKey.toInt())
+            .doOnError { AndroidUtils.logException(it) }
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
-                onSuccess = { scheduleFilter -> courseFilter.onNext(ScheduleFilterUiState(data = scheduleFilter)) },
-                onError = { throwable -> courseFilter.onNext(ScheduleFilterUiState(throwable = throwable)) }
+                onSuccess = { scheduleFilter ->
+                    uiState.onNext(
+                        uiState.value!!.copy(
+                            courseFilterUiState = uiState.value!!.courseFilterUiState.copy(
+                                isLoading = false,
+                                dataState = DataState(data = scheduleFilter)
+                            )
+                        )
+                    )
+                },
+                onError = { throwable ->
+                    val error = Utils.getErrorType(throwable)
+                    uiState.onNext(
+                        uiState.value!!.copy(
+                            courseFilterUiState = uiState.value!!.courseFilterUiState.copy(isLoading = false),
+                            errorEvent = ErrorUiEvent(error = error)
+                        )
+                    )
+                }
             )
     }
 
     fun downloadGroupFilter() {
-        assert(facultyKey.hasValue() && courseKey.hasValue())
-        groupFilter.onNext(ScheduleFilterUiState(isLoading = true))
-        groupFilterDisposable =
-            networkRepository.getGroups(facultyKey.value!!.toInt(), courseKey.value!!.toInt(), currentDate.academicYear)
+        assert(uiState.value!!.groupFilterUiState == ScheduleFilterUiState())
+
+        uiState.onNext(
+            uiState.value!!.copy(groupFilterUiState = ScheduleFilterUiState(isLoading = true))
+        )
+
+        val facultyKey = uiState.value!!.facultyFilterUiState.key
+        val courseKey = uiState.value!!.courseFilterUiState.key
+        groupsNetworkRequestDisposable =
+            networkRepository.getGroups(facultyKey.toInt(), courseKey.toInt(), currentDate.academicYear)
+                .doOnError { AndroidUtils.logException(it) }
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
                 .subscribeBy(
-                    onSuccess = { scheduleFilter -> groupFilter.onNext(ScheduleFilterUiState(data = scheduleFilter)) },
-                    onError = { throwable -> groupFilter.onNext(ScheduleFilterUiState(throwable = throwable)) }
+                    onSuccess = { scheduleFilter ->
+                        uiState.onNext(
+                            uiState.value!!.copy(
+                                groupFilterUiState = uiState.value!!.groupFilterUiState.copy(
+                                    isLoading = false,
+                                    dataState = DataState(data = scheduleFilter)
+                                )
+                            )
+                        )
+                    },
+                    onError = { throwable ->
+                        val error = Utils.getErrorType(throwable)
+                        uiState.onNext(
+                            uiState.value!!.copy(
+                                groupFilterUiState = uiState.value!!.groupFilterUiState.copy(isLoading = false),
+                                errorEvent = ErrorUiEvent(error = error)
+                            )
+                        )
+                    }
                 )
     }
 
     fun isGroupAdded(key: String): Boolean {
-        assert(storedGroups.hasValue() && facultyKey.hasValue() && groupFilter.hasValue())
-        assert(!groupFilter.value!!.isError() && groupFilter.value!!.isData())
+        val facultyKey = uiState.value!!.facultyFilterUiState.key
+        val facultyData = uiState.value!!.facultyFilterUiState.dataState.data
+        assert(facultyData != null)
+        val groupData = uiState.value!!.groupFilterUiState.dataState.data
+        assert(groupData != null)
         return storedGroups.value
             ?.filter { group -> group.year == currentDate.academicYear }
-            ?.filter { group -> group.faculty.toString(10) == facultyKey.value }
+            ?.filter { group -> group.faculty.toString(10) == facultyKey }
             ?.any { group ->
-                val facultyKey = facultyKey.value!!
-                val facultyName = facultyFilter.value!!.data!!.getValueOrDefault(facultyKey)
-                val groupName = groupFilter.value!!.data!!.getValueOrDefault(key)
+                val facultyName = facultyData!!.getValueOrDefault(facultyKey)
+                val groupName = groupData!!.getValueOrDefault(key)
                 group.value == formatGroupName(groupName, facultyName)
             } == true
     }
 
     fun createSelectedStudyGroupObject(): StudyGroup {
-        assert(facultyFilter.hasValue() && facultyKey.hasValue())
-        assert(courseFilter.hasValue() && courseKey.hasValue())
-        assert(groupFilter.hasValue() && groupKey.hasValue())
-        assert(!facultyFilter.value!!.isError() && facultyFilter.value!!.isData())
-        assert(!courseFilter.value!!.isError() && courseFilter.value!!.isData())
-        assert(!groupFilter.value!!.isError() && groupFilter.value!!.isData())
-        val facultyKey = facultyKey.value!!
-        val facultyName = facultyFilter.value!!.data!!.getValueOrDefault(facultyKey)
-        val groupKey = groupKey.value!!
-        val groupName = groupFilter.value!!.data!!.getValueOrDefault(groupKey)
+        val facultyKey = uiState.value!!.facultyFilterUiState.key
+        val facultyData = uiState.value!!.facultyFilterUiState.dataState.data
+        assert(facultyData != null)
+        val courseKey = uiState.value!!.courseFilterUiState.key
+        val courseData = uiState.value!!.courseFilterUiState.dataState.data
+        assert(courseData != null)
+        val groupKey = uiState.value!!.groupFilterUiState.key
+        val groupData = uiState.value!!.groupFilterUiState.dataState.data
+        assert(groupData != null)
+        val facultyName = facultyData!!.getValueOrDefault(facultyKey)
+        val groupName = groupData!!.getValueOrDefault(groupKey)
         val name = formatGroupName(groupName, facultyName)
-        val courseKey = courseKey.value!!
         return StudyGroup(AUTO_ID, groupKey, name, currentDate.academicYear, facultyKey.toInt(), courseKey.toInt())
+    }
+
+    fun storedGroupsLoadedEventConsumed() {
+        uiState.onNext(
+            uiState.value!!.copy(storedGroupsLoadedEvent = UiEvent())
+        )
+    }
+
+    fun errorEventConsumed() {
+        uiState.onNext(
+            uiState.value!!.copy(errorEvent = ErrorUiEvent())
+        )
     }
 
     private fun formatGroupName(groupName: String, facultyName: String): String {

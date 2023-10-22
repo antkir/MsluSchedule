@@ -124,7 +124,7 @@ class MainPresenterTest {
         val scheduleContainer =
             ScheduleContainer(studyGroup.id, studyGroup.value, ScheduleType.STUDYGROUP, studyGroup.year)
         whenever(sharedPreferencesRepository.getSelectedScheduleContainer()).thenReturn(scheduleContainer)
-        val mainUiStateObserver = presenter.mainUiStateObservable.test()
+        val uiStateObserver = presenter.uiStateObservable.test()
         // when
         presenter.addGroup(studyGroup)
         // then
@@ -137,9 +137,9 @@ class MainPresenterTest {
         verify(databaseRepository).insertStudyGroup(any())
         verify(databaseRepository).insertWeeksGetIds(any(), eq(0))
         verify(sharedPreferencesRepository).setSelectedScheduleContainer(any())
-        mainUiStateObserver.assertSubscribed()
-        mainUiStateObserver.assertNoErrors()
-        mainUiStateObserver.assertValues(
+        uiStateObserver.assertSubscribed()
+        uiStateObserver.assertNoErrors()
+        uiStateObserver.assertValues(
             MainUiState(selectedScheduleContainer = SELECTED_SCHEDULE_CONTAINER),
             MainUiState(selectedScheduleContainer = SELECTED_SCHEDULE_CONTAINER, isLoading = true),
             MainUiState(selectedScheduleContainer = scheduleContainer)
@@ -153,7 +153,7 @@ class MainPresenterTest {
         val scheduleContainer =
             ScheduleContainer(teacher.id, teacher.value, ScheduleType.TEACHER, teacher.year)
         whenever(sharedPreferencesRepository.getSelectedScheduleContainer()).thenReturn(scheduleContainer)
-        val mainUiStateObserver = presenter.mainUiStateObservable.test()
+        val uiStateObserver = presenter.uiStateObservable.test()
         // when
         presenter.addTeacher(teacher)
         // then
@@ -166,9 +166,9 @@ class MainPresenterTest {
         verify(databaseRepository).insertTeacher(any())
         verify(databaseRepository).insertWeeksGetIds(any(), eq(0))
         verify(sharedPreferencesRepository).setSelectedScheduleContainer(any())
-        mainUiStateObserver.assertSubscribed()
-        mainUiStateObserver.assertNoErrors()
-        mainUiStateObserver.assertValues(
+        uiStateObserver.assertSubscribed()
+        uiStateObserver.assertNoErrors()
+        uiStateObserver.assertValues(
             MainUiState(selectedScheduleContainer = SELECTED_SCHEDULE_CONTAINER),
             MainUiState(selectedScheduleContainer = SELECTED_SCHEDULE_CONTAINER, isLoading = true),
             MainUiState(selectedScheduleContainer = scheduleContainer)
@@ -187,7 +187,7 @@ class MainPresenterTest {
             course = 0
         )
         whenever(networkRepository.getWeeks()).thenReturn(Single.error(NullPointerException()))
-        val mainUiStateObserver = presenter.mainUiStateObservable.test()
+        val uiStateObserver = presenter.uiStateObservable.test()
         // when
         presenter.addGroup(studyGroup)
         // then
@@ -199,14 +199,14 @@ class MainPresenterTest {
         verify(networkRepository).getWeeks()
         verify(databaseRepository).deleteScheduleContainer(eq(0))
         verify(sharedPreferencesRepository, times(0)).setSelectedScheduleContainer(any())
-        mainUiStateObserver.assertSubscribed()
-        mainUiStateObserver.assertNoErrors()
-        mainUiStateObserver.assertValues(
+        uiStateObserver.assertSubscribed()
+        uiStateObserver.assertNoErrors()
+        uiStateObserver.assertValues(
             MainUiState(selectedScheduleContainer = SELECTED_SCHEDULE_CONTAINER),
             MainUiState(selectedScheduleContainer = SELECTED_SCHEDULE_CONTAINER, isLoading = true),
             MainUiState(
                 selectedScheduleContainer = SELECTED_SCHEDULE_CONTAINER,
-                errorUiState = ErrorUiState(errorType = NewScheduleContainerError)
+                errorEvent = ErrorUiEvent(error = NewScheduleContainerError)
             )
         )
     }
@@ -216,7 +216,7 @@ class MainPresenterTest {
         // given
         val teacher = Teacher(id = 0, key = String.DEFAULT, value = String.DEFAULT, year = ACADEMIC_YEAR)
         whenever(networkRepository.getWeeks()).thenReturn(Single.error(NullPointerException()))
-        val mainUiStateObserver = presenter.mainUiStateObservable.test()
+        val uiStateObserver = presenter.uiStateObservable.test()
         // when
         presenter.addTeacher(teacher)
         // then
@@ -228,14 +228,14 @@ class MainPresenterTest {
         verify(networkRepository).getWeeks()
         verify(databaseRepository).deleteScheduleContainer(eq(0))
         verify(sharedPreferencesRepository, times(0)).setSelectedScheduleContainer(any())
-        mainUiStateObserver.assertSubscribed()
-        mainUiStateObserver.assertNoErrors()
-        mainUiStateObserver.assertValues(
+        uiStateObserver.assertSubscribed()
+        uiStateObserver.assertNoErrors()
+        uiStateObserver.assertValues(
             MainUiState(selectedScheduleContainer = SELECTED_SCHEDULE_CONTAINER),
             MainUiState(selectedScheduleContainer = SELECTED_SCHEDULE_CONTAINER, isLoading = true),
             MainUiState(
                 selectedScheduleContainer = SELECTED_SCHEDULE_CONTAINER,
-                errorUiState = ErrorUiState(errorType = NewScheduleContainerError)
+                errorEvent = ErrorUiEvent(error = NewScheduleContainerError)
             )
         )
     }

@@ -18,14 +18,12 @@ import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.ui.adapters.ScheduleFilterAdapter
 import by.ntnk.msluschedule.ui.customviews.AutoCompleteTextView
 import by.ntnk.msluschedule.utils.DEFAULT
-import by.ntnk.msluschedule.utils.Utils
+import by.ntnk.msluschedule.utils.ErrorType
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.Lazy
 import dagger.android.support.AndroidSupportInjection
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
-import io.reactivex.rxkotlin.subscribeBy
-import timber.log.Timber
 import javax.inject.Inject
 
 class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), AddGroupView {
@@ -141,98 +139,92 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
     override fun onStart() {
         super.onStart()
 
-        disposables += presenter.storedGroupsLoadedEventObservable.subscribeBy(
-            onNext = { storedGroupsLoadedEvent ->
-                if (storedGroupsLoadedEvent.isEvent()) {
-                    storedGroupsLoadedEvent.consumeEvent()
-                    binding.autocompletetextFaculty.text.clear()
-                    binding.autocompletetextCourse.text.clear()
-                    binding.autocompletetextGroup.text.clear()
-                }
-
-                if (storedGroupsLoadedEvent.isError()) {
-                    val throwable = storedGroupsLoadedEvent.consumeError()
-                    showError(throwable)
-                }
-            },
-        )
-
-        disposables += presenter.facultyFilterObservable.subscribeBy(
-            onNext = { state ->
-                if (state.isLoading) {
+        disposables += presenter.uiStateObservable
+            .map { it.facultyFilterUiState.isLoading }
+            .distinctUntilChanged()
+            .subscribe { isLoading ->
+                if (isLoading) {
                     binding.progressindicatorFaculty.visibility = View.VISIBLE
                 } else {
                     binding.progressindicatorFaculty.visibility = View.GONE
                 }
+            }
 
-                if (state.isData()) {
-                    onFacultyFilterChanged(state.data!!)
-                }
-
-                if (state.isError()) {
-                    showError(state.throwable!!)
+        disposables += presenter.uiStateObservable
+            .map { it.facultyFilterUiState.dataState }
+            .distinctUntilChanged()
+            .subscribe { dataState ->
+                if (dataState.data != null) {
+                    onFacultyFilterChanged(dataState.data)
                 }
             }
-        )
 
-        disposables += presenter.facultyKeyObservable.subscribeBy(
-            onNext = { key ->
+        disposables += presenter.uiStateObservable
+            .map { it.facultyFilterUiState.key }
+            .distinctUntilChanged()
+            .subscribe { key ->
                 if (key != String.DEFAULT) {
                     if (presenter.isCourseFilterUiStateDefault()) {
                         presenter.downloadCourseFilter()
                     }
                 }
             }
-        )
 
-        disposables += presenter.courseFilterObservable.subscribeBy(
-            onNext = { state ->
-                if (state.isLoading) {
+        disposables += presenter.uiStateObservable
+            .map { it.courseFilterUiState.isLoading }
+            .distinctUntilChanged()
+            .subscribe { isLoading ->
+                if (isLoading) {
                     binding.progressindicatorCourse.visibility = View.VISIBLE
                 } else {
                     binding.progressindicatorCourse.visibility = View.GONE
                 }
+            }
 
-                if (state.isData()) {
-                    onCourseFilterChanged(state.data!!)
-                }
-
-                if (state.isError()) {
-                    showError(state.throwable!!)
+        disposables += presenter.uiStateObservable
+            .map { it.courseFilterUiState.dataState }
+            .distinctUntilChanged()
+            .subscribe { dataState ->
+                if (dataState.data != null) {
+                    onCourseFilterChanged(dataState.data)
                 }
             }
-        )
 
-        disposables += presenter.courseKeyObservable.subscribeBy(
-            onNext = { key ->
+        disposables += presenter.uiStateObservable
+            .map { it.courseFilterUiState.key }
+            .distinctUntilChanged()
+            .subscribe { key ->
                 if (key != String.DEFAULT) {
                     if (presenter.isGroupFilterUiStateDefault()) {
                         presenter.downloadGroupFilter()
                     }
                 }
             }
-        )
 
-        disposables += presenter.groupFilterObservable.subscribeBy(
-            onNext = { state ->
-                if (state.isLoading) {
+        disposables += presenter.uiStateObservable
+            .map { it.groupFilterUiState.isLoading }
+            .distinctUntilChanged()
+            .subscribe { isLoading ->
+                if (isLoading) {
                     binding.progressindicatorGroup.visibility = View.VISIBLE
                 } else {
                     binding.progressindicatorGroup.visibility = View.GONE
                 }
+            }
 
-                if (state.isData()) {
-                    onGroupFilterChanged(state.data!!)
-                }
-
-                if (state.isError()) {
-                    showError(state.throwable!!)
+        disposables += presenter.uiStateObservable
+            .map { it.groupFilterUiState.dataState }
+            .distinctUntilChanged()
+            .subscribe { dataState ->
+                if (dataState.data != null) {
+                    onGroupFilterChanged(dataState.data)
                 }
             }
-        )
 
-        disposables += presenter.groupKeyObservable.subscribeBy(
-            onNext = { key ->
+        disposables += presenter.uiStateObservable
+            .map { it.groupFilterUiState.key }
+            .distinctUntilChanged()
+            .subscribe { key ->
                 val alertDialog = dialog as AlertDialog
                 var isEnabled = false
                 if (key != String.DEFAULT) {
@@ -248,7 +240,28 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
                 }
                 alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = isEnabled
             }
-        )
+
+        disposables += presenter.uiStateObservable
+            .map { it.storedGroupsLoadedEvent }
+            .distinctUntilChanged()
+            .subscribe { storedGroupsLoadedEvent ->
+                if (storedGroupsLoadedEvent.isTriggered) {
+                    binding.autocompletetextFaculty.text.clear()
+                    binding.autocompletetextCourse.text.clear()
+                    binding.autocompletetextGroup.text.clear()
+                    presenter.storedGroupsLoadedEventConsumed()
+                }
+            }
+
+        disposables += presenter.uiStateObservable
+            .map { it.errorEvent }
+            .distinctUntilChanged()
+            .subscribe { errorEvent ->
+                if (errorEvent.error != null) {
+                    showError(errorEvent.error)
+                    presenter.errorEventConsumed()
+                }
+            }
     }
 
     override fun onStop() {
@@ -261,14 +274,9 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
         fragmentBinding = null
     }
 
-    private fun showError(throwable: Throwable) {
-        if (Utils.isUnexpectedException(throwable)) {
-            Timber.e(throwable)
-        } else {
-            Timber.i(throwable)
-        }
+    private fun showError(error: ErrorType) {
         dismiss()
-        listener.onDialogFragmentError(throwable)
+        listener.showError(error)
     }
 
     private fun onFacultyFilterChanged(data: ScheduleFilter) {
@@ -314,7 +322,7 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
 
     interface DialogListener {
         fun onNewStudyGroup(studyGroup: StudyGroup)
-        fun onDialogFragmentError(throwable: Throwable)
+        fun showError(error: ErrorType)
     }
 
     companion object {

@@ -15,14 +15,12 @@ import by.ntnk.msluschedule.mvp.views.MvpDialogFragment
 import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.ui.adapters.ScheduleFilterAdapter
 import by.ntnk.msluschedule.utils.DEFAULT
-import by.ntnk.msluschedule.utils.Utils
+import by.ntnk.msluschedule.utils.ErrorType
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.Lazy
 import dagger.android.support.AndroidSupportInjection
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
-import io.reactivex.rxkotlin.subscribeBy
-import timber.log.Timber
 import javax.inject.Inject
 
 class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView>(), AddTeacherView {
@@ -93,40 +91,30 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
     override fun onStart() {
         super.onStart()
 
-        disposables += presenter.storedTeachersLoadedEventObservable.subscribeBy(
-            onNext = { storedTeachersLoadedEvent ->
-                if (storedTeachersLoadedEvent.isEvent()) {
-                    storedTeachersLoadedEvent.consumeEvent()
-                    binding.autocompletetextTeacher.text.clear()
-                }
-
-                if (storedTeachersLoadedEvent.isError()) {
-                    val throwable = storedTeachersLoadedEvent.consumeError()
-                    showError(throwable)
-                }
-            },
-        )
-
-        disposables += presenter.teacherFilterObservable.subscribeBy(
-            onNext = { state ->
-                if (state.isLoading) {
+        disposables += presenter.uiStateObservable
+            .map { it.teacherFilterUiState.isLoading }
+            .distinctUntilChanged()
+            .subscribe { isLoading ->
+                if (isLoading) {
                     binding.progressindicatorTeacher.visibility = View.VISIBLE
                 } else {
                     binding.progressindicatorTeacher.visibility = View.GONE
                 }
+            }
 
-                if (state.isData()) {
-                    onTeacherFilterChanged(state.data!!)
-                }
-
-                if (state.isError()) {
-                    showError(state.throwable!!)
+        disposables += presenter.uiStateObservable
+            .map { it.teacherFilterUiState.dataState }
+            .distinctUntilChanged()
+            .subscribe { dataState ->
+                if (dataState.data != null) {
+                    onTeacherFilterChanged(dataState.data)
                 }
             }
-        )
 
-        disposables += presenter.teacherKeyObservable.subscribeBy(
-            onNext = { key ->
+        disposables += presenter.uiStateObservable
+            .map { it.teacherFilterUiState.key }
+            .distinctUntilChanged()
+            .subscribe { key ->
                 val alertDialog = dialog as AlertDialog
                 var isEnabled = false
                 if (key != String.DEFAULT) {
@@ -142,7 +130,26 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
                 }
                 alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = isEnabled
             }
-        )
+
+        disposables += presenter.uiStateObservable
+            .map { it.storedTeachersLoadedEvent }
+            .distinctUntilChanged()
+            .subscribe { storedTeachersLoadedEvent ->
+                if (storedTeachersLoadedEvent.isTriggered) {
+                    binding.autocompletetextTeacher.text.clear()
+                    presenter.storedTeachersLoadedEventConsumed()
+                }
+            }
+
+        disposables += presenter.uiStateObservable
+            .map { it.errorEvent }
+            .distinctUntilChanged()
+            .subscribe { errorEvent ->
+                if (errorEvent.error != null) {
+                    showError(errorEvent.error)
+                    presenter.errorEventConsumed()
+                }
+            }
     }
 
     override fun onStop() {
@@ -174,19 +181,14 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
         )
     }
 
-    private fun showError(throwable: Throwable) {
-        if (Utils.isUnexpectedException(throwable)) {
-            Timber.e(throwable)
-        } else {
-            Timber.i(throwable)
-        }
+    private fun showError(error: ErrorType) {
         dismiss()
-        listener.onDialogFragmentError(throwable)
+        listener.showError(error)
     }
 
     interface DialogListener {
         fun onNewTeacher(teacher: Teacher)
-        fun onDialogFragmentError(throwable: Throwable)
+        fun showError(error: ErrorType)
     }
 
     companion object {

@@ -40,6 +40,11 @@ import by.ntnk.msluschedule.ui.settings.SettingsActivity
 import by.ntnk.msluschedule.ui.weekscontainer.WeeksContainerFragment
 import by.ntnk.msluschedule.utils.AndroidUtils
 import by.ntnk.msluschedule.utils.DEFAULT
+import by.ntnk.msluschedule.utils.ErrorType
+import by.ntnk.msluschedule.utils.NetworkApiVersionError
+import by.ntnk.msluschedule.utils.NetworkError
+import by.ntnk.msluschedule.utils.NetworkTimeoutError
+import by.ntnk.msluschedule.utils.NoDataOnServerError
 import by.ntnk.msluschedule.utils.ScheduleType
 import by.ntnk.msluschedule.utils.SimpleDrawerListener
 import by.ntnk.msluschedule.utils.dipToPixels
@@ -57,7 +62,6 @@ import dagger.android.HasAndroidInjector
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.plusAssign
-import io.reactivex.rxkotlin.subscribeBy
 import javax.inject.Inject
 
 class MainActivity :
@@ -342,84 +346,75 @@ class MainActivity :
             consumePendingScheduleContainerId()
         }
 
-        disposables += presenter.mainUiStateObservable
-            .map { it.scheduleContainers }
+        disposables += presenter.uiStateObservable
+            .map { it.isLoading }
             .distinctUntilChanged()
-            .subscribeBy(
-                onNext = { scheduleContainers ->
-                    clearScheduleContainersMenu()
-                    for (scheduleContainer in scheduleContainers) {
-                        addScheduleContainerMenuItem(scheduleContainer)
-                    }
+            .subscribe { isLoading ->
+                if (isLoading) {
+                    binding.content.progressindicator.visibility = View.VISIBLE
+                    setWeeksContainerViewTransparent()
 
-                    val selectedScheduleContainer = presenter.getSelectedScheduleContainer()
-                    selectScheduleContainerMenuItem(selectedScheduleContainer)
-                }
-            )
-
-        disposables += presenter.mainUiStateObservable
-            .map { it.selectedScheduleContainer }
-            .distinctUntilChanged()
-            .subscribeBy(
-                onNext = { selectedScheduleContainer ->
-                    if (isScheduleContainerDefault(selectedScheduleContainer)) {
-                        clearScheduleContainer()
-                        binding.content.imageBackground.visibility = View.VISIBLE
-                        binding.content.textHint.visibility = View.VISIBLE
-
-                        if (binding.fam.container.visibility == View.INVISIBLE) {
-                            binding.fam.container.visibility = View.VISIBLE
-                        }
-
-                        binding.content.progressindicator.visibility = View.GONE
-                    } else {
-                        changeScheduleContainer(selectedScheduleContainer)
+                    if (isScheduleContainerDefault(presenter.getSelectedScheduleContainer())) {
                         binding.content.imageBackground.visibility = View.GONE
                         binding.content.textHint.visibility = View.GONE
-
-                        selectScheduleContainerMenuItem(selectedScheduleContainer)
                     }
                 }
-            )
 
-        disposables += presenter.mainUiStateObservable
-            .map { it.errorUiState }
+                // When isLoading flag is cleared, we don't hide progress indicator here.
+                // Instead we do it from current week fragment when its data is ready for display,
+                // so switching between schedule containers is visually as seamless as possible.
+                // In case of switching to default schedule container or receiving an error,
+                // we hide progress indicator in selectedScheduleContainer or errorUiState subscibers.
+                // We don't need to set weeks container view alpha back to normal in these cases,
+                // because weeks container fragment is assumed to be destroyed.
+            }
+
+        disposables += presenter.uiStateObservable
+            .map { it.scheduleContainers }
             .distinctUntilChanged()
-            .subscribeBy(
-                onNext = { errorUiState ->
-                    if (errorUiState.errorType != null) {
-                        showError()
-                        presenter.errorShown()
+            .subscribe { scheduleContainers ->
+                clearScheduleContainersMenu()
+                for (scheduleContainer in scheduleContainers) {
+                    addScheduleContainerMenuItem(scheduleContainer)
+                }
+
+                val selectedScheduleContainer = presenter.getSelectedScheduleContainer()
+                selectScheduleContainerMenuItem(selectedScheduleContainer)
+            }
+
+        disposables += presenter.uiStateObservable
+            .map { it.selectedScheduleContainer }
+            .distinctUntilChanged()
+            .subscribe { selectedScheduleContainer ->
+                if (isScheduleContainerDefault(selectedScheduleContainer)) {
+                    clearScheduleContainer()
+                    binding.content.imageBackground.visibility = View.VISIBLE
+                    binding.content.textHint.visibility = View.VISIBLE
+
+                    if (binding.fam.container.visibility == View.INVISIBLE) {
+                        binding.fam.container.visibility = View.VISIBLE
                     }
 
                     binding.content.progressindicator.visibility = View.GONE
-                }
-            )
+                } else {
+                    changeScheduleContainer(selectedScheduleContainer)
+                    binding.content.imageBackground.visibility = View.GONE
+                    binding.content.textHint.visibility = View.GONE
 
-        disposables += presenter.mainUiStateObservable
-            .map { it.isLoading }
+                    selectScheduleContainerMenuItem(selectedScheduleContainer)
+                }
+            }
+
+        disposables += presenter.uiStateObservable
+            .map { it.errorEvent }
             .distinctUntilChanged()
-            .subscribeBy(
-                onNext = { isLoading ->
-                    if (isLoading) {
-                        binding.content.progressindicator.visibility = View.VISIBLE
-                        setWeeksContainerViewTransparent()
-
-                        if (isScheduleContainerDefault(presenter.getSelectedScheduleContainer())) {
-                            binding.content.imageBackground.visibility = View.GONE
-                            binding.content.textHint.visibility = View.GONE
-                        }
-                    }
-
-                    // When isLoading flag is cleared, we don't hide progress indicator here.
-                    // Instead we do it from current week fragment when its data is ready for display,
-                    // so switching between schedule containers is visually as seamless as possible.
-                    // In case of switching to default schedule container or receiving an error,
-                    // we hide progress indicator in selectedScheduleContainer or errorUiState subscibers.
-                    // We don't need to set weeks container view alpha back to normal in these cases,
-                    // because weeks container fragment is assumed to be destroyed.
+            .subscribe { errorEvent ->
+                if (errorEvent.error != null) {
+                    showError(errorEvent.error)
+                    binding.content.progressindicator.visibility = View.GONE
+                    presenter.errorEventConsumed()
                 }
-            )
+            }
 
         binding.fam.container.visibility = if (presenter.isFabShown()) View.VISIBLE else View.GONE
     }
@@ -593,12 +588,15 @@ class MainActivity :
         presenter.addTeacher(teacher)
     }
 
-    override fun onDialogFragmentError(throwable: Throwable) {
-        val errorMessageResource = AndroidUtils.getErrorMessageResId(throwable)
-        val snackbar = Snackbar.make(binding.content.layout, errorMessageResource, Snackbar.LENGTH_LONG)
+    override fun showError(error: ErrorType) {
+        val snackbar = Snackbar.make(binding.content.layout, getErrorMessageResId(error), Snackbar.LENGTH_LONG)
         snackbar.anchorView = binding.fam.fabBase
         ViewCompat.setOnApplyWindowInsetsListener(snackbar.view) { _, insets -> insets }
         snackbar.show()
+    }
+
+    override fun onScheduleContainerDeleted(scheduleContainer: ScheduleContainer) {
+        presenter.clearSelectedScheduleContainer()
     }
 
     private fun changeScheduleContainer(scheduleContainer: ScheduleContainer) {
@@ -678,23 +676,22 @@ class MainActivity :
         return scheduleContainer.id == Int.DEFAULT
     }
 
-    private fun showError() {
-        val snackbar = Snackbar.make(binding.content.layout, R.string.error_general, Snackbar.LENGTH_LONG)
-        snackbar.anchorView = binding.fam.fabBase
-        ViewCompat.setOnApplyWindowInsetsListener(snackbar.view) { _, insets -> insets }
-        snackbar.show()
-    }
-
     private fun consumePendingScheduleContainerId() {
         presenter.changeScheduleContainer(pendingScheduleContainerId)
         pendingScheduleContainerId = Int.DEFAULT
     }
 
-    override fun onScheduleContainerDeleted(scheduleContainer: ScheduleContainer) {
-        presenter.clearSelectedScheduleContainer()
+    private fun getErrorMessageResId(error: ErrorType): Int {
+        return when (error) {
+            is NetworkError,
+            is NetworkTimeoutError -> R.string.error_website_unavailable
+            is NetworkApiVersionError -> R.string.error_network_api_version
+            is NoDataOnServerError -> R.string.error_no_data_on_server
+            else -> R.string.error_general
+        }
     }
 
-    companion object {
+    private companion object {
         private const val ARG_TOOLBAR_TITLE = "toolbarTitle"
         private const val ARG_PENDING_SCHEDULE_CONTAINER_ID = "pendingScheduleContainerId"
 

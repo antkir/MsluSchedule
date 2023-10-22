@@ -49,6 +49,16 @@ data class Entry<K, V>(override val key: K, override val value: V) : Map.Entry<K
 
 interface ErrorType
 
+object CommonError : ErrorType
+
+object NetworkError : ErrorType
+
+object NetworkTimeoutError : ErrorType
+
+object NetworkApiVersionError : ErrorType
+
+object NoDataOnServerError : ErrorType
+
 class InvalidYearException : RuntimeException()
 
 class NetworkApiVersionException : RuntimeException()
@@ -74,6 +84,20 @@ object Utils {
             throwable !is NoDataOnServerException &&
             throwable !is SSLException &&
             throwable !is SocketException
+    }
+
+    fun getErrorType(throwable: Throwable): ErrorType {
+        return when (throwable) {
+            is ConnectException,
+            is UnknownHostException,
+            is HttpStatusException,
+            is SSLException,
+            is SocketException -> NetworkError
+            is SocketTimeoutException -> NetworkTimeoutError
+            is NetworkApiVersionException -> NetworkApiVersionError
+            is NoDataOnServerException -> NoDataOnServerError
+            else -> CommonError
+        }
     }
 
     /*

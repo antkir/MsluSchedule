@@ -6,6 +6,7 @@ import by.ntnk.msluschedule.data.Teacher
 import by.ntnk.msluschedule.db.DatabaseRepository
 import by.ntnk.msluschedule.mvp.Presenter
 import by.ntnk.msluschedule.network.NetworkRepository
+import by.ntnk.msluschedule.utils.AndroidUtils
 import by.ntnk.msluschedule.utils.CurrentDate
 import by.ntnk.msluschedule.utils.ErrorType
 import by.ntnk.msluschedule.utils.ScheduleType
@@ -18,20 +19,19 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.BehaviorSubject
-import timber.log.Timber
 import javax.inject.Inject
 
 object NewScheduleContainerError : ErrorType
 
-data class ErrorUiState(
-    val errorType: ErrorType? = null
+data class ErrorUiEvent(
+    val error: ErrorType? = null
 )
 
 data class MainUiState(
-    val selectedScheduleContainer: ScheduleContainer = ScheduleContainer.DEFAULT,
-    val scheduleContainers: List<ScheduleContainer> = emptyList(),
     val isLoading: Boolean = false,
-    val errorUiState: ErrorUiState = ErrorUiState()
+    val scheduleContainers: List<ScheduleContainer> = emptyList(),
+    val selectedScheduleContainer: ScheduleContainer = ScheduleContainer.DEFAULT,
+    val errorEvent: ErrorUiEvent = ErrorUiEvent()
 )
 
 class MainPresenter @Inject constructor(
@@ -42,9 +42,9 @@ class MainPresenter @Inject constructor(
     private val schedulerProvider: SchedulerProvider
 ) : Presenter<MainView>() {
 
-    private val mainUiState: BehaviorSubject<MainUiState> = BehaviorSubject.createDefault(MainUiState())
-    val mainUiStateObservable: Observable<MainUiState>
-        get() = mainUiState
+    private val uiState: BehaviorSubject<MainUiState> = BehaviorSubject.createDefault(MainUiState())
+    val uiStateObservable: Observable<MainUiState>
+        get() = uiState
 
     private val disposables: CompositeDisposable = CompositeDisposable()
 
@@ -58,21 +58,27 @@ class MainPresenter @Inject constructor(
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
                 onNext = { scheduleContainers ->
-                    mainUiState.onNext(mainUiState.value!!.copy(scheduleContainers = scheduleContainers))
+                    uiState.onNext(
+                        uiState.value!!.copy(scheduleContainers = scheduleContainers)
+                    )
                 }
             )
 
         val scheduleContainer = sharedPreferencesRepository.getSelectedScheduleContainer()
         val uiScheduleContainer = formatScheduleContainerValue(scheduleContainer)
-        mainUiState.onNext(mainUiState.value!!.copy(selectedScheduleContainer = uiScheduleContainer))
+        uiState.onNext(
+            uiState.value!!.copy(selectedScheduleContainer = uiScheduleContainer)
+        )
     }
 
     fun addGroup(studyGroup: StudyGroup) {
-        mainUiState.onNext(mainUiState.value!!.copy(isLoading = true))
+        uiState.onNext(
+            uiState.value!!.copy(isLoading = true)
+        )
 
         disposables += databaseRepository.insertStudyGroup(studyGroup)
             .flatMap { id -> insertWeeksWithWeekdays(id).andThen(Single.just(id)) }
-            .doOnError { throwable -> Timber.e(throwable) }
+            .doOnError { AndroidUtils.logException(it) }
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
@@ -82,18 +88,18 @@ class MainPresenter @Inject constructor(
                     sharedPreferencesRepository.setSelectedScheduleContainer(scheduleContainer)
 
                     val uiScheduleContainer = formatScheduleContainerValue(scheduleContainer)
-                    mainUiState.onNext(
-                        mainUiState.value!!.copy(
-                            selectedScheduleContainer = uiScheduleContainer,
-                            isLoading = false
+                    uiState.onNext(
+                        uiState.value!!.copy(
+                            isLoading = false,
+                            selectedScheduleContainer = uiScheduleContainer
                         )
                     )
                 },
                 onError = {
-                    mainUiState.onNext(
-                        mainUiState.value!!.copy(
-                            errorUiState = ErrorUiState(errorType = NewScheduleContainerError),
-                            isLoading = false
+                    uiState.onNext(
+                        uiState.value!!.copy(
+                            isLoading = false,
+                            errorEvent = ErrorUiEvent(error = NewScheduleContainerError)
                         )
                     )
                 }
@@ -101,11 +107,13 @@ class MainPresenter @Inject constructor(
     }
 
     fun addTeacher(teacher: Teacher) {
-        mainUiState.onNext(mainUiState.value!!.copy(isLoading = true))
+        uiState.onNext(
+            uiState.value!!.copy(isLoading = true)
+        )
 
         disposables += databaseRepository.insertTeacher(teacher)
             .flatMap { id -> insertWeeksWithWeekdays(id).andThen(Single.just(id)) }
-            .doOnError { throwable -> Timber.e(throwable) }
+            .doOnError { AndroidUtils.logException(it) }
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
@@ -114,18 +122,18 @@ class MainPresenter @Inject constructor(
                     sharedPreferencesRepository.setSelectedScheduleContainer(scheduleContainer)
 
                     val uiScheduleContainer = formatScheduleContainerValue(scheduleContainer)
-                    mainUiState.onNext(
-                        mainUiState.value!!.copy(
-                            selectedScheduleContainer = uiScheduleContainer,
-                            isLoading = false
+                    uiState.onNext(
+                        uiState.value!!.copy(
+                            isLoading = false,
+                            selectedScheduleContainer = uiScheduleContainer
                         )
                     )
                 },
                 onError = {
-                    mainUiState.onNext(
-                        mainUiState.value!!.copy(
-                            errorUiState = ErrorUiState(errorType = NewScheduleContainerError),
-                            isLoading = false
+                    uiState.onNext(
+                        uiState.value!!.copy(
+                            isLoading = false,
+                            errorEvent = ErrorUiEvent(error = NewScheduleContainerError)
                         )
                     )
                 }
@@ -138,7 +146,7 @@ class MainPresenter @Inject constructor(
             .ignoreElements()
             .doOnError {
                 databaseRepository.deleteScheduleContainer(scheduleContainerId)
-                    .doOnError { throwable -> Timber.e(throwable) }
+                    .doOnError { AndroidUtils.logException(it) }
                     .subscribe()
             }
     }
@@ -148,11 +156,15 @@ class MainPresenter @Inject constructor(
 
         val scheduleContainer = sharedPreferencesRepository.getSelectedScheduleContainer()
         val uiScheduleContainer = formatScheduleContainerValue(scheduleContainer)
-        mainUiState.onNext(mainUiState.value!!.copy(selectedScheduleContainer = uiScheduleContainer))
+        uiState.onNext(
+            uiState.value!!.copy(selectedScheduleContainer = uiScheduleContainer)
+        )
     }
 
     fun changeScheduleContainer(scheduleContainerId: Int) {
-        mainUiState.onNext(mainUiState.value!!.copy(isLoading = true))
+        uiState.onNext(
+            uiState.value!!.copy(isLoading = true)
+        )
 
         disposables += databaseRepository.getScheduleContainer(scheduleContainerId)
             .retry()
@@ -163,18 +175,20 @@ class MainPresenter @Inject constructor(
                     sharedPreferencesRepository.setSelectedScheduleContainer(scheduleContainer)
 
                     val uiScheduleContainer = formatScheduleContainerValue(scheduleContainer)
-                    mainUiState.onNext(
-                        mainUiState.value!!.copy(
-                            selectedScheduleContainer = uiScheduleContainer,
-                            isLoading = false
+                    uiState.onNext(
+                        uiState.value!!.copy(
+                            isLoading = false,
+                            selectedScheduleContainer = uiScheduleContainer
                         )
                     )
                 }
             )
     }
 
-    fun errorShown() {
-        mainUiState.onNext(mainUiState.value!!.copy(errorUiState = ErrorUiState(errorType = null)))
+    fun errorEventConsumed() {
+        uiState.onNext(
+            uiState.value!!.copy(errorEvent = ErrorUiEvent())
+        )
     }
 
     private fun formatScheduleContainerValue(scheduleContainer: ScheduleContainer): ScheduleContainer {
@@ -187,7 +201,7 @@ class MainPresenter @Inject constructor(
     }
 
     fun getSelectedScheduleContainer(): ScheduleContainer {
-        return mainUiState.value!!.selectedScheduleContainer
+        return uiState.value!!.selectedScheduleContainer
     }
 
     fun isFabShown(): Boolean {
