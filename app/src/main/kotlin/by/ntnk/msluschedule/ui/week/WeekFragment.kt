@@ -37,9 +37,12 @@ import by.ntnk.msluschedule.ui.weekday.WeekdayActivity
 import by.ntnk.msluschedule.utils.AndroidUtils
 import by.ntnk.msluschedule.utils.AndroidUtils.SNACKBAR_LENGTH_LONGER
 import by.ntnk.msluschedule.utils.DEFAULT
-import by.ntnk.msluschedule.utils.NoDataOnServerException
+import by.ntnk.msluschedule.utils.ErrorType
+import by.ntnk.msluschedule.utils.NetworkApiVersionError
+import by.ntnk.msluschedule.utils.NetworkError
+import by.ntnk.msluschedule.utils.NetworkTimeoutError
+import by.ntnk.msluschedule.utils.NoDataOnServerError
 import by.ntnk.msluschedule.utils.ScheduleType
-import by.ntnk.msluschedule.utils.Utils
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import dagger.Lazy
@@ -47,11 +50,7 @@ import dagger.android.support.AndroidSupportInjection
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.plusAssign
-import io.reactivex.rxkotlin.subscribeBy
-import timber.log.Timber
 import java.lang.ref.WeakReference
-import java.net.SocketTimeoutException
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
@@ -151,8 +150,8 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     }
 
     private fun observeAdapterOnClick(adapter: LessonRecyclerViewAdapter) {
-        adapterOnClickDisposable = adapter.onClickObservable.subscribeBy(
-            onNext = { itemView ->
+        adapterOnClickDisposable = adapter.onClickObservable
+            .subscribe { itemView ->
                 when (itemView.viewType) {
                     LessonRecyclerViewAdapter.ItemViewType.DAY -> {
                         val weekdayId = (itemView as LessonRecyclerViewAdapter.DayItemView).weekdayId
@@ -171,113 +170,110 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
 
                     else -> {}
                 }
-            },
-            onError = { throwable -> Timber.e(throwable) }
-        )
+            }
     }
 
     override fun onStart() {
         super.onStart()
 
-        disposables += presenter.weekUiStateObservable
-            .subscribeBy(
-                onNext = { weekUiState ->
-                    if (weekUiState == WeekUiState()) {
-                        presenter.checkWeekInitialized(scheduleContainer, weekId)
+        disposables += presenter.uiStateObservable
+            .map { it.isUiStateInitialized }
+            .distinctUntilChanged()
+            .subscribe { isUiStateInitialized ->
+                if (!isUiStateInitialized) {
+                    presenter.getData(scheduleContainer, weekId)
+                }
+            }
+
+        disposables += presenter.uiStateObservable
+            .map { it.isLoading }
+            .distinctUntilChanged()
+            .subscribe { isLoading ->
+                if (isLoading) {
+                    binding.progressIndicatorInit.visibility = View.VISIBLE
+
+                    if (isCurrentWeek) {
+                        hideActivityProgressIndicator()
+                    }
+                } else {
+                    binding.progressIndicatorInit.visibility = View.GONE
+                }
+            }
+
+        disposables += presenter.uiStateObservable
+            .map { it.isUpdating }
+            .distinctUntilChanged()
+            .subscribe { isUpdating ->
+                if (isUpdating) {
+                    showUpdateProgressIndicator()
+                } else {
+                    hideUpdateProgressIndicator()
+                }
+            }
+
+        disposables += presenter.uiStateObservable
+            .map { it.dataState }
+            .distinctUntilChanged()
+            .subscribe { dataState ->
+                if (dataState.data != null) {
+                    onWeekData(dataState.data)
+                    for (weekday in dataState.data) {
+                        setNotesStatus(weekday.id)
                     }
 
-                    if (weekUiState.isInitializingWeek ||
-                        weekUiState.isProcessingInitialUpdate ||
-                        weekUiState.isInitialUpdateError
-                    ) {
-                        binding.progressIndicatorInit.visibility = View.VISIBLE
-                    } else {
-                        binding.progressIndicatorInit.visibility = View.GONE
+                    if (isCurrentWeek) {
+                        hideActivityProgressIndicator()
                     }
+                }
+            }
 
-                    if (weekUiState.isWeekInitialized) {
-                        presenter.getSchedule(scheduleContainer.type, weekId)
-                    }
+        disposables += presenter.uiStateObservable
+            .map { it.successfulScheduleUpdateEvent }
+            .distinctUntilChanged()
+            .subscribe { successfulScheduleUpdateEvent ->
+                if (successfulScheduleUpdateEvent.isTriggered) {
+                    showSuccessfulUpdateToast()
+                    presenter.successfulScheduleUpdateEventConsumed()
+                }
+            }
 
-                    if (weekUiState.isData()) {
-                        val data = weekUiState.data!!
-                        onWeekData(data)
-                        for (weekday in data) {
-                            setNotesStatus(weekday.id)
+        disposables += presenter.uiStateObservable
+            .map { it.errorEvent }
+            .distinctUntilChanged()
+            .subscribe { errorEvent ->
+                if (errorEvent.error != null) {
+                    if (errorEvent.isScheduleUpdateError) {
+                        when (errorEvent.error) {
+                            is NoDataOnServerError -> showSuccessfulUpdateToast()
+                            is NetworkTimeoutError -> showError(NetworkTimeoutError, showRetryButton = true)
+                            else -> showError(errorEvent.error, showRetryButton = false)
                         }
-                    }
-
-                    if (weekUiState.isError()) {
-                        val throwable = weekUiState.throwable!!
-                        if (weekUiState.isInitialUpdateError) {
-                            if (Utils.isUnexpectedException(throwable)) {
-                                Timber.e(throwable)
-                            } else {
-                                Timber.i(throwable)
-                            }
-                            if (throwable !is NoDataOnServerException) {
-                                showError(throwable, showRetryButton = false)
-                            }
-                            presenter.getSchedule(scheduleContainer.type, weekId)
-                        } else {
-                            Timber.e(throwable)
-                            showError(throwable, showRetryButton = false)
+                    } else {
+                        if (errorEvent.error !is NoDataOnServerError) {
+                            showError(errorEvent.error, showRetryButton = false)
                         }
                     }
 
                     if (isCurrentWeek) {
-                        if (weekUiState.isInitializingWeek || weekUiState.isData() || weekUiState.isError()) {
-                            activity?.findViewById<View>(R.id.progressindicator)?.visibility = View.GONE
-                            parentFragment?.view?.findViewById<ViewGroup>(R.id.viewpager_weeks)?.alpha = 1f
-                        }
+                        hideActivityProgressIndicator()
                     }
+
+                    presenter.errorEventConsumed()
                 }
-            )
+            }
+    }
 
-        disposables += presenter.scheduleUpdateEventObservable
-            .subscribeBy(
-                onNext = { scheduleUpdateEvent ->
-                    if (scheduleUpdateEvent.isLoading) {
-                        showUpdateProgressIndicator()
-                    } else {
-                        hideUpdateProgressIndicator()
-                    }
-
-                    if (scheduleUpdateEvent.isEvent()) {
-                        scheduleUpdateEvent.consumeEvent()
-                        if (!checkUiEventExpired(scheduleUpdateEvent.timestamp)) {
-                            showSuccessfulUpdateToast()
-                        }
-                    }
-
-                    if (scheduleUpdateEvent.isError()) {
-                        val throwable = scheduleUpdateEvent.consumeError()
-                        if (Utils.isUnexpectedException(throwable)) {
-                            Timber.e(throwable)
-                        } else {
-                            Timber.i(throwable)
-                        }
-                        if (!checkUiEventExpired(scheduleUpdateEvent.timestamp)) {
-                            when (throwable) {
-                                is NoDataOnServerException -> showSuccessfulUpdateToast()
-                                is SocketTimeoutException -> showError(throwable, showRetryButton = true)
-                                else -> showError(throwable, showRetryButton = false)
-                            }
-                        }
-                    }
-                }
-            )
+    private fun hideActivityProgressIndicator() {
+        activity?.findViewById<View>(R.id.progressindicator)?.visibility = View.GONE
+        parentFragment?.view?.findViewById<ViewGroup>(R.id.viewpager_weeks)?.alpha = 1f
     }
 
     private fun setNotesStatus(weekdayId: Int) {
         disposables += presenter.hasNotes(weekdayId)
-            .subscribeBy(
-                onSuccess = { hasNotes ->
-                    val adapter = binding.recyclerviewDays.adapter as LessonRecyclerViewAdapter
-                    adapter.updateWeekdayNotesStatus(weekdayId, hasNotes)
-                },
-                onError = { throwable -> Timber.e(throwable) }
-            )
+            .subscribe { hasNotes ->
+                val adapter = binding.recyclerviewDays.adapter as LessonRecyclerViewAdapter
+                adapter.updateWeekdayNotesStatus(weekdayId, hasNotes)
+            }
     }
 
     override fun onStop() {
@@ -445,10 +441,9 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         }
     }
 
-    private fun showError(throwable: Throwable, showRetryButton: Boolean) {
+    private fun showError(error: ErrorType, showRetryButton: Boolean) {
         val baseFABMain = requireActivity().findViewById<FloatingActionButton>(R.id.fab_base)
-        val errorMessageResource = AndroidUtils.getErrorMessageResId(throwable)
-        val snackbar = Snackbar.make(requireView(), errorMessageResource, SNACKBAR_LENGTH_LONGER)
+        val snackbar = Snackbar.make(requireView(), getErrorMessageResId(error), SNACKBAR_LENGTH_LONGER)
         snackbar.anchorView = baseFABMain
         snackbar.setTextMaxLines(5)
         if (showRetryButton) {
@@ -465,14 +460,14 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         snackbar.show()
     }
 
-    /**
-     * It would be confusing for users to see successful update or error notifications when
-     * a schedule update UI event wasn't consumed and user maximizes the app after some time.
-     * So limit event's lifetime and use this function to check if the unconsumed event is expired.
-     */
-    private fun checkUiEventExpired(eventTimestamp: Long): Boolean {
-        val timeDelta = System.nanoTime() - eventTimestamp
-        return timeDelta > TimeUnit.MILLISECONDS.toNanos(EVENT_EXPIRATION_TIME_LIMIT)
+    private fun getErrorMessageResId(error: ErrorType): Int {
+        return when (error) {
+            is NetworkError,
+            is NetworkTimeoutError -> R.string.error_website_unavailable
+            is NetworkApiVersionError -> R.string.error_network_api_version
+            is NoDataOnServerError -> R.string.error_no_data_on_server
+            else -> R.string.error_general
+        }
     }
 
     companion object {
@@ -485,8 +480,6 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         private const val ANIMATION_HIDE_SCHEDULE_UPDATE_INDICATOR_DURATION = 200L
 
         private const val TOAST_SCHEDULE_UPDATED_DELAY = 250L
-
-        private const val EVENT_EXPIRATION_TIME_LIMIT = 2 * 60 * 1000L // 2 minutes
 
         fun newInstance(weekId: Int, isCurrentWeek: Boolean): WeekFragment {
             return WeekFragment().apply {

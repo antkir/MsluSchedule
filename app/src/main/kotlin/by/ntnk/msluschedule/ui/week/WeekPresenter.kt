@@ -6,10 +6,13 @@ import by.ntnk.msluschedule.data.WeekdayWithLessons
 import by.ntnk.msluschedule.db.DatabaseRepository
 import by.ntnk.msluschedule.mvp.Presenter
 import by.ntnk.msluschedule.network.NetworkRepository
+import by.ntnk.msluschedule.utils.AndroidUtils
 import by.ntnk.msluschedule.utils.CurrentDate
+import by.ntnk.msluschedule.utils.ErrorType
 import by.ntnk.msluschedule.utils.ScheduleType
 import by.ntnk.msluschedule.utils.SchedulerProvider
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
+import by.ntnk.msluschedule.utils.Utils
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.subscribeBy
@@ -17,40 +20,27 @@ import io.reactivex.subjects.BehaviorSubject
 import org.threeten.bp.DayOfWeek
 import javax.inject.Inject
 
+data class DataState(
+    val data: List<WeekdayWithLessons<Lesson>>? = null
+)
+
+data class UiEvent(
+    val isTriggered: Boolean = false
+)
+
+data class ErrorUiEvent(
+    val isScheduleUpdateError: Boolean = false,
+    val error: ErrorType? = null
+)
+
 data class WeekUiState(
-    val isCheckingWeekStatus: Boolean = false,
-    val isInitializingWeek: Boolean = false,
-    val isProcessingInitialUpdate: Boolean = false,
-    val isWeekInitialized: Boolean = false,
-    val data: List<WeekdayWithLessons<Lesson>>? = null,
-    val throwable: Throwable? = null,
-    val isInitialUpdateError: Boolean = false
-) {
-    fun isData(): Boolean = data != null
-    fun isError(): Boolean = throwable != null
-}
-
-data class ScheduleUpdateEvent(
+    val isUiStateInitialized: Boolean = false,
     val isLoading: Boolean = false,
-    private var isUpdateSuccessful: Boolean = false,
-    private var throwable: Throwable? = null
-) {
-    val timestamp: Long = System.nanoTime()
-
-    fun isEvent(): Boolean = isUpdateSuccessful
-
-    fun consumeEvent() {
-        isUpdateSuccessful = false
-    }
-
-    fun isError(): Boolean = throwable != null
-
-    fun consumeError(): Throwable {
-        val throwableCopy = throwable!!
-        throwable = null
-        return throwableCopy
-    }
-}
+    val isUpdating: Boolean = false,
+    val dataState: DataState = DataState(),
+    val successfulScheduleUpdateEvent: UiEvent = UiEvent(),
+    val errorEvent: ErrorUiEvent = ErrorUiEvent()
+)
 
 class WeekPresenter @Inject constructor(
     private val currentDate: CurrentDate,
@@ -60,32 +50,37 @@ class WeekPresenter @Inject constructor(
     private val networkRepository: NetworkRepository
 ) : Presenter<WeekView>() {
 
-    private val weekUiState: BehaviorSubject<WeekUiState> = BehaviorSubject.createDefault(WeekUiState())
-    val weekUiStateObservable: Observable<WeekUiState>
-        get() = weekUiState
-
-    private val scheduleUpdateEvent: BehaviorSubject<ScheduleUpdateEvent> =
-        BehaviorSubject.createDefault(ScheduleUpdateEvent())
-    val scheduleUpdateEventObservable: Observable<ScheduleUpdateEvent>
-        get() = scheduleUpdateEvent
+    private val uiState: BehaviorSubject<WeekUiState> = BehaviorSubject.createDefault(WeekUiState())
+    val uiStateObservable: Observable<WeekUiState>
+        get() = uiState
 
     fun getSelectedScheduleContainer(): ScheduleContainer {
         return sharedPreferencesRepository.getSelectedScheduleContainer()
     }
 
-    fun getSchedule(scheduleType: ScheduleType, weekId: Int) {
+    private fun getLocalData(scheduleType: ScheduleType, weekId: Int) {
         getWeekdays(scheduleType, weekId)
             .toList()
+            .doOnError { AndroidUtils.logException(it) }
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
                 onSuccess = { weekdays ->
-                    val state = WeekUiState(data = weekdays)
-                    weekUiState.onNext(state)
+                    uiState.onNext(
+                        uiState.value!!.copy(
+                            isLoading = false,
+                            dataState = DataState(data = weekdays)
+                        )
+                    )
                 },
                 onError = { throwable ->
-                    val state = WeekUiState(throwable = throwable)
-                    weekUiState.onNext(state)
+                    val error = Utils.getErrorType(throwable)
+                    uiState.onNext(
+                        uiState.value!!.copy(
+                            isLoading = false,
+                            errorEvent = ErrorUiEvent(error = error)
+                        )
+                    )
                 }
             )
     }
@@ -100,61 +95,84 @@ class WeekPresenter @Inject constructor(
 
     fun hasNotes(weekdayId: Int): Single<Boolean> {
         return databaseRepository.checkWeekdayHasNotes(weekdayId)
+            .doOnError { AndroidUtils.logException(it) }
             .subscribeOn(schedulerProvider.single())
             .observeOn(schedulerProvider.ui())
     }
 
     private fun initializeWeek(scheduleContainer: ScheduleContainer, weekId: Int) {
-        weekUiState.onNext(WeekUiState(isInitializingWeek = true))
+        uiState.onNext(
+            uiState.value!!.copy(isLoading = true)
+        )
+
         databaseRepository.insertWeekdays(weekId)
+            .doOnError { AndroidUtils.logException(it) }
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
-                onComplete = { updateSchedule(scheduleContainer, weekId, isInitialUpdate = true) },
-                onError = { throwable -> weekUiState.onNext(WeekUiState(throwable = throwable)) }
+                onComplete = { updateSchedule(scheduleContainer, weekId, isInitializationUpdate = true) },
+                onError = { throwable ->
+                    val error = Utils.getErrorType(throwable)
+                    uiState.onNext(
+                        uiState.value!!.copy(
+                            isLoading = false,
+                            errorEvent = ErrorUiEvent(error = error)
+                        )
+                    )
+                }
             )
     }
 
     fun updateSchedule(scheduleContainer: ScheduleContainer, weekId: Int) {
-        updateSchedule(scheduleContainer, weekId, isInitialUpdate = false)
-    }
-
-    private fun updateSchedule(scheduleContainer: ScheduleContainer, weekId: Int, isInitialUpdate: Boolean) {
-        assert(scheduleUpdateEvent.hasValue())
-        if (scheduleUpdateEvent.value!! != ScheduleUpdateEvent()) {
+        if (uiState.value?.isLoading == true || uiState.value?.isUpdating == true) {
             return
         }
 
-        if (isInitialUpdate) {
-            weekUiState.onNext(WeekUiState(isProcessingInitialUpdate = true))
-        } else {
-            scheduleUpdateEvent.onNext(ScheduleUpdateEvent(isLoading = true))
-        }
+        uiState.onNext(
+            uiState.value!!.copy(isUpdating = true)
+        )
 
+        updateSchedule(scheduleContainer, weekId, isInitializationUpdate = false)
+    }
+
+    private fun updateSchedule(scheduleContainer: ScheduleContainer, weekId: Int, isInitializationUpdate: Boolean) {
         when (scheduleContainer.type) {
             ScheduleType.STUDYGROUP -> updateScheduleGroup(scheduleContainer, weekId)
             ScheduleType.TEACHER -> updateScheduleTeacher(scheduleContainer, weekId)
             else -> Single.error(IllegalArgumentException())
         }
+            .doOnError { AndroidUtils.logException(it) }
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
                 onSuccess = { weekdays ->
-                    val state = WeekUiState(data = weekdays)
-                    weekUiState.onNext(state)
-
-                    if (!isInitialUpdate) {
-                        val event = ScheduleUpdateEvent(isUpdateSuccessful = true)
-                        scheduleUpdateEvent.onNext(event)
-                    }
+                    uiState.onNext(
+                        uiState.value!!.copy(
+                            isLoading = false,
+                            isUpdating = false,
+                            dataState = DataState(data = weekdays),
+                            successfulScheduleUpdateEvent = UiEvent(isTriggered = !isInitializationUpdate)
+                        )
+                    )
                 },
                 onError = { throwable ->
-                    if (isInitialUpdate) {
-                        val state = WeekUiState(throwable = throwable, isInitialUpdateError = true)
-                        weekUiState.onNext(state)
+                    val error = Utils.getErrorType(throwable)
+                    if (isInitializationUpdate) {
+                        uiState.onNext(
+                            uiState.value!!.copy(errorEvent = ErrorUiEvent(error = error))
+                        )
+
+                        getLocalData(scheduleContainer.type, weekId)
                     } else {
-                        val updateState = ScheduleUpdateEvent(throwable = throwable)
-                        scheduleUpdateEvent.onNext(updateState)
+                        uiState.onNext(
+                            uiState.value!!.copy(
+                                isUpdating = false,
+                                errorEvent = ErrorUiEvent(
+                                    isScheduleUpdateError = true,
+                                    error = error
+                                )
+                            )
+                        )
                     }
                 }
             )
@@ -190,20 +208,29 @@ class WeekPresenter @Inject constructor(
             .flatMap { weekdays -> databaseRepository.insertTeacherSchedule(weekdays, weekId) }
     }
 
-    fun checkWeekInitialized(scheduleContainer: ScheduleContainer, weekId: Int) {
-        weekUiState.onNext(WeekUiState(isCheckingWeekStatus = true))
+    fun getData(scheduleContainer: ScheduleContainer, weekId: Int) {
+        uiState.onNext(
+            uiState.value!!.copy(isUiStateInitialized = true)
+        )
+
         databaseRepository.isWeekInitialized(weekId)
+            .doOnError { AndroidUtils.logException(it) }
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
                 onSuccess = { isInitialized ->
                     if (isInitialized) {
-                        weekUiState.onNext(WeekUiState(isWeekInitialized = true))
+                        getLocalData(scheduleContainer.type, weekId)
                     } else {
                         initializeWeek(scheduleContainer, weekId)
                     }
                 },
-                onError = { throwable -> weekUiState.onNext(WeekUiState(throwable = throwable)) }
+                onError = { throwable ->
+                    val error = Utils.getErrorType(throwable)
+                    uiState.onNext(
+                        uiState.value!!.copy(errorEvent = ErrorUiEvent(error = error))
+                    )
+                }
             )
     }
 
@@ -213,5 +240,17 @@ class WeekPresenter @Inject constructor(
         } else {
             DayOfWeek.MONDAY.value
         }
+    }
+
+    fun successfulScheduleUpdateEventConsumed() {
+        uiState.onNext(
+            uiState.value!!.copy(successfulScheduleUpdateEvent = UiEvent())
+        )
+    }
+
+    fun errorEventConsumed() {
+        uiState.onNext(
+            uiState.value!!.copy(errorEvent = ErrorUiEvent())
+        )
     }
 }
