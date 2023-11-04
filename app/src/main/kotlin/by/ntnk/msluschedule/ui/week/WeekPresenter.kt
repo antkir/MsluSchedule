@@ -106,7 +106,7 @@ class WeekPresenter @Inject constructor(
             .observeOn(scheduler)
             .andThen(downloadSchedule(isUpdate = false, container = container, weekId = weekId))
             .observeOn(schedulerProvider.ui())
-            .doOnDispose { view?.hideUpdateProgressBar() }
+            .doOnDispose { view?.hideInitProgressBar() }
             .doOnEvent { _, _ -> view?.hideInitProgressBar() }
     }
 
