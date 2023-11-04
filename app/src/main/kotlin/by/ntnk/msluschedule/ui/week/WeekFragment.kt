@@ -101,7 +101,11 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
                 if (!isEmptyScheduleDaysVisible) {
                     layoutManagerSavedState = binding.recyclerViewDays.layoutManager?.onSaveInstanceState()
                 }
-                presenter.updateSchedule(weekId)
+                if (binding.progressbarInit.visibility != View.VISIBLE &&
+                    binding.progressbarUpdate.visibility != View.VISIBLE
+                ) {
+                    presenter.updateSchedule(weekId)
+                }
             } else {
                 val baseFABMain = requireActivity().findViewById<FloatingActionButton>(R.id.fab_base)
                 AndroidUtils.showSnackbarNetworkInaccessible(baseFABMain)
@@ -119,8 +123,13 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
                         R.id.item_week_update -> {
                             if (AndroidUtils.isNetworkAccessible(requireContext().applicationContext)) {
                                 if (weekId != INVALID_VALUE) {
-                                    layoutManagerSavedState = binding.recyclerViewDays.layoutManager?.onSaveInstanceState()
-                                    presenter.updateSchedule(weekId)
+                                    layoutManagerSavedState =
+                                        binding.recyclerViewDays.layoutManager?.onSaveInstanceState()
+                                    if (binding.progressbarInit.visibility != View.VISIBLE &&
+                                        binding.progressbarUpdate.visibility != View.VISIBLE
+                                    ) {
+                                        presenter.updateSchedule(weekId)
+                                    }
                                 }
                             } else {
                                 val baseFABMain = requireActivity().findViewById<FloatingActionButton>(R.id.fab_base)
@@ -157,10 +166,12 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
                         val weekdayId = (it as LessonRecyclerViewAdapter.DayView).weekdayId
                         WeekdayActivity.startActivity(requireContext(), weekdayId)
                     }
+
                     VIEWTYPE_STUDYGROUP -> {
                         val lessonId = (it as LessonRecyclerViewAdapter.StudyGroupLessonView).lesson.id
                         LessonInfoActivity.startActivity(requireContext(), lessonId, ScheduleType.STUDYGROUP, weekId)
                     }
+
                     VIEWTYPE_TEACHER -> {
                         val lessonId = (it as LessonRecyclerViewAdapter.TeacherLessonView).lesson.id
                         LessonInfoActivity.startActivity(requireContext(), lessonId, ScheduleType.TEACHER, weekId)
