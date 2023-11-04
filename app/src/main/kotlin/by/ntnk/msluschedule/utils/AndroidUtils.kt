@@ -15,9 +15,11 @@ import by.ntnk.msluschedule.R
 import com.google.android.material.snackbar.Snackbar
 import io.reactivex.subjects.PublishSubject
 import java.net.ConnectException
+import java.net.SocketException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import java.util.concurrent.ThreadLocalRandom
+import javax.net.ssl.SSLException
 
 val onThemeChanged: PublishSubject<Boolean> = PublishSubject.create()
 
@@ -71,10 +73,12 @@ object AndroidUtils {
 
     fun getErrorMessageResId(t: Throwable): Int {
         return when (t) {
-            is ConnectException -> R.string.error_website_unavailable
-            is HttpStatusException -> R.string.error_website_unavailable
-            is SocketTimeoutException -> R.string.error_website_unavailable
-            is UnknownHostException -> R.string.error_website_unavailable
+            is ConnectException,
+            is SocketTimeoutException,
+            is UnknownHostException,
+            is HttpStatusException,
+            is SSLException,
+            is SocketException -> R.string.error_website_unavailable
             is NetworkApiVersionException -> R.string.error_network_api_version
             is NoDataOnServerException -> R.string.error_no_data_on_server
             else -> R.string.error_general
