@@ -7,14 +7,14 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 
 object Migrations {
     val MIGRATION_8_9: Migration = object : Migration(8, 9) {
-        override fun migrate(database: SupportSQLiteDatabase) {
-            database.execSQL("ALTER TABLE DbNote ADD COLUMN subject VARCHAR DEFAULT '' NOT NULL")
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("ALTER TABLE DbNote ADD COLUMN subject VARCHAR DEFAULT '' NOT NULL")
         }
     }
 
     val MIGRATION_9_10: Migration = object : Migration(9, 10) {
-        override fun migrate(database: SupportSQLiteDatabase) {
-            database.execSQL("ALTER TABLE DbStudyGroupLesson ADD COLUMN type VARCHAR DEFAULT '' NOT NULL")
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("ALTER TABLE DbStudyGroupLesson ADD COLUMN type VARCHAR DEFAULT '' NOT NULL")
         }
     }
 
@@ -23,9 +23,9 @@ object Migrations {
     // but it turns out they also use non-digit characters there (e.g. "1000-7s"),
     // so just store schedule container keys as TEXT in the app's database.
     val MIGRATION_10_11: Migration = object : Migration(10, 11) {
-        override fun migrate(database: SupportSQLiteDatabase) {
-            database.execSQL("DROP TABLE IF EXISTS new_ScheduleContainer")
-            database.execSQL(
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("DROP TABLE IF EXISTS new_ScheduleContainer")
+            db.execSQL(
                 """
                 CREATE TABLE new_ScheduleContainer (
                     key TEXT NOT NULL,
@@ -39,7 +39,7 @@ object Migrations {
                 """.trimIndent()
             )
 
-            val cursor = database.query("SELECT * FROM ScheduleContainer ORDER BY id")
+            val cursor = db.query("SELECT * FROM ScheduleContainer ORDER BY id")
             for (i in 0..<cursor.count) {
                 cursor.moveToPosition(i)
 
@@ -62,12 +62,12 @@ object Migrations {
                         put("id", cursor.getInt(idIndex))
                     }
 
-                database.insert("new_ScheduleContainer", SQLiteDatabase.CONFLICT_REPLACE, values)
+                db.insert("new_ScheduleContainer", SQLiteDatabase.CONFLICT_REPLACE, values)
             }
             cursor.close()
 
-            database.execSQL("DROP TABLE ScheduleContainer")
-            database.execSQL("ALTER TABLE new_ScheduleContainer RENAME TO ScheduleContainer")
+            db.execSQL("DROP TABLE ScheduleContainer")
+            db.execSQL("ALTER TABLE new_ScheduleContainer RENAME TO ScheduleContainer")
         }
 
         private val GROUP_CODE_OFFSET = 100
