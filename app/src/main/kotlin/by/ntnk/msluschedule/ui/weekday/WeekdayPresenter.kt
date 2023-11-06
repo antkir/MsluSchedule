@@ -8,6 +8,7 @@ import by.ntnk.msluschedule.mvp.Presenter
 import by.ntnk.msluschedule.utils.ScheduleType
 import by.ntnk.msluschedule.utils.SchedulerProvider
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
+import by.ntnk.msluschedule.utils.assertDebug
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
@@ -153,8 +154,8 @@ class WeekdayPresenter @Inject constructor(
     }
 
     fun getWeekdayData(): WeekdayWithLessons<Lesson> {
-        assert(weekdayUiState.hasValue())
-        assert(weekdayUiState.value!!.isData())
+        assertDebug { weekdayUiState.hasValue() }
+        assertDebug { weekdayUiState.value!!.isData() }
         return weekdayUiState.value!!.data!!
     }
 

@@ -14,6 +14,7 @@ import by.ntnk.msluschedule.utils.NetworkApiVersion
 import by.ntnk.msluschedule.utils.SchedulerProvider
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
 import by.ntnk.msluschedule.utils.Utils
+import by.ntnk.msluschedule.utils.assertDebug
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
@@ -127,7 +128,7 @@ class AddGroupPresenter @Inject constructor(
     }
 
     private fun downloadFacultyFilter() {
-        assert(uiState.value!!.facultyFilterUiState == ScheduleFilterUiState())
+        assertDebug { uiState.value!!.facultyFilterUiState == ScheduleFilterUiState() }
 
         uiState.onNext(
             uiState.value!!.copy(facultyFilterUiState = uiState.value!!.facultyFilterUiState.copy(isLoading = true))
@@ -161,7 +162,7 @@ class AddGroupPresenter @Inject constructor(
     }
 
     fun downloadCourseFilter() {
-        assert(uiState.value!!.courseFilterUiState == ScheduleFilterUiState())
+        assertDebug { uiState.value!!.courseFilterUiState == ScheduleFilterUiState() }
 
         uiState.onNext(
             uiState.value!!.copy(courseFilterUiState = ScheduleFilterUiState(isLoading = true))
@@ -196,7 +197,7 @@ class AddGroupPresenter @Inject constructor(
     }
 
     fun downloadGroupFilter() {
-        assert(uiState.value!!.groupFilterUiState == ScheduleFilterUiState())
+        assertDebug { uiState.value!!.groupFilterUiState == ScheduleFilterUiState() }
 
         uiState.onNext(
             uiState.value!!.copy(groupFilterUiState = ScheduleFilterUiState(isLoading = true))
@@ -235,9 +236,9 @@ class AddGroupPresenter @Inject constructor(
     fun isGroupAdded(key: String): Boolean {
         val facultyKey = uiState.value!!.facultyFilterUiState.key
         val facultyData = uiState.value!!.facultyFilterUiState.dataState.data
-        assert(facultyData != null)
+        assertDebug { facultyData != null }
         val groupData = uiState.value!!.groupFilterUiState.dataState.data
-        assert(groupData != null)
+        assertDebug { groupData != null }
         return storedGroups.value
             ?.filter { group -> group.year == currentDate.academicYear }
             ?.filter { group -> group.faculty.toString(10) == facultyKey }
@@ -251,13 +252,13 @@ class AddGroupPresenter @Inject constructor(
     fun createSelectedStudyGroupObject(): StudyGroup {
         val facultyKey = uiState.value!!.facultyFilterUiState.key
         val facultyData = uiState.value!!.facultyFilterUiState.dataState.data
-        assert(facultyData != null)
+        assertDebug { facultyData != null }
         val courseKey = uiState.value!!.courseFilterUiState.key
         val courseData = uiState.value!!.courseFilterUiState.dataState.data
-        assert(courseData != null)
+        assertDebug { courseData != null }
         val groupKey = uiState.value!!.groupFilterUiState.key
         val groupData = uiState.value!!.groupFilterUiState.dataState.data
-        assert(groupData != null)
+        assertDebug { groupData != null }
         val facultyName = facultyData!!.getValueOrDefault(facultyKey)
         val groupName = groupData!!.getValueOrDefault(groupKey)
         val name = formatGroupName(groupName, facultyName)

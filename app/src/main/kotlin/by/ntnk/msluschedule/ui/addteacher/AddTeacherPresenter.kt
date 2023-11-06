@@ -12,6 +12,7 @@ import by.ntnk.msluschedule.utils.DEFAULT
 import by.ntnk.msluschedule.utils.ErrorType
 import by.ntnk.msluschedule.utils.SchedulerProvider
 import by.ntnk.msluschedule.utils.Utils
+import by.ntnk.msluschedule.utils.assertDebug
 import io.reactivex.Observable
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.BehaviorSubject
@@ -112,7 +113,7 @@ class AddTeacherPresenter @Inject constructor(
 
     fun isTeacherAdded(key: String): Boolean {
         val teacherData = uiState.value!!.teacherFilterUiState.dataState.data
-        assert(teacherData != null)
+        assertDebug { teacherData != null }
         return storedTeachers.value
             ?.filter { teacher -> teacher.year == currentDate.academicYear }
             ?.map { teacher -> teacher.value }
@@ -122,7 +123,7 @@ class AddTeacherPresenter @Inject constructor(
     fun createSelectedTeacherObject(): Teacher {
         val teacherKey = uiState.value!!.teacherFilterUiState.key
         val teacherData = uiState.value!!.teacherFilterUiState.dataState.data
-        assert(teacherData != null)
+        assertDebug { teacherData != null }
         val teacherName = teacherData!!.getValueOrDefault(teacherKey)
         return Teacher(AUTO_ID, teacherKey, teacherName, currentDate.academicYear)
     }

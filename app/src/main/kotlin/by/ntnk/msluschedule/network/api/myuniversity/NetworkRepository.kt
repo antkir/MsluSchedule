@@ -19,6 +19,7 @@ import by.ntnk.msluschedule.utils.NetworkApiVersionException
 import by.ntnk.msluschedule.utils.NoDataOnServerException
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
 import by.ntnk.msluschedule.utils.Utils
+import by.ntnk.msluschedule.utils.assertDebug
 import by.ntnk.msluschedule.utils.firstOrDefault
 import by.ntnk.msluschedule.utils.takeIfOrDefault
 import by.ntnk.msluschedule.utils.takeUnlessOrDefault
@@ -439,7 +440,7 @@ class NetworkRepository @Inject constructor(
     }
 
     private fun parseDateTime(dateTime: String): LocalDateTime {
-        assert(dateTime != String.DEFAULT)
+        assertDebug { dateTime != String.DEFAULT }
         val dateTimeFormatter = DateTimeFormatterBuilder()
             .parseCaseInsensitive()
             .append(DateTimeFormatter.ISO_LOCAL_DATE)
