@@ -3,11 +3,13 @@ package by.ntnk.msluschedule.mvp
 open class Presenter<V : View> {
     protected var view: V? = null
 
-    internal fun bindView(view: V) {
+    fun bindView(view: V) {
         this.view = view
     }
 
-    internal fun unbindView() {
+    fun unbindView() {
         this.view = null
     }
+
+    open fun onCleared() {}
 }

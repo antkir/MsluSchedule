@@ -30,8 +30,7 @@ abstract class MvpDialogFragment<out P : Presenter<V>, V : View> : DialogFragmen
         get() =
             if (presenterId != null) {
                 @Suppress("UNCHECKED_CAST")
-                // Have a fail-safe path here, just in case.
-                presenterManager.getPresenter(presenterId!!) as? P ?: onCreatePresenter().also { presenterId = null }
+                presenterManager.getPresenter(presenterId!!) as P
             } else {
                 onCreatePresenter()
             }
@@ -73,6 +72,7 @@ abstract class MvpDialogFragment<out P : Presenter<V>, V : View> : DialogFragmen
     override fun onDestroy() {
         super.onDestroy()
         if (presenterId != null && !requireActivity().isChangingConfigurations) {
+            presenter.onCleared()
             presenterManager.removePresenter(presenterId!!)
         }
     }

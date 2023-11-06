@@ -30,8 +30,7 @@ abstract class MvpActivity<out P : Presenter<V>, V : View> : AppCompatActivity()
         get() =
             if (presenterId != null) {
                 @Suppress("UNCHECKED_CAST")
-                // Have a fail-safe path here, just in case.
-                presenterManager.getPresenter(presenterId!!) as? P ?: onCreatePresenter().also { presenterId = null }
+                presenterManager.getPresenter(presenterId!!) as P
             } else {
                 onCreatePresenter()
             }
@@ -39,22 +38,17 @@ abstract class MvpActivity<out P : Presenter<V>, V : View> : AppCompatActivity()
     /** Represents this [AppCompatActivity]. */
     protected abstract val view: V
 
-    /** Indicates if the presenter should be retained. */
-    private var retainPresenter: Boolean = true
-
     /** Called if the presenter for this activity hasn't been created yet. */
     protected abstract fun onCreatePresenter(): P
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         presenterId = savedInstanceState?.getSerializable(PRESENTER_ID_KEY) as Int?
-        if (retainPresenter) {
-            validatePresenter()
-            if (presenterId == null) {
-                val hashCode = toString().hashCode().absoluteValue
-                val id = (0 until Int.MAX_VALUE - hashCode).random() + hashCode
-                presenterId = presenterManager.addPresenter(id, presenter)
-            }
+        validatePresenter()
+        if (presenterId == null) {
+            val hashCode = toString().hashCode().absoluteValue
+            val id = (0 until Int.MAX_VALUE - hashCode).random() + hashCode
+            presenterId = presenterManager.addPresenter(id, presenter)
         }
         presenter.bindView(view)
     }
@@ -78,7 +72,8 @@ abstract class MvpActivity<out P : Presenter<V>, V : View> : AppCompatActivity()
 
     override fun onDestroy() {
         super.onDestroy()
-        if (retainPresenter && presenterId != null && !isChangingConfigurations) {
+        if (presenterId != null && !isChangingConfigurations) {
+            presenter.onCleared()
             presenterManager.removePresenter(presenterId!!)
         }
     }
