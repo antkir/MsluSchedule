@@ -396,12 +396,12 @@ class NetworkRepository @Inject constructor(
 
     private fun getEstimatedScheduleUpdateTime(academicWeek: Long): LocalDateTime {
         // Schedule data for the current week is usually deleted
-        // from the server on Saturday evening (after 6pm) or on Sunday.
+        // from the server on Saturday evening (after 8pm) or on Sunday.
         return currentDate.academicYearStartDate
             .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
             .plusWeeks(academicWeek)
             .with(TemporalAdjusters.nextOrSame(DayOfWeek.SATURDAY))
-            .atTime(18, 0)
+            .atTime(20, 0)
     }
 
     private fun getAcademicYearWeeks(): List<String> {
