@@ -15,6 +15,8 @@ import by.ntnk.msluschedule.utils.SharedPreferencesRepository
 import by.ntnk.msluschedule.utils.Utils
 import io.reactivex.Observable
 import io.reactivex.Single
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.BehaviorSubject
 import org.threeten.bp.DayOfWeek
@@ -54,12 +56,14 @@ class WeekPresenter @Inject constructor(
     val uiStateObservable: Observable<WeekUiState>
         get() = uiState
 
+    private val disposables: CompositeDisposable = CompositeDisposable()
+
     fun getSelectedScheduleContainer(): ScheduleContainer {
         return sharedPreferencesRepository.getSelectedScheduleContainer()
     }
 
     private fun getLocalData(scheduleType: ScheduleType, weekId: Int) {
-        getWeekdays(scheduleType, weekId)
+        disposables += getWeekdays(scheduleType, weekId)
             .toList()
             .doOnError { AndroidUtils.logException(it) }
             .subscribeOn(schedulerProvider.io())
@@ -105,7 +109,7 @@ class WeekPresenter @Inject constructor(
             uiState.value!!.copy(isLoading = true)
         )
 
-        databaseRepository.insertWeekdays(weekId)
+        disposables += databaseRepository.insertWeekdays(weekId)
             .doOnError { AndroidUtils.logException(it) }
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
@@ -136,7 +140,7 @@ class WeekPresenter @Inject constructor(
     }
 
     private fun updateSchedule(scheduleContainer: ScheduleContainer, weekId: Int, isInitializationUpdate: Boolean) {
-        when (scheduleContainer.type) {
+        disposables += when (scheduleContainer.type) {
             ScheduleType.STUDYGROUP -> updateScheduleGroup(scheduleContainer, weekId)
             ScheduleType.TEACHER -> updateScheduleTeacher(scheduleContainer, weekId)
             else -> Single.error(IllegalArgumentException())
@@ -213,7 +217,7 @@ class WeekPresenter @Inject constructor(
             uiState.value!!.copy(isUiStateInitialized = true)
         )
 
-        databaseRepository.isWeekInitialized(weekId)
+        disposables += databaseRepository.isWeekInitialized(weekId)
             .doOnError { AndroidUtils.logException(it) }
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
