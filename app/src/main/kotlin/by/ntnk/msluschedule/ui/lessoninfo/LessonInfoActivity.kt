@@ -27,7 +27,6 @@ import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasAndroidInjector
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
-import io.reactivex.rxkotlin.subscribeBy
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -94,27 +93,41 @@ class LessonInfoActivity :
             return
         }
 
-        disposables += presenter.classUiStateObservable
-            .subscribeBy(
-                onNext = { classUiState ->
-                    if (classUiState == ClassUiState()) {
-                        presenter.getClassDescriptor(classId, scheduleType, weekId)
-                    }
-
-                    if (classUiState.isGroupData()) {
-                        onClassDataReceived(classUiState.groupClassDescriptor!!, classUiState.weekdays!!)
-                    }
-
-                    if (classUiState.isTeacherData()) {
-                        onClassDataReceived(classUiState.teacherClassDescriptor!!, classUiState.weekdays!!)
-                    }
-
-                    if (classUiState.isError()) {
-                        Timber.e(classUiState.throwable)
-                        NavUtils.navigateUpFromSameTask(this)
-                    }
+        disposables += presenter.uiStateObservable
+            .map { it.isUiStateInitialized }
+            .distinctUntilChanged()
+            .subscribe { isUiStateInitialized ->
+                if (!isUiStateInitialized) {
+                    presenter.getData(classId, scheduleType, weekId)
                 }
-            )
+            }
+
+        disposables += presenter.uiStateObservable
+            .map { it.dataState }
+            .distinctUntilChanged()
+            .subscribe { dataState ->
+                val groupClassData = dataState.groupClassDataOrNull()
+                if (groupClassData != null) {
+                    val (groupClass, weekdays) = groupClassData
+                    onClassDataReceived(groupClass, weekdays)
+                }
+
+                val teacherClassData = dataState.teacherClassDataOrNull()
+                if (teacherClassData != null) {
+                    val (teacherClass, weekdays) = teacherClassData
+                    onClassDataReceived(teacherClass, weekdays)
+                }
+            }
+
+        disposables += presenter.uiStateObservable
+            .map { it.errorEvent }
+            .distinctUntilChanged()
+            .subscribe { errorEvent ->
+                if (errorEvent.error != null) {
+                    NavUtils.navigateUpFromSameTask(this)
+                    presenter.errorEventConsumed()
+                }
+            }
     }
 
     override fun onStop() {
@@ -122,13 +135,13 @@ class LessonInfoActivity :
         disposables.clear()
     }
 
-    private fun onClassDataReceived(classDescriptor: StudyGroupLesson, weekdays: List<String>) {
-        setFieldText(classDescriptor.subject, bindingStudyGroup.textviewSubject, bindingStudyGroup.imageviewSubject)
-        setFieldText(classDescriptor.type, bindingStudyGroup.textviewClassType, bindingStudyGroup.imageviewClassType)
-        setFieldText(classDescriptor.teacher, bindingStudyGroup.textviewTeacher, bindingStudyGroup.imageviewTeacher)
-        val classroom = classDescriptor.classroom
+    private fun onClassDataReceived(classData: StudyGroupLesson, weekdays: List<String>) {
+        setFieldText(classData.subject, bindingStudyGroup.textviewSubject, bindingStudyGroup.imageviewSubject)
+        setFieldText(classData.type, bindingStudyGroup.textviewClassType, bindingStudyGroup.imageviewClassType)
+        setFieldText(classData.teacher, bindingStudyGroup.textviewTeacher, bindingStudyGroup.imageviewTeacher)
+        val classroom = classData.classroom
         setFieldText(classroom, bindingStudyGroup.textviewClassroom, bindingStudyGroup.imageviewClassroom)
-        val time = "${classDescriptor.startTime} - ${classDescriptor.endTime}"
+        val time = "${classData.startTime} - ${classData.endTime}"
         setFieldText(time, bindingStudyGroup.textviewTime, bindingStudyGroup.imageviewTime)
 
         var weekdaysText: String = String.DEFAULT
@@ -139,20 +152,20 @@ class LessonInfoActivity :
         bindingStudyGroup.textviewWeekdays.text = weekdaysText
     }
 
-    private fun onClassDataReceived(classDescriptor: TeacherLesson, weekdays: List<String>) {
-        setFieldText(classDescriptor.subject, bindingTeacher.textviewSubject, bindingTeacher.imageviewSubject)
-        setFieldText(classDescriptor.classroom, bindingTeacher.textviewClassroom, bindingTeacher.imageviewClassroom)
-        val time = "${classDescriptor.startTime} - ${classDescriptor.endTime}"
+    private fun onClassDataReceived(classData: TeacherLesson, weekdays: List<String>) {
+        setFieldText(classData.subject, bindingTeacher.textviewSubject, bindingTeacher.imageviewSubject)
+        setFieldText(classData.classroom, bindingTeacher.textviewClassroom, bindingTeacher.imageviewClassroom)
+        val time = "${classData.startTime} - ${classData.endTime}"
         setFieldText(time, bindingTeacher.textviewTime, bindingTeacher.imageviewTime)
-        setFieldText(classDescriptor.type, bindingTeacher.textviewClassType, imageView = null)
-        val faculties = classDescriptor.faculty.replace(", ", "\n")
+        setFieldText(classData.type, bindingTeacher.textviewClassType, imageView = null)
+        val faculties = classData.faculty.replace(", ", "\n")
         setFieldText(faculties, bindingTeacher.textviewFaculties, imageView = null)
-        val groups = classDescriptor.groups.replace(", ", "\n")
+        val groups = classData.groups.replace(", ", "\n")
         setFieldText(groups, bindingTeacher.textviewGroups, imageView = null)
 
-        if (classDescriptor.type == String.DEFAULT &&
-            classDescriptor.faculty == String.DEFAULT &&
-            classDescriptor.groups == String.DEFAULT
+        if (classData.type == String.DEFAULT &&
+            classData.faculty == String.DEFAULT &&
+            classData.groups == String.DEFAULT
         ) {
             bindingTeacher.imageviewGroups.visibility = View.GONE
         }
