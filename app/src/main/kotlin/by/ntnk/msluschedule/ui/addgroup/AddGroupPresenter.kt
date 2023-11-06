@@ -18,6 +18,7 @@ import by.ntnk.msluschedule.utils.assertDebug
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
+import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.BehaviorSubject
 import javax.inject.Inject
@@ -62,11 +63,12 @@ class AddGroupPresenter @Inject constructor(
     val uiStateObservable: Observable<AddGroupUiState>
         get() = uiState
 
+    private val disposables: CompositeDisposable = CompositeDisposable()
     private var courseNetworkRequestDisposable: Disposable = CompositeDisposable()
     private var groupsNetworkRequestDisposable: Disposable = CompositeDisposable()
 
     init {
-        databaseRepository.getStudyGroups()
+        disposables += databaseRepository.getStudyGroups()
             .toList()
             .retry()
             .subscribeOn(schedulerProvider.io())
@@ -134,7 +136,7 @@ class AddGroupPresenter @Inject constructor(
             uiState.value!!.copy(facultyFilterUiState = uiState.value!!.facultyFilterUiState.copy(isLoading = true))
         )
 
-        networkRepository.getFaculties()
+        disposables += networkRepository.getFaculties()
             .doOnError { AndroidUtils.logException(it) }
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
@@ -283,5 +285,11 @@ class AddGroupPresenter @Inject constructor(
         } else {
             groupName
         }
+    }
+
+    override fun onCleared() {
+        disposables.clear()
+        courseNetworkRequestDisposable.dispose()
+        groupsNetworkRequestDisposable.dispose()
     }
 }

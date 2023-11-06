@@ -14,6 +14,8 @@ import by.ntnk.msluschedule.utils.SchedulerProvider
 import by.ntnk.msluschedule.utils.Utils
 import by.ntnk.msluschedule.utils.assertDebug
 import io.reactivex.Observable
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.BehaviorSubject
 import javax.inject.Inject
@@ -55,8 +57,10 @@ class AddTeacherPresenter @Inject constructor(
     val uiStateObservable: Observable<AddTeacherUiState>
         get() = uiState
 
+    private val disposables: CompositeDisposable = CompositeDisposable()
+
     init {
-        databaseRepository.getTeachers()
+        disposables += databaseRepository.getTeachers()
             .toList()
             .retry()
             .subscribeOn(schedulerProvider.io())
@@ -78,7 +82,7 @@ class AddTeacherPresenter @Inject constructor(
             uiState.value!!.copy(teacherFilterUiState = ScheduleFilterUiState(isLoading = true))
         )
 
-        networkRepository.getTeachers()
+        disposables += networkRepository.getTeachers()
             .doOnError { AndroidUtils.logException(it) }
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
@@ -138,5 +142,9 @@ class AddTeacherPresenter @Inject constructor(
         uiState.onNext(
             uiState.value!!.copy(errorEvent = ErrorUiEvent())
         )
+    }
+
+    override fun onCleared() {
+        disposables.clear()
     }
 }
