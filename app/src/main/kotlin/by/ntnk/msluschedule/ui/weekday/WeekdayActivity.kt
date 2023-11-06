@@ -473,11 +473,11 @@ class WeekdayActivity :
         }
 
         val subjects = weekday.classes
-            .map { classDescriptor ->
-                if (classDescriptor.type != String.DEFAULT) {
-                    "${classDescriptor.subject}, ${classDescriptor.type}"
+            .map { classData ->
+                if (classData.type != String.DEFAULT) {
+                    "${classData.subject}, ${classData.type}"
                 } else {
-                    classDescriptor.subject
+                    classData.subject
                 }
             }
             .toSet()

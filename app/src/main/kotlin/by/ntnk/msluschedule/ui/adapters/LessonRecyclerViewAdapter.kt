@@ -57,19 +57,19 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
             itemViews.add(DayItemView(weekday.id, weekday.value))
             if (weekday.classes.isNotEmpty()) {
                 var prevStartTime: String = String.DEFAULT
-                for (classDesciptor in weekday.classes) {
+                for (classData in weekday.classes) {
                     val classItemView: BaseItemView =
-                        when (classDesciptor) {
+                        when (classData) {
                             is StudyGroupLesson -> {
-                                val overlapsPreviousClass: Boolean = prevStartTime == classDesciptor.startTime
-                                StudyGroupClassItemView(classDesciptor, weekday.id, overlapsPreviousClass)
+                                val overlapsPreviousClass: Boolean = prevStartTime == classData.startTime
+                                StudyGroupClassItemView(classData, weekday.id, overlapsPreviousClass)
                             }
 
-                            is TeacherLesson -> TeacherClassItemView(classDesciptor, weekday.id)
+                            is TeacherLesson -> TeacherClassItemView(classData, weekday.id)
                             else -> throw IllegalStateException("Illegal class type!")
                         }
                     itemViews.add(classItemView)
-                    prevStartTime = classDesciptor.startTime
+                    prevStartTime = classData.startTime
                 }
             } else {
                 itemViews.add(BlankDayItemView())
@@ -119,7 +119,7 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
                     itemView.setOnClickListener {
                         if (bindingAdapterPosition != NO_POSITION) {
                             val item = itemViews[bindingAdapterPosition] as StudyGroupClassItemView
-                            if (item.classDesciptor.subject != String.DEFAULT) {
+                            if (item.classData.subject != String.DEFAULT) {
                                 onClickSubject.onNext(item)
                             }
                         }
@@ -149,7 +149,7 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
                     itemView.setOnClickListener {
                         if (bindingAdapterPosition != NO_POSITION) {
                             val item = itemViews[bindingAdapterPosition] as TeacherClassItemView
-                            if (item.classDesciptor.subject != String.DEFAULT) {
+                            if (item.classData.subject != String.DEFAULT) {
                                 onClickSubject.onNext(item)
                             }
                         }
@@ -237,7 +237,7 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
     }
 
     class StudyGroupClassItemView(
-        val classDesciptor: StudyGroupLesson,
+        val classData: StudyGroupLesson,
         val weekdayId: Int,
         val overlapsPreviousClass: Boolean
     ) : BaseItemView {
@@ -245,12 +245,12 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
 
         override fun bindViewHolder(viewHolder: RecyclerView.ViewHolder) {
             with(viewHolder as StudyGroupClassViewHolder) {
-                binding.textTimeStart.text = if (overlapsPreviousClass) String.DEFAULT else classDesciptor.startTime
-                binding.textTimeEnd.text = if (overlapsPreviousClass) String.DEFAULT else classDesciptor.endTime
-                binding.textSubject.text = classDesciptor.subject
-                binding.textTeacher.text = classDesciptor.teacher
-                binding.textClassroom.text = classDesciptor.classroom
-                binding.textClassType.text = classDesciptor.type.lowercase()
+                binding.textTimeStart.text = if (overlapsPreviousClass) String.DEFAULT else classData.startTime
+                binding.textTimeEnd.text = if (overlapsPreviousClass) String.DEFAULT else classData.endTime
+                binding.textSubject.text = classData.subject
+                binding.textTeacher.text = classData.teacher
+                binding.textClassroom.text = classData.classroom
+                binding.textClassType.text = classData.type.lowercase()
 
                 if (overlapsPreviousClass) {
                     binding.imageClassOverlap.visibility = View.VISIBLE
@@ -267,18 +267,18 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
         }
     }
 
-    class TeacherClassItemView(val classDesciptor: TeacherLesson, val weekdayId: Int) : BaseItemView {
+    class TeacherClassItemView(val classData: TeacherLesson, val weekdayId: Int) : BaseItemView {
         override val viewType: ItemViewType = ItemViewType.TEACHERCLASS
 
         override fun bindViewHolder(viewHolder: RecyclerView.ViewHolder) {
             with(viewHolder as TeacherClassViewHolder) {
-                binding.textTimeStart.text = classDesciptor.startTime
-                binding.textTimeEnd.text = classDesciptor.endTime
-                binding.textSubject.text = classDesciptor.subject
-                binding.textGroups.text = classDesciptor.groups
-                binding.textClassroom.text = classDesciptor.classroom
-                binding.textClassType.text = classDesciptor.type.lowercase()
-                binding.textFaculty.text = classDesciptor.faculty
+                binding.textTimeStart.text = classData.startTime
+                binding.textTimeEnd.text = classData.endTime
+                binding.textSubject.text = classData.subject
+                binding.textGroups.text = classData.groups
+                binding.textClassroom.text = classData.classroom
+                binding.textClassType.text = classData.type.lowercase()
+                binding.textFaculty.text = classData.faculty
 
                 if (binding.textClassType.text.isBlank()) {
                     binding.textClassType.visibility = View.GONE
@@ -325,16 +325,16 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
                         oldItemView as StudyGroupClassItemView
                         newItemView as StudyGroupClassItemView
                         oldItemView.weekdayId == newItemView.weekdayId &&
-                            oldItemView.classDesciptor.startTime == newItemView.classDesciptor.startTime &&
-                            oldItemView.classDesciptor.endTime == newItemView.classDesciptor.endTime
+                            oldItemView.classData.startTime == newItemView.classData.startTime &&
+                            oldItemView.classData.endTime == newItemView.classData.endTime
                     }
 
                     ItemViewType.TEACHERCLASS -> {
                         oldItemView as TeacherClassItemView
                         newItemView as TeacherClassItemView
                         oldItemView.weekdayId == newItemView.weekdayId &&
-                            oldItemView.classDesciptor.startTime == newItemView.classDesciptor.startTime &&
-                            oldItemView.classDesciptor.endTime == newItemView.classDesciptor.endTime
+                            oldItemView.classData.startTime == newItemView.classData.startTime &&
+                            oldItemView.classData.endTime == newItemView.classData.endTime
                     }
 
                     ItemViewType.DAY -> {
@@ -357,20 +357,20 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
                 ItemViewType.STUDYGROUPCLASS -> {
                     oldItemView as StudyGroupClassItemView
                     newItemView as StudyGroupClassItemView
-                    oldItemView.classDesciptor.subject == newItemView.classDesciptor.subject &&
-                        oldItemView.classDesciptor.type == newItemView.classDesciptor.type &&
-                        oldItemView.classDesciptor.classroom == newItemView.classDesciptor.classroom &&
-                        oldItemView.classDesciptor.teacher == newItemView.classDesciptor.teacher
+                    oldItemView.classData.subject == newItemView.classData.subject &&
+                        oldItemView.classData.type == newItemView.classData.type &&
+                        oldItemView.classData.classroom == newItemView.classData.classroom &&
+                        oldItemView.classData.teacher == newItemView.classData.teacher
                 }
 
                 ItemViewType.TEACHERCLASS -> {
                     oldItemView as TeacherClassItemView
                     newItemView as TeacherClassItemView
-                    oldItemView.classDesciptor.subject == newItemView.classDesciptor.subject &&
-                        oldItemView.classDesciptor.type == newItemView.classDesciptor.type &&
-                        oldItemView.classDesciptor.classroom == newItemView.classDesciptor.classroom &&
-                        oldItemView.classDesciptor.faculty == newItemView.classDesciptor.faculty &&
-                        oldItemView.classDesciptor.groups == newItemView.classDesciptor.groups
+                    oldItemView.classData.subject == newItemView.classData.subject &&
+                        oldItemView.classData.type == newItemView.classData.type &&
+                        oldItemView.classData.classroom == newItemView.classData.classroom &&
+                        oldItemView.classData.faculty == newItemView.classData.faculty &&
+                        oldItemView.classData.groups == newItemView.classData.groups
                 }
 
                 ItemViewType.DAY -> {

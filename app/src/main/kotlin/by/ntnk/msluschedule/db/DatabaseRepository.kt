@@ -213,7 +213,7 @@ class DatabaseRepository @Inject constructor(
         weekdayId: Int
     ): Single<List<StudyGroupLesson>> {
         return Observable.fromIterable(classes)
-            .map { classDescriptor -> DbStudyGroupLesson(classDescriptor, weekdayId) }
+            .map { classData -> DbStudyGroupLesson(classData, weekdayId) }
             .toList()
             .flatMap { dbClasses ->
                 appDatabase.studyGroupLessonDao.insert(dbClasses)
@@ -252,7 +252,7 @@ class DatabaseRepository @Inject constructor(
 
     private fun insertTeacherClasses(classes: List<TeacherLesson>, weekdayId: Int): Single<List<TeacherLesson>> {
         return Observable.fromIterable(classes)
-            .map { classDesciptor -> DbTeacherLesson(classDesciptor, weekdayId) }
+            .map { classData -> DbTeacherLesson(classData, weekdayId) }
             .toList()
             .flatMap { dbClasses ->
                 appDatabase.teacherLessonDao.insert(dbClasses)
@@ -269,31 +269,31 @@ class DatabaseRepository @Inject constructor(
 
     fun getStudyGroupLesson(id: Int): Single<StudyGroupLesson> {
         return appDatabase.studyGroupLessonDao.getLesson(id)
-            .map { classDescriptor ->
+            .map { classData ->
                 StudyGroupLesson(
-                    classDescriptor.id,
-                    classDescriptor.subject,
-                    classDescriptor.type,
-                    classDescriptor.classroom,
-                    classDescriptor.startTime,
-                    classDescriptor.endTime,
-                    classDescriptor.teacher
+                    classData.id,
+                    classData.subject,
+                    classData.type,
+                    classData.classroom,
+                    classData.startTime,
+                    classData.endTime,
+                    classData.teacher
                 )
             }
     }
 
     fun getTeacherLesson(id: Int): Single<TeacherLesson> {
         return appDatabase.teacherLessonDao.getLesson(id)
-            .map { classDescriptor ->
+            .map { classData ->
                 TeacherLesson(
-                    classDescriptor.id,
-                    classDescriptor.subject,
-                    classDescriptor.type,
-                    classDescriptor.classroom,
-                    classDescriptor.startTime,
-                    classDescriptor.endTime,
-                    classDescriptor.faculty,
-                    classDescriptor.groups
+                    classData.id,
+                    classData.subject,
+                    classData.type,
+                    classData.classroom,
+                    classData.startTime,
+                    classData.endTime,
+                    classData.faculty,
+                    classData.groups
                 )
             }
     }

@@ -39,7 +39,7 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
         getWorkbookFontAt: (Short) -> HSSFFont
     ): List<WeekdayWithStudyGroupLessons> {
         val weekdays = ArrayList<WeekdayWithStudyGroupLessons>(Days.num())
-        lateinit var weekdayDescriptor: WeekdayWithStudyGroupLessons
+        lateinit var weekdayData: WeekdayWithStudyGroupLessons
         lateinit var startTime: String
         lateinit var endTime: String
         lateinit var subject: String
@@ -54,8 +54,8 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
             when (cell.columnIndex) {
                 0 -> {
                     if (cell.stringCellValue.isNotEmpty()) {
-                        weekdayDescriptor = WeekdayWithStudyGroupLessons(id = AUTO_ID, value = cell.stringCellValue)
-                        weekdays.add(weekdayDescriptor)
+                        weekdayData = WeekdayWithStudyGroupLessons(id = AUTO_ID, value = cell.stringCellValue)
+                        weekdays.add(weekdayData)
                     }
                 }
 
@@ -104,7 +104,7 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
                     classroom = cell.stringCellValue.replace(" ", String.DEFAULT)
 
                     if (startTime.isNotEmpty() || subject.isNotEmpty()) {
-                        val classDescriptor =
+                        val classData =
                             StudyGroupLesson(
                                 AUTO_ID,
                                 subject,
@@ -121,10 +121,10 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
                                 isPreviousClassPhysEd = true
                             } else if (!(isPreviousClassPhysEd && subject.isBlank())) {
                                 isPreviousClassPhysEd = false
-                                weekdayDescriptor.classes.add(classDescriptor)
+                                weekdayData.classes.add(classData)
                             }
                         } else {
-                            weekdayDescriptor.classes.add(classDescriptor)
+                            weekdayData.classes.add(classData)
                         }
                     }
                 }
@@ -146,8 +146,8 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
         }
 
         if (weekdays.firstOrNull { it.value == Days.SUNDAY } == null) {
-            weekdayDescriptor = WeekdayWithStudyGroupLessons(id = AUTO_ID, value = Days.SUNDAY)
-            weekdays.add(weekdayDescriptor)
+            weekdayData = WeekdayWithStudyGroupLessons(id = AUTO_ID, value = Days.SUNDAY)
+            weekdays.add(weekdayData)
         }
 
         return weekdays
@@ -218,8 +218,8 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
                 } else if (hssfCell.columnIndex in 2..7) {
                     val weekday = weekdays[hssfCell.columnIndex - 2].classes
                     if (hssfCell.stringCellValue.isNotEmpty()) {
-                        val classDescriptor = parseCellToTeacherClass(hssfCell, startTime, endTime, getWorkbookFontAt)
-                        weekday.add(classDescriptor)
+                        val classData = parseCellToTeacherClass(hssfCell, startTime, endTime, getWorkbookFontAt)
+                        weekday.add(classData)
                     }
                 }
             }

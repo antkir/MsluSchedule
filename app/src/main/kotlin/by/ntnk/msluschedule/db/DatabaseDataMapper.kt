@@ -33,17 +33,17 @@ class DatabaseDataMapper @Inject constructor() {
 
     fun map(weekdayWithClasses: DbWeekdayWithTeacherLessons): WeekdayWithTeacherLessons {
         val classes = ArrayList<TeacherLesson>(weekdayWithClasses.lessons.size)
-        for (classDescriptor in weekdayWithClasses.lessons) {
+        for (classData in weekdayWithClasses.lessons) {
             classes.add(
                 TeacherLesson(
-                    classDescriptor.id,
-                    classDescriptor.subject,
-                    classDescriptor.type,
-                    classDescriptor.classroom,
-                    classDescriptor.startTime,
-                    classDescriptor.endTime,
-                    classDescriptor.faculty,
-                    classDescriptor.groups
+                    classData.id,
+                    classData.subject,
+                    classData.type,
+                    classData.classroom,
+                    classData.startTime,
+                    classData.endTime,
+                    classData.faculty,
+                    classData.groups
                 )
             )
         }
@@ -52,16 +52,16 @@ class DatabaseDataMapper @Inject constructor() {
 
     fun map(weekdayWithClasses: DbWeekdayWithStudyGroupLessons): WeekdayWithStudyGroupLessons {
         val classes = ArrayList<StudyGroupLesson>(weekdayWithClasses.lessons.size)
-        for (classDescriptor in weekdayWithClasses.lessons) {
+        for (classData in weekdayWithClasses.lessons) {
             classes.add(
                 StudyGroupLesson(
-                    classDescriptor.id,
-                    classDescriptor.subject,
-                    classDescriptor.type,
-                    classDescriptor.classroom,
-                    classDescriptor.startTime,
-                    classDescriptor.endTime,
-                    classDescriptor.teacher
+                    classData.id,
+                    classData.subject,
+                    classData.type,
+                    classData.classroom,
+                    classData.startTime,
+                    classData.endTime,
+                    classData.teacher
                 )
             )
         }

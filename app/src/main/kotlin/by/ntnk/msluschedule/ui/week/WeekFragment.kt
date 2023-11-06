@@ -159,12 +159,12 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
                     }
 
                     LessonRecyclerViewAdapter.ItemViewType.STUDYGROUPCLASS -> {
-                        val classId = (itemView as LessonRecyclerViewAdapter.StudyGroupClassItemView).classDesciptor.id
+                        val classId = (itemView as LessonRecyclerViewAdapter.StudyGroupClassItemView).classData.id
                         LessonInfoActivity.startActivity(requireContext(), classId, ScheduleType.STUDYGROUP, weekId)
                     }
 
                     LessonRecyclerViewAdapter.ItemViewType.TEACHERCLASS -> {
-                        val classId = (itemView as LessonRecyclerViewAdapter.TeacherClassItemView).classDesciptor.id
+                        val classId = (itemView as LessonRecyclerViewAdapter.TeacherClassItemView).classData.id
                         LessonInfoActivity.startActivity(requireContext(), classId, ScheduleType.TEACHER, weekId)
                     }
 

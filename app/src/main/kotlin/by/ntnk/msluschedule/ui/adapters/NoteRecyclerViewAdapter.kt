@@ -53,8 +53,8 @@ class NoteRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() 
         itemViews.clear()
 
         val sortedData = linkedMapOf<String, MutableList<Note>>()
-        for (classDescriptor in classes) {
-            val subject = getClassSubjectText(classDescriptor)
+        for (classData in classes) {
+            val subject = getClassSubjectText(classData)
             if (subject != String.DEFAULT) {
                 sortedData[subject] = mutableListOf()
             }
@@ -92,19 +92,19 @@ class NoteRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() 
         diffResult.dispatchUpdatesTo(this)
     }
 
-    private fun getClassSubjectText(classDescriptor: Lesson): String {
-        return if (classDescriptor.type != String.DEFAULT) {
-            "${classDescriptor.subject}, ${classDescriptor.type}"
+    private fun getClassSubjectText(classData: Lesson): String {
+        return if (classData.type != String.DEFAULT) {
+            "${classData.subject}, ${classData.type}"
         } else {
-            classDescriptor.subject
+            classData.subject
         }
     }
 
     private fun getClassTimeText(subject: String, classes: List<Lesson>): String {
-        val filteredClasses = classes.filter { classDescriptor -> getClassSubjectText(classDescriptor) == subject }
+        val filteredClasses = classes.filter { classData -> getClassSubjectText(classData) == subject }
         var time = String.DEFAULT
-        for ((index, classDescriptor) in filteredClasses.withIndex()) {
-            time += classDescriptor.startTime
+        for ((index, classData) in filteredClasses.withIndex()) {
+            time += classData.startTime
             if (index < filteredClasses.lastIndex) {
                 time += " / "
             }
