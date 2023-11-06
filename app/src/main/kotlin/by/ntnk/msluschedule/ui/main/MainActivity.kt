@@ -426,9 +426,6 @@ class MainActivity :
 
     override fun onDestroy() {
         super.onDestroy()
-        if (!isChangingConfigurations) {
-            presenter.clear()
-        }
         onThemeChangedDisposable.dispose()
         binding.fam.fabGroup.animate().setListener(null)
         binding.fam.fabTeacher.animate().setListener(null)

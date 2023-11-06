@@ -216,7 +216,7 @@ class MainPresenter @Inject constructor(
         sharedPreferencesRepository.isFirstAppLaunch = false
     }
 
-    fun clear() {
+    override fun onCleared() {
         disposables.clear()
     }
 }
