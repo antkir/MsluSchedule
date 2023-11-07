@@ -4,45 +4,44 @@ import by.ntnk.msluschedule.data.ScheduleContainer
 import by.ntnk.msluschedule.data.Week
 import by.ntnk.msluschedule.db.DatabaseRepository
 import by.ntnk.msluschedule.mvp.Presenter
+import by.ntnk.msluschedule.utils.AndroidUtils
 import by.ntnk.msluschedule.utils.CurrentDate
 import by.ntnk.msluschedule.utils.DEFAULT
+import by.ntnk.msluschedule.utils.ErrorType
 import by.ntnk.msluschedule.utils.SchedulerProvider
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
+import by.ntnk.msluschedule.utils.Utils
 import io.reactivex.Observable
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.BehaviorSubject
 import javax.inject.Inject
 
+data class DataState(
+    val data: List<Week>? = null,
+    val currentAcademicWeekIndex: Int = Int.DEFAULT
+)
+
+data class UiEvent(
+    val isTriggered: Boolean = false
+)
+
+data class ScheduleContainerDeletedUiEvent(
+    val isTriggered: Boolean = false,
+    val data: ScheduleContainer = ScheduleContainer.DEFAULT
+)
+
+data class ErrorUiEvent(
+    val error: ErrorType? = null
+)
+
 data class ScheduleUiState(
-    val isLoading: Boolean = false,
-    val weeks: List<Week>? = null,
-    val currentAcademicWeekIndex: Int = Int.DEFAULT,
-    val throwable: Throwable? = null
-) {
-    fun isData(): Boolean = weeks != null && currentAcademicWeekIndex != Int.DEFAULT
-    fun isError(): Boolean = throwable != null
-}
-
-data class ScheduleContainerDeletedEvent(
-    private var data: ScheduleContainer? = null,
-    private var throwable: Throwable? = null
-) {
-    fun isEvent(): Boolean = data != null
-
-    fun consumeEvent(): ScheduleContainer {
-        val dataCopy = data!!
-        data = null
-        return dataCopy
-    }
-
-    fun isError(): Boolean = throwable != null
-
-    fun consumeError(): Throwable {
-        val throwableCopy = throwable!!
-        throwable = null
-        return throwableCopy
-    }
-}
+    val dataState: DataState = DataState(),
+    val academicWeekChangedEvent: UiEvent = UiEvent(),
+    val scheduleContainerDeletedEvent: ScheduleContainerDeletedUiEvent = ScheduleContainerDeletedUiEvent(),
+    val errorEvent: ErrorUiEvent = ErrorUiEvent()
+)
 
 class WeeksContainerPresenter @Inject constructor(
     private val databaseRepository: DatabaseRepository,
@@ -51,30 +50,29 @@ class WeeksContainerPresenter @Inject constructor(
     private val schedulerProvider: SchedulerProvider
 ) : Presenter<WeeksContainerView>() {
 
-    private val academicWeek: BehaviorSubject<Int> = BehaviorSubject.createDefault(Int.DEFAULT)
+    private val uiState: BehaviorSubject<ScheduleUiState> = BehaviorSubject.createDefault(ScheduleUiState())
+    val uiStateObservable: Observable<ScheduleUiState>
+        get() = uiState
 
-    private val scheduleUiState: BehaviorSubject<ScheduleUiState> = BehaviorSubject.createDefault(ScheduleUiState())
-    val scheduleUiStateObservable: Observable<ScheduleUiState>
-        get() = scheduleUiState
+    private val disposables: CompositeDisposable = CompositeDisposable()
 
-    private val scheduleContainerDeletedEvent: BehaviorSubject<ScheduleContainerDeletedEvent> =
-        BehaviorSubject.createDefault(ScheduleContainerDeletedEvent())
-    val scheduleContainerDeletedEventObservable: Observable<ScheduleContainerDeletedEvent>
-        get() = scheduleContainerDeletedEvent
+    private var academicWeek: Int = Int.DEFAULT
 
     fun getSelectedScheduleContainer(): ScheduleContainer {
         return sharedPreferencesRepository.getSelectedScheduleContainer()
     }
 
-    fun isAcademicWeekChanged(): Boolean {
-        val academicWeekPrev = academicWeek.value
-        academicWeek.onNext(currentDate.academicWeek)
-        return academicWeek.value != academicWeekPrev
+    fun updateCurrentAcademicWeek() {
+        if (academicWeek != currentDate.academicWeek) {
+            uiState.onNext(
+                uiState.value!!.copy(academicWeekChangedEvent = UiEvent(isTriggered = true))
+            )
+        }
+        academicWeek = currentDate.academicWeek
     }
 
-    fun getWeeks(scheduleContainerId: Int) {
-        scheduleUiState.onNext(ScheduleUiState(isLoading = true))
-        databaseRepository.getWeeks(scheduleContainerId)
+    fun getData(scheduleContainer: ScheduleContainer) {
+        disposables += databaseRepository.getWeeks(scheduleContainer.id)
             .toList()
             .map { weeks ->
                 val currentAcademicWeekIndex = minOf(weeks.lastIndex, maxOf(currentDate.academicWeek, 0))
@@ -86,30 +84,72 @@ class WeeksContainerPresenter @Inject constructor(
                 }
                 Pair(filteredWeeks, currentAcademicWeekIndex)
             }
+            .doOnError { AndroidUtils.logException(it) }
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
                 onSuccess = { (weeks, currentAcademicWeekIndex) ->
-                    val data = ScheduleUiState(weeks = weeks, currentAcademicWeekIndex = currentAcademicWeekIndex)
-                    scheduleUiState.onNext(data)
+                    uiState.onNext(
+                        uiState.value!!.copy(dataState = DataState(weeks, currentAcademicWeekIndex))
+                    )
                 },
-                onError = { throwable -> scheduleUiState.onNext(ScheduleUiState(throwable = throwable)) }
+                onError = { throwable ->
+                    val error = Utils.getErrorType(throwable)
+                    uiState.onNext(
+                        uiState.value!!.copy(errorEvent = ErrorUiEvent(error = error))
+                    )
+                }
             )
     }
 
-    fun deleteScheduleContainer(scheduleContainer: ScheduleContainer) {
-        databaseRepository.deleteScheduleContainer(scheduleContainer.id)
+    fun deleteSelectedScheduleContainer() {
+        val scheduleContainer = sharedPreferencesRepository.getSelectedScheduleContainer()
+
+        disposables += databaseRepository.deleteScheduleContainer(scheduleContainer.id)
+            .doOnError { AndroidUtils.logException(it) }
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
                 onComplete = {
                     sharedPreferencesRepository.clearSelectedScheduleContainer()
-                    scheduleContainerDeletedEvent.onNext(ScheduleContainerDeletedEvent(data = scheduleContainer))
+                    uiState.onNext(
+                        uiState.value!!.copy(
+                            scheduleContainerDeletedEvent = ScheduleContainerDeletedUiEvent(
+                                isTriggered = true,
+                                data = scheduleContainer
+                            )
+                        )
+                    )
                 },
                 onError = { throwable ->
-                    scheduleContainerDeletedEvent.onNext(ScheduleContainerDeletedEvent(throwable = throwable))
+                    val error = Utils.getErrorType(throwable)
+                    uiState.onNext(
+                        uiState.value!!.copy(errorEvent = ErrorUiEvent(error = error))
+                    )
                 }
             )
+    }
+
+    fun academicWeekChangedEventConsumed() {
+        uiState.onNext(
+            uiState.value!!.copy(academicWeekChangedEvent = UiEvent())
+        )
+    }
+
+    fun scheduleContainerDeletedEventConsumed() {
+        uiState.onNext(
+            uiState.value!!.copy(scheduleContainerDeletedEvent = ScheduleContainerDeletedUiEvent())
+        )
+    }
+
+    fun errorEventConsumed() {
+        uiState.onNext(
+            uiState.value!!.copy(errorEvent = ErrorUiEvent())
+        )
+    }
+
+    override fun onCleared() {
+        disposables.clear()
     }
 
     companion object {

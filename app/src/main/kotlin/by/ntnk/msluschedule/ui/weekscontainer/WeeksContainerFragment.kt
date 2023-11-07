@@ -19,15 +19,17 @@ import by.ntnk.msluschedule.mvp.views.MvpFragment
 import by.ntnk.msluschedule.ui.adapters.WeekFragmentViewPagerAdapter
 import by.ntnk.msluschedule.ui.deleteschedule.DeleteScheduleFragment
 import by.ntnk.msluschedule.ui.weekscontainer.WeeksContainerPresenter.Companion.CENTRAL_VIEW_POSITION
-import by.ntnk.msluschedule.utils.AndroidUtils
 import by.ntnk.msluschedule.utils.DEFAULT
+import by.ntnk.msluschedule.utils.ErrorType
+import by.ntnk.msluschedule.utils.NetworkApiVersionError
+import by.ntnk.msluschedule.utils.NetworkError
+import by.ntnk.msluschedule.utils.NetworkTimeoutError
+import by.ntnk.msluschedule.utils.NoDataOnServerError
 import com.google.android.material.snackbar.Snackbar
 import dagger.Lazy
 import dagger.android.support.AndroidSupportInjection
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
-import io.reactivex.rxkotlin.subscribeBy
-import timber.log.Timber
 import javax.inject.Inject
 
 class WeeksContainerFragment :
@@ -110,41 +112,47 @@ class WeeksContainerFragment :
     override fun onStart() {
         super.onStart()
 
-        if (presenter.isAcademicWeekChanged()) {
-            val scheduleContainer = presenter.getSelectedScheduleContainer()
-            presenter.getWeeks(scheduleContainer.id)
-        }
+        presenter.updateCurrentAcademicWeek()
 
-        disposables += presenter.scheduleUiStateObservable
-            .subscribeBy(
-                onNext = { scheduleUiState ->
-                    if (scheduleUiState.isData()) {
-                        onData(scheduleUiState.weeks!!, scheduleUiState.currentAcademicWeekIndex)
-                    }
-
-                    if (scheduleUiState.isError()) {
-                        val throwable = scheduleUiState.throwable!!
-                        Timber.e(throwable)
-                        showError(throwable)
-                    }
+        disposables += presenter.uiStateObservable
+            .map { it.dataState }
+            .distinctUntilChanged()
+            .subscribe { dataState ->
+                if (dataState.data != null && dataState.currentAcademicWeekIndex != Int.DEFAULT) {
+                    onData(dataState.data, dataState.currentAcademicWeekIndex)
                 }
-            )
+            }
 
-        disposables += presenter.scheduleContainerDeletedEventObservable
-            .subscribeBy(
-                onNext = { scheduleContainerDeletedEvent ->
-                    if (scheduleContainerDeletedEvent.isEvent()) {
-                        val scheduleContainer = scheduleContainerDeletedEvent.consumeEvent()
-                        listener.onScheduleContainerDeleted(scheduleContainer)
-                    }
-
-                    if (scheduleContainerDeletedEvent.isError()) {
-                        val throwable = scheduleContainerDeletedEvent.consumeError()
-                        Timber.e(throwable)
-                        showError(throwable)
-                    }
+        disposables += presenter.uiStateObservable
+            .map { it.academicWeekChangedEvent }
+            .distinctUntilChanged()
+            .subscribe { academicWeekChangedEvent ->
+                if (academicWeekChangedEvent.isTriggered) {
+                    val scheduleContainer = presenter.getSelectedScheduleContainer()
+                    presenter.getData(scheduleContainer)
+                    presenter.academicWeekChangedEventConsumed()
                 }
-            )
+            }
+
+        disposables += presenter.uiStateObservable
+            .map { it.scheduleContainerDeletedEvent }
+            .distinctUntilChanged()
+            .subscribe { scheduleContainerDeletedEvent ->
+                if (scheduleContainerDeletedEvent.isTriggered) {
+                    listener.onScheduleContainerDeleted(scheduleContainerDeletedEvent.data)
+                    presenter.scheduleContainerDeletedEventConsumed()
+                }
+            }
+
+        disposables += presenter.uiStateObservable
+            .map { it.errorEvent }
+            .distinctUntilChanged()
+            .subscribe { errorEvent ->
+                if (errorEvent.error != null) {
+                    showError(errorEvent.error)
+                    presenter.errorEventConsumed()
+                }
+            }
     }
 
     override fun onStop() {
@@ -188,13 +196,23 @@ class WeeksContainerFragment :
 
     fun swapData() {
         val scheduleContainer = presenter.getSelectedScheduleContainer()
-        presenter.getWeeks(scheduleContainer.id)
+        presenter.getData(scheduleContainer)
     }
 
-    private fun showError(throwable: Throwable) {
-        val snackbar = Snackbar.make(binding.root, AndroidUtils.getErrorMessageResId(throwable), Snackbar.LENGTH_LONG)
+    private fun showError(error: ErrorType) {
+        val snackbar = Snackbar.make(binding.root, getErrorMessageResId(error), Snackbar.LENGTH_LONG)
         snackbar.anchorView = activity?.findViewById(R.id.fab_base)
         snackbar.show()
+    }
+
+    private fun getErrorMessageResId(error: ErrorType): Int {
+        return when (error) {
+            is NetworkError,
+            is NetworkTimeoutError -> R.string.error_website_unavailable
+            is NetworkApiVersionError -> R.string.error_network_api_version
+            is NoDataOnServerError -> R.string.error_no_data_on_server
+            else -> R.string.error_general
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -203,8 +221,7 @@ class WeeksContainerFragment :
     }
 
     override fun onDeleteScheduleContainerClick() {
-        val scheduleContainer = presenter.getSelectedScheduleContainer()
-        presenter.deleteScheduleContainer(scheduleContainer)
+        presenter.deleteSelectedScheduleContainer()
     }
 
     interface OnScheduleContainerDeletedListener {
