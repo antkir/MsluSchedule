@@ -160,17 +160,6 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
             }
 
         disposables += presenter.uiStateObservable
-            .map { it.facultyFilterUiState.key }
-            .distinctUntilChanged()
-            .subscribe { key ->
-                if (key != String.DEFAULT) {
-                    if (presenter.isCourseFilterUiStateDefault()) {
-                        presenter.downloadCourseFilter()
-                    }
-                }
-            }
-
-        disposables += presenter.uiStateObservable
             .map { it.courseFilterUiState.isLoading }
             .distinctUntilChanged()
             .subscribe { isLoading ->
@@ -187,17 +176,6 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
             .subscribe { dataState ->
                 if (dataState.data != null) {
                     onCourseFilterChanged(dataState.data)
-                }
-            }
-
-        disposables += presenter.uiStateObservable
-            .map { it.courseFilterUiState.key }
-            .distinctUntilChanged()
-            .subscribe { key ->
-                if (key != String.DEFAULT) {
-                    if (presenter.isGroupFilterUiStateDefault()) {
-                        presenter.downloadGroupFilter()
-                    }
                 }
             }
 

@@ -86,28 +86,28 @@ class AddGroupPresenter @Inject constructor(
         downloadFacultyFilter()
     }
 
-    fun isCourseFilterUiStateDefault(): Boolean {
-        return uiState.value?.courseFilterUiState == ScheduleFilterUiState()
-    }
-
-    fun isGroupFilterUiStateDefault(): Boolean {
-        return uiState.value?.groupFilterUiState == ScheduleFilterUiState()
-    }
-
     fun isGroupKeyDefault(): Boolean {
         return uiState.value?.groupFilterUiState?.key == String.DEFAULT
     }
 
     fun setFacultyKey(key: String) {
         uiState.onNext(
-            uiState.value!!.copy(facultyFilterUiState = uiState.value!!.facultyFilterUiState.copy(key = key))
+            uiState.value!!.copy(
+                facultyFilterUiState = uiState.value!!.facultyFilterUiState.copy(key = key)
+            )
         )
+
+        downloadCourseFilter()
     }
 
     fun setCourseKey(key: String) {
         uiState.onNext(
-            uiState.value!!.copy(courseFilterUiState = uiState.value!!.courseFilterUiState.copy(key = key))
+            uiState.value!!.copy(
+                courseFilterUiState = uiState.value!!.courseFilterUiState.copy(key = key)
+            )
         )
+
+        downloadGroupFilter()
     }
 
     fun setGroupKey(key: String) {
@@ -164,7 +164,7 @@ class AddGroupPresenter @Inject constructor(
             )
     }
 
-    fun downloadCourseFilter() {
+    private fun downloadCourseFilter() {
         assertDebug { uiState.value!!.courseFilterUiState == ScheduleFilterUiState() }
 
         uiState.onNext(
@@ -199,7 +199,7 @@ class AddGroupPresenter @Inject constructor(
             )
     }
 
-    fun downloadGroupFilter() {
+    private fun downloadGroupFilter() {
         assertDebug { uiState.value!!.groupFilterUiState == ScheduleFilterUiState() }
 
         uiState.onNext(
