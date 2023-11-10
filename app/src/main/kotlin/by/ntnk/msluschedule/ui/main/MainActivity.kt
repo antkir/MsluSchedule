@@ -41,10 +41,6 @@ import by.ntnk.msluschedule.ui.weekscontainer.WeeksContainerFragment
 import by.ntnk.msluschedule.utils.AndroidUtils
 import by.ntnk.msluschedule.utils.DEFAULT
 import by.ntnk.msluschedule.utils.ErrorType
-import by.ntnk.msluschedule.utils.NetworkApiVersionError
-import by.ntnk.msluschedule.utils.NetworkError
-import by.ntnk.msluschedule.utils.NetworkTimeoutError
-import by.ntnk.msluschedule.utils.NoDataOnServerError
 import by.ntnk.msluschedule.utils.ScheduleType
 import by.ntnk.msluschedule.utils.SimpleDrawerListener
 import by.ntnk.msluschedule.utils.dipToPixels
@@ -586,7 +582,8 @@ class MainActivity :
     }
 
     override fun showError(error: ErrorType) {
-        val snackbar = Snackbar.make(binding.content.layout, getErrorMessageResId(error), Snackbar.LENGTH_LONG)
+        val errorMessageResource = AndroidUtils.getErrorMessageResId(error)
+        val snackbar = Snackbar.make(binding.content.layout, errorMessageResource, Snackbar.LENGTH_LONG)
         snackbar.anchorView = binding.fam.fabBase
         ViewCompat.setOnApplyWindowInsetsListener(snackbar.view) { _, insets -> insets }
         snackbar.show()
@@ -676,16 +673,6 @@ class MainActivity :
     private fun consumePendingScheduleContainerId() {
         presenter.changeScheduleContainer(pendingScheduleContainerId)
         pendingScheduleContainerId = Int.DEFAULT
-    }
-
-    private fun getErrorMessageResId(error: ErrorType): Int {
-        return when (error) {
-            is NetworkError,
-            is NetworkTimeoutError -> R.string.error_website_unavailable
-            is NetworkApiVersionError -> R.string.error_network_api_version
-            is NoDataOnServerError -> R.string.error_no_data_on_server
-            else -> R.string.error_general
-        }
     }
 
     private companion object {

@@ -13,9 +13,6 @@ import by.ntnk.msluschedule.R
 import com.google.android.material.snackbar.Snackbar
 import io.reactivex.subjects.PublishSubject
 import timber.log.Timber
-import java.net.ConnectException
-import java.net.SocketTimeoutException
-import java.net.UnknownHostException
 import java.util.concurrent.ThreadLocalRandom
 
 val onThemeChanged: PublishSubject<Boolean> = PublishSubject.create()
@@ -70,14 +67,12 @@ object AndroidUtils {
         snackbar.show()
     }
 
-    fun getErrorMessageResId(throwable: Throwable): Int {
-        return when (throwable) {
-            is ConnectException -> R.string.error_website_unavailable
-            is HttpStatusException -> R.string.error_website_unavailable
-            is SocketTimeoutException -> R.string.error_website_unavailable
-            is UnknownHostException -> R.string.error_website_unavailable
-            is NetworkApiVersionException -> R.string.error_network_api_version
-            is NoDataOnServerException -> R.string.error_no_data_on_server
+    fun getErrorMessageResId(error: ErrorType): Int {
+        return when (error) {
+            is NetworkError,
+            is NetworkTimeoutError -> R.string.error_website_unavailable
+            is NetworkApiVersionError -> R.string.error_network_api_version
+            is NoDataOnServerError -> R.string.error_no_data_on_server
             else -> R.string.error_general
         }
     }

@@ -19,12 +19,9 @@ import by.ntnk.msluschedule.mvp.views.MvpFragment
 import by.ntnk.msluschedule.ui.adapters.WeekFragmentViewPagerAdapter
 import by.ntnk.msluschedule.ui.deleteschedule.DeleteScheduleFragment
 import by.ntnk.msluschedule.ui.weekscontainer.WeeksContainerPresenter.Companion.CENTRAL_VIEW_POSITION
+import by.ntnk.msluschedule.utils.AndroidUtils
 import by.ntnk.msluschedule.utils.DEFAULT
 import by.ntnk.msluschedule.utils.ErrorType
-import by.ntnk.msluschedule.utils.NetworkApiVersionError
-import by.ntnk.msluschedule.utils.NetworkError
-import by.ntnk.msluschedule.utils.NetworkTimeoutError
-import by.ntnk.msluschedule.utils.NoDataOnServerError
 import com.google.android.material.snackbar.Snackbar
 import dagger.Lazy
 import dagger.android.support.AndroidSupportInjection
@@ -200,19 +197,10 @@ class WeeksContainerFragment :
     }
 
     private fun showError(error: ErrorType) {
-        val snackbar = Snackbar.make(binding.root, getErrorMessageResId(error), Snackbar.LENGTH_LONG)
+        val errorMessageResource = AndroidUtils.getErrorMessageResId(error)
+        val snackbar = Snackbar.make(binding.root, errorMessageResource, Snackbar.LENGTH_LONG)
         snackbar.anchorView = activity?.findViewById(R.id.fab_base)
         snackbar.show()
-    }
-
-    private fun getErrorMessageResId(error: ErrorType): Int {
-        return when (error) {
-            is NetworkError,
-            is NetworkTimeoutError -> R.string.error_website_unavailable
-            is NetworkApiVersionError -> R.string.error_network_api_version
-            is NoDataOnServerError -> R.string.error_no_data_on_server
-            else -> R.string.error_general
-        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

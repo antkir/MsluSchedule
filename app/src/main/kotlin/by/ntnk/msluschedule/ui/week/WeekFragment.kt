@@ -38,8 +38,6 @@ import by.ntnk.msluschedule.utils.AndroidUtils
 import by.ntnk.msluschedule.utils.AndroidUtils.SNACKBAR_LENGTH_LONGER
 import by.ntnk.msluschedule.utils.DEFAULT
 import by.ntnk.msluschedule.utils.ErrorType
-import by.ntnk.msluschedule.utils.NetworkApiVersionError
-import by.ntnk.msluschedule.utils.NetworkError
 import by.ntnk.msluschedule.utils.NetworkTimeoutError
 import by.ntnk.msluschedule.utils.NoDataOnServerError
 import by.ntnk.msluschedule.utils.ScheduleType
@@ -442,8 +440,9 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     }
 
     private fun showError(error: ErrorType, showRetryButton: Boolean) {
+        val errorMessageResource = AndroidUtils.getErrorMessageResId(error)
         val baseFABMain = requireActivity().findViewById<FloatingActionButton>(R.id.fab_base)
-        val snackbar = Snackbar.make(requireView(), getErrorMessageResId(error), SNACKBAR_LENGTH_LONGER)
+        val snackbar = Snackbar.make(requireView(), errorMessageResource, SNACKBAR_LENGTH_LONGER)
         snackbar.anchorView = baseFABMain
         snackbar.setTextMaxLines(5)
         if (showRetryButton) {
@@ -458,16 +457,6 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
         }
         ViewCompat.setOnApplyWindowInsetsListener(snackbar.view) { _, insets -> insets }
         snackbar.show()
-    }
-
-    private fun getErrorMessageResId(error: ErrorType): Int {
-        return when (error) {
-            is NetworkError,
-            is NetworkTimeoutError -> R.string.error_website_unavailable
-            is NetworkApiVersionError -> R.string.error_network_api_version
-            is NoDataOnServerError -> R.string.error_no_data_on_server
-            else -> R.string.error_general
-        }
     }
 
     companion object {
