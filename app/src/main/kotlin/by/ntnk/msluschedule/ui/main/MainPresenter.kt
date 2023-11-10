@@ -12,6 +12,7 @@ import by.ntnk.msluschedule.utils.ErrorType
 import by.ntnk.msluschedule.utils.ScheduleType
 import by.ntnk.msluschedule.utils.SchedulerProvider
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
+import by.ntnk.msluschedule.utils.Utils
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -20,8 +21,6 @@ import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.BehaviorSubject
 import javax.inject.Inject
-
-object NewScheduleContainerError : ErrorType
 
 data class ErrorUiEvent(
     val error: ErrorType? = null
@@ -53,6 +52,7 @@ class MainPresenter @Inject constructor(
             .map { scheduleContainers ->
                 scheduleContainers.map { scheduleContainer -> formatScheduleContainerValue(scheduleContainer) }
             }
+            .doOnError { AndroidUtils.logException(it) }
             .retry()
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
@@ -95,11 +95,12 @@ class MainPresenter @Inject constructor(
                         )
                     )
                 },
-                onError = {
+                onError = { throwable ->
+                    val error = Utils.getErrorType(throwable)
                     uiState.onNext(
                         uiState.value!!.copy(
                             isLoading = false,
-                            errorEvent = ErrorUiEvent(error = NewScheduleContainerError)
+                            errorEvent = ErrorUiEvent(error = error)
                         )
                     )
                 }
@@ -129,11 +130,12 @@ class MainPresenter @Inject constructor(
                         )
                     )
                 },
-                onError = {
+                onError = { throwable ->
+                    val error = Utils.getErrorType(throwable)
                     uiState.onNext(
                         uiState.value!!.copy(
                             isLoading = false,
-                            errorEvent = ErrorUiEvent(error = NewScheduleContainerError)
+                            errorEvent = ErrorUiEvent(error = error)
                         )
                     )
                 }
@@ -167,7 +169,7 @@ class MainPresenter @Inject constructor(
         )
 
         disposables += databaseRepository.getScheduleContainer(scheduleContainerId)
-            .retry()
+            .doOnError { AndroidUtils.logException(it) }
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
@@ -179,6 +181,15 @@ class MainPresenter @Inject constructor(
                         uiState.value!!.copy(
                             isLoading = false,
                             selectedScheduleContainer = uiScheduleContainer
+                        )
+                    )
+                },
+                onError = { throwable ->
+                    val error = Utils.getErrorType(throwable)
+                    uiState.onNext(
+                        uiState.value!!.copy(
+                            isLoading = false,
+                            errorEvent = ErrorUiEvent(error = error)
                         )
                     )
                 }

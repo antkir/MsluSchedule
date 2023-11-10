@@ -8,6 +8,7 @@ import by.ntnk.msluschedule.data.Teacher
 import by.ntnk.msluschedule.db.DatabaseRepository
 import by.ntnk.msluschedule.network.NetworkRepository
 import by.ntnk.msluschedule.network.data.ScheduleFilter
+import by.ntnk.msluschedule.utils.CommonError
 import by.ntnk.msluschedule.utils.CurrentDate
 import by.ntnk.msluschedule.utils.DEFAULT
 import by.ntnk.msluschedule.utils.ScheduleType
@@ -206,7 +207,7 @@ class MainPresenterTest {
             MainUiState(selectedScheduleContainer = SELECTED_SCHEDULE_CONTAINER, isLoading = true),
             MainUiState(
                 selectedScheduleContainer = SELECTED_SCHEDULE_CONTAINER,
-                errorEvent = ErrorUiEvent(error = NewScheduleContainerError)
+                errorEvent = ErrorUiEvent(error = CommonError)
             )
         )
     }
@@ -235,7 +236,7 @@ class MainPresenterTest {
             MainUiState(selectedScheduleContainer = SELECTED_SCHEDULE_CONTAINER, isLoading = true),
             MainUiState(
                 selectedScheduleContainer = SELECTED_SCHEDULE_CONTAINER,
-                errorEvent = ErrorUiEvent(error = NewScheduleContainerError)
+                errorEvent = ErrorUiEvent(error = CommonError)
             )
         )
     }
