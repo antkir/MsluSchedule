@@ -23,7 +23,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.os.BundleCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.doOnLayout
-import androidx.core.view.isNotEmpty
 import androidx.core.widget.doOnTextChanged
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -41,6 +40,11 @@ import by.ntnk.msluschedule.ui.customviews.ItemSwipeCallback
 import by.ntnk.msluschedule.utils.AUTO_ID
 import by.ntnk.msluschedule.utils.AndroidUtils
 import by.ntnk.msluschedule.utils.DEFAULT
+import by.ntnk.msluschedule.utils.ErrorType
+import by.ntnk.msluschedule.utils.NetworkApiVersionError
+import by.ntnk.msluschedule.utils.NetworkError
+import by.ntnk.msluschedule.utils.NetworkTimeoutError
+import by.ntnk.msluschedule.utils.NoDataOnServerError
 import by.ntnk.msluschedule.utils.dipToPixels
 import by.ntnk.msluschedule.utils.getWidthMinusPadding
 import com.google.android.material.chip.Chip
@@ -355,73 +359,90 @@ class WeekdayActivity :
 
         binding.coordinatorLayout.viewTreeObserver.addOnGlobalLayoutListener(onKeyboardStateChangeListener)
 
-        disposables += presenter.weekdayUiStateObservable
-            .subscribeBy(
-                onNext = { weekdayUiState ->
-                    if (weekdayUiState == WeekdayUiState()) {
-                        presenter.getWeekday(weekdayId)
-                    }
-
-                    if (weekdayUiState.isData()) {
-                        val weekday = weekdayUiState.data!!
-                        onWeekdayData(weekday)
-
-                        if (presenter.isNotesUiStateDefault()) {
-                            presenter.observeNotes(weekday)
-                        }
-                    }
-
-                    if (weekdayUiState.isError()) {
-                        val throwable = weekdayUiState.throwable!!
-                        Timber.e(throwable)
-                        NavUtils.navigateUpFromSameTask(this)
-                    }
+        disposables += presenter.uiStateObservable
+            .map { it.isUiStateInitialized }
+            .distinctUntilChanged()
+            .subscribe { isUiStateInitialized ->
+                if (!isUiStateInitialized) {
+                    presenter.getWeekday(weekdayId)
                 }
-            )
+            }
 
-        disposables += presenter.notesUiStateObservable
-            .subscribeBy(
-                onNext = { notesUiState ->
-                    if (notesUiState.isData()) {
-                        val notes = notesUiState.data!!
-                        val weekday = presenter.getWeekdayData()
-                        onNotesData(notes, weekday.classes)
-                    }
-
-                    if (notesUiState.isError()) {
-                        val throwable = notesUiState.throwable!!
-                        Timber.e(throwable)
-                        NavUtils.navigateUpFromSameTask(this)
-                    }
+        disposables += presenter.uiStateObservable
+            .map { it.dataState }
+            .distinctUntilChanged()
+            .subscribe { dataState ->
+                if (dataState.data != null) {
+                    onWeekdayData(dataState.data)
                 }
-            )
+            }
 
-        disposables += presenter.noteChangeEventObservable
-            .subscribeBy(
-                onNext = { noteChangeEvent ->
-                    if (noteChangeEvent.isDataDeleted()) {
-                        val note = noteChangeEvent.consumeDataDeleted()
+        disposables += presenter.uiStateObservable
+            .map { it.notesState }
+            .distinctUntilChanged()
+            .subscribe { notesState ->
+                if (notesState.data != null && notesState.classes != null) {
+                    onNotesData(notesState.data, notesState.classes)
+                }
+            }
+
+        disposables += presenter.uiStateObservable
+            .map { it.weekdayDataReadyEvent }
+            .distinctUntilChanged()
+            .subscribe { weekdayDataReadyEvent ->
+                if (weekdayDataReadyEvent.isTriggered) {
+                    presenter.observeNotes(weekdayId)
+                    presenter.weekdayDataReadyEventConsumed()
+                }
+            }
+
+        disposables += presenter.uiStateObservable
+            .map { it.noteUpdatedEvent }
+            .distinctUntilChanged()
+            .subscribe { noteUpdatedEvent ->
+                if (noteUpdatedEvent.isTriggered) {
+                    if (noteUpdatedEvent.error != null) {
+                        val delay = ANIMATION_HIDE_EDIT_NOTE_LAYOUT_DURATION + ANIMATION_SHOW_FAB_DURATION
+                        showError(noteUpdatedEvent.error, delay)
+                    }
+
+                    presenter.noteUpdatedEventConsumed()
+                }
+            }
+
+        disposables += presenter.uiStateObservable
+            .map { it.noteDeletedEvent }
+            .distinctUntilChanged()
+            .subscribe { noteDeletedEvent ->
+                if (noteDeletedEvent.isTriggered) {
+                    if (noteDeletedEvent.data != null) {
                         val noteDeletedText = resources.getString(R.string.snackbar_note_deleted)
                         val snackbar = Snackbar.make(binding.coordinatorLayout, noteDeletedText, Snackbar.LENGTH_LONG)
                         snackbar.anchorView = binding.fabAddNote
                         snackbar.setAction(resources.getString(R.string.snackbar_action_undo)) {
-                            presenter.insertNote(note, weekdayId)
+                            presenter.insertNote(noteDeletedEvent.data, weekdayId)
                         }
                         snackbar.show()
                     }
 
-                    if (noteChangeEvent.isError()) {
-                        var delayMillis: Long = 0
-                        if (noteChangeEvent.isInserted() || noteChangeEvent.isUpdated()) {
-                            delayMillis = ANIMATION_HIDE_EDIT_NOTE_LAYOUT_DURATION + ANIMATION_SHOW_FAB_DURATION
-                        }
-
-                        val throwable = noteChangeEvent.consumeError()
-                        Timber.e(throwable)
-                        showError(throwable, delayMillis)
+                    if (noteDeletedEvent.error != null) {
+                        showError(noteDeletedEvent.error, delayMillis = 0)
                     }
+
+                    presenter.noteDeletedEventConsumed()
                 }
-            )
+            }
+
+        disposables += presenter.uiStateObservable
+            .map { it.errorEvent }
+            .distinctUntilChanged()
+            .subscribe { errorEvent ->
+                if (errorEvent.error != null) {
+                    presenter.errorEventConsumed()
+
+                    NavUtils.navigateUpFromSameTask(this)
+                }
+            }
     }
 
     override fun onStop() {
@@ -450,9 +471,6 @@ class WeekdayActivity :
 
     override fun onDestroy() {
         super.onDestroy()
-        if (!isChangingConfigurations) {
-            presenter.destroy()
-        }
         adapterOnClickDisposable.dispose()
         binding.layoutEditNote.animate().setListener(null)
     }
@@ -468,18 +486,10 @@ class WeekdayActivity :
     private fun onWeekdayData(weekday: WeekdayWithLessons<Lesson>) {
         supportActionBar?.title = AndroidUtils.getWeekdayFromTag(weekday.value, applicationContext)
 
-        if (binding.chipsSubjects.isNotEmpty()) {
-            return
-        }
+        binding.chipsSubjects.removeAllViews()
 
         val subjects = weekday.classes
-            .map { classData ->
-                if (classData.type != String.DEFAULT) {
-                    "${classData.subject}, ${classData.type}"
-                } else {
-                    classData.subject
-                }
-            }
+            .map { classData -> getClassSubjectText(classData) }
             .toSet()
 
         if (subjects.isEmpty()) {
@@ -515,6 +525,14 @@ class WeekdayActivity :
         }
     }
 
+    private fun getClassSubjectText(classData: Lesson): String {
+        return if (classData.type != String.DEFAULT) {
+            "${classData.subject}, ${classData.type}"
+        } else {
+            classData.subject
+        }
+    }
+
     private fun onNotesData(notes: List<Note>, classes: List<Lesson>) {
         val adapter = binding.recyclerviewNotes.adapter as NoteRecyclerViewAdapter
         adapter.onNewData(notes, classes)
@@ -525,13 +543,23 @@ class WeekdayActivity :
         }
     }
 
-    private fun showError(throwable: Throwable, delayMillis: Long) {
+    private fun showError(error: ErrorType, delayMillis: Long) {
         Handler(Looper.getMainLooper()).postDelayed({
-            val errorMessageResource = AndroidUtils.getErrorMessageResId(throwable)
+            val errorMessageResource = getErrorMessageResId(error)
             val snackbar = Snackbar.make(binding.root, errorMessageResource, Snackbar.LENGTH_LONG)
             snackbar.anchorView = binding.fabAddNote
             snackbar.show()
         }, delayMillis)
+    }
+
+    private fun getErrorMessageResId(error: ErrorType): Int {
+        return when (error) {
+            is NetworkError,
+            is NetworkTimeoutError -> R.string.error_website_unavailable
+            is NetworkApiVersionError -> R.string.error_network_api_version
+            is NoDataOnServerError -> R.string.error_no_data_on_server
+            else -> R.string.error_general
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

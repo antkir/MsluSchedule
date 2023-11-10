@@ -5,67 +5,57 @@ import by.ntnk.msluschedule.data.Note
 import by.ntnk.msluschedule.data.WeekdayWithLessons
 import by.ntnk.msluschedule.db.DatabaseRepository
 import by.ntnk.msluschedule.mvp.Presenter
+import by.ntnk.msluschedule.utils.AndroidUtils
+import by.ntnk.msluschedule.utils.ErrorType
 import by.ntnk.msluschedule.utils.ScheduleType
 import by.ntnk.msluschedule.utils.SchedulerProvider
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
-import by.ntnk.msluschedule.utils.assertDebug
+import by.ntnk.msluschedule.utils.Utils
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
+import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.BehaviorSubject
 import javax.inject.Inject
 
-data class WeekdayUiState(
-    val isLoading: Boolean = false,
-    val data: WeekdayWithLessons<Lesson>? = null,
-    val throwable: Throwable? = null
-) {
-    fun isData(): Boolean = data != null
-    fun isError(): Boolean = throwable != null
-}
+data class DataState(
+    val data: WeekdayWithLessons<Lesson>? = null
+)
 
-data class NotesUiState(
-    val isLoading: Boolean = false,
+data class NotesState(
     val data: List<Note>? = null,
-    val throwable: Throwable? = null
-) {
-    fun isData(): Boolean = data != null
-    fun isError(): Boolean = throwable != null
-}
+    val classes: List<Lesson>? = null
+)
 
-data class NoteChangeEvent(
-    private var isInserted: Boolean = false,
-    private var isDeleted: Boolean = false,
-    private var isUpdated: Boolean = false,
-    private var data: Note? = null,
-    private var throwable: Throwable? = null
-) {
-    fun isInserted(): Boolean = isInserted
+data class UiEvent(
+    val isTriggered: Boolean = false
+)
 
-    fun isDataDeleted(): Boolean = data != null && isDeleted
+data class NoteUpdatedUiEvent(
+    val isTriggered: Boolean = false,
+    val error: ErrorType? = null
+)
 
-    fun isUpdated(): Boolean = isUpdated
+data class NoteDeletedUiEvent(
+    val isTriggered: Boolean = false,
+    val data: Note? = null,
+    val error: ErrorType? = null
+)
 
-    fun consumeDataDeleted(): Note {
-        isDeleted = false
-        val note = data!!
-        data = null
-        return note
-    }
+data class ErrorUiEvent(
+    val error: ErrorType? = null
+)
 
-    fun isError(): Boolean = throwable != null
-
-    fun consumeError(): Throwable {
-        isInserted = false
-        isDeleted = false
-        isUpdated = false
-        val throwableCopy = throwable!!
-        throwable = null
-        return throwableCopy
-    }
-}
+data class WeekdayUiState(
+    val isUiStateInitialized: Boolean = false,
+    val dataState: DataState = DataState(),
+    val notesState: NotesState = NotesState(),
+    val weekdayDataReadyEvent: UiEvent = UiEvent(),
+    val noteUpdatedEvent: NoteUpdatedUiEvent = NoteUpdatedUiEvent(),
+    val noteDeletedEvent: NoteDeletedUiEvent = NoteDeletedUiEvent(),
+    val errorEvent: ErrorUiEvent = ErrorUiEvent()
+)
 
 class WeekdayPresenter @Inject constructor(
     private val databaseRepository: DatabaseRepository,
@@ -73,93 +63,155 @@ class WeekdayPresenter @Inject constructor(
     private val schedulerProvider: SchedulerProvider
 ) : Presenter<WeekdayView>() {
 
-    private val weekdayUiState: BehaviorSubject<WeekdayUiState> = BehaviorSubject.createDefault(WeekdayUiState())
-    val weekdayUiStateObservable: Observable<WeekdayUiState>
-        get() = weekdayUiState
+    private val uiState: BehaviorSubject<WeekdayUiState> = BehaviorSubject.createDefault(WeekdayUiState())
+    val uiStateObservable: Observable<WeekdayUiState>
+        get() = uiState
 
-    private val notesUiState: BehaviorSubject<NotesUiState> = BehaviorSubject.createDefault(NotesUiState())
-    val notesUiStateObservable: Observable<NotesUiState>
-        get() = notesUiState
-
-    private val noteChangeEvent: BehaviorSubject<NoteChangeEvent> =
-        BehaviorSubject.createDefault(NoteChangeEvent())
-    val noteChangeEventObservable: Observable<NoteChangeEvent>
-        get() = noteChangeEvent
-
-    private var notesDisposable: Disposable = CompositeDisposable()
+    private val disposables: CompositeDisposable = CompositeDisposable()
 
     fun getWeekday(id: Int) {
-        weekdayUiState.onNext(WeekdayUiState(isLoading = true))
-        when (sharedPreferencesRepository.getSelectedScheduleContainer().type) {
+        disposables += when (sharedPreferencesRepository.getSelectedScheduleContainer().type) {
             ScheduleType.STUDYGROUP -> databaseRepository.getWeekdayWithStudyGroupLessons(id)
             ScheduleType.TEACHER -> databaseRepository.getWeekdayWithTeacherLessons(id)
             else -> Single.error(NullPointerException())
         }
+            .doOnError { AndroidUtils.logException(it) }
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
-                onSuccess = { weekday -> weekdayUiState.onNext(WeekdayUiState(data = weekday)) },
-                onError = { throwable -> weekdayUiState.onNext(WeekdayUiState(throwable = throwable)) }
+                onSuccess = { weekday ->
+                    uiState.onNext(
+                        uiState.value!!.copy(
+                            dataState = DataState(weekday),
+                            weekdayDataReadyEvent = UiEvent(isTriggered = true)
+                        )
+                    )
+                },
+                onError = { throwable ->
+                    val error = Utils.getErrorType(throwable)
+                    uiState.onNext(
+                        uiState.value!!.copy(errorEvent = ErrorUiEvent(error = error))
+                    )
+                }
             )
     }
 
-    fun observeNotes(weekday: WeekdayWithLessons<Lesson>) {
-        notesUiState.onNext(NotesUiState(isLoading = true))
-        notesDisposable.dispose()
-        notesDisposable = databaseRepository.getNotesForWeekday(weekday.id)
+    fun observeNotes(weekdayId: Int) {
+        disposables += databaseRepository.getNotesForWeekday(weekdayId)
+            .doOnError { AndroidUtils.logException(it) }
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
-                onNext = { notes -> notesUiState.onNext(NotesUiState(data = notes)) },
-                onError = { throwable -> notesUiState.onNext(NotesUiState(throwable = throwable)) }
+                onNext = { notes ->
+                    val classes = uiState.value!!.dataState.data?.classes
+                    uiState.onNext(
+                        uiState.value!!.copy(notesState = NotesState(notes, classes))
+                    )
+                },
+                onError = { throwable ->
+                    val error = Utils.getErrorType(throwable)
+                    uiState.onNext(
+                        uiState.value!!.copy(errorEvent = ErrorUiEvent(error = error))
+                    )
+                }
             )
     }
 
     fun insertNote(note: Note, weekdayId: Int) {
-        databaseRepository.insertNote(note, weekdayId)
+        disposables += databaseRepository.insertNote(note, weekdayId)
+            .doOnError { AndroidUtils.logException(it) }
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
                 onError = { throwable ->
-                    noteChangeEvent.onNext(NoteChangeEvent(isInserted = true, throwable = throwable))
+                    val error = Utils.getErrorType(throwable)
+                    uiState.onNext(
+                        uiState.value!!.copy(
+                            noteUpdatedEvent = NoteUpdatedUiEvent(
+                                isTriggered = true,
+                                error = error
+                            )
+                        )
+                    )
                 }
             )
     }
 
     fun deleteNote(note: Note) {
-        databaseRepository.deleteNote(note.id)
+        disposables += databaseRepository.deleteNote(note.id)
+            .doOnError { AndroidUtils.logException(it) }
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
-                onComplete = { noteChangeEvent.onNext(NoteChangeEvent(isDeleted = true, data = note)) },
+                onComplete = {
+                    uiState.onNext(
+                        uiState.value!!.copy(
+                            noteDeletedEvent = NoteDeletedUiEvent(
+                                isTriggered = true,
+                                data = note
+                            )
+                        )
+                    )
+                },
                 onError = { throwable ->
-                    noteChangeEvent.onNext(NoteChangeEvent(isDeleted = true, throwable = throwable))
+                    val error = Utils.getErrorType(throwable)
+                    uiState.onNext(
+                        uiState.value!!.copy(
+                            noteDeletedEvent = NoteDeletedUiEvent(
+                                isTriggered = true,
+                                error = error
+                            )
+                        )
+                    )
                 }
             )
     }
 
     fun updateNote(note: Note, weekdayId: Int) {
-        databaseRepository.updateNote(note, weekdayId)
+        disposables += databaseRepository.updateNote(note, weekdayId)
+            .doOnError { AndroidUtils.logException(it) }
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
             .subscribeBy(
                 onError = { throwable ->
-                    noteChangeEvent.onNext(NoteChangeEvent(isUpdated = true, throwable = throwable))
+                    val error = Utils.getErrorType(throwable)
+                    uiState.onNext(
+                        uiState.value!!.copy(
+                            noteUpdatedEvent = NoteUpdatedUiEvent(
+                                isTriggered = true,
+                                error = error
+                            )
+                        )
+                    )
                 }
             )
     }
 
-    fun isNotesUiStateDefault(): Boolean {
-        return notesUiState.value == NotesUiState()
+    fun weekdayDataReadyEventConsumed() {
+        uiState.onNext(
+            uiState.value!!.copy(weekdayDataReadyEvent = UiEvent())
+        )
     }
 
-    fun getWeekdayData(): WeekdayWithLessons<Lesson> {
-        assertDebug { weekdayUiState.hasValue() }
-        assertDebug { weekdayUiState.value!!.isData() }
-        return weekdayUiState.value!!.data!!
+    fun noteUpdatedEventConsumed() {
+        uiState.onNext(
+            uiState.value!!.copy(noteUpdatedEvent = NoteUpdatedUiEvent())
+        )
     }
 
-    fun destroy() {
-        notesDisposable.dispose()
+    fun noteDeletedEventConsumed() {
+        uiState.onNext(
+            uiState.value!!.copy(noteDeletedEvent = NoteDeletedUiEvent())
+        )
+    }
+
+    fun errorEventConsumed() {
+        uiState.onNext(
+            uiState.value!!.copy(errorEvent = ErrorUiEvent())
+        )
+    }
+
+    override fun onCleared() {
+        disposables.clear()
     }
 }
