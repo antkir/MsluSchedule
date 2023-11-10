@@ -146,8 +146,10 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
             .distinctUntilChanged()
             .subscribe { errorEvent ->
                 if (errorEvent.error != null) {
-                    showError(errorEvent.error)
+                    listener.showError(errorEvent.error)
                     presenter.errorEventConsumed()
+
+                    dismiss()
                 }
             }
     }
@@ -179,11 +181,6 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
             data,
             isFilteringEnabled = true
         )
-    }
-
-    private fun showError(error: ErrorType) {
-        dismiss()
-        listener.showError(error)
     }
 
     interface DialogListener {

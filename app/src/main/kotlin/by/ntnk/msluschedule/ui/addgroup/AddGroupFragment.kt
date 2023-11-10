@@ -258,8 +258,10 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
             .distinctUntilChanged()
             .subscribe { errorEvent ->
                 if (errorEvent.error != null) {
-                    showError(errorEvent.error)
+                    listener.showError(errorEvent.error)
                     presenter.errorEventConsumed()
+
+                    dismiss()
                 }
             }
     }
@@ -272,11 +274,6 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
     override fun onDestroyView() {
         super.onDestroyView()
         fragmentBinding = null
-    }
-
-    private fun showError(error: ErrorType) {
-        dismiss()
-        listener.showError(error)
     }
 
     private fun onFacultyFilterChanged(data: ScheduleFilter) {
