@@ -70,6 +70,7 @@ class AddGroupPresenter @Inject constructor(
     init {
         disposables += databaseRepository.getStudyGroups()
             .toList()
+            .doOnError { AndroidUtils.logException(it) }
             .retry()
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())

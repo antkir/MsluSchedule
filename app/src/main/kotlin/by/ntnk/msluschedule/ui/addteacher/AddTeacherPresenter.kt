@@ -62,6 +62,7 @@ class AddTeacherPresenter @Inject constructor(
     init {
         disposables += databaseRepository.getTeachers()
             .toList()
+            .doOnError { AndroidUtils.logException(it) }
             .retry()
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
