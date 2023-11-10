@@ -124,8 +124,9 @@ class LessonInfoActivity :
             .distinctUntilChanged()
             .subscribe { errorEvent ->
                 if (errorEvent.error != null) {
-                    NavUtils.navigateUpFromSameTask(this)
                     presenter.errorEventConsumed()
+
+                    NavUtils.navigateUpFromSameTask(this)
                 }
             }
     }
