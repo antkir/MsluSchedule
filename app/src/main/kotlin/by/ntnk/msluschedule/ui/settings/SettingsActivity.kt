@@ -110,7 +110,7 @@ class SettingsActivity : AppCompatActivity(), HasAndroidInjector {
                 if (value != sharedPreferencesRepository.getThemeMode()) {
                     AppCompatDelegate.setDefaultNightMode(value.toInt())
                     onThemeChanged.onNext(true)
-                    activity?.recreate()
+                    requireActivity().recreate()
                 }
                 return@OnPreferenceChangeListener true
             }
@@ -160,11 +160,11 @@ class SettingsActivity : AppCompatActivity(), HasAndroidInjector {
 
             val libraries = findPreference<Preference>(getString(R.string.key_libraries))!!
             libraries.setOnPreferenceClickListener {
-                activity?.supportFragmentManager?.beginTransaction()
-                    ?.setCustomAnimations(R.anim.dialog_zoom_in, 0, 0, R.anim.dialog_zoom_out)
-                    ?.replace(android.R.id.content, SettingsLibrariesFragment())
-                    ?.addToBackStack(null)
-                    ?.commit()
+                requireActivity().supportFragmentManager.beginTransaction()
+                    .setCustomAnimations(R.anim.dialog_zoom_in, 0, 0, R.anim.dialog_zoom_out)
+                    .replace(android.R.id.content, SettingsLibrariesFragment())
+                    .addToBackStack(null)
+                    .commit()
                 return@setOnPreferenceClickListener true
             }
 

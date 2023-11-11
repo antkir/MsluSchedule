@@ -262,8 +262,8 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     }
 
     private fun hideActivityProgressIndicator() {
-        activity?.findViewById<View>(R.id.progressindicator)?.visibility = View.GONE
-        parentFragment?.view?.findViewById<ViewGroup>(R.id.viewpager_weeks)?.alpha = 1f
+        requireActivity().findViewById<View>(R.id.progressindicator)?.visibility = View.GONE
+        requireParentFragment().requireView().findViewById<ViewGroup>(R.id.viewpager_weeks)?.alpha = 1f
     }
 
     private fun setNotesStatus(weekdayId: Int) {

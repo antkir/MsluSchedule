@@ -30,7 +30,7 @@ class DeleteScheduleFragment : DialogFragment() {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
         try {
-            listener = parentFragment as DialogListener
+            listener = requireParentFragment() as DialogListener
         } catch (e: ClassCastException) {
             throw ClassCastException("$parentFragment must implement DialogListener")
         }

@@ -199,7 +199,7 @@ class WeeksContainerFragment :
     private fun showError(error: ErrorType) {
         val errorMessageResource = AndroidUtils.getErrorMessageResId(error)
         val snackbar = Snackbar.make(binding.root, errorMessageResource, Snackbar.LENGTH_LONG)
-        snackbar.anchorView = activity?.findViewById(R.id.fab_base)
+        snackbar.anchorView = requireActivity().findViewById(R.id.fab_base)
         snackbar.show()
     }
 
