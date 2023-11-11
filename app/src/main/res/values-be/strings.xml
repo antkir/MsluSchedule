@@ -68,7 +68,6 @@
     <string name="action_show_today">Выбраць сённяшні дзень</string>
     <string name="error_general">Адбылася памылка &#128542;</string>
     <string name="error_website_unavailable">Немагчыма звязацца з сайтам з раскладам</string>
-    <string name="snackbar_week_init_retry">Паўтарыць</string>
     <string name="text_week_no_classes">Няма заняткаў на гэтым тыдні. Удачы!</string>
 
     <string-array name="pref_theme_entries">

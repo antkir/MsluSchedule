@@ -18,7 +18,6 @@
     <dimen name="item_lesson_type_height">24dp</dimen>
     <dimen name="item_note_deleteicon_margin_right">24dp</dimen>
     <dimen name="textview_subhead_notes_height">36dp</dimen>
-    <dimen name="textview_zeronotes_padding">16dp</dimen>
     <dimen name="edittext_note_minheight">60dp</dimen>
     <dimen name="edittext_note_padding_start">16dp</dimen>
     <dimen name="edittext_note_padding_end">40dp</dimen>

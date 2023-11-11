@@ -13,7 +13,6 @@
     <color name="chip_text">#000000</color>
     <color name="app_bar_text">#FFFFFF</color>
 
-    <color name="state_pressed">#2C2C2C</color>
     <color name="item_highlight">#2C2C2C</color>
     <color name="nav_view_item_highlight">#1F1F1F</color>
     <color name="item_separator">#313131</color>
