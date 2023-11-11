@@ -64,7 +64,7 @@ class WeekPresenterTest {
     private val downloadStudyGroupScheduleTest = TestObserver.create<List<WeekdayWithStudyGroupLessons>>()
     private val downloadTeacherScheduleTest = TestObserver.create<List<WeekdayWithTeacherLessons>>()
     private val insertWeekdaysTest = TestObserver.create<Int>()
-    private val getNotesForWeekdayTest = TestObserver.create<Int>()
+    private val getNotesForWeekdayReactiveTest = TestObserver.create<Int>()
 
     @Before
     fun setUp() {
@@ -130,10 +130,10 @@ class WeekPresenterTest {
                 Completable.complete()
                     .doOnSubscribe { disposable -> insertWeekdaysTest.onSubscribe(disposable) }
             )
-        whenever(databaseRepository.getNotesForWeekday(anyInt()))
+        whenever(databaseRepository.getNotesForWeekdayReactive(anyInt()))
             .thenReturn(
                 Observable.just(listOf(Note(id = 0, text = String.DEFAULT, subject = String.DEFAULT)))
-                    .doOnSubscribe { disposable -> getNotesForWeekdayTest.onSubscribe(disposable) }
+                    .doOnSubscribe { disposable -> getNotesForWeekdayReactiveTest.onSubscribe(disposable) }
             )
         whenever(networkRepository.getSchedule(any<StudyGroup>(), anyInt()))
             .thenReturn(

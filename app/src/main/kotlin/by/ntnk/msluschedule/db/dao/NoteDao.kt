@@ -10,7 +10,7 @@ import io.reactivex.Single
 @Dao
 interface NoteDao : BaseDao<DbNote> {
     @Query("SELECT * FROM DbNote WHERE weekdayId=:weekdayId ORDER BY id")
-    fun getNotesForWeekday(weekdayId: Int): Observable<List<DbNote>>
+    fun getNotesForWeekdayReactive(weekdayId: Int): Observable<List<DbNote>>
 
     @Query("DELETE FROM DbNote WHERE id=:id")
     fun delete(id: Int): Completable

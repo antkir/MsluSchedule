@@ -97,7 +97,7 @@ class WeekdayPresenter @Inject constructor(
     }
 
     fun observeNotes(weekdayId: Int) {
-        disposables += databaseRepository.getNotesForWeekday(weekdayId)
+        disposables += databaseRepository.getNotesForWeekdayReactive(weekdayId)
             .doOnError { AndroidUtils.logException(it) }
             .subscribeOn(schedulerProvider.io())
             .observeOn(schedulerProvider.ui())
