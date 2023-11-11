@@ -257,4 +257,8 @@ class WeekPresenter @Inject constructor(
             uiState.value!!.copy(errorEvent = ErrorUiEvent())
         )
     }
+
+    override fun onCleared() {
+        disposables.clear()
+    }
 }
