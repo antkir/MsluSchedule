@@ -1,7 +1,7 @@
 package by.ntnk.msluschedule.network.api.original
 
 import by.ntnk.msluschedule.network.api.original.data.JsonBody
-import io.reactivex.Single
+import io.reactivex.rxjava3.core.Single
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Field

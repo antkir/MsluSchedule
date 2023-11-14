@@ -19,9 +19,9 @@ import by.ntnk.msluschedule.di.PerApp
 import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.utils.DEFAULT
 import by.ntnk.msluschedule.utils.ScheduleType
-import io.reactivex.Completable
-import io.reactivex.Observable
-import io.reactivex.Single
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Single
 import javax.inject.Inject
 
 @PerApp

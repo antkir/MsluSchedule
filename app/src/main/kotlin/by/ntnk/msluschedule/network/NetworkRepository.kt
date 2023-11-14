@@ -5,8 +5,8 @@ import by.ntnk.msluschedule.data.Teacher
 import by.ntnk.msluschedule.data.WeekdayWithStudyGroupLessons
 import by.ntnk.msluschedule.data.WeekdayWithTeacherLessons
 import by.ntnk.msluschedule.network.data.ScheduleFilter
-import io.reactivex.Observable
-import io.reactivex.Single
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Single
 
 interface NetworkRepository {
     fun getFaculties(): Single<ScheduleFilter>

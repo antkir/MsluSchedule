@@ -24,8 +24,8 @@ import by.ntnk.msluschedule.utils.firstOrDefault
 import by.ntnk.msluschedule.utils.takeIfOrDefault
 import by.ntnk.msluschedule.utils.takeUnlessOrDefault
 import com.squareup.moshi.JsonDataException
-import io.reactivex.Observable
-import io.reactivex.Single
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Single
 import org.threeten.bp.DayOfWeek
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime

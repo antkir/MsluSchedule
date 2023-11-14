@@ -4,7 +4,7 @@ import by.ntnk.msluschedule.network.api.myuniversity.data.JsonGroupClasses
 import by.ntnk.msluschedule.network.api.myuniversity.data.JsonGroups
 import by.ntnk.msluschedule.network.api.myuniversity.data.JsonTeacherClasses
 import by.ntnk.msluschedule.network.api.myuniversity.data.JsonTeachers
-import io.reactivex.Single
+import io.reactivex.rxjava3.core.Single
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path

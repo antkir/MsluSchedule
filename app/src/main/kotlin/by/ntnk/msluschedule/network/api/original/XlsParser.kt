@@ -8,7 +8,7 @@ import by.ntnk.msluschedule.utils.AUTO_ID
 import by.ntnk.msluschedule.utils.Days
 import by.ntnk.msluschedule.utils.DEFAULT
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
-import io.reactivex.Observable
+import io.reactivex.rxjava3.core.Observable
 import org.apache.poi.hssf.usermodel.HSSFFont
 import org.apache.poi.hssf.usermodel.HSSFRichTextString
 import org.apache.poi.hssf.usermodel.HSSFWorkbook

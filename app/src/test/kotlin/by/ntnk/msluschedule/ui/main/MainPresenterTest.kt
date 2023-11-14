@@ -14,11 +14,11 @@ import by.ntnk.msluschedule.utils.DEFAULT
 import by.ntnk.msluschedule.utils.ScheduleType
 import by.ntnk.msluschedule.utils.SchedulerProvider
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
-import io.reactivex.Completable
-import io.reactivex.Observable
-import io.reactivex.Single
-import io.reactivex.observers.TestObserver
-import io.reactivex.schedulers.Schedulers
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.observers.TestObserver
+import io.reactivex.rxjava3.schedulers.Schedulers
 import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentMatchers.eq
@@ -129,16 +129,10 @@ class MainPresenterTest {
         // when
         presenter.addGroup(studyGroup)
         // then
-        getScheduleContainersReactiveTest.assertSubscribed()
-        insertStudyGroupTest.assertSubscribed()
-        getWeeksTest.assertSubscribed()
-        insertWeeksGetIdsTest.assertSubscribed()
-        deleteScheduleContainerTest.assertNotSubscribed()
         verify(networkRepository).getWeeks()
         verify(databaseRepository).insertStudyGroup(any())
         verify(databaseRepository).insertWeeksGetIds(any(), eq(0))
         verify(sharedPreferencesRepository).setSelectedScheduleContainer(any())
-        uiStateObserver.assertSubscribed()
         uiStateObserver.assertNoErrors()
         uiStateObserver.assertValues(
             MainUiState(selectedScheduleContainer = SELECTED_SCHEDULE_CONTAINER),
@@ -158,16 +152,10 @@ class MainPresenterTest {
         // when
         presenter.addTeacher(teacher)
         // then
-        getScheduleContainersReactiveTest.assertSubscribed()
-        insertTeacherTest.assertSubscribed()
-        getWeeksTest.assertSubscribed()
-        insertWeeksGetIdsTest.assertSubscribed()
-        deleteScheduleContainerTest.assertNotSubscribed()
         verify(networkRepository).getWeeks()
         verify(databaseRepository).insertTeacher(any())
         verify(databaseRepository).insertWeeksGetIds(any(), eq(0))
         verify(sharedPreferencesRepository).setSelectedScheduleContainer(any())
-        uiStateObserver.assertSubscribed()
         uiStateObserver.assertNoErrors()
         uiStateObserver.assertValues(
             MainUiState(selectedScheduleContainer = SELECTED_SCHEDULE_CONTAINER),
@@ -192,15 +180,9 @@ class MainPresenterTest {
         // when
         presenter.addGroup(studyGroup)
         // then
-        getScheduleContainersReactiveTest.assertSubscribed()
-        insertStudyGroupTest.assertSubscribed()
-        getWeeksTest.assertNotSubscribed()
-        insertWeeksGetIdsTest.assertNotSubscribed()
-        deleteScheduleContainerTest.assertSubscribed()
         verify(networkRepository).getWeeks()
         verify(databaseRepository).deleteScheduleContainer(eq(0))
         verify(sharedPreferencesRepository, times(0)).setSelectedScheduleContainer(any())
-        uiStateObserver.assertSubscribed()
         uiStateObserver.assertNoErrors()
         uiStateObserver.assertValues(
             MainUiState(selectedScheduleContainer = SELECTED_SCHEDULE_CONTAINER),
@@ -221,15 +203,9 @@ class MainPresenterTest {
         // when
         presenter.addTeacher(teacher)
         // then
-        getScheduleContainersReactiveTest.assertSubscribed()
-        insertTeacherTest.assertSubscribed()
-        getWeeksTest.assertNotSubscribed()
-        insertWeeksGetIdsTest.assertNotSubscribed()
-        deleteScheduleContainerTest.assertSubscribed()
         verify(networkRepository).getWeeks()
         verify(databaseRepository).deleteScheduleContainer(eq(0))
         verify(sharedPreferencesRepository, times(0)).setSelectedScheduleContainer(any())
-        uiStateObserver.assertSubscribed()
         uiStateObserver.assertNoErrors()
         uiStateObserver.assertValues(
             MainUiState(selectedScheduleContainer = SELECTED_SCHEDULE_CONTAINER),

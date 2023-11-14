@@ -23,8 +23,8 @@ import by.ntnk.msluschedule.databinding.ItemDayBinding
 import by.ntnk.msluschedule.databinding.ItemDayEndBinding
 import by.ntnk.msluschedule.utils.AndroidUtils
 import by.ntnk.msluschedule.utils.DEFAULT
-import io.reactivex.Observable
-import io.reactivex.subjects.PublishSubject
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.subjects.PublishSubject
 
 class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 

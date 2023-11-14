@@ -95,10 +95,9 @@ ext {
     recyclerviewVersion = '1.3.2'
     retrofitVersion = '2.9.0'
     roomVersion = '2.6.0'
-    rxandroidVersion = '2.1.1'
-    // RxJava 3.1.0 release bumps minimum requirements to Android 5+.
-    rxjavaVersion = '2.2.21'
-    rxkotlinVersion = '2.4.0'
+    rxandroidVersion = '3.0.2'
+    rxjavaVersion = '3.1.8'
+    rxkotlinVersion = '3.0.1'
     spotlightVersion = '2.0.5'
     swiperefreshlayoutVersion = '1.1.0'
     testextjunitVersion = '1.1.5'
@@ -118,7 +117,7 @@ dependencies {
     implementation "androidx.preference:preference-ktx:$preferenceVersion"
     implementation "androidx.recyclerview:recyclerview:$recyclerviewVersion"
     implementation "androidx.room:room-runtime:$roomVersion"
-    implementation "androidx.room:room-rxjava2:$roomVersion"
+    implementation "androidx.room:room-rxjava3:$roomVersion"
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:$swiperefreshlayoutVersion"
     implementation "androidx.window:window:$windowVersion"
     kapt "androidx.room:room-compiler:$roomVersion"
@@ -140,14 +139,14 @@ dependencies {
     implementation "org.apache.poi:poi:$poiVersion"
     // Retrofit
     implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
-    implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofitVersion"
+    implementation "com.squareup.retrofit2:adapter-rxjava3:$retrofitVersion"
     implementation "com.squareup.retrofit2:converter-moshi:$retrofitVersion"
     // RxAndroid
-    implementation "io.reactivex.rxjava2:rxandroid:$rxandroidVersion"
+    implementation "io.reactivex.rxjava3:rxandroid:$rxandroidVersion"
     // RxJava
-    implementation "io.reactivex.rxjava2:rxjava:$rxjavaVersion"
+    implementation "io.reactivex.rxjava3:rxjava:$rxjavaVersion"
     // RxKotlin
-    implementation "io.reactivex.rxjava2:rxkotlin:$rxkotlinVersion"
+    implementation "io.reactivex.rxjava3:rxkotlin:$rxkotlinVersion"
     // Spotlight
     implementation "com.github.takusemba:spotlight:$spotlightVersion"
     // Timber

@@ -13,8 +13,8 @@ import by.ntnk.msluschedule.data.Note
 import by.ntnk.msluschedule.databinding.ItemNoteBinding
 import by.ntnk.msluschedule.databinding.ItemSubjectBinding
 import by.ntnk.msluschedule.utils.DEFAULT
-import io.reactivex.Observable
-import io.reactivex.subjects.PublishSubject
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.subjects.PublishSubject
 import kotlin.math.absoluteValue
 
 class NoteRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {

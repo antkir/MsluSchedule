@@ -18,11 +18,11 @@ import by.ntnk.msluschedule.utils.ScheduleType
 import by.ntnk.msluschedule.utils.SchedulerProvider
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
 import by.ntnk.msluschedule.utils.Utils
-import io.reactivex.Completable
-import io.reactivex.Observable
-import io.reactivex.Single
-import io.reactivex.observers.TestObserver
-import io.reactivex.schedulers.Schedulers
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.observers.TestObserver
+import io.reactivex.rxjava3.schedulers.Schedulers
 import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyInt
@@ -178,14 +178,6 @@ class WeekPresenterTest {
         // when
         presenter.getData(scheduleContainer, weekId)
         // then
-        isWeekInitializedTest.assertSubscribed()
-        insertWeekdaysTest.assertSubscribed()
-        getStudyGroupTest.assertSubscribed()
-        getWeekKeyTest.assertSubscribed()
-        downloadStudyGroupScheduleTest.assertSubscribed()
-        deleteLessonsForWeekTest.assertSubscribed()
-        insertStudyGroupScheduleTest.assertSubscribed()
-        uiStateObserver.assertSubscribed()
         uiStateObserver.assertNoErrors()
         uiStateObserver.assertValues(
             WeekUiState(),
@@ -226,10 +218,7 @@ class WeekPresenterTest {
         // when
         presenter.getData(scheduleContainer, weekId)
         // then
-        isWeekInitializedTest.assertSubscribed()
-        insertWeekdaysTest.assertSubscribed()
         insertWeekdaysTest.assertError(expectedThrowable)
-        uiStateObserver.assertSubscribed()
         uiStateObserver.assertNoErrors()
         uiStateObserver.assertValues(
             WeekUiState(),
@@ -268,13 +257,7 @@ class WeekPresenterTest {
         // when
         presenter.getData(scheduleContainer, weekId)
         // then
-        isWeekInitializedTest.assertSubscribed()
-        insertWeekdaysTest.assertSubscribed()
-        getStudyGroupTest.assertSubscribed()
-        getWeekKeyTest.assertSubscribed()
-        downloadStudyGroupScheduleTest.assertSubscribed()
         downloadStudyGroupScheduleTest.assertError(expectedThrowable)
-        uiStateObserver.assertSubscribed()
         uiStateObserver.assertNoErrors()
         uiStateObserver.assertValues(
             WeekUiState(),
@@ -308,9 +291,6 @@ class WeekPresenterTest {
         // when
         presenter.getData(scheduleContainer, weekId)
         // then
-        isWeekInitializedTest.assertSubscribed()
-        insertWeekdaysTest.assertNotSubscribed()
-        uiStateObserver.assertSubscribed()
         uiStateObserver.assertNoErrors()
         uiStateObserver.assertValues(
             WeekUiState(),
@@ -342,9 +322,7 @@ class WeekPresenterTest {
         // when
         presenter.getData(scheduleContainer, weekId)
         // then
-        getWeekdayWithStudyGroupLessonsForWeekTest.assertSubscribed()
         getWeekdayWithStudyGroupLessonsForWeekTest.assertError(expectedThrowable)
-        uiStateObserver.assertSubscribed()
         uiStateObserver.assertNoErrors()
         uiStateObserver.assertValues(
             WeekUiState(),
@@ -366,12 +344,6 @@ class WeekPresenterTest {
         // when
         presenter.updateSchedule(scheduleContainer, weekId)
         // then
-        getStudyGroupTest.assertSubscribed()
-        getWeekKeyTest.assertSubscribed()
-        downloadStudyGroupScheduleTest.assertSubscribed()
-        deleteLessonsForWeekTest.assertSubscribed()
-        insertStudyGroupScheduleTest.assertSubscribed()
-        uiStateObserver.assertSubscribed()
         uiStateObserver.assertNoErrors()
         uiStateObserver.assertValues(
             WeekUiState(),
@@ -403,11 +375,7 @@ class WeekPresenterTest {
         // when
         presenter.updateSchedule(scheduleContainer, weekId)
         // then
-        getStudyGroupTest.assertSubscribed()
-        getWeekKeyTest.assertSubscribed()
-        downloadStudyGroupScheduleTest.assertSubscribed()
         downloadStudyGroupScheduleTest.assertError(expectedThrowable)
-        uiStateObserver.assertSubscribed()
         uiStateObserver.assertNoErrors()
         uiStateObserver.assertValues(
             WeekUiState(),

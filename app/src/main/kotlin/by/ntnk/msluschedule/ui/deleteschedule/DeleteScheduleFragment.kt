@@ -11,9 +11,9 @@ import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.utils.SchedulerProvider
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.android.support.AndroidSupportInjection
-import io.reactivex.Observable
-import io.reactivex.disposables.Disposable
-import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.disposables.Disposable
+import io.reactivex.rxjava3.kotlin.subscribeBy
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject

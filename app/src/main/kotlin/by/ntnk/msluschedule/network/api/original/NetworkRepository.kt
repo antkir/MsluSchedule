@@ -16,9 +16,9 @@ import by.ntnk.msluschedule.utils.NetworkApiVersion
 import by.ntnk.msluschedule.utils.NetworkApiVersionException
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
 import by.ntnk.msluschedule.utils.Utils
-import io.reactivex.Completable
-import io.reactivex.Observable
-import io.reactivex.Single
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Single
 import retrofit2.Response
 import java.io.InputStream
 import javax.inject.Inject
@@ -94,7 +94,7 @@ class NetworkRepository @Inject constructor(
      * so we make sure everything will work by creating and closing
      * a session on every batch of related requests.
      */
-    private inline fun <T> wrapRequest(request: () -> Single<T>): Single<T> {
+    private inline fun <T : Any> wrapRequest(request: () -> Single<T>): Single<T> {
         return initSession()
             .andThen(request())
             .doOnEvent { _, _ -> closeSession() }
@@ -156,7 +156,10 @@ class NetworkRepository @Inject constructor(
                 requestData.selectedValue
             )
             .doOnSuccess { response -> checkErrors(response) }
-            .map { response -> response.body() }
+            .map { response ->
+                val body = response.body()
+                if (body != null) body else throw NullPointerException()
+            }
     }
 
     private fun getHtmlBody(scheduleType: String): Single<String> {
@@ -170,7 +173,10 @@ class NetworkRepository @Inject constructor(
         return scheduleService
             .getSchedule(scheduleType)
             .doOnSuccess { response -> checkErrors(response) }
-            .map { response -> response.body()?.byteStream() }
+            .map { response ->
+                val body = response.body()
+                if (body != null) body.byteStream() else throw NullPointerException()
+            }
     }
 
     private fun <T> checkErrors(response: Response<T>) {

@@ -3,7 +3,7 @@ package by.ntnk.msluschedule.db.dao
 import androidx.room.Dao
 import androidx.room.Query
 import by.ntnk.msluschedule.db.data.Week
-import io.reactivex.Single
+import io.reactivex.rxjava3.core.Single
 
 @Dao
 interface WeekDao : BaseDao<Week> {

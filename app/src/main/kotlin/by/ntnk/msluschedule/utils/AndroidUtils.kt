@@ -11,7 +11,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import by.ntnk.msluschedule.BuildConfig
 import by.ntnk.msluschedule.R
 import com.google.android.material.snackbar.Snackbar
-import io.reactivex.subjects.PublishSubject
+import io.reactivex.rxjava3.subjects.PublishSubject
 import timber.log.Timber
 import java.util.concurrent.ThreadLocalRandom
 

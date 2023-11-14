@@ -19,8 +19,8 @@ import by.ntnk.msluschedule.utils.ErrorType
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.Lazy
 import dagger.android.support.AndroidSupportInjection
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.plusAssign
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.kotlin.plusAssign
 import javax.inject.Inject
 
 class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView>(), AddTeacherView {

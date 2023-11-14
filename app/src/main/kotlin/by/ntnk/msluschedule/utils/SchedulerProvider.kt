@@ -2,9 +2,9 @@ package by.ntnk.msluschedule.utils
 
 import android.os.Looper
 import by.ntnk.msluschedule.di.PerApp
-import io.reactivex.Scheduler
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Scheduler
+import io.reactivex.rxjava3.schedulers.Schedulers
 import javax.inject.Inject
 
 @PerApp
@@ -16,6 +16,6 @@ class SchedulerProvider @Inject constructor() {
     fun single(): Scheduler = Schedulers.single()
 
     private companion object {
-        val uiScheduler: Scheduler by lazy { AndroidSchedulers.from(Looper.getMainLooper(), true) }
+        val uiScheduler: Scheduler by lazy { AndroidSchedulers.from(Looper.getMainLooper()) }
     }
 }

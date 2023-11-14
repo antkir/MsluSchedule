@@ -11,7 +11,7 @@ import by.ntnk.msluschedule.utils.CurrentDate
 import by.ntnk.msluschedule.utils.DEFAULT
 import by.ntnk.msluschedule.utils.InvalidYearException
 import by.ntnk.msluschedule.utils.toInt
-import io.reactivex.Single
+import io.reactivex.rxjava3.core.Single
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import javax.inject.Inject
