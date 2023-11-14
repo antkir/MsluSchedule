@@ -5,8 +5,8 @@ import by.ntnk.msluschedule.network.api.original.NetworkHelper
 import by.ntnk.msluschedule.utils.CurrentDate
 import by.ntnk.msluschedule.utils.DEFAULT
 import by.ntnk.msluschedule.utils.InvalidYearException
-import okhttp3.MediaType
-import okhttp3.ResponseBody
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
@@ -32,8 +32,8 @@ class NetworkHelperTest {
     fun `Throws InvalidYearException() when main html page doesn't contain requested elements`() {
         // given
         val requestInfo = NetworkHelper.FACULTY_REQUEST_INFO
-        val mediaType = MediaType.parse(String.DEFAULT)
-        val responseBody = ResponseBody.create(mediaType, String.DEFAULT).string()
+        val mediaType = String.DEFAULT.toMediaTypeOrNull()
+        val responseBody = String.DEFAULT.toResponseBody(mediaType).string()
         // when
         val testObserver = networkHelper.parseDataFromHtmlBody(requestInfo, responseBody).test()
         // then
@@ -45,8 +45,8 @@ class NetworkHelperTest {
         // given
         val requestInfo = NetworkHelper.FACULTY_REQUEST_INFO
         val htmlBody = javaClass.getResource("/main.html")!!.readText()
-        val mediaType = MediaType.parse(String.DEFAULT)
-        val responseBody = ResponseBody.create(mediaType, htmlBody).string()
+        val mediaType = String.DEFAULT.toMediaTypeOrNull()
+        val responseBody = htmlBody.toResponseBody(mediaType).string()
         val date = LocalDate.of(2000, 1, 1)
         whenever(currentDate.date).thenReturn(date)
         // when

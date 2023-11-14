@@ -464,7 +464,7 @@ class NetworkRepository @Inject constructor(
             throw HttpStatusException(
                 response.message(),
                 response.code(),
-                response.raw().request().url().toString()
+                response.raw().request.url.toString()
             )
         }
     }

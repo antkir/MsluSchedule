@@ -88,14 +88,12 @@ ext {
     materialVersion = '1.10.0'
     mockitoVersion = '5.7.0'
     multidexVersion = '2.0.1'
-    // OkHttp 3.13.0 release bumps minimum requirements to Android 5+.
-    okhttpVersion = '3.12.13'
+    okhttpVersion = '4.12.0'
     // POI 4.1.0 release bumps minimum requirements to Android O+ (minSdk 26).
     poiVersion = '4.0.1'
     preferenceVersion = '1.2.1'
     recyclerviewVersion = '1.3.2'
-    // Retrofit 2.7.0 release bumps minimum requirements to Android 5+.
-    retrofitVersion = '2.6.4'
+    retrofitVersion = '2.9.0'
     roomVersion = '2.6.0'
     rxandroidVersion = '2.1.1'
     // RxJava 3.1.0 release bumps minimum requirements to Android 5+.

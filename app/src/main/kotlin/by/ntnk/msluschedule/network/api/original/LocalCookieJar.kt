@@ -20,7 +20,8 @@ import by.ntnk.msluschedule.utils.DEFAULT
 import okhttp3.Cookie
 import okhttp3.CookieJar
 import okhttp3.HttpUrl
-import okhttp3.internal.Util
+import okhttp3.internal.delimiterOffset
+import okhttp3.internal.trimSubstring
 import java.net.HttpCookie
 
 /* Simplified JavaNetCookieJar from OkHttp package with local threads support */
@@ -37,7 +38,7 @@ class LocalCookieJar : CookieJar {
     override fun saveFromResponse(url: HttpUrl, cookies: List<Cookie>) {
         if (localThreadCookie.get() == null) {
             for (cookie in cookies) {
-                if (cookie.name().equals("JSESSIONID", ignoreCase = true)) {
+                if (cookie.name.equals("JSESSIONID", ignoreCase = true)) {
                     localThreadCookie.set(cookie.toString())
                 }
             }
@@ -65,9 +66,9 @@ class LocalCookieJar : CookieJar {
         val limit = header.length
         var pairEnd: Int
         while (pos < limit) {
-            pairEnd = Util.delimiterOffset(header, pos, limit, ";,")
-            val equalsSign = Util.delimiterOffset(header, pos, pairEnd, '=')
-            val name = Util.trimSubstring(header, pos, equalsSign)
+            pairEnd = header.delimiterOffset(";,", pos, limit)
+            val equalsSign = header.delimiterOffset('=', pos, pairEnd)
+            val name = header.trimSubstring(pos, equalsSign)
             if (name.startsWith("$")) {
                 pos = pairEnd + 1
                 continue
@@ -75,7 +76,7 @@ class LocalCookieJar : CookieJar {
 
             // We have either name=value or just a name.
             var value = if (equalsSign < pairEnd) {
-                Util.trimSubstring(header, equalsSign + 1, pairEnd)
+                header.trimSubstring(equalsSign + 1, pairEnd)
             } else {
                 String.DEFAULT
             }
@@ -89,7 +90,7 @@ class LocalCookieJar : CookieJar {
                 Cookie.Builder()
                     .name(name)
                     .value(value)
-                    .domain(url.host())
+                    .domain(url.host)
                     .build()
             )
             pos = pairEnd + 1
