@@ -140,7 +140,7 @@ class NetworkRepository @Inject constructor(
     private fun initSession(): Completable {
         return scheduleService
             .initSession()
-            .doOnSuccess { response -> checkErrors(response) }
+            .doOnSuccess { response -> checkResponse(response) }
             .ignoreElement()
     }
 
@@ -155,7 +155,7 @@ class NetworkRepository @Inject constructor(
                 formIds.second,
                 requestData.selectedValue
             )
-            .doOnSuccess { response -> checkErrors(response) }
+            .doOnSuccess { response -> checkResponse(response) }
             .map { response ->
                 val body = response.body()
                 if (body != null) body else throw NullPointerException()
@@ -165,21 +165,21 @@ class NetworkRepository @Inject constructor(
     private fun getHtmlBody(scheduleType: String): Single<String> {
         return scheduleService
             .getHtmlBody(scheduleType)
-            .doOnSuccess { response -> checkErrors(response) }
+            .doOnSuccess { response -> checkResponse(response) }
             .map { response -> response.body()?.string() ?: String.DEFAULT }
     }
 
     private fun getScheduleInputStream(scheduleType: String): Single<InputStream> {
         return scheduleService
             .getSchedule(scheduleType)
-            .doOnSuccess { response -> checkErrors(response) }
+            .doOnSuccess { response -> checkResponse(response) }
             .map { response ->
                 val body = response.body()
                 if (body != null) body.byteStream() else throw NullPointerException()
             }
     }
 
-    private fun <T> checkErrors(response: Response<T>) {
+    private fun <T> checkResponse(response: Response<T>) {
         if (!response.isSuccessful) {
             throw HttpStatusException(
                 response.message(),
