@@ -65,7 +65,11 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
                                 StudyGroupClassItemView(classData, weekday.id, overlapsPreviousClass)
                             }
 
-                            is TeacherLesson -> TeacherClassItemView(classData, weekday.id)
+                            is TeacherLesson -> {
+                                val overlapsPreviousClass: Boolean = prevStartTime == classData.startTime
+                                TeacherClassItemView(classData, weekday.id, overlapsPreviousClass)
+                            }
+
                             else -> throw IllegalStateException("Illegal class type!")
                         }
                     itemViews.add(classItemView)
@@ -153,6 +157,22 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
                                 onClickSubject.onNext(item)
                             }
                         }
+                    }
+
+                    itemView.setOnLongClickListener { view ->
+                        if (bindingAdapterPosition != NO_POSITION) {
+                            val item = itemViews[bindingAdapterPosition] as TeacherClassItemView
+                            if (item.overlapsPreviousClass) {
+                                if (view.context != null) {
+                                    Toast.makeText(
+                                        view.context,
+                                        view.context.resources.getString(R.string.class_same_time_description),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }
+                        }
+                        return@setOnLongClickListener true
                     }
                 }
             }
@@ -267,18 +287,28 @@ class LessonRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
         }
     }
 
-    class TeacherClassItemView(val classData: TeacherLesson, val weekdayId: Int) : BaseItemView {
+    class TeacherClassItemView(
+        val classData: TeacherLesson,
+        val weekdayId: Int,
+        val overlapsPreviousClass: Boolean
+    ) : BaseItemView {
         override val viewType: ItemViewType = ItemViewType.TEACHERCLASS
 
         override fun bindViewHolder(viewHolder: RecyclerView.ViewHolder) {
             with(viewHolder as TeacherClassViewHolder) {
-                binding.textTimeStart.text = classData.startTime
-                binding.textTimeEnd.text = classData.endTime
+                binding.textTimeStart.text = if (overlapsPreviousClass) String.DEFAULT else classData.startTime
+                binding.textTimeEnd.text = if (overlapsPreviousClass) String.DEFAULT else classData.endTime
                 binding.textSubject.text = classData.subject
                 binding.textGroups.text = classData.groups
                 binding.textClassroom.text = classData.classroom
                 binding.textClassType.text = classData.type.lowercase()
                 binding.textFaculty.text = classData.faculty
+
+                if (overlapsPreviousClass) {
+                    binding.imageClassOverlap.visibility = View.VISIBLE
+                } else {
+                    binding.imageClassOverlap.visibility = View.GONE
+                }
 
                 if (binding.textClassType.text.isBlank()) {
                     binding.textClassType.visibility = View.GONE
