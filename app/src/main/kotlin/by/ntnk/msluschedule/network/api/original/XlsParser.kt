@@ -36,7 +36,7 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
 
     private fun parseCellsToStudyGroupWeekdays(
         cells: List<Cell>,
-        getWorkbookFontAt: (Short) -> HSSFFont
+        getWorkbookFontAt: (Int) -> HSSFFont
     ): List<WeekdayWithStudyGroupLessons> {
         val weekdays = ArrayList<WeekdayWithStudyGroupLessons>(Days.num())
         lateinit var weekdayData: WeekdayWithStudyGroupLessons
@@ -85,7 +85,7 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
                     for (i in 0 until valueRichString.numFormattingRuns()) {
                         val startIdx = valueRichString.getIndexOfFormattingRun(i)
                         val fontIdx = valueRichString.getFontAtIndex(startIdx)
-                        val font = getWorkbookFontAt(fontIdx)
+                        val font = getWorkbookFontAt(fontIdx.toInt())
 
                         if (font.bold) {
                             val nextStartIdx = substringLengths[i]
@@ -194,7 +194,7 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
 
     private fun parseCellsToTeacherWeekdays(
         hssfRows: List<Row>,
-        getWorkbookFontAt: (Short) -> HSSFFont
+        getWorkbookFontAt: (Int) -> HSSFFont
     ): List<WeekdayWithTeacherLessons> {
         val weekdays = listOf(
             WeekdayWithTeacherLessons(id = AUTO_ID, value = Days.MONDAY),
@@ -232,7 +232,7 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
         cell: Cell,
         startTime: String,
         endTime: String,
-        getWorkbookFontAt: (Short) -> HSSFFont
+        getWorkbookFontAt: (Int) -> HSSFFont
     ): TeacherLesson {
         val valueRichString = cell.richStringCellValue as HSSFRichTextString
         val substringLengths = getRichTextSubstringLengths(valueRichString)
@@ -254,7 +254,7 @@ class XlsParser @Inject constructor(private val sharedPreferencesRepository: Sha
         for (i in 0 until valueRichString.numFormattingRuns()) {
             val startIdx = valueRichString.getIndexOfFormattingRun(i)
             val fontIdx = valueRichString.getFontAtIndex(startIdx)
-            val font: HSSFFont = getWorkbookFontAt(fontIdx)
+            val font: HSSFFont = getWorkbookFontAt(fontIdx.toInt())
 
             if (font.bold) {
                 val nextStartIdx = startIdx + substringLengths[i]
