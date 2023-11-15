@@ -105,7 +105,7 @@ ext {
     testrunnerVersion = '1.5.2'
     threetenbpVersion = '1.6.8'
     timberVersion = '5.0.1'
-    windowVersion = '1.1.0'
+    windowVersion = '1.2.0'
 }
 
 dependencies {
