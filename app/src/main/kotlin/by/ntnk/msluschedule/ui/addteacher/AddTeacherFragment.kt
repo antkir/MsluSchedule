@@ -30,9 +30,6 @@ class AddTeacherFragment : MvpDialogFragment<AddTeacherPresenter, AddTeacherView
     private lateinit var listener: DialogListener
     private val disposables: CompositeDisposable = CompositeDisposable()
 
-    override val view: AddTeacherView
-        get() = this
-
     @Inject
     lateinit var injectedPresenter: Lazy<AddTeacherPresenter>
 

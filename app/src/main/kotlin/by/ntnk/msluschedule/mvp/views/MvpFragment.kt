@@ -35,9 +35,6 @@ abstract class MvpFragment<out P : Presenter<V>, V : View> : Fragment() {
                 onCreatePresenter()
             }
 
-    /** Represents this [Fragment]. */
-    protected abstract val view: V
-
     /** Called if the presenter for this fragment hasn't been created yet. */
     protected abstract fun onCreatePresenter(): P
 
@@ -50,7 +47,6 @@ abstract class MvpFragment<out P : Presenter<V>, V : View> : Fragment() {
             val id = (0 until Int.MAX_VALUE - hashCode).random() + hashCode
             presenterId = presenterManager.addPresenter(id, presenter)
         }
-        presenter.bindView(view)
     }
 
     private fun validatePresenter() {
@@ -58,16 +54,6 @@ abstract class MvpFragment<out P : Presenter<V>, V : View> : Fragment() {
             presenterManager.removePresenter(presenterId!!)
             presenterId = null
         }
-    }
-
-    override fun onStart() {
-        super.onStart()
-        presenter.bindView(view)
-    }
-
-    override fun onStop() {
-        super.onStop()
-        presenter.unbindView()
     }
 
     override fun onDestroy() {

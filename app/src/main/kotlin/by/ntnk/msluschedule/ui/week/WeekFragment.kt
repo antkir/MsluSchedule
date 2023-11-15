@@ -64,9 +64,6 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     private var fragmentBinding: FragmentWeekBinding? = null
     private val binding get() = fragmentBinding!!
 
-    override val view: WeekView
-        get() = this
-
     @Inject
     lateinit var injectedPresenter: Lazy<WeekPresenter>
 

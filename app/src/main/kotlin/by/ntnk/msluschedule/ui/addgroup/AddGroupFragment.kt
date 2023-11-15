@@ -33,9 +33,6 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
     private lateinit var listener: DialogListener
     private val disposables: CompositeDisposable = CompositeDisposable()
 
-    override val view: AddGroupView
-        get() = this
-
     @Inject
     lateinit var injectedPresenter: Lazy<AddGroupPresenter>
 

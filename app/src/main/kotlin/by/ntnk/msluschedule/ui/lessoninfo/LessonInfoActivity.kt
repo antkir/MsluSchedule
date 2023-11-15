@@ -43,9 +43,6 @@ class LessonInfoActivity :
     private lateinit var bindingStudyGroup: ActivityLessoninfoStudygroupBinding
     private lateinit var bindingTeacher: ActivityLessoninfoTeacherBinding
 
-    override val view: LessonInfoView
-        get() = this
-
     @Inject
     lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Any>
 

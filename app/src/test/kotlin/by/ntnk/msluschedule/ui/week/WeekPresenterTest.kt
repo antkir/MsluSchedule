@@ -48,9 +48,6 @@ class WeekPresenterTest {
     @Mock
     private lateinit var schedulerProvider: SchedulerProvider
 
-    @Mock
-    private lateinit var view: WeekView
-
     private lateinit var presenter: WeekPresenter
 
     private val isWeekInitializedTest = TestObserver.create<Boolean>()
@@ -160,7 +157,6 @@ class WeekPresenterTest {
             schedulerProvider,
             networkRepository
         )
-        presenter.bindView(view)
     }
 
     @Test

@@ -77,9 +77,6 @@ class MainActivity :
 
     private lateinit var binding: ActivityMainBinding
 
-    override val view: MainView
-        get() = this
-
     private val onDrawerOpenBackPressedCallback = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
             binding.drawerLayout.closeDrawer(GravityCompat.START)

@@ -46,9 +46,6 @@ class MainPresenterTest {
     @Mock
     private lateinit var schedulerProvider: SchedulerProvider
 
-    @Mock
-    private lateinit var view: MainView
-
     private lateinit var presenter: MainPresenter
 
     private val insertStudyGroupTest = TestObserver.create<Int>()
@@ -108,7 +105,6 @@ class MainPresenterTest {
             sharedPreferencesRepository,
             schedulerProvider
         )
-        presenter.bindView(view)
     }
 
     @Test

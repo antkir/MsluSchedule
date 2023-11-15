@@ -72,9 +72,6 @@ class WeekdayActivity :
 
     private lateinit var binding: ActivityWeekdayBinding
 
-    override val view: WeekdayView
-        get() = this
-
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             remove()

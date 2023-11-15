@@ -35,9 +35,6 @@ abstract class MvpDialogFragment<out P : Presenter<V>, V : View> : DialogFragmen
                 onCreatePresenter()
             }
 
-    /** Represents this [DialogFragment]. */
-    protected abstract val view: V
-
     /** Called if the presenter for this dialog fragment hasn't been created yet. */
     protected abstract fun onCreatePresenter(): P
 
@@ -57,16 +54,6 @@ abstract class MvpDialogFragment<out P : Presenter<V>, V : View> : DialogFragmen
             presenterManager.removePresenter(presenterId!!)
             presenterId = null
         }
-    }
-
-    override fun onStart() {
-        super.onStart()
-        presenter.bindView(view)
-    }
-
-    override fun onStop() {
-        super.onStop()
-        presenter.unbindView()
     }
 
     override fun onDestroy() {

@@ -40,9 +40,6 @@ class WeeksContainerFragment :
     private var restoredAdapterPosition = Int.DEFAULT
     private val disposables: CompositeDisposable = CompositeDisposable()
 
-    override val view: WeeksContainerView
-        get() = this
-
     @Inject
     lateinit var injectedPresenter: Lazy<WeeksContainerPresenter>
 
