@@ -10,7 +10,7 @@ import androidx.fragment.app.DialogFragment
 import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.utils.SchedulerProvider
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import dagger.android.support.AndroidSupportInjection
+import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.kotlin.subscribeBy
@@ -18,6 +18,7 @@ import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class DeleteScheduleFragment : DialogFragment() {
 
     private lateinit var disposable: Disposable
@@ -27,7 +28,6 @@ class DeleteScheduleFragment : DialogFragment() {
     lateinit var schedulerProvider: SchedulerProvider
 
     override fun onAttach(context: Context) {
-        AndroidSupportInjection.inject(this)
         super.onAttach(context)
         try {
             listener = requireParentFragment() as DialogListener

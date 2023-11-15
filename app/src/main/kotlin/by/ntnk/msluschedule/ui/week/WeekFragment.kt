@@ -44,13 +44,14 @@ import by.ntnk.msluschedule.utils.ScheduleType
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import dagger.Lazy
-import dagger.android.support.AndroidSupportInjection
+import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.kotlin.plusAssign
 import java.lang.ref.WeakReference
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
 
     private var isNoClassesViewVisible: Boolean = true
@@ -68,11 +69,6 @@ class WeekFragment : MvpFragment<WeekPresenter, WeekView>(), WeekView {
     lateinit var injectedPresenter: Lazy<WeekPresenter>
 
     override fun onCreatePresenter(): WeekPresenter = injectedPresenter.get()
-
-    override fun onAttach(context: Context) {
-        AndroidSupportInjection.inject(this)
-        super.onAttach(context)
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

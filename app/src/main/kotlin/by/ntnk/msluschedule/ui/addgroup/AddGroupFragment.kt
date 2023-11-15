@@ -21,11 +21,12 @@ import by.ntnk.msluschedule.utils.DEFAULT
 import by.ntnk.msluschedule.utils.ErrorType
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.Lazy
-import dagger.android.support.AndroidSupportInjection
+import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.plusAssign
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), AddGroupView {
 
     private var fragmentBinding: FragmentAddGroupBinding? = null
@@ -39,7 +40,6 @@ class AddGroupFragment : MvpDialogFragment<AddGroupPresenter, AddGroupView>(), A
     override fun onCreatePresenter(): AddGroupPresenter = injectedPresenter.get()
 
     override fun onAttach(context: Context) {
-        AndroidSupportInjection.inject(this)
         super.onAttach(context)
         try {
             listener = context as DialogListener

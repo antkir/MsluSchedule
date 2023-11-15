@@ -5,12 +5,13 @@ import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatDelegate
 import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.data.ScheduleContainer
-import by.ntnk.msluschedule.di.PerApp
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
+import javax.inject.Singleton
 
-@PerApp
+@Singleton
 class SharedPreferencesRepository @Inject constructor(
-    private val applicationContext: Context,
+    @ApplicationContext private val applicationContext: Context,
     private val sharedPreferences: SharedPreferences
 ) {
     var isFirstAppLaunch: Boolean
@@ -45,8 +46,9 @@ class SharedPreferencesRepository @Inject constructor(
     }
 
     fun getThemeMode(): String {
-        val intValue = sharedPreferences.getString(applicationContext.getString(R.string.key_theme), String.DEFAULT)?.toIntOrNull()
-            ?: AppCompatDelegate.MODE_NIGHT_NO
+        val intValue =
+            sharedPreferences.getString(applicationContext.getString(R.string.key_theme), String.DEFAULT)?.toIntOrNull()
+                ?: AppCompatDelegate.MODE_NIGHT_NO
         return intValue.toString()
     }
 
@@ -67,7 +69,7 @@ class SharedPreferencesRepository @Inject constructor(
             .getBoolean(applicationContext.getString(R.string.key_hide_self_study_classes), false)
     }
 
-    fun getCurrentNetworkApiVersion() : NetworkApiVersion {
+    fun getCurrentNetworkApiVersion(): NetworkApiVersion {
         return NetworkApiVersion.MYUNIVERSITY
     }
 

@@ -1,7 +1,6 @@
 package by.ntnk.msluschedule.di.modules
 
 import by.ntnk.msluschedule.BuildConfig
-import by.ntnk.msluschedule.di.PerApp
 import by.ntnk.msluschedule.network.NetworkRepository
 import by.ntnk.msluschedule.network.api.original.LocalCookieJar
 import by.ntnk.msluschedule.network.api.original.dns.MsluDns
@@ -14,6 +13,8 @@ import by.ntnk.msluschedule.network.api.myuniversity.NetworkRepository as Networ
 import by.ntnk.msluschedule.network.api.myuniversity.ScheduleService as ScheduleServiceMyUniversity
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -25,12 +26,14 @@ import java.io.File
 import java.util.concurrent.TimeUnit
 import javax.inject.Named
 import javax.inject.Qualifier
+import javax.inject.Singleton
 
 @Module
+@InstallIn(SingletonComponent::class)
 class NetworkModule {
 
     @Provides
-    @PerApp
+    @Singleton
     fun provideHttpLoggingInterceptor(): HttpLoggingInterceptor {
         val logger: (message: String) -> Unit = {
             Timber.tag("OkHttp").d(it)
@@ -44,13 +47,13 @@ class NetworkModule {
     }
 
     @Provides
-    @PerApp
+    @Singleton
     fun provideLocalCookieJar(): LocalCookieJar {
         return LocalCookieJar()
     }
 
     @Provides
-    @PerApp
+    @Singleton
     @Api(NetworkApiVersion.ORIGINAL.name)
     fun provideOkHttpClient(
         @Named("cache") cacheDir: File,
@@ -76,7 +79,7 @@ class NetworkModule {
     }
 
     @Provides
-    @PerApp
+    @Singleton
     @Api(NetworkApiVersion.ORIGINAL.name)
     fun provideRetrofit(@Api(NetworkApiVersion.ORIGINAL.name) okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
@@ -88,7 +91,7 @@ class NetworkModule {
     }
 
     @Provides
-    @PerApp
+    @Singleton
     fun provideScheduleServiceOriginal(
         @Api(NetworkApiVersion.ORIGINAL.name) retrofit: Retrofit
     ): ScheduleServiceOriginal {
@@ -96,7 +99,7 @@ class NetworkModule {
     }
 
     @Provides
-    @PerApp
+    @Singleton
     @Api(NetworkApiVersion.MYUNIVERSITY.name)
     fun provideOkHttpClientMyUniversity(
         @Named("cache") cacheDir: File,
@@ -112,7 +115,7 @@ class NetworkModule {
     }
 
     @Provides
-    @PerApp
+    @Singleton
     @Api(NetworkApiVersion.MYUNIVERSITY.name)
     fun provideRetrofitMyUniversity(@Api(NetworkApiVersion.MYUNIVERSITY.name) okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
@@ -124,7 +127,7 @@ class NetworkModule {
     }
 
     @Provides
-    @PerApp
+    @Singleton
     fun provideScheduleServiceMyUniversity(
         @Api(NetworkApiVersion.MYUNIVERSITY.name) retrofit: Retrofit
     ): ScheduleServiceMyUniversity {
@@ -132,7 +135,7 @@ class NetworkModule {
     }
 
     @Provides
-    @PerApp
+    @Singleton
     fun provideNetworkRepository(
         sharedPreferencesRepository: SharedPreferencesRepository,
         networkRepositoryOriginal: Lazy<NetworkRepositoryOriginal>,

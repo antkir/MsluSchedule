@@ -1,13 +1,13 @@
 package by.ntnk.msluschedule.utils
 
 import android.os.Looper
-import by.ntnk.msluschedule.di.PerApp
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.schedulers.Schedulers
 import javax.inject.Inject
+import javax.inject.Singleton
 
-@PerApp
+@Singleton
 class SchedulerProvider @Inject constructor() {
     fun ui(): Scheduler = uiScheduler
 

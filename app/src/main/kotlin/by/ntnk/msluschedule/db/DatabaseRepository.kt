@@ -15,7 +15,6 @@ import by.ntnk.msluschedule.db.data.DbNote
 import by.ntnk.msluschedule.db.data.DbStudyGroupLesson
 import by.ntnk.msluschedule.db.data.DbTeacherLesson
 import by.ntnk.msluschedule.db.data.ScheduleContainer as DbScheduleContainer
-import by.ntnk.msluschedule.di.PerApp
 import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.utils.DEFAULT
 import by.ntnk.msluschedule.utils.ScheduleType
@@ -23,8 +22,9 @@ import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
 import javax.inject.Inject
+import javax.inject.Singleton
 
-@PerApp
+@Singleton
 class DatabaseRepository @Inject constructor(
     private val appDatabase: AppDatabase,
     private val databaseDataMapper: DatabaseDataMapper

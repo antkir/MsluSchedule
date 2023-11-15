@@ -21,19 +21,16 @@ import by.ntnk.msluschedule.utils.DEFAULT
 import by.ntnk.msluschedule.utils.ScheduleType
 import by.ntnk.msluschedule.utils.ScheduleTypeConverter
 import dagger.Lazy
-import dagger.android.AndroidInjection
-import dagger.android.AndroidInjector
-import dagger.android.DispatchingAndroidInjector
-import dagger.android.HasAndroidInjector
+import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.plusAssign
 import timber.log.Timber
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class LessonInfoActivity :
     MvpActivity<LessonInfoPresenter, LessonInfoView>(),
-    LessonInfoView,
-    HasAndroidInjector {
+    LessonInfoView {
 
     private var classId: Int = Int.DEFAULT
     private var weekId: Int = Int.DEFAULT
@@ -44,17 +41,11 @@ class LessonInfoActivity :
     private lateinit var bindingTeacher: ActivityLessoninfoTeacherBinding
 
     @Inject
-    lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Any>
-
-    @Inject
     lateinit var injectedPresenter: Lazy<LessonInfoPresenter>
-
-    override fun androidInjector(): AndroidInjector<Any> = dispatchingAndroidInjector
 
     override fun onCreatePresenter(): LessonInfoPresenter = injectedPresenter.get()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
 
         bindingStudyGroup = ActivityLessoninfoStudygroupBinding.inflate(layoutInflater)

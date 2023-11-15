@@ -47,10 +47,7 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipDrawable
 import com.google.android.material.snackbar.Snackbar
 import dagger.Lazy
-import dagger.android.AndroidInjection
-import dagger.android.AndroidInjector
-import dagger.android.DispatchingAndroidInjector
-import dagger.android.HasAndroidInjector
+import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.kotlin.plusAssign
@@ -58,10 +55,10 @@ import io.reactivex.rxjava3.kotlin.subscribeBy
 import timber.log.Timber
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class WeekdayActivity :
     MvpActivity<WeekdayPresenter, WeekdayView>(),
-    WeekdayView,
-    HasAndroidInjector {
+    WeekdayView {
 
     private var weekdayId: Int = Int.DEFAULT
     private lateinit var adapterOnClickDisposable: Disposable
@@ -86,17 +83,11 @@ class WeekdayActivity :
     }
 
     @Inject
-    lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Any>
-
-    @Inject
     lateinit var injectedPresenter: Lazy<WeekdayPresenter>
-
-    override fun androidInjector(): AndroidInjector<Any> = dispatchingAndroidInjector
 
     override fun onCreatePresenter(): WeekdayPresenter = injectedPresenter.get()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
         binding = ActivityWeekdayBinding.inflate(layoutInflater)
         setContentView(binding.root)

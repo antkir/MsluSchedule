@@ -3,25 +3,28 @@ package by.ntnk.msluschedule.di.modules
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
-import by.ntnk.msluschedule.di.PerApp
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
 import java.io.File
 import javax.inject.Named
+import javax.inject.Singleton
 
 @Module
+@InstallIn(SingletonComponent::class)
 class UtilsModule {
 
     @Provides
-    @PerApp
-    fun provideSharedPreferences(applicationContext: Context): SharedPreferences {
+    @Singleton
+    fun provideSharedPreferences(@ApplicationContext applicationContext: Context): SharedPreferences {
         return PreferenceManager.getDefaultSharedPreferences(applicationContext)
     }
 
     @Provides
     @Named("cache")
-    @PerApp
-    fun provideCacheFolder(applicationContext: Context): File {
+    fun provideCacheFolder(@ApplicationContext applicationContext: Context): File {
         return applicationContext.cacheDir
     }
 }

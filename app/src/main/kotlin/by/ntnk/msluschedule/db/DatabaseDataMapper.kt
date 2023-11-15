@@ -8,12 +8,12 @@ import by.ntnk.msluschedule.db.data.DbWeekdayWithStudyGroupLessons
 import by.ntnk.msluschedule.db.data.DbWeekdayWithTeacherLessons
 import by.ntnk.msluschedule.db.data.Week
 import by.ntnk.msluschedule.db.data.Weekday
-import by.ntnk.msluschedule.di.PerApp
 import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.utils.Days
 import javax.inject.Inject
+import javax.inject.Singleton
 
-@PerApp
+@Singleton
 class DatabaseDataMapper @Inject constructor() {
     fun map(data: ScheduleFilter, containerId: Int): List<Week> {
         val weeks = ArrayList<Week>(data.size)

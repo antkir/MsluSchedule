@@ -2,6 +2,7 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'org.jetbrains.kotlin.kapt'
     id 'com.android.application'
+    id 'com.google.dagger.hilt.android'
     id 'com.google.gms.google-services'
     id 'com.google.firebase.crashlytics'
 }
@@ -125,10 +126,8 @@ dependencies {
     androidTestImplementation "androidx.test.ext:junit-ktx:$testextjunitVersion"
     androidTestImplementation "androidx.test:runner:$testrunnerVersion"
     // Dagger
-    implementation "com.google.dagger:dagger:$daggerVersion"
-    implementation "com.google.dagger:dagger-android-support:$daggerVersion"
-    kapt "com.google.dagger:dagger-compiler:$daggerVersion"
-    kapt "com.google.dagger:dagger-android-processor:$daggerVersion"
+    implementation "com.google.dagger:hilt-android:$daggerVersion"
+    kapt "com.google.dagger:hilt-compiler:$daggerVersion"
     // Jsoup
     implementation "org.jsoup:jsoup:$jsoupVersion"
     // Material Components

@@ -6,7 +6,6 @@ import by.ntnk.msluschedule.data.Teacher
 import by.ntnk.msluschedule.data.TeacherLesson
 import by.ntnk.msluschedule.data.WeekdayWithStudyGroupLessons
 import by.ntnk.msluschedule.data.WeekdayWithTeacherLessons
-import by.ntnk.msluschedule.di.PerApp
 import by.ntnk.msluschedule.network.NetworkRepository
 import by.ntnk.msluschedule.network.data.ScheduleFilter
 import by.ntnk.msluschedule.utils.AUTO_ID
@@ -39,8 +38,9 @@ import org.threeten.bp.temporal.TemporalAdjusters
 import retrofit2.Response
 import java.util.Locale
 import javax.inject.Inject
+import javax.inject.Singleton
 
-@PerApp
+@Singleton
 class NetworkRepository @Inject constructor(
     private val currentDate: CurrentDate,
     private val sharedPreferencesRepository: SharedPreferencesRepository,

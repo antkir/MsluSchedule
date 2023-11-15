@@ -51,21 +51,18 @@ import com.takusemba.spotlight.OnSpotlightListener
 import com.takusemba.spotlight.Spotlight
 import com.takusemba.spotlight.Target
 import dagger.Lazy
-import dagger.android.AndroidInjection
-import dagger.android.AndroidInjector
-import dagger.android.DispatchingAndroidInjector
-import dagger.android.HasAndroidInjector
+import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.kotlin.plusAssign
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class MainActivity :
     MvpActivity<MainPresenter, MainView>(),
     MainView,
     NavigationView.OnNavigationItemSelectedListener,
     SimpleDrawerListener,
-    HasAndroidInjector,
     AddGroupFragment.DialogListener,
     AddTeacherFragment.DialogListener,
     WeeksContainerFragment.OnScheduleContainerDeletedListener {
@@ -84,17 +81,11 @@ class MainActivity :
     }
 
     @Inject
-    lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Any>
-
-    @Inject
     lateinit var injectedPresenter: Lazy<MainPresenter>
-
-    override fun androidInjector(): AndroidInjector<Any> = dispatchingAndroidInjector
 
     override fun onCreatePresenter(): MainPresenter = injectedPresenter.get()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        AndroidInjection.inject(this)
         setTheme(R.style.MsluTheme_NoActionBarTransparentStatusBar)
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)

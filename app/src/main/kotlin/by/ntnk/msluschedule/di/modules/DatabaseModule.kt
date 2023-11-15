@@ -1,19 +1,24 @@
 package by.ntnk.msluschedule.di.modules
 
+import android.content.Context
 import androidx.room.Room
-import by.ntnk.msluschedule.MsluScheduleApp
 import by.ntnk.msluschedule.db.AppDatabase
 import by.ntnk.msluschedule.db.Migrations
-import by.ntnk.msluschedule.di.PerApp
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
 
 @Module
+@InstallIn(SingletonComponent::class)
 class DatabaseModule {
-    @PerApp
+
     @Provides
-    fun provideAppDatabase(app: MsluScheduleApp): AppDatabase {
-        return Room.databaseBuilder(app, AppDatabase::class.java, DATABASE_NAME)
+    @Singleton
+    fun provideAppDatabase(@ApplicationContext applicationContext: Context): AppDatabase {
+        return Room.databaseBuilder(applicationContext, AppDatabase::class.java, DATABASE_NAME)
             .addMigrations(
                 Migrations.MIGRATION_8_9,
                 Migrations.MIGRATION_9_10,

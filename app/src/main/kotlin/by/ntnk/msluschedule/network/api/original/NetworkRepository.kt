@@ -4,7 +4,6 @@ import by.ntnk.msluschedule.data.StudyGroup
 import by.ntnk.msluschedule.data.Teacher
 import by.ntnk.msluschedule.data.WeekdayWithStudyGroupLessons
 import by.ntnk.msluschedule.data.WeekdayWithTeacherLessons
-import by.ntnk.msluschedule.di.PerApp
 import by.ntnk.msluschedule.network.NetworkRepository
 import by.ntnk.msluschedule.network.api.original.data.JsonBody
 import by.ntnk.msluschedule.network.api.original.data.RequestData
@@ -22,8 +21,9 @@ import io.reactivex.rxjava3.core.Single
 import retrofit2.Response
 import java.io.InputStream
 import javax.inject.Inject
+import javax.inject.Singleton
 
-@PerApp
+@Singleton
 class NetworkRepository @Inject constructor(
     private val localCookieJar: LocalCookieJar,
     private val networkHelper: NetworkHelper,

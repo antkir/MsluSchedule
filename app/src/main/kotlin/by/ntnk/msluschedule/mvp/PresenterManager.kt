@@ -1,10 +1,10 @@
 package by.ntnk.msluschedule.mvp
 
 import androidx.collection.SparseArrayCompat
-import by.ntnk.msluschedule.di.PerApp
 import javax.inject.Inject
+import javax.inject.Singleton
 
-@PerApp
+@Singleton
 class PresenterManager @Inject constructor() {
     private val presenters = SparseArrayCompat<Presenter<*>>()
 

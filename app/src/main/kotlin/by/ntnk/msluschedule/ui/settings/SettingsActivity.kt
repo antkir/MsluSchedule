@@ -28,22 +28,13 @@ import by.ntnk.msluschedule.R
 import by.ntnk.msluschedule.utils.NetworkApiVersion
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
 import by.ntnk.msluschedule.utils.onThemeChanged
-import dagger.android.AndroidInjection
-import dagger.android.AndroidInjector
-import dagger.android.DispatchingAndroidInjector
-import dagger.android.HasAndroidInjector
-import dagger.android.support.AndroidSupportInjection
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
-class SettingsActivity : AppCompatActivity(), HasAndroidInjector {
-
-    @Inject
-    lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Any>
-
-    override fun androidInjector(): AndroidInjector<Any> = dispatchingAndroidInjector
+@AndroidEntryPoint
+class SettingsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         if (savedInstanceState == null) {
@@ -71,14 +62,10 @@ class SettingsActivity : AppCompatActivity(), HasAndroidInjector {
         return super.onOptionsItemSelected(menuItem)
     }
 
+    @AndroidEntryPoint
     class SettingsFragment : PreferenceFragmentCompat() {
         @Inject
         lateinit var sharedPreferencesRepository: SharedPreferencesRepository
-
-        override fun onAttach(context: Context) {
-            AndroidSupportInjection.inject(this)
-            super.onAttach(context)
-        }
 
         override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
             val view = super.onCreateView(inflater, container, savedInstanceState)

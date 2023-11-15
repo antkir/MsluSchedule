@@ -2,7 +2,6 @@ package by.ntnk.msluschedule.network.api.original
 
 import by.ntnk.msluschedule.data.StudyGroup
 import by.ntnk.msluschedule.data.Teacher
-import by.ntnk.msluschedule.di.PerApp
 import by.ntnk.msluschedule.network.api.original.data.JsonBody
 import by.ntnk.msluschedule.network.api.original.data.RequestData
 import by.ntnk.msluschedule.network.api.original.data.RequestInfo
@@ -15,8 +14,9 @@ import io.reactivex.rxjava3.core.Single
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import javax.inject.Inject
+import javax.inject.Singleton
 
-@PerApp
+@Singleton
 class NetworkHelper @Inject constructor(private val currentDate: CurrentDate) {
 
     private fun createYearRequestDataInstance(key: Int) = RequestData(YEAR_REQUEST_INFO, key)
