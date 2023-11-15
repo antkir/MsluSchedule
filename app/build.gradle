@@ -1,7 +1,7 @@
 plugins {
     id 'org.jetbrains.kotlin.android'
-    id 'org.jetbrains.kotlin.kapt'
     id 'com.android.application'
+    id 'com.google.devtools.ksp'
     id 'com.google.dagger.hilt.android'
     id 'com.google.gms.google-services'
     id 'com.google.firebase.crashlytics'
@@ -52,14 +52,6 @@ android {
         versionCode versionMajor * 1000000 + versionMinor * 10000 + versionPatch * 100 + versionBuild
         versionName "${versionMajor}.${versionMinor}.${versionPatch}"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments += [
-                        "room.schemaLocation":"$projectDir/schemas".toString(),
-                        "room.incremental":"true"
-                ]
-            }
-        }
         resourceConfigurations += ["en", "be", "ru"]
     }
     buildTypes {
@@ -74,6 +66,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+}
+
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
 }
 
 ext {
@@ -121,13 +117,13 @@ dependencies {
     implementation "androidx.room:room-rxjava3:$roomVersion"
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:$swiperefreshlayoutVersion"
     implementation "androidx.window:window:$windowVersion"
-    kapt "androidx.room:room-compiler:$roomVersion"
+    ksp "androidx.room:room-compiler:$roomVersion"
     androidTestImplementation "androidx.room:room-testing:$roomVersion"
     androidTestImplementation "androidx.test.ext:junit-ktx:$testextjunitVersion"
     androidTestImplementation "androidx.test:runner:$testrunnerVersion"
     // Dagger
     implementation "com.google.dagger:hilt-android:$daggerVersion"
-    kapt "com.google.dagger:hilt-compiler:$daggerVersion"
+    ksp "com.google.dagger:hilt-compiler:$daggerVersion"
     // Jsoup
     implementation "org.jsoup:jsoup:$jsoupVersion"
     // Material Components
