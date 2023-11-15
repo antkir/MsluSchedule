@@ -1,6 +1,9 @@
 package by.ntnk.msluschedule.di.modules
 
 import by.ntnk.msluschedule.BuildConfig
+import by.ntnk.msluschedule.di.Qualifiers.CacheDirectory
+import by.ntnk.msluschedule.di.Qualifiers.OriginalNetworkApi
+import by.ntnk.msluschedule.di.Qualifiers.MyUniversityNetworkApi
 import by.ntnk.msluschedule.network.NetworkRepository
 import by.ntnk.msluschedule.network.api.original.LocalCookieJar
 import by.ntnk.msluschedule.network.api.original.dns.MsluDns
@@ -24,8 +27,6 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 import timber.log.Timber
 import java.io.File
 import java.util.concurrent.TimeUnit
-import javax.inject.Named
-import javax.inject.Qualifier
 import javax.inject.Singleton
 
 @Module
@@ -54,9 +55,9 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    @Api(NetworkApiVersion.ORIGINAL.name)
+    @OriginalNetworkApi
     fun provideOkHttpClient(
-        @Named("cache") cacheDir: File,
+        @CacheDirectory cacheDir: File,
         httpLoggingInterceptor: HttpLoggingInterceptor,
         localCookieJar: LocalCookieJar
     ): OkHttpClient {
@@ -80,8 +81,8 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    @Api(NetworkApiVersion.ORIGINAL.name)
-    fun provideRetrofit(@Api(NetworkApiVersion.ORIGINAL.name) okHttpClient: OkHttpClient): Retrofit {
+    @OriginalNetworkApi
+    fun provideRetrofit(@OriginalNetworkApi okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
             .baseUrl("http://raspisanie.mslu.by/")
             .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
@@ -93,16 +94,17 @@ class NetworkModule {
     @Provides
     @Singleton
     fun provideScheduleServiceOriginal(
-        @Api(NetworkApiVersion.ORIGINAL.name) retrofit: Retrofit
+        @OriginalNetworkApi retrofit: Retrofit
     ): ScheduleServiceOriginal {
         return retrofit.create(ScheduleServiceOriginal::class.java)
     }
 
+
     @Provides
     @Singleton
-    @Api(NetworkApiVersion.MYUNIVERSITY.name)
+    @MyUniversityNetworkApi
     fun provideOkHttpClientMyUniversity(
-        @Named("cache") cacheDir: File,
+        @CacheDirectory cacheDir: File,
         httpLoggingInterceptor: HttpLoggingInterceptor
     ): OkHttpClient {
         return OkHttpClient().newBuilder()
@@ -116,8 +118,8 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    @Api(NetworkApiVersion.MYUNIVERSITY.name)
-    fun provideRetrofitMyUniversity(@Api(NetworkApiVersion.MYUNIVERSITY.name) okHttpClient: OkHttpClient): Retrofit {
+    @MyUniversityNetworkApi
+    fun provideRetrofitMyUniversity(@MyUniversityNetworkApi okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
             .baseUrl("https://myuniversity.by/api/schedule/mglu/")
             .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
@@ -129,7 +131,7 @@ class NetworkModule {
     @Provides
     @Singleton
     fun provideScheduleServiceMyUniversity(
-        @Api(NetworkApiVersion.MYUNIVERSITY.name) retrofit: Retrofit
+        @MyUniversityNetworkApi retrofit: Retrofit
     ): ScheduleServiceMyUniversity {
         return retrofit.create(ScheduleServiceMyUniversity::class.java)
     }
@@ -145,11 +147,5 @@ class NetworkModule {
             NetworkApiVersion.ORIGINAL -> networkRepositoryOriginal.get()
             NetworkApiVersion.MYUNIVERSITY -> networkRepositoryMyUniversity.get()
         }
-    }
-
-    private companion object {
-        @Qualifier
-        @Retention(AnnotationRetention.RUNTIME)
-        annotation class Api(val value: String)
     }
 }
