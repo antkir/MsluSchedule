@@ -14,7 +14,6 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.app.NavUtils
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.ListFragment
@@ -53,17 +52,16 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(menuItem: MenuItem): Boolean {
-        when (menuItem.itemId) {
-            android.R.id.home -> {
-                NavUtils.navigateUpFromSameTask(this)
-                return true
-            }
+        if (menuItem.itemId == android.R.id.home) {
+            onBackPressedDispatcher.onBackPressed()
+            return true
         }
         return super.onOptionsItemSelected(menuItem)
     }
 
     @AndroidEntryPoint
     class SettingsFragment : PreferenceFragmentCompat() {
+
         @Inject
         lateinit var sharedPreferencesRepository: SharedPreferencesRepository
 
@@ -160,6 +158,7 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         class SettingsLibrariesFragment : ListFragment(), AdapterView.OnItemClickListener {
+
             private lateinit var libraryUrls: Array<String>
 
             override fun onCreateView(
