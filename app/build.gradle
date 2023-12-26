@@ -1,10 +1,10 @@
 plugins {
-    id 'org.jetbrains.kotlin.android'
-    id 'com.android.application'
-    id 'com.google.devtools.ksp'
-    id 'com.google.dagger.hilt.android'
-    id 'com.google.gms.google-services'
-    id 'com.google.firebase.crashlytics'
+    alias libs.plugins.android.application
+    alias libs.plugins.kotlin.android
+    alias libs.plugins.ksp
+    alias libs.plugins.hilt
+    alias libs.plugins.gms
+    alias libs.plugins.firebase.crashlytics
 }
 
 android {
@@ -72,89 +72,55 @@ ksp {
     arg("room.schemaLocation", "$projectDir/schemas")
 }
 
-ext {
-    appcompatVersion = '1.6.1'
-    constraintlayoutVersion = '2.1.4'
-    coreVersion = '1.12.0'
-    daggerVersion = '2.49'
-    firebasebomVersion = '32.6.0'
-    fragmentVersion = '1.6.2'
-    jsoupVersion = '1.17.1'
-    junitVersion = '4.13.2'
-    leakcanaryVersion = '2.12'
-    materialVersion = '1.10.0'
-    mockitoVersion = '5.8.0'
-    multidexVersion = '2.0.1'
-    okhttpVersion = '4.12.0'
-    // POI 4.1.0 release bumps minimum requirements to Android O+ (minSdk 26).
-    poiVersion = '4.0.1'
-    preferenceVersion = '1.2.1'
-    recyclerviewVersion = '1.3.2'
-    retrofitVersion = '2.9.0'
-    roomVersion = '2.6.1'
-    rxandroidVersion = '3.0.2'
-    rxjavaVersion = '3.1.8'
-    rxkotlinVersion = '3.0.1'
-    spotlightVersion = '2.0.5'
-    swiperefreshlayoutVersion = '1.1.0'
-    testextjunitVersion = '1.1.5'
-    testrunnerVersion = '1.5.2'
-    threetenbpVersion = '1.6.8'
-    timberVersion = '5.0.1'
-    windowVersion = '1.2.0'
-}
-
 dependencies {
     // AndroidX libraries
-    implementation "androidx.appcompat:appcompat:$appcompatVersion"
-    implementation "androidx.constraintlayout:constraintlayout:$constraintlayoutVersion"
-    implementation "androidx.core:core-ktx:$coreVersion"
-    implementation "androidx.fragment:fragment-ktx:$fragmentVersion"
-    implementation "androidx.multidex:multidex:$multidexVersion"
-    implementation "androidx.preference:preference-ktx:$preferenceVersion"
-    implementation "androidx.recyclerview:recyclerview:$recyclerviewVersion"
-    implementation "androidx.room:room-runtime:$roomVersion"
-    implementation "androidx.room:room-rxjava3:$roomVersion"
-    implementation "androidx.swiperefreshlayout:swiperefreshlayout:$swiperefreshlayoutVersion"
-    implementation "androidx.window:window:$windowVersion"
-    ksp "androidx.room:room-compiler:$roomVersion"
-    androidTestImplementation "androidx.room:room-testing:$roomVersion"
-    androidTestImplementation "androidx.test.ext:junit-ktx:$testextjunitVersion"
-    androidTestImplementation "androidx.test:runner:$testrunnerVersion"
-    // Dagger
-    implementation "com.google.dagger:hilt-android:$daggerVersion"
-    ksp "com.google.dagger:hilt-compiler:$daggerVersion"
+    implementation libs.androidx.appcompat
+    implementation libs.androidx.constraintlayout
+    implementation libs.androidx.core.ktx
+    implementation libs.androidx.fragment.ktx
+    implementation libs.androidx.multidex
+    implementation libs.androidx.preference.ktx
+    implementation libs.androidx.recyclerview
+    implementation libs.androidx.room.runtime
+    implementation libs.androidx.room.rxjava3
+    implementation libs.androidx.swiperefreshlayout
+    implementation libs.androidx.window
+    ksp libs.androidx.room.compiler
+    androidTestImplementation libs.androidx.room.testing
+    androidTestImplementation libs.androidx.junit.ktx
+    androidTestImplementation libs.androidx.test.runner
+    // Hilt
+    implementation libs.hilt.android
+    ksp libs.hilt.compiler
     // Jsoup
-    implementation "org.jsoup:jsoup:$jsoupVersion"
+    implementation libs.jsoup
     // Material Components
-    implementation "com.google.android.material:material:$materialVersion"
+    implementation libs.material
     // Okhttp
-    implementation "com.squareup.okhttp3:logging-interceptor:$okhttpVersion"
+    implementation libs.okhttp.logging
     // Poi
-    implementation "org.apache.poi:poi:$poiVersion"
+    implementation libs.poi
     // Retrofit
-    implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
-    implementation "com.squareup.retrofit2:adapter-rxjava3:$retrofitVersion"
-    implementation "com.squareup.retrofit2:converter-moshi:$retrofitVersion"
-    // RxAndroid
-    implementation "io.reactivex.rxjava3:rxandroid:$rxandroidVersion"
+    implementation libs.retrofit.core
+    implementation libs.retrofit.adapter.rxjava3
+    implementation libs.retrofit.converter.moshi
     // RxJava
-    implementation "io.reactivex.rxjava3:rxjava:$rxjavaVersion"
-    // RxKotlin
-    implementation "io.reactivex.rxjava3:rxkotlin:$rxkotlinVersion"
+    implementation libs.rxandroid
+    implementation libs.rxjava
+    implementation libs.rxkotlin
     // Spotlight
-    implementation "com.github.takusemba:spotlight:$spotlightVersion"
+    implementation libs.spotlight
     // Timber
-    implementation "com.jakewharton.timber:timber:$timberVersion"
+    implementation libs.timber
     // Time
-    implementation "org.threeten:threetenbp:$threetenbpVersion:no-tzdb"
+    implementation libs.threetenbp
     // LeakCanary
-    debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakcanaryVersion"
+    debugImplementation libs.leakcanary
     // Testing
-    testImplementation "org.mockito:mockito-core:$mockitoVersion"
-    testImplementation "junit:junit:$junitVersion"
+    testImplementation libs.mockito.core
+    testImplementation libs.junit
     // Firebase
-    implementation platform("com.google.firebase:firebase-bom:$firebasebomVersion")
-    implementation 'com.google.firebase:firebase-analytics'
-    implementation 'com.google.firebase:firebase-crashlytics'
+    implementation platform(libs.firebase.bom)
+    implementation libs.firebase.analytics
+    implementation libs.firebase.crashlytics
 }
