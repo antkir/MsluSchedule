@@ -13,4 +13,4 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "MSLU Schedule"
-include ':app'
+include(":app")
