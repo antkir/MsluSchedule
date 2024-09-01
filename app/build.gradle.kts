@@ -15,8 +15,8 @@ android {
     val versionPatch = 0
     val versionBuild = 0
 
-    compileSdk = 34
-    buildToolsVersion = "34.0.0"
+    compileSdk = 35
+    buildToolsVersion = "35.0.0"
 
     buildFeatures {
         buildConfig = true
