@@ -25,7 +25,7 @@ fun IntRange.random(): Int {
 }
 
 fun View.getWidthMinusPadding(): Int {
-    return width - paddingLeft - paddingRight
+    return width - paddingStart - paddingEnd
 }
 
 interface SimpleDrawerListener : DrawerLayout.DrawerListener {

@@ -477,7 +477,7 @@ class MainActivity :
     private fun expandFam() {
         isFamOpen = true
 
-        ViewCompat.animate(binding.fam.fabBase)
+        binding.fam.fabBase.animate()
             .setDuration(ANIMATION_ROTATE_BASE_FAB_DURATION)
             .rotation(135f)
             .setInterpolator(OvershootInterpolator(2f))
@@ -548,7 +548,7 @@ class MainActivity :
             })
             .start()
 
-        ViewCompat.animate(binding.fam.fabBase)
+        binding.fam.fabBase.animate()
             .setDuration(ANIMATION_ROTATE_BASE_FAB_DURATION)
             .rotation(0f)
             .setInterpolator(OvershootInterpolator(2f))

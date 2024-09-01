@@ -65,18 +65,15 @@ android {
         resourceConfigurations += listOf("en", "be", "ru")
     }
     buildTypes {
-        getByName("debug") {
+        debug {
             multiDexEnabled = true
             isMinifyEnabled = false
             applicationIdSuffix = ".debug"
         }
-        getByName("release") {
+        release {
             multiDexEnabled = false
             isMinifyEnabled = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
 }
