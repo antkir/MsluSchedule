@@ -1,7 +1,10 @@
 package by.ntnk.msluschedule.network.api.myuniversity.data
 
-data class JsonTeacherClasses constructor(val result: List<Class>?, val statusText: String?) {
+import com.squareup.moshi.JsonClass
 
+@JsonClass(generateAdapter = true)
+data class JsonTeacherClasses constructor(val result: List<Class>?, val statusText: String?) {
+    @JsonClass(generateAdapter = true)
     data class Class constructor(
         val title: String?,
         val summary: String?,

@@ -106,6 +106,8 @@ dependencies {
     implementation(libs.jsoup)
     // Material Components
     implementation(libs.material)
+    // Moshi
+    ksp(libs.moshi.codegen)
     // Okhttp
     implementation(libs.okhttp.logging)
     // Poi
