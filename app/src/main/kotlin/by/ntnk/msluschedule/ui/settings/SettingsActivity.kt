@@ -24,6 +24,7 @@ import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
 import by.ntnk.msluschedule.BuildConfig
 import by.ntnk.msluschedule.R
+import by.ntnk.msluschedule.databinding.ActivitySettingsBinding
 import by.ntnk.msluschedule.utils.NetworkApiVersion
 import by.ntnk.msluschedule.utils.SharedPreferencesRepository
 import by.ntnk.msluschedule.utils.onThemeChanged
@@ -33,12 +34,17 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class SettingsActivity : AppCompatActivity() {
 
+    private lateinit var binding: ActivitySettingsBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        binding = ActivitySettingsBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
-                .replace(android.R.id.content, SettingsFragment())
+                .replace(R.id.fragment_settings, SettingsFragment())
                 .commitNow()
         }
 
