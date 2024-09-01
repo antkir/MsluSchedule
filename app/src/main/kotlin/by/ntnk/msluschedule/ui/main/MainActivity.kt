@@ -3,7 +3,6 @@ package by.ntnk.msluschedule.ui.main
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.content.res.Configuration
-import android.graphics.Color
 import android.graphics.PointF
 import android.os.Build
 import android.os.Bundle
@@ -439,11 +438,6 @@ class MainActivity :
     }
 
     override fun onDrawerOpened(drawerView: View) {
-        val nightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
-        if (nightMode == Configuration.UI_MODE_NIGHT_NO) {
-            window.statusBarColor = ContextCompat.getColor(this, R.color.statusbar_nav_drawer)
-        }
-
         onDrawerOpenBackPressedCallback.isEnabled = true
     }
 
@@ -453,19 +447,6 @@ class MainActivity :
         }
 
         onDrawerOpenBackPressedCallback.isEnabled = false
-    }
-
-    override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
-        val nightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
-        if (nightMode == Configuration.UI_MODE_NIGHT_NO) {
-            val color = ContextCompat.getColor(this, R.color.statusbar_nav_drawer)
-            window.statusBarColor = Color.argb(
-                (slideOffset * Color.alpha(color)).toInt(),
-                Color.red(color),
-                Color.green(color),
-                Color.blue(color)
-            )
-        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

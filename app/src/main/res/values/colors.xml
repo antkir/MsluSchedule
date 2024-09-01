@@ -18,7 +18,7 @@
     <color name="item_highlight">#E0EBF9</color>
     <color name="nav_view_item_highlight">#EBF3FF</color>
     <color name="item_separator">#E5E5E5</color>
-    <color name="statusbar_nav_drawer">#40000000</color>
+    <color name="statusbar_nav_drawer">#B0B0B0</color>
     <color name="class_type_background">#EBF3FF</color>
 
     <color name="snackbar_surface">#303030</color>
